@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5ucew1PbRGjGzhurPsQprwhxOE3AZolsMGZ2rTxleoc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -583,7 +584,7 @@
 
       <div class="settings-card">
         <h3>حسابات الموظفين والصلاحيات</h3>
-        <p class="hint">لكل موظف حساب مستقل (اسم مستخدم وكلمة مرور)، وتقدر تحدد لكل تبويب هل يشوفه بس (عرض) ولا يقدر يضيف/يعدّل فيه (تعديل) ولا يتخفي عنه خالص. حسابك كمدير شايف كل حاجة دايمًا، وتبويب الإعدادات ده مايظهرش غير للمدير.</p>
+        <p class="hint">لكل موظف حساب مستقل (إيميل وكلمة مرور مؤقتة)، وتقدر تحدد لكل تبويب هل يشوفه بس (عرض) ولا يقدر يضيف/يعدّل فيه (تعديل) ولا يتخفي عنه خالص. حسابك كمدير شايف كل حاجة دايمًا، وتبويب الإعدادات ده مايظهرش غير للمدير.</p>
         <div id="users-list"></div>
         <div id="user-form-holder"></div>
         <button class="btn btn-primary btn-sm" id="btn-new-user" style="margin-top:10px;">+ حساب موظف جديد</button>
@@ -624,7 +625,7 @@
 
       <div class="settings-card">
         <h3>نسخة احتياطية كاملة</h3>
-        <p class="hint">ملف واحد فيه كل بيانات النظام (الأنظمة والقراءات والمهام والمخزون والحسابات وكل حاجة تانية) — للنقل بين الأجهزة أو كأمان إضافي. ملف الاستعادة بيحتوي على كلمات مرور الحسابات بالنص الصريح، فخليه في مكان آمن ومتبعتوش بسهولة.</p>
+        <p class="hint">ملف واحد فيه كل بيانات النظام (الأنظمة والقراءات والمهام والمخزون والحسابات وكل حاجة تانية) — للنقل بين الأجهزة أو كأمان إضافي. الاستعادة بتكتب البيانات بس ومش بتغيّر حسابات الدخول، وخليه في مكان آمن لأنه فيه كل بيانات المزرعة.</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn btn-primary btn-sm" id="btn-backup-export">تنزيل نسخة احتياطية (JSON)</button>
           <button class="btn btn-ghost btn-sm" id="btn-backup-import">استعادة من نسخة احتياطية</button>
@@ -5595,7 +5596,8 @@
       renderAll();
     }).catch(function(e){
       console.error('enterApp failed', e);
-      $('#login-error').textContent = friendlyAuthError(e);
+      $('#login-error').textContent = (e && e.code==='permission-denied') ? 'حسابك مش مفعّل في النظام، كلّم المدير' : friendlyAuthError(e);
+      if(fbAuth) fbAuth.signOut();
     });
   }
   function setupLogin(){
