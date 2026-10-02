@@ -151,6 +151,8 @@
   .btn-danger-ghost{background:transparent;color:var(--alert);border:1px solid var(--alert);padding:8px 12px;font-size:0.85rem;}
   .btn-sm{padding:8px 12px;font-size:0.85rem;border-radius:8px;}
   .login-error{color:#F0A08E;font-size:0.85rem;margin-top:-6px;margin-bottom:14px;min-height:1em;}
+  .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+  .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
 
   /* ---------- App shell ---------- */
@@ -464,7 +466,7 @@
         </div>
         <div class="login-error" id="login-error"></div>
         <button type="submit" class="btn btn-primary">دخول</button>
-        <button type="button" id="btn-forgot" class="btn btn-ghost" style="margin-top:8px">نسيت كلمة المرور؟</button>
+        <button type="button" id="btn-forgot" class="btn">نسيت كلمة المرور؟</button>
       </form>
     </div>
     <p class="login-note">الحساب متاح من مسؤول النظام.</p>
