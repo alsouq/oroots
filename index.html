@@ -421,6 +421,27 @@
   #to-top.show{opacity:1;transform:none;pointer-events:auto;}
   ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:9px;}::-webkit-scrollbar-thumb:hover{background:var(--muted);}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}}
+  #print-report{display:none;}
+  @media print{
+    @page{margin-bottom:26mm;}
+    html, body{height:auto !important;}
+    body > *:not(#print-report){display:none !important;}
+    #print-report{display:block !important;position:static !important;width:100%;padding:20px;background:#fff;color:#111;}
+    #print-report h1{font-size:1.3rem;margin:0 0 4px;}
+    #print-report h2{font-size:1rem;margin:16px 0 6px;border-bottom:2px solid #ccc;padding-bottom:4px;}
+    #print-report table{width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:10px;}
+    #print-report th,#print-report td{border:1px solid #ccc;padding:4px 8px;text-align:right;}
+    #print-report .pr-meta{color:#555;font-size:0.85rem;margin-bottom:10px;}
+    #print-report .pr-empty{color:#777;font-size:0.85rem;}
+    #print-report .pr-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:10px;}
+    #print-report .pr-header img{height:52px;width:auto;}
+    #print-report .pr-header .pr-title{text-align:left;}
+    #print-report .pr-outer{width:100%;border-collapse:collapse;}
+    #print-report .pr-outer > tbody > tr > td{padding:0;border:none;}
+    #print-report .pr-outer tfoot td{padding-top:14px;border:none;text-align:left;}
+    #print-report .pf-title{font-size:0.95rem;font-weight:700;color:#222;margin:0 0 3px;}
+    #print-report .pf-sig{font-family:'Segoe Script','Bradley Hand','Lucida Handwriting','Brush Script MT',cursive;font-size:1.35rem;color:#3a3a3a;letter-spacing:-0.5px;display:inline-block;transform:rotate(-7deg);}
+  }
 </style>
 </head>
 <body>
@@ -479,6 +500,10 @@
 
     <section class="panel active" id="panel-overview">
       <h1 class="page-title">نظرة عامة</h1>
+      <div class="form-actions" style="justify-content:flex-end;margin-bottom:6px;">
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-print-weekly">🖨️ طباعة تقرير الأسبوع</button>
+      </div>
+      <div id="overview-alerts"></div>
       <h2 class="section-title">الصوب والأنظمة</h2>
       <p class="hint" style="margin-top:-4px;">اختار الصوبة، وبعدين اختار النظام، عشان تشوف كل بياناته في مكان واحد.</p>
       <div id="systems-overview"></div>
@@ -510,6 +535,10 @@
       <div class="system-picker" id="greenhouse-picker"></div>
       <div class="system-picker" id="system-picker"></div>
       <div id="water-body"></div>
+
+      <h2 class="section-title">معايرة أجهزة القياس</h2>
+      <p class="hint" style="margin-top:-4px;">تابع معايرة أجهزة الـ pH والـ EC نفسها (مختلف عن معايرة تصرف نقط الري اللي فوق، واللي بتتبع لكل نظام لوحده — دي عامة لكل الأجهزة في المزرعة).</p>
+      <div id="instrument-calib-body"></div>
     </section>
 
     <section class="panel" id="panel-climate">
@@ -591,6 +620,17 @@
         </div>
         <button class="btn btn-primary btn-sm" id="btn-save-ranges">حفظ الإعدادات</button>
         <span class="save-msg hidden" id="msg-ranges">تم الحفظ</span>
+      </div>
+
+      <div class="settings-card">
+        <h3>نسخة احتياطية كاملة</h3>
+        <p class="hint">ملف واحد فيه كل بيانات النظام (الأنظمة والقراءات والمهام والمخزون والحسابات وكل حاجة تانية) — للنقل بين الأجهزة أو كأمان إضافي. ملف الاستعادة بيحتوي على كلمات مرور الحسابات بالنص الصريح، فخليه في مكان آمن ومتبعتوش بسهولة.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" id="btn-backup-export">تنزيل نسخة احتياطية (JSON)</button>
+          <button class="btn btn-ghost btn-sm" id="btn-backup-import">استعادة من نسخة احتياطية</button>
+          <input type="file" id="backup-file-input" accept="application/json,.json" style="display:none;">
+        </div>
+        <p class="hint" id="backup-status" style="margin-top:8px;"></p>
       </div>
 
       <div class="settings-card">
@@ -698,7 +738,7 @@
   };
   var BOOTSTRAP_ADMIN = 'dragoncool3330@gmail.com';
   var fbAuth = null, fbStorage = null, appEntered = false;
-  var settings = { accessCode:'oroots-2026', ph:[5.5,6.5], ec:[1.2,3.0], temp:[18,26] };
+  var settings = { accessCode:'', ph:[5.5,6.5], ec:[1.2,3.0], temp:[18,26] };
   var settingsLoaded = false;
   var readingsDocs = [];
   var systems = [];
@@ -715,9 +755,11 @@
   var inventoryFilterType = '';
   var harvestFilterCrop = '';
   var harvestChartCrop = null;
+  var harvestCompareLastSeason = false;
   var irrigCalib = [];
   var calibRangeDays = null;
   var auditLog = [];
+  var instrumentCalibrations = [];
   var auditSuppress = 0;
   var auditSubscribed = false;
   var auditRangeDays = 7;
@@ -839,6 +881,8 @@
       if(us){ var parsedUsers = JSON.parse(us); if(parsedUsers.length) appUsers = parsedUsers; }
       var np = localStorage.getItem('oroots_local_nursery_plans');
       if(np) nurseryPlans = JSON.parse(np);
+      var ins = localStorage.getItem('oroots_local_instrument_calib');
+      if(ins) instrumentCalibrations = JSON.parse(ins);
     }catch(e){}
     settingsLoaded = true;
   }
@@ -849,9 +893,103 @@
     try{ localStorage.setItem('oroots_local_settings', JSON.stringify(settings)); }catch(e){}
   }
 
+  /* ---------- معايرة أجهزة القياس (pH/EC meters) ---------- */
+  var INSTRUMENT_TYPES = [{v:'ph', l:'جهاز pH'}, {v:'ec', l:'جهاز EC'}, {v:'other', l:'أخرى'}];
+  function instrumentTypeLabel(v){ var m = INSTRUMENT_TYPES.filter(function(x){ return x.v===v; })[0]; return m?m.l:(v||'—'); }
+  function persistLocalInstrumentCalib(){
+    try{ localStorage.setItem('oroots_local_instrument_calib', JSON.stringify(instrumentCalibrations)); }catch(e){}
+  }
+  function saveInstrumentCalibRaw(rec){
+    if(db) return db.collection('instrumentCalibrations').doc(rec.id).set(rec);
+    var idx = instrumentCalibrations.findIndex(function(x){ return x.id===rec.id; });
+    if(idx>=0) instrumentCalibrations[idx]=rec; else instrumentCalibrations.push(rec);
+    persistLocalInstrumentCalib(); renderAll(); return Promise.resolve();
+  }
+  function saveInstrumentCalib(data){
+    var rec = {
+      id: genId(), instrumentType: data.instrumentType||'other', instrumentName: data.instrumentName||'',
+      calibrationDate: data.calibrationDate||todayStr(), nextDueDate: data.nextDueDate||'',
+      solutionUsed: data.solutionUsed||'', resultNote: data.resultNote||'',
+      by: currentUser||'', createdAt: Date.now()
+    };
+    return saveInstrumentCalibRaw(rec).then(function(r){
+      logAudit('add', 'instruments', 'معايرة '+instrumentTypeLabel(rec.instrumentType)+' — '+rec.instrumentName+(rec.nextDueDate?(' — القادمة: '+rec.nextDueDate):''));
+      return r;
+    });
+  }
+  function deleteInstrumentCalib(id){
+    if(!requireAdminForDelete()) return;
+    if(!confirm('تحذف سجل المعايرة ده؟')) return;
+    var it = instrumentCalibrations.filter(function(x){ return x.id===id; })[0];
+    if(it) logAudit('delete', 'instruments', 'معايرة '+instrumentTypeLabel(it.instrumentType)+' — '+it.instrumentName);
+    if(db){
+      db.collection('instrumentCalibrations').doc(id).delete().then(function(){ toast('اتحذف'); });
+    } else {
+      instrumentCalibrations = instrumentCalibrations.filter(function(x){ return x.id!==id; });
+      persistLocalInstrumentCalib(); renderAll(); toast('اتحذف');
+    }
+  }
+  function overdueInstrumentCalibs(){
+    return instrumentCalibrations.filter(function(x){ return x.nextDueDate && daysUntil(x.nextDueDate) < 0; });
+  }
+  function exportInstrumentCalibCSV(){
+    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
+    if(!instrumentCalibrations.length){ toast('لا توجد بيانات للتصدير'); return; }
+    var header = ['النوع','اسم الجهاز','تاريخ المعايرة','المعايرة القادمة','محلول المعايرة','ملاحظة النتيجة','بواسطة'];
+    var lines = [header.map(csvEscape).join(',')];
+    instrumentCalibrations.slice().sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); }).forEach(function(x){
+      lines.push([instrumentTypeLabel(x.instrumentType), x.instrumentName, x.calibrationDate, x.nextDueDate, x.solutionUsed, x.resultNote, x.by].map(csvEscape).join(','));
+    });
+    downloadsCap.save({filename:'oroots-instrument-calibration-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){
+      toast('تم حفظ الملف');
+    }).catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
+  }
+  function renderInstrumentCalibSection(){
+    var el = $('#instrument-calib-body');
+    if(!el) return;
+    var list = instrumentCalibrations.slice().sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); });
+    var overdue = overdueInstrumentCalibs();
+    var rows = list.length ? list.map(function(x){
+      return '<tr data-id="'+x.id+'"><td>'+instrumentTypeLabel(x.instrumentType)+'</td><td>'+(x.instrumentName||'—')+'</td>'+
+        '<td class="ltr num">'+x.calibrationDate+'</td><td>'+(x.nextDueDate?nextReleaseBadge(x.nextDueDate):'—')+'</td>'+
+        '<td>'+(x.solutionUsed||'—')+'</td><td>'+(x.resultNote||'—')+'</td><td>'+(x.by||'—')+'</td>'+
+        '<td><button class="del-btn instr-calib-del" title="حذف">✕</button></td></tr>';
+    }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد سجلات معايرة بعد.</td></tr>';
+
+    el.innerHTML =
+      (overdue.length ? '<div class="climate-stats">'+climateStatChip('أجهزة متأخرة المعايرة', overdue.length, '')+'</div>' : '')+
+      '<form class="entry-form" id="instr-calib-form">'+
+        '<div class="form-grid">'+
+          '<div class="field-sm"><label>نوع الجهاز</label><select id="instr-type">'+INSTRUMENT_TYPES.map(function(t){ return '<option value="'+t.v+'">'+t.l+'</option>'; }).join('')+'</select></div>'+
+          '<div class="field-sm"><label>اسم/موقع الجهاز</label><input type="text" id="instr-name" maxlength="100" placeholder="مثال: جهاز pH الرئيسي"></div>'+
+          '<div class="field-sm"><label>تاريخ المعايرة</label><input type="date" class="ltr" id="instr-cal-date" required></div>'+
+          '<div class="field-sm"><label>المعايرة القادمة (اختياري)</label><input type="date" class="ltr" id="instr-next-date"></div>'+
+          '<div class="field-sm"><label>محلول المعايرة المستخدم (اختياري)</label><input type="text" id="instr-solution" maxlength="100" placeholder="مثال: buffer 7.0 و4.0"></div>'+
+          '<div class="field-sm full"><label>ملاحظة النتيجة (اختياري)</label><input type="text" id="instr-result" maxlength="200"></div>'+
+        '</div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعايرة</button></div>'+
+      '</form>'+
+      '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="instr-calib-export">تصدير CSV</button></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الجهاز</th><th>تاريخ المعايرة</th><th>القادمة</th><th>المحلول</th><th>النتيجة</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+
+    $('#instr-cal-date').value = todayStr();
+    $('#instr-calib-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      saveInstrumentCalib({
+        instrumentType: $('#instr-type').value, instrumentName: $('#instr-name').value.trim(),
+        calibrationDate: $('#instr-cal-date').value || todayStr(), nextDueDate: $('#instr-next-date').value,
+        solutionUsed: $('#instr-solution').value.trim(), resultNote: $('#instr-result').value.trim()
+      }).then(function(){ toast('اتسجّلت المعايرة'); renderInstrumentCalibSection(); });
+    });
+    $all('.instr-calib-del', el).forEach(function(btn){
+      btn.addEventListener('click', function(){ deleteInstrumentCalib(btn.closest('tr').getAttribute('data-id')); });
+    });
+    $('#instr-calib-export').addEventListener('click', exportInstrumentCalibCSV);
+  }
+
   /* ---------- سجل النشاط (Audit Log) ---------- */
   var AUDIT_AREAS = {auth:'تسجيل الدخول', water:'بيانات المياه', climate:'بيانات المناخ', tasks:'المهام والإجراءات',
-    nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', inventory:'المخازن', admin:'الإدارة والإعدادات', data:'البيانات'};
+    nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', inventory:'المخازن', instruments:'معايرة الأجهزة', admin:'الإدارة والإعدادات', data:'البيانات'};
   var AUDIT_ACTIONS = {login:'دخول', login_failed:'محاولة دخول فاشلة', logout:'خروج', add:'إضافة', edit:'تعديل',
     delete:'حذف', export:'تصدير', clear:'مسح', seed:'بيانات تجريبية'};
   var AUDIT_ACTION_CLASS = {login:'good', add:'good', login_failed:'alert', delete:'alert', clear:'alert', edit:'warn'};
@@ -883,6 +1021,11 @@
   function subscribeAudit(){
     if(!db || auditSubscribed) return;
     auditSubscribed = true;
+    db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+      instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAll();
+    }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
+
     db.collection('auditLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       auditLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       safe(renderAuditPanel);
@@ -1122,6 +1265,16 @@
   /* ---------- المخازن: الأسمدة والمبيدات ---------- */
   var PEST_STAGES = [{v:'egg', l:'بيضة'}, {v:'larva', l:'يرقة'}, {v:'pupa', l:'عذراء'}, {v:'adult', l:'حشرة كاملة'}];
   function pestStageLabels(arr){ return (arr||[]).map(function(v){ var m=PEST_STAGES.filter(function(x){return x.v===v;})[0]; return m?m.l:v; }).join('، ')||'—'; }
+  function deductInventoryQty(id, amount){
+    var it = getInventoryItem(id);
+    if(!it || !(amount>0) || it.quantity==null) return Promise.resolve();
+    var newQty = Math.max(0, +(it.quantity - amount).toFixed(3));
+    var updated = Object.assign({}, it, {quantity:newQty});
+    return saveInventoryItemRaw(updated).then(function(r){
+      logAudit('edit', 'inventory', (it.type==='pesticide'?'مبيد':'سماد')+': '+it.name+' — خصم '+amount+' '+(it.unit||'')+' (المتبقي '+newQty+')');
+      return r;
+    });
+  }
   function getInventoryItem(id){ return inventoryItems.filter(function(x){ return x.id===id; })[0]; }
   function persistLocalInventory(){
     try{ localStorage.setItem('oroots_local_inventory', JSON.stringify(inventoryItems)); }catch(e){}
@@ -1139,6 +1292,7 @@
     });
   }
   function deleteInventoryItem(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف الصنف ده من المخزن؟')) return;
     var it = getInventoryItem(id);
     if(it) logAudit('delete', 'inventory', (it.type==='pesticide'?'مبيد':'سماد')+': '+it.name);
@@ -1283,6 +1437,7 @@
     });
   }
   function deleteHarvest(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف سجل الحصاد ده؟')) return;
     var h = harvestLog.filter(function(x){ return x.id===id; })[0];
     if(h) logAudit('delete', 'harvest', 'حصاد: '+h.cropName+' — '+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+' — '+auditSysName(h.systemId));
@@ -1384,6 +1539,7 @@
   }
 
   function deleteReading(sourceKey, dateKey, entryId, systemId){
+    if(!requireAdminForDelete()) return Promise.resolve();
     var existing = findDoc(sourceKey, dateKey, systemId);
     if(!existing) return Promise.resolve();
     var entries = existing.entries.filter(function(e){ return e.id!==entryId; });
@@ -1471,6 +1627,7 @@
     });
   }
   function deleteUser(id){
+    if(!requireAdminForDelete()) return;
     var target = getUser(id);
     if(!target) return;
     var otherAdmins = appUsers.filter(function(u){ return u.role==='admin' && u.id!==id; });
@@ -1488,24 +1645,144 @@
   function canView(tabKey){
     return currentUserRole==='admin' || (currentUserPermissions[tabKey] && currentUserPermissions[tabKey]!=='none');
   }
+  /* ---------- نسخة احتياطية كاملة (Export / Import) ---------- */
+  function buildBackupObject(){
+    return {
+      app: 'oroots', version: 1, exportedAt: new Date().toISOString(), exportedBy: currentUser||'',
+      settings: settings,
+      readingsDocs: readingsDocs, systems: systems, sops: sops, customFertilizers: customFertilizers,
+      nutrientRecipes: nutrientRecipes, targetProfiles: targetProfiles, pestLog: pestLog,
+      bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
+      nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
+      irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
+      instrumentCalibrations: instrumentCalibrations
+    };
+  }
+  function exportFullBackup(){
+    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
+    var data = JSON.stringify(buildBackupObject(), null, 0);
+    downloadsCap.save({filename:'oroots-backup-'+todayStr()+'.json', data:data}).then(function(){
+      logAudit('export', 'admin', 'تصدير نسخة احتياطية كاملة');
+      toast('اتحفظت النسخة الاحتياطية');
+    }).catch(function(err){
+      if(err && err.code==='declined') return;
+      toast('تعذر حفظ الملف');
+    });
+  }
+  function applyBackupLocal(backup){
+    if(Array.isArray(backup.readingsDocs)) readingsDocs = backup.readingsDocs;
+    if(Array.isArray(backup.systems)) systems = backup.systems;
+    if(Array.isArray(backup.sops)) sops = backup.sops;
+    if(Array.isArray(backup.customFertilizers)) customFertilizers = backup.customFertilizers;
+    if(Array.isArray(backup.nutrientRecipes)) nutrientRecipes = backup.nutrientRecipes;
+    if(Array.isArray(backup.targetProfiles)) targetProfiles = backup.targetProfiles;
+    if(Array.isArray(backup.pestLog)) pestLog = backup.pestLog;
+    if(Array.isArray(backup.bioReleases)) bioReleases = backup.bioReleases;
+    if(Array.isArray(backup.stickyTraps)) stickyTraps = backup.stickyTraps;
+    if(Array.isArray(backup.pheromoneTraps)) pheromoneTraps = backup.pheromoneTraps;
+    if(Array.isArray(backup.nurseryLog)) nurseryLog = backup.nurseryLog;
+    if(Array.isArray(backup.harvestLog)) harvestLog = backup.harvestLog;
+    if(Array.isArray(backup.inventoryItems)) inventoryItems = backup.inventoryItems;
+    if(Array.isArray(backup.irrigCalib)) irrigCalib = backup.irrigCalib;
+    if(Array.isArray(backup.auditLog)) auditLog = backup.auditLog;
+    if(Array.isArray(backup.appUsers) && backup.appUsers.length) appUsers = backup.appUsers;
+    if(Array.isArray(backup.nurseryPlans)) nurseryPlans = backup.nurseryPlans;
+    if(Array.isArray(backup.instrumentCalibrations)) instrumentCalibrations = backup.instrumentCalibrations;
+    if(backup.settings) settings = Object.assign({}, settings, backup.settings);
+    try{
+      localStorage.setItem('oroots_local_readings', JSON.stringify(readingsDocs));
+      localStorage.setItem('oroots_local_settings', JSON.stringify(settings));
+      localStorage.setItem('oroots_local_systems', JSON.stringify(systems));
+      localStorage.setItem('oroots_local_sops', JSON.stringify(sops));
+      localStorage.setItem('oroots_local_fertilizers', JSON.stringify(customFertilizers));
+      localStorage.setItem('oroots_local_recipes', JSON.stringify(nutrientRecipes));
+      localStorage.setItem('oroots_local_target_profiles', JSON.stringify(targetProfiles));
+      localStorage.setItem('oroots_local_pestlog', JSON.stringify(pestLog));
+      localStorage.setItem('oroots_local_bioreleases', JSON.stringify(bioReleases));
+      localStorage.setItem('oroots_local_stickytraps', JSON.stringify(stickyTraps));
+      localStorage.setItem('oroots_local_pheromonetraps', JSON.stringify(pheromoneTraps));
+      localStorage.setItem('oroots_local_nursery', JSON.stringify(nurseryLog));
+      localStorage.setItem('oroots_local_harvest', JSON.stringify(harvestLog));
+      localStorage.setItem('oroots_local_inventory', JSON.stringify(inventoryItems));
+      localStorage.setItem('oroots_local_irrig_calib', JSON.stringify(irrigCalib));
+      localStorage.setItem('oroots_local_audit', JSON.stringify(auditLog));
+      localStorage.setItem('oroots_local_users', JSON.stringify(appUsers));
+      localStorage.setItem('oroots_local_nursery_plans', JSON.stringify(nurseryPlans));
+      localStorage.setItem('oroots_local_instrument_calib', JSON.stringify(instrumentCalibrations));
+    }catch(e){}
+    renderAll();
+    return Promise.resolve();
+  }
+  function applyBackupDb(backup){
+    var writes = [];
+    ['readingsDocs','sops','customFertilizers','nutrientRecipes','targetProfiles','pestLog','bioReleases',
+     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations']
+     .forEach(function(k){
+       var coll = {readingsDocs:'readings', sops:'sops', customFertilizers:'fertilizers', nutrientRecipes:'nutrientRecipes',
+         targetProfiles:'targetProfiles', pestLog:'pestlog', bioReleases:'bioReleases', stickyTraps:'stickyTraps',
+         pheromoneTraps:'pheromoneTraps', nurseryLog:'nursery', harvestLog:'harvest', inventoryItems:'inventory',
+         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations'}[k];
+       (backup[k]||[]).forEach(function(item){
+         if(item && item.id) writes.push(db.collection(coll).doc(item.id).set(item));
+       });
+     });
+    if(backup.settings) writes.push(db.doc('settings/config').set(Object.assign({}, settings, backup.settings)));
+    if(Array.isArray(backup.systems)) writes.push(db.doc('settings/systems').set({list: backup.systems}));
+    if(Array.isArray(backup.nurseryPlans)) writes.push(db.doc('settings/nurseryPlans').set({list: backup.nurseryPlans}));
+    return Promise.all(writes);
+  }
+  function importFullBackup(backup){
+    if(!backup || backup.app!=='oroots' || !Array.isArray(backup.readingsDocs)){
+      toast('الملف ده مش نسخة احتياطية صالحة من O\'Roots');
+      return Promise.reject(new Error('invalid backup'));
+    }
+    var countApprox = (backup.readingsDocs||[]).length + (backup.pestLog||[]).length + (backup.harvestLog||[]).length +
+      (backup.inventoryItems||[]).length + (backup.sops||[]).length;
+    if(!confirm('هيتم '+(db?'كتابة':'استبدال')+' كل البيانات الحالية ببيانات الملف ده (حوالي '+countApprox+' سجل أو أكتر). '+
+      (db ? 'في وضع البيانات المشتركة، السجلات اللي في الملف هتتكتب/تتحدّث، لكن أي سجل موجود دلوقتي ومش في الملف هيفضل موجود (مش هيتمسح).' : 'هيستبدل كل البيانات المحلية على الجهاز ده.')+
+      '\\n\\nمتأكد إنك عايز تكمل؟')) return Promise.resolve();
+    var applyFn = db ? applyBackupDb(backup) : applyBackupLocal(backup);
+    return Promise.resolve(applyFn).then(function(){
+      logAudit('edit', 'admin', 'استعادة نسخة احتياطية كاملة (بتاريخ التصدير: '+(backup.exportedAt||'—')+')');
+      toast('اتمت الاستعادة بنجاح');
+      var st = $('#backup-status'); if(st) st.textContent = 'تمت الاستعادة من نسخة بتاريخ '+(backup.exportedAt?fmtTs(backup.exportedAt.slice(0,16)):'—')+'.';
+      if(!db) setTimeout(function(){ location.reload(); }, 900);
+    }).catch(function(err){
+      console.error('backup import error', err);
+      toast('حصل خطأ أثناء الاستعادة');
+    });
+  }
+
+  function requireAdminForDelete(){
+    if(currentUserRole!=='admin'){ toast('الحذف متاح للمدير بس'); return false; }
+    return true;
+  }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
     '#btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
+  var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
   function applyPermissionLock(containerEl, tabKey){
-    if(!containerEl || canEdit(tabKey)) return;
-    $all('.entry-form', containerEl).forEach(function(form){
-      $all('input, select, textarea, button', form).forEach(function(el){ el.disabled = true; });
-    });
-    $all(MUTATION_SELECTOR, containerEl).forEach(function(el){
-      el.disabled = true; el.style.opacity = '0.45'; el.style.pointerEvents = 'none';
-    });
-    if(!containerEl.querySelector('.view-only-banner')){
-      var banner = document.createElement('div');
-      banner.className = 'view-only-banner';
-      banner.textContent = '👁️ عندك صلاحية عرض بس هنا — مفيش تعديل أو إضافة';
-      containerEl.insertBefore(banner, containerEl.firstChild);
+    if(!containerEl) return;
+    if(!canEdit(tabKey)){
+      $all('.entry-form', containerEl).forEach(function(form){
+        $all('input, select, textarea, button', form).forEach(function(el){ el.disabled = true; });
+      });
+      $all(MUTATION_SELECTOR, containerEl).forEach(function(el){
+        el.disabled = true; el.style.opacity = '0.45'; el.style.pointerEvents = 'none';
+      });
+      if(!containerEl.querySelector('.view-only-banner')){
+        var banner = document.createElement('div');
+        banner.className = 'view-only-banner';
+        banner.textContent = '👁️ عندك صلاحية عرض بس هنا — مفيش تعديل أو إضافة';
+        containerEl.insertBefore(banner, containerEl.firstChild);
+      }
+    }
+    if(currentUserRole!=='admin'){
+      $all(DELETE_ONLY_SELECTOR, containerEl).forEach(function(el){
+        el.disabled = true; el.style.opacity = '0.45'; el.style.pointerEvents = 'none'; el.title = 'الحذف متاح للمدير بس';
+      });
     }
   }
   function applyTabVisibility(){
@@ -1526,6 +1803,7 @@
     });
   }
   function deleteSystem(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف النظام ده؟ القراءات المسجلة عليه هتفضل محفوظة، لكن مش هتظهر تاني إلا لو رجعت نفس النظام.')) return;
     saveSystems(systems.filter(function(s){ return s.id!==id; })).then(function(){
       if(selectedSystemId===id) selectedSystemId = null;
@@ -1567,6 +1845,7 @@
     return Promise.resolve();
   }
   function deleteIrrigCalib(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف المعايرة دي؟')) return;
     var _c = irrigCalib.filter(function(x){ return x.id===id; })[0];
     logAudit('delete', 'water', 'معايرة ري — '+(_c?(auditSysName(_c.systemId)+': '+(Math.round(_c.perPointLpm*1000)/1000)+' لتر/دقيقة للنقطة'):id));
@@ -1630,6 +1909,7 @@
     return saveSop(updated);
   }
   function deleteSop(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف الإجراء ده؟')) return;
     var _s = getSop(id); logAudit('delete', 'tasks', 'إجراء (SOP): '+(_s?_s.title:id));
     if(db){
@@ -1670,6 +1950,7 @@
     return saveFertilizer(Object.assign({id:genId(), name:name, tank:tank||'-', comp:comp||{}, createdBy:currentUser||'', createdAt:Date.now()}, extra||{}));
   }
   function deleteCustomFertilizer(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف السماد ده من المكتبة؟')) return;
     var _f = getFertilizer(id); logAudit('delete', 'nutrients', 'سماد: '+(_f?_f.name:id));
     if(db){
@@ -1708,6 +1989,7 @@
     toast('اتحمّلت الأهداف');
   }
   function deleteTargetProfile(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف الهدف المحفوظ ده؟')) return;
     var pr = targetProfiles.filter(function(x){ return x.id===id; })[0];
     if(pr) logAudit('delete', 'nutrients', 'هدف غذائي: '+pr.name);
@@ -1755,6 +2037,7 @@
     toast('اتحمّلت الخلطة');
   }
   function deleteRecipe(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف الخلطة المحفوظة دي؟')) return;
     var _r = nutrientRecipes.filter(function(x){ return x.id===id; })[0]; logAudit('delete', 'nutrients', 'خلطة سمادية: '+(_r?_r.name:id));
     if(db){
@@ -1793,6 +2076,7 @@
     return Promise.resolve();
   }
   function deletePestIncident(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف السجل ده؟')) return;
     var _p = pestLog.filter(function(x){ return x.id===id; })[0]; logAudit('delete', 'pests', 'مشكلة: '+(_p?_p.problemName:id));
     if(db){
@@ -1842,6 +2126,7 @@
     });
   }
   function deleteBioRelease(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف سجل الإطلاق ده؟')) return;
     var r = bioReleases.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'إطلاق حيوي: '+r.beneficialName+' — '+(r.greenhouse||''));
@@ -1861,6 +2146,7 @@
     });
   }
   function deleteStickyTrap(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف سجل اللاصقات ده؟')) return;
     var r = stickyTraps.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'لاصقة '+r.color+' — '+(r.greenhouse||''));
@@ -1880,6 +2166,7 @@
     });
   }
   function deletePheromoneTrap(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف سجل المصيدة ده؟')) return;
     var r = pheromoneTraps.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'مصيدة فيرمونية — '+(r.greenhouse||''));
@@ -1949,6 +2236,7 @@
     return saveNurseryBatch(Object.assign({}, existing, patch, {updatedAt:Date.now()}));
   }
   function deleteNurseryBatch(id){
+    if(!requireAdminForDelete()) return;
     if(!confirm('تحذف سجل الصينية ده؟')) return;
     var _n = getNurseryBatch(id); logAudit('delete', 'nursery', 'صينية: '+(_n?_n.cropName:id));
     if(db){
@@ -2319,6 +2607,7 @@
     });
   }
   function deleteTask(dateKey, taskId){
+    if(!requireAdminForDelete()) return Promise.resolve();
     var existing = findDoc('tasks', dateKey);
     if(!existing) return Promise.resolve();
     var entries = existing.entries.filter(function(t){ return t.id!==taskId; });
@@ -2494,6 +2783,7 @@
   }
 
   function clearAllReadings(){
+    if(!requireAdminForDelete()) return Promise.resolve();
     if(!confirm('متأكد؟ هيمسح كل القراءات (التجريبية والحقيقية) من المصادر التلاتة.')) return Promise.resolve();
     logAudit('clear', 'data', 'مسح كل قراءات المياه من المصادر التلاتة');
     if(db){
@@ -2763,7 +3053,102 @@
     renderWaterPanel();
   }
 
+  function buildAndPrintWeeklyReport(){
+    var today = new Date();
+    var weekAgo = new Date(today.getTime()-6*86400000);
+    var weekAgoStr = weekAgo.getFullYear()+'-'+pad(weekAgo.getMonth()+1)+'-'+pad(weekAgo.getDate());
+    var todayStrV = todayStr();
+
+    var pendingTasks = flattenTasks().filter(function(t){ return t.status==='pending'; }).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    var overdueTasks = pendingTasks.filter(function(t){ return t.ts.slice(0,10) < todayStrV; });
+    var overdueReleases = bioReleases.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate) < 0; });
+    var overdueInstrPr = overdueInstrumentCalibs();
+
+    var weekHarvest = harvestLog.filter(function(h){ return h.ts.slice(0,10) >= weekAgoStr; });
+    var harvestTotals = {};
+    weekHarvest.forEach(function(h){ var k=h.cropName+'|'+h.unit; harvestTotals[k]=(harvestTotals[k]||0)+(parseFloat(h.quantity)||0); });
+
+    var weekPests = pestLog.filter(function(x){ return x.ts.slice(0,10) >= weekAgoStr; });
+
+    var ghGroups = greenhouseGroups();
+    var ghRows = ghGroups.map(function(g){
+      var climEntries = flattenEntries('climate', g.name);
+      var lastClim = climEntries.length ? climEntries[climEntries.length-1] : null;
+      return '<tr><td>'+g.name+'</td><td>'+g.systems.length+'</td>'+
+        '<td>'+(lastClim ? (fmtNum(lastClim.temp)+'°C / '+fmtNum(lastClim.rh)+'%') : '—')+'</td></tr>';
+    }).join('');
+
+    var footerHtml =
+      '<div class="pf-title">مدير الموقع</div><div class="pf-sig">Ahmed Hassan</div>';
+
+    var reportBody =
+      '<div class="pr-header"><img src="data:image/png;base64,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" alt="O\'Roots"><div class="pr-title"><h1 style="margin:0;">تقرير أسبوعي</h1><div class="pr-meta" style="margin:2px 0 0;">من '+weekAgoStr+' إلى '+todayStrV+' — طُبع بتاريخ '+fmtTs(nowLocalInputValue())+' بواسطة '+(currentUser||'')+'</div></div></div>'+
+
+      '<h2>تنبيهات متأخرة</h2>'+
+      (overdueTasks.length||overdueReleases.length||overdueInstrPr.length ?
+        '<table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+
+          overdueTasks.map(function(t){ return '<tr><td>مهمة</td><td>'+t.title+(t.assignedTo?(' — '+t.assignedTo):'')+(t.greenhouse?(' — '+t.greenhouse):'')+'</td><td>'+t.ts.slice(0,10)+'</td></tr>'; }).join('')+
+          overdueReleases.map(function(x){ return '<tr><td>إطلاق حيوي</td><td>'+x.beneficialName+' — '+(x.greenhouse||'')+'</td><td>'+x.nextReleaseDate+'</td></tr>'; }).join('')+
+          overdueInstrPr.map(function(x){ return '<tr><td>معايرة جهاز</td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td>'+x.nextDueDate+'</td></tr>'; }).join('')+
+        '</tbody></table>' : '<p class="pr-empty">لا توجد تنبيهات متأخرة.</p>')+
+
+      '<h2>المهام المعلّقة ('+pendingTasks.length+')</h2>'+
+      (pendingTasks.length ?
+        '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المهمة</th><th>المكلّف</th></tr></thead><tbody>'+
+          pendingTasks.slice(0,30).map(function(t){ return '<tr><td>'+t.ts.slice(0,10)+'</td><td>'+(t.greenhouse||'—')+'</td><td>'+t.title+'</td><td>'+(t.assignedTo||'—')+'</td></tr>'; }).join('')+
+        '</tbody></table>' : '<p class="pr-empty">لا توجد مهام معلّقة.</p>')+
+
+      '<h2>الحصاد هذا الأسبوع</h2>'+
+      (Object.keys(harvestTotals).length ?
+        '<table><thead><tr><th>الصنف</th><th>الكمية</th></tr></thead><tbody>'+
+          Object.keys(harvestTotals).map(function(k){ var parts=k.split('|'); return '<tr><td>'+parts[0]+'</td><td>'+(Math.round(harvestTotals[k]*100)/100)+' '+HARVEST_UNIT_LABELS[parts[1]]+'</td></tr>'; }).join('')+
+        '</tbody></table>' : '<p class="pr-empty">لا يوجد حصاد مسجل هذا الأسبوع.</p>')+
+
+      '<h2>الإصابات المسجلة هذا الأسبوع ('+weekPests.length+')</h2>'+
+      (weekPests.length ?
+        '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المرض/الآفة</th><th>الحالة</th></tr></thead><tbody>'+
+          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+x.problemName+'</td><td>'+(x.treated?'اتعالجت':'لسه')+'</td></tr>'; }).join('')+
+        '</tbody></table>' : '<p class="pr-empty">لا توجد إصابات مسجلة هذا الأسبوع.</p>')+
+
+      '<h2>حالة الصوب</h2>'+
+      (ghRows ? '<table><thead><tr><th>الصوبة</th><th>عدد الأنظمة</th><th>آخر قراءة مناخ</th></tr></thead><tbody>'+ghRows+'</tbody></table>' : '<p class="pr-empty">لا توجد صوب مضافة.</p>');
+
+    var html =
+      '<table class="pr-outer"><tbody><tr><td>'+reportBody+'</td></tr></tbody>'+
+      '<tfoot><tr><td>'+footerHtml+'</td></tr></tfoot></table>';
+
+    $('#print-report').innerHTML = html;
+    setTimeout(function(){ window.print(); }, 80);
+  }
+
+  function renderOverviewAlerts(){
+    var el = $('#overview-alerts');
+    if(!el) return;
+    var today = todayStr();
+    var overdueTasks = flattenTasks().filter(function(t){ return t.status==='pending' && t.ts.slice(0,10) < today; });
+    var overdueReleases = bioReleases.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate) < 0; });
+    var overdueInstr = overdueInstrumentCalibs();
+    var totalAlerts = overdueTasks.length + overdueReleases.length + overdueInstr.length;
+    if(!totalAlerts){ el.innerHTML = ''; return; }
+    var rows = [];
+    overdueTasks.slice(0,6).forEach(function(t){
+      rows.push('<tr><td><span class="status-pill alert">مهمة</span></td><td>'+t.title+(t.assignedTo?(' — '+t.assignedTo):'')+(t.greenhouse?(' — '+t.greenhouse):'')+'</td><td class="ltr num">'+t.ts.slice(0,10)+'</td></tr>');
+    });
+    overdueReleases.slice(0,6).forEach(function(x){
+      rows.push('<tr><td><span class="status-pill alert">إطلاق حيوي</span></td><td>'+x.beneficialName+' — '+(x.greenhouse||'')+'</td><td class="ltr num">'+x.nextReleaseDate+'</td></tr>');
+    });
+    overdueInstr.slice(0,6).forEach(function(x){
+      rows.push('<tr><td><span class="status-pill alert">معايرة جهاز</span></td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td class="ltr num">'+x.nextDueDate+'</td></tr>');
+    });
+    el.innerHTML = '<div class="chart-card" style="border-color:var(--alert);">'+
+      '<h3 style="color:var(--alert);">⚠️ تنبيهات متأخرة ('+totalAlerts+')</h3>'+
+      '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'+
+      (totalAlerts>rows.length ? '<p class="hint" style="margin:6px 0 0;">+'+(totalAlerts-rows.length)+' تنبيه إضافي — راجع تابات المهام والمكافحة.</p>' : '')+
+    '</div>';
+  }
+
   function renderSystemsOverview(){
+    renderOverviewAlerts();
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
     if(!el) return;
@@ -3492,6 +3877,7 @@
       (crops.length ?
         '<h2 class="section-title">شارت المحصول</h2>'+
         '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>'+
+        '<label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0;"><input type="checkbox" id="harvest-compare-season" style="width:auto;"'+(harvestCompareLastSeason?' checked':'')+'> قارن بنفس الفترة من الموسم اللي فات (سنة قبل كده)</label>'+
         '<div class="chart-card"><h3>حصاد '+(harvestChartCrop||'')+' عبر الزمن</h3><div class="chart-wrap"><div id="harvest-chart" class="svg-chart-holder"></div></div><p class="hint" id="harvest-chart-total" style="margin:6px 0 0;"></p></div>'
       : '')+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
@@ -3518,6 +3904,8 @@
       });
     });
 
+    var compareChk = $('#harvest-compare-season', inner);
+    if(compareChk) compareChk.addEventListener('change', function(){ harvestCompareLastSeason = this.checked; renderHarvestPanel(); });
     $all('.harvest-crop-pill', inner).forEach(function(btn){
       btn.addEventListener('click', function(){ harvestChartCrop = btn.getAttribute('data-crop'); renderHarvestPanel(); });
     });
@@ -3527,15 +3915,43 @@
     $('#harvest-export', inner).addEventListener('click', function(){ exportHarvestCSV(selectedSystemId); });
 
     if(harvestChartCrop){
-      var cropPoints = list.filter(function(h){ return h.cropName===harvestChartCrop; })
-        .map(function(h){ return {x:new Date(h.ts).getTime(), y:parseFloat(h.quantity)||0}; });
-      var unitForCrop = list.filter(function(h){ return h.cropName===harvestChartCrop; }).slice(-1)[0];
-      renderSvgChart(document.getElementById('harvest-chart'), [{
-        label: harvestChartCrop, color:'#C9932F', points: cropPoints
-      }], {height:190});
-      var total = cropPoints.reduce(function(a,p){ return a+p.y; }, 0);
+      var cropList = list.filter(function(h){ return h.cropName===harvestChartCrop; });
+      var unitForCrop = cropList.slice(-1)[0];
       var totEl = document.getElementById('harvest-chart-total');
-      if(totEl) totEl.textContent = cropPoints.length+' قطفة — إجمالي '+(Math.round(total*100)/100)+' '+(unitForCrop?HARVEST_UNIT_LABELS[unitForCrop.unit]:'');
+
+      if(!harvestCompareLastSeason){
+        var cropPoints = cropList.map(function(h){ return {x:new Date(h.ts).getTime(), y:parseFloat(h.quantity)||0}; });
+        renderSvgChart(document.getElementById('harvest-chart'), [{label: harvestChartCrop, color:'#C9932F', points: cropPoints}], {height:190});
+        var total = cropPoints.reduce(function(a,p){ return a+p.y; }, 0);
+        if(totEl) totEl.textContent = cropPoints.length+' قطفة — إجمالي '+(Math.round(total*100)/100)+' '+(unitForCrop?HARVEST_UNIT_LABELS[unitForCrop.unit]:'');
+      } else {
+        var latestYear = cropList.length ? new Date(cropList[cropList.length-1].ts).getFullYear() : new Date().getFullYear();
+        function dayAxisX(d){ return new Date(2000, d.getMonth(), d.getDate()).getTime(); } // common reference year so both series overlay by day-of-year
+        var curYearPts = [], prevYearPts = [];
+        cropList.forEach(function(h){
+          var d = new Date(h.ts);
+          var pt = {x: dayAxisX(d), y: parseFloat(h.quantity)||0};
+          if(d.getFullYear()===latestYear) curYearPts.push(pt);
+          else if(d.getFullYear()===latestYear-1) prevYearPts.push(pt);
+        });
+        curYearPts.sort(function(a,b){ return a.x-b.x; });
+        prevYearPts.sort(function(a,b){ return a.x-b.x; });
+        renderSvgChart(document.getElementById('harvest-chart'), [
+          {label: 'موسم '+latestYear, color:'#C9932F', points: curYearPts},
+          {label: 'موسم '+(latestYear-1), color:'#9AA6A0', points: prevYearPts}
+        ], {height:190, xFormat:'%m/%d'});
+        var curTotal = curYearPts.reduce(function(a,p){ return a+p.y; }, 0);
+        var prevTotal = prevYearPts.reduce(function(a,p){ return a+p.y; }, 0);
+        if(totEl){
+          if(!prevYearPts.length){
+            totEl.textContent = 'مفيش بيانات لموسم '+(latestYear-1)+' لنفس المحصول للمقارنة.';
+          } else {
+            var diffPct = prevTotal>0 ? Math.round(((curTotal-prevTotal)/prevTotal)*1000)/10 : null;
+            totEl.textContent = 'موسم '+latestYear+': '+(Math.round(curTotal*100)/100)+' — موسم '+(latestYear-1)+': '+(Math.round(prevTotal*100)/100)+
+              (unitForCrop?(' '+HARVEST_UNIT_LABELS[unitForCrop.unit]):'')+(diffPct!==null?(' — الفرق: '+(diffPct>0?'+':'')+diffPct+'%'):'');
+          }
+        }
+      }
     }
 
     var tbody = $('#harvest-tbody', inner);
@@ -3818,11 +4234,11 @@
 
     var allTasks = flattenTasks();
     var today = todayStr();
-    var myTasks = allTasks.filter(function(t){ return t.status==='pending' && namesMatch(t.assignedTo, currentUser); });
+    var myTasks = allTasks.filter(function(t){ return t.status==='pending' && namesMatch(t.assignedTo, currentUser) && t.ts.slice(0,10)===today; });
 
     var myTasksHtml;
     if(!myTasks.length){
-      myTasksHtml = '<p class="empty-note">مفيش مهام متعينة لك دلوقتي.</p>';
+      myTasksHtml = '<p class="empty-note">مفيش مهام ليك النهاردة.</p>';
     } else {
       myTasksHtml = myTasks.map(function(t){
         var dateKey = t.ts.slice(0,10);
@@ -4156,7 +4572,9 @@
       '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="btn-add-to-mix">إضافة للخلطة</button></div></details>'+
 
       '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٤) الخلطة الحالية (علّم «تثبيت» على أي وزن عايزه ثابت وأعد الحساب)</h2>'+
-      '<div class="form-actions" style="margin:0 0 8px;"><button type="button" class="btn-danger-ghost btn-sm" id="btn-reset-weights" style="border-radius:8px;">إعادة ضبط الأوزان</button></div>'+
+      '<div class="form-actions" style="margin:0 0 8px;flex-wrap:wrap;"><button type="button" class="btn-danger-ghost btn-sm" id="btn-reset-weights" style="border-radius:8px;">إعادة ضبط الأوزان</button>'+
+        (currentMix.length ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-deduct-inventory">خصم الكميات دي من المخزون</button>' : '')+'</div>'+
+      (currentMix.length ? '<p class="hint" id="deduct-inventory-report" style="margin:0 0 8px;"></p>' : '')+
       '<h3 style="font-size:0.85rem;margin:0 0 6px;color:var(--brand-strong);">خزان A (مع نترات الكالسيوم)</h3>'+
       mixRowsHtml(mixByTank.A)+
       '<h3 style="font-size:0.85rem;margin:14px 0 6px;color:var(--water);">خزان B (كبريتات وفوسفات)</h3>'+
@@ -4219,6 +4637,35 @@
       deleteTargetProfile(v.slice(1));
     });
     $('#btn-reset-weights').addEventListener('click', function(){ if(!currentMix.length) return; if(!confirm('تمسح الخلطة الحالية وكل الأوزان المثبتة؟')) return; currentMix = []; renderNutrientsPanel(); });
+    var deductBtn = $('#btn-deduct-inventory');
+    if(deductBtn){
+      deductBtn.addEventListener('click', function(){
+        var matched = [], unmatched = [];
+        currentMix.forEach(function(item){
+          var f = getFertilizer(item.fertilizerId);
+          if(!f) return;
+          var invItem = inventoryItems.filter(function(x){ return x.type==='fertilizer' && x.name.trim().toLowerCase()===f.name.trim().toLowerCase(); })[0];
+          if(!invItem || invItem.quantity==null){ unmatched.push(f.name); return; }
+          var qty = null;
+          if(invItem.unit==='كجم') qty = +(item.grams/1000).toFixed(3);
+          else if(invItem.unit==='جم') qty = +item.grams.toFixed(2);
+          if(qty===null){ unmatched.push(f.name+' (وحدة المخزون '+invItem.unit+' — يحتاج تحويل يدوي)'); return; }
+          matched.push({id:invItem.id, name:f.name, qty:qty, unit:invItem.unit});
+        });
+        if(!matched.length){
+          $('#deduct-inventory-report').textContent = 'مفيش أصناف متطابقة بالاسم في المخزون (وحدة كجم/جم) لخصمها. تأكد إن اسم السماد هنا مطابق لاسمه في تاب المخازن.';
+          return;
+        }
+        if(!confirm('هيتم خصم:\n'+matched.map(function(m){ return '- '+m.name+': '+m.qty+' '+m.unit; }).join('\n')+'\n\nمتأكد؟')) return;
+        Promise.all(matched.map(function(m){ return deductInventoryQty(m.id, m.qty); })).then(function(){
+          toast('اتخصمت الكميات من المخزون');
+          var msg = 'اتخصم: '+matched.map(function(m){ return m.name+' ('+m.qty+' '+m.unit+')'; }).join('، ');
+          if(unmatched.length) msg += ' — محتاج تخصم يدوي: '+unmatched.join('، ');
+          var rep = $('#deduct-inventory-report');
+          if(rep) rep.textContent = msg;
+        });
+      });
+    }
     $all('.mix-fixed-chk', body).forEach(function(c){
       c.addEventListener('change', function(){
         var it = currentMix.filter(function(m){ return m.fertilizerId===c.closest('tr').getAttribute('data-fertid'); })[0];
@@ -4442,6 +4889,7 @@
             '<input type="text" id="pest-pesticide" maxlength="150" style="margin-top:8px;display:none;" placeholder="اسم المبيد">'+
             '<p class="hint" id="pest-pesticide-info" style="margin:6px 0 0;"></p></div>'+
           '<div class="field-sm" id="pest-dose-wrap" style="display:none;"><label>الكمية/الجرعة</label><input type="text" id="pest-dose" maxlength="80" placeholder="مثال: 2 مل/لتر"></div>'+
+          '<div class="field-sm" id="pest-stock-used-wrap" style="display:none;"><label id="pest-stock-used-label">الكمية المستخدمة من المخزون (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="pest-stock-used" placeholder="0"></div>'+
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="pest-note" maxlength="200"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">حفظ</button></div>'+
@@ -4463,8 +4911,10 @@
       pestSelectEl.addEventListener('change', function(){
         var v = this.value;
         var otherInput = $('#pest-pesticide'), info = $('#pest-pesticide-info'), doseInput = $('#pest-dose');
+        var stockWrap = $('#pest-stock-used-wrap'), stockInput = $('#pest-stock-used'), stockLabel = $('#pest-stock-used-label');
         if(v==='__other__'){
           otherInput.style.display=''; otherInput.value=''; info.textContent='';
+          stockWrap.style.display='none'; stockInput.value='';
         } else if(v){
           otherInput.style.display='none'; otherInput.value='';
           var it = getInventoryItem(v);
@@ -4473,11 +4923,18 @@
             if(it.activeIngredient) infoParts.push('المادة الفعالة: '+it.activeIngredient);
             if(it.dose) infoParts.push('الجرعة الموصى بها: '+it.dose);
             if(it.type==='pesticide' && it.stages && it.stages.length) infoParts.push('يشتغل على: '+pestStageLabels(it.stages));
+            if(it.quantity!=null) infoParts.push('المتاح بالمخزن: '+it.quantity+' '+(it.unit||''));
             info.textContent = infoParts.join(' — ');
             if(it.dose && !doseInput.value) doseInput.value = it.dose;
+            if(it.quantity!=null){
+              stockWrap.style.display=''; stockLabel.textContent = 'الكمية المستخدمة من المخزون ('+(it.unit||'')+') — اختياري';
+            } else {
+              stockWrap.style.display='none'; stockInput.value='';
+            }
           }
         } else {
           otherInput.style.display='none'; otherInput.value=''; info.textContent='';
+          stockWrap.style.display='none'; stockInput.value='';
         }
       });
     }
@@ -4490,6 +4947,15 @@
       submitBtn.disabled = true;
       var originalText = submitBtn.textContent;
       submitBtn.textContent = file ? 'بيرفع الصورة...' : 'بيحفظ...';
+      var pestSelEl = $('#pest-pesticide-select');
+      var capturedSelId = pestSelEl ? pestSelEl.value : '';
+      var capturedUsedQty = parseFloat($('#pest-stock-used') ? $('#pest-stock-used').value : '');
+      var capturedPesticideName = (function(){
+        if(!pestSelEl) return '';
+        if(pestSelEl.value==='__other__') return $('#pest-pesticide').value.trim();
+        if(pestSelEl.value){ var it=getInventoryItem(pestSelEl.value); return it?it.name:''; }
+        return '';
+      })();
       uploadPestPhoto(file).then(function(photoAssetId){
         return addPestIncident({
           ts: $('#pest-ts').value || nowLocalInputValue(),
@@ -4500,15 +4966,14 @@
           location: $('#pest-location').value.trim(),
           photoAssetId: photoAssetId,
           treated: $('#pest-treated').checked,
-          pesticideName: (function(){
-            var sel = $('#pest-pesticide-select');
-            if(!sel) return '';
-            if(sel.value==='__other__') return $('#pest-pesticide').value.trim();
-            if(sel.value){ var it=getInventoryItem(sel.value); return it?it.name:''; }
-            return '';
-          })(),
+          pesticideName: capturedPesticideName,
           dose: $('#pest-dose').value.trim(),
           note: $('#pest-note').value.trim()
+        }).then(function(r){
+          if(capturedSelId && capturedSelId!=='__other__' && capturedUsedQty>0){
+            return deductInventoryQty(capturedSelId, capturedUsedQty).then(function(){ return r; });
+          }
+          return r;
         });
       }).then(function(){
         toast('اتسجّل');
@@ -4956,6 +5421,7 @@
     safe(renderNurseryPanel);
     safe(renderHarvestPanel);
     safe(renderInventoryPanel);
+    safe(renderInstrumentCalibSection);
     safe(renderAuditPanel);
     safe(updateSyncBadge);
   }
@@ -5043,6 +5509,22 @@
         btn.disabled = false;
         btn.textContent = original;
       });
+    });
+
+    $('#btn-backup-export').addEventListener('click', exportFullBackup);
+    $('#btn-backup-import').addEventListener('click', function(){ $('#backup-file-input').click(); });
+    $('#backup-file-input').addEventListener('change', function(ev){
+      var file = ev.target.files && ev.target.files[0];
+      if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        var parsed;
+        try{ parsed = JSON.parse(reader.result); }
+        catch(e){ toast('الملف ده مش JSON صحيح'); ev.target.value=''; return; }
+        importFullBackup(parsed).then(function(){ ev.target.value=''; }).catch(function(){ ev.target.value=''; });
+      };
+      reader.onerror = function(){ toast('تعذرت قراءة الملف'); ev.target.value=''; };
+      reader.readAsText(file);
     });
 
     $('#btn-clear-all').addEventListener('click', function(){
@@ -5142,6 +5624,9 @@
         $('#login-error').textContent = 'بعتنا رابط تغيير كلمة المرور على الإيميل (راجع الـ Spam)';
       }).catch(function(e){ $('#login-error').textContent = friendlyAuthError(e); });
     });
+
+    var printBtn = $('#btn-print-weekly');
+    if(printBtn) printBtn.addEventListener('click', buildAndPrintWeeklyReport);
 
     $('#btn-logout').addEventListener('click', function(){
       Promise.resolve(logAudit('logout', 'auth', 'تسجيل خروج')).then(function(){
@@ -5282,6 +5767,17 @@
     });
   }
 
+  function watchForDayChange(){
+    var lastSeenDay = todayStr();
+    setInterval(function(){
+      var d = todayStr();
+      if(d!==lastSeenDay){
+        lastSeenDay = d;
+        if(currentUser) renderAll();
+      }
+    }, 60000);
+  }
+
   function init(){
     setupTheme();
     setupTabs();
@@ -5289,6 +5785,7 @@
     setupLogin();
     fillSettingsForm();
     updateSyncBadge();
+    watchForDayChange();
 
     if(!window.firebase){
       $('#login-error').textContent = 'تعذّر تحميل خدمة Firebase. تأكد من الإنترنت وحدّث الصفحة.';
@@ -5312,7 +5809,6 @@
       logAudit('export', 'data', 'تصدير ملف: '+((o && o.filename)||''));
       return Promise.resolve();
     } };
-    /* الصور بتتضغط وتتخزن جوه Firestore نفسه (من غير Storage ومن غير دفع) */
     assetsCap = { upload: function(blob){
       return new Promise(function(resolve, reject){
         var r = new FileReader();
@@ -5348,5 +5844,6 @@
     window.addEventListener('scroll', function(){ up.classList.toggle('show', window.scrollY>500); }, {passive:true});
   })();
 </script>
+<div id="print-report"></div>
 </body>
 </html>
