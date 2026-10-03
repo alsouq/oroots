@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-h+iwsDi9/k5qy7oKWBHFKgWfy2IVrKpIIQp1h9F6EWk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t0DUr9lKVe+m8BJ5LAwA05vb/H66p0eg2vID8T8vKDU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -2206,6 +2206,21 @@
   function persistLocalNursery(){
     try{ localStorage.setItem('oroots_local_nursery', JSON.stringify(nurseryLog)); }catch(e){}
   }
+  var TRAY_SIZE = 209;
+  function batchTrays(n){ var t = parseInt(n && n.trays, 10); return t>0 ? t : 1; }
+  function batchPlants(n){ return parseFloat(n && n.quantity) || (batchTrays(n)*TRAY_SIZE); }
+  function dayDiff(a, b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00'))/86400000); }
+  function batchAgeDays(n){
+    if(!n || !n.sowDate) return null;
+    var d = dayDiff(n.sowDate, n.transplantDate || todayStr());
+    return d<0 ? 0 : d;
+  }
+  function batchAgeLabel(n){
+    var d = batchAgeDays(n);
+    if(d===null) return '—';
+    return n.transplantDate ? ('اتنقلت بعد '+d+' يوم') : (d+' يوم');
+  }
+  function sumTrays(list){ return list.reduce(function(sum,n){ return sum + batchTrays(n); }, 0); }
   function flattenNursery(){
     return nurseryLog.slice().sort(function(a,b){ return (b.sowDate||'').localeCompare(a.sowDate||''); });
   }
@@ -2226,7 +2241,7 @@
   }
   function addNurseryBatch(data){
     var batch = {
-      id: genId(), cropName:data.cropName||'', quantity:data.quantity||'',
+      id: genId(), cropName:data.cropName||'', quantity:data.quantity||'', trays:data.trays||1,
       sowDate:data.sowDate||todayStr(), transplantDate:data.transplantDate||'',
       greenhouse:data.greenhouse||'', systemId:data.systemId||'', note:data.note||'',
       by:currentUser||'', createdAt:Date.now(), updatedAt:Date.now()
@@ -2286,7 +2301,7 @@
     var pendingBatches = nurseryLog.filter(function(n){
       return String(n.cropName||'').trim().toLowerCase()===cropKey && !n.transplantDate;
     });
-    var actualTrays = pendingBatches.length;
+    var actualTrays = sumTrays(pendingBatches);
     var actualPlants = pendingBatches.reduce(function(sum,n){ return sum + (parseFloat(n.quantity)||0); }, 0);
     if(actualPlants===0 && actualTrays>0 && traySize>0) actualPlants = actualTrays*traySize;
 
@@ -3285,7 +3300,7 @@
     var nurseryList = nurseryLog.filter(function(x){ return x.systemId===overviewSystemId; });
     var nurseryPending = nurseryList.filter(function(x){ return !x.transplantDate; });
     var nurseryHtml = '<div class="chart-card"><h3>المشتل</h3>'+
-      (nurseryList.length ? '<div class="climate-stats">'+climateStatChip('إجمالي الصواني', nurseryList.length, '')+climateStatChip('لسه في المشتل', nurseryPending.length, '')+'</div>' : '<p class="empty-note">لا توجد سجلات مشتل لهذا النظام.</p>')+
+      (nurseryList.length ? '<div class="climate-stats">'+climateStatChip('إجمالي الصواني', sumTrays(nurseryList), '')+climateStatChip('لسه في المشتل', sumTrays(nurseryPending), '')+'</div>' : '<p class="empty-note">لا توجد سجلات مشتل لهذا النظام.</p>')+
     '</div>';
 
     /* ---- harvest (system) ---- */
@@ -3365,7 +3380,7 @@
     var todayTasks = flattenTasks().filter(function(t){ return t.status==='pending' && t.ts.slice(0,10)===todayStr(); }).length;
     var weekCutoff = Date.now() - 7*86400000;
     var incidentsWeek = pestLog.filter(function(p){ return new Date(p.ts).getTime()>=weekCutoff; }).length;
-    var inNursery = nurseryLog.filter(function(n){ return !n.transplantDate; }).length;
+    var inNursery = sumTrays(nurseryLog.filter(function(n){ return !n.transplantDate; }));
     el.innerHTML =
       climateStatChip('مهام معلّقة', pendingTasks, '') +
       climateStatChip('مهام اليوم', todayTasks, '') +
@@ -5221,7 +5236,7 @@
       '<form class="entry-form" id="nursery-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>اسم الصنف/المحصول</label><input type="text" id="nursery-crop" maxlength="150" required value="'+(existingBatch?existingBatch.cropName:'')+'"></div>'+
-          '<div class="field-sm"><label>عدد الشتلات (اختياري)</label><input type="number" step="1" min="0" class="ltr" id="nursery-qty" value="'+(existingBatch?existingBatch.quantity:'')+'"></div>'+
+          '<div class="field-sm"><label>عدد الصواني (كل صينية = '+TRAY_SIZE+' نبات)</label><input type="number" step="1" min="1" class="ltr" id="nursery-trays" required value="'+(existingBatch?batchTrays(existingBatch):1)+'"></div>'+
           '<div class="field-sm"><label>تاريخ زراعة البذور</label><input type="date" class="ltr" id="nursery-sow-date" required value="'+(existingBatch?existingBatch.sowDate:todayStr())+'"></div>'+
           '<div class="field-sm"><label>تاريخ نزول الصينية في السيستم (اختياري)</label><input type="date" class="ltr" id="nursery-transplant-date" value="'+(existingBatch?existingBatch.transplantDate:'')+'"></div>'+
           '<div class="field-sm"><label>الصوبة (اختياري)</label><select id="nursery-gh">'+ghOptions+'</select></div>'+
@@ -5246,7 +5261,8 @@
       ev.preventDefault();
       var data = {
         cropName: $('#nursery-crop').value.trim(),
-        quantity: $('#nursery-qty').value,
+        trays: Math.max(1, parseInt($('#nursery-trays').value,10) || 1),
+        quantity: Math.max(1, parseInt($('#nursery-trays').value,10) || 1) * TRAY_SIZE,
         sowDate: $('#nursery-sow-date').value,
         transplantDate: $('#nursery-transplant-date').value,
         greenhouse: $('#nursery-gh').value,
@@ -5279,7 +5295,7 @@
         '<div class="field-sm full"><label>اسم المحصول</label><input type="text" id="plan-crop" maxlength="150" value="'+(plan.cropName||'')+'"></div>'+
         '<div class="field-sm"><label>عدد الجتر (القنوات)</label><input type="number" step="1" min="0" class="ltr" id="plan-gutters" value="'+(plan.gutterCount!=null?plan.gutterCount:'')+'"></div>'+
         '<div class="field-sm"><label>عدد النباتات في الجتر الواحد</label><input type="number" step="1" min="0" class="ltr" id="plan-plants-per-gutter" value="'+(plan.plantsPerGutter!=null?plan.plantsPerGutter:'')+'"></div>'+
-        '<div class="field-sm"><label>عدد النباتات في الصينية الواحدة</label><input type="number" step="1" min="1" class="ltr" id="plan-tray-size" value="'+(plan.traySize!=null?plan.traySize:'')+'"></div>'+
+        '<div class="field-sm"><label>عدد النباتات في الصينية الواحدة</label><input type="number" step="1" min="1" class="ltr" id="plan-tray-size" value="'+(plan.traySize!=null?plan.traySize:TRAY_SIZE)+'"></div>'+
         '<div class="field-sm"><label>نسبة الفاقد المتوقع (%)</label><input type="number" step="0.5" min="0" max="90" class="ltr" id="plan-loss" value="'+(plan.lossPercent!=null?plan.lossPercent:'')+'"></div>'+
         '<div class="field-sm"><label>مدة موسم الحصاد (يوم)</label><input type="number" step="1" min="0" class="ltr" id="plan-harvest-days" value="'+(plan.harvestDays!=null?plan.harvestDays:'')+'"></div>'+
         '<div class="field-sm"><label>عدد أيام التحضين بالمشتل</label><input type="number" step="1" min="0" class="ltr" id="plan-nursery-days" value="'+(plan.nurseryDays!=null?plan.nurseryDays:'')+'"></div>'+
@@ -5371,7 +5387,8 @@
       return '<tr data-id="'+n.id+'">'+
         '<td class="ltr">'+n.sowDate+'</td>'+
         '<td>'+n.cropName+'</td>'+
-        '<td class="ltr num">'+(n.quantity||'—')+'</td>'+
+        '<td class="num">'+batchTrays(n)+' <span style="color:var(--muted);font-size:0.76rem;">('+batchPlants(n)+' نبات)</span></td>'+
+        '<td>'+batchAgeLabel(n)+'</td>'+
         '<td>'+statusHtml+'</td>'+
         '<td>'+(n.note||'—')+'</td>'+
         '<td><button class="btn-ghost btn-sm nursery-edit-btn" style="border-radius:8px;white-space:nowrap;">تعديل</button></td>'+
@@ -5389,9 +5406,10 @@
       '<h2 class="section-title">'+(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة')+'</h2>'+
       '<div id="nursery-form-holder"></div>'+
 
+      nurserySummaryHtml(all) +
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
-      '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>العدد</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
 
     wireNurseryPlanSection();
@@ -5418,15 +5436,39 @@
     applyPermissionLock($('#nursery-body'), 'nursery');
   }
 
+  function nurserySummaryHtml(all){
+    var pending = all.filter(function(n){ return !n.transplantDate; });
+    var groups = {};
+    pending.forEach(function(n){
+      var key = String(n.cropName||'').trim().toLowerCase() || '—';
+      var g = groups[key] || (groups[key] = {name:(String(n.cropName||'').trim() || '—'), trays:0, oldest:0});
+      g.trays += batchTrays(n);
+      g.oldest = Math.max(g.oldest, batchAgeDays(n)||0);
+    });
+    var arr = Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a,b){ return b.trays-a.trays; });
+    var totalTrays = sumTrays(pending);
+    var cards = '<div class="cards-grid" style="margin-bottom:12px;">'+
+      '<div class="stat-card"><div class="stat-card-head"><span class="stat-card-title">إجمالي الصواني في المشتل</span></div><div class="stat-value">'+totalTrays+'</div></div>'+
+      '<div class="stat-card"><div class="stat-card-head"><span class="stat-card-title">إجمالي النباتات ('+TRAY_SIZE+' / صينية)</span></div><div class="stat-value">'+(totalTrays*TRAY_SIZE).toLocaleString('en-US')+'</div></div>'+
+    '</div>';
+    var rows = arr.length ? arr.map(function(g){
+      return '<tr><td>'+escH(g.name)+'</td><td class="num">'+g.trays+'</td><td class="num">'+(g.trays*TRAY_SIZE).toLocaleString('en-US')+'</td><td class="num">'+g.oldest+' يوم</td></tr>';
+    }).join('') : '';
+    return '<h2 class="section-title">ملخص المشتل (اللي لسه فيه)</h2>'+cards+
+      (arr.length
+        ? '<div class="table-wrap"><table><thead><tr><th>الصنف</th><th>الصواني</th><th>النباتات</th><th>أكبر عمر</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+        : '<p class="empty-note">مفيش صواني في المشتل دلوقتي.</p>');
+  }
+
   function exportNurseryCSV(){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var all = flattenNursery();
     if(!all.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['تاريخ زراعة البذور','الصنف','العدد','تاريخ النزول للسيستم','الصوبة','السيستم','ملاحظة'];
+    var header = ['تاريخ زراعة البذور','الصنف','عدد الصواني','عدد النباتات','العمر (يوم)','تاريخ النزول للسيستم','الصوبة','السيستم','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
     all.forEach(function(n){
       var sys = n.systemId ? getSystem(n.systemId) : null;
-      lines.push([n.sowDate, n.cropName, n.quantity, n.transplantDate, n.greenhouse, sys?sys.name:'', n.note].map(csvEscape).join(','));
+      lines.push([n.sowDate, n.cropName, batchTrays(n), batchPlants(n), batchAgeDays(n), n.transplantDate, n.greenhouse, sys?sys.name:'', n.note].map(csvEscape).join(','));
     });
     var csv = '\uFEFF' + lines.join('\r\n');
     downloadsCap.save({filename:'oroots-nursery-'+todayStr()+'.csv', data:csv}).then(function(){
