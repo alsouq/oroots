@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5ucew1PbRGjGzhurPsQprwhxOE3AZolsMGZ2rTxleoc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-h+iwsDi9/k5qy7oKWBHFKgWfy2IVrKpIIQp1h9F6EWk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -1607,7 +1607,7 @@
     renderAll();
     return Promise.resolve();
   }
-  function addUser(email, password, role, permissions){
+  function addUser(email, password, role, permissions, displayName){
     email = String(email||'').trim().toLowerCase();
     if(!email || !password) return Promise.resolve(false);
     if(findUser(email)){ toast('الإيميل ده موجود خلاص'); return Promise.resolve(false); }
@@ -1616,7 +1616,7 @@
       .then(function(){ return sec.auth().signOut(); })
       .catch(function(e){ if(e && e.code==='auth/email-already-in-use') return null; throw e; })
       .then(function(){
-        var user = {id:genId(), username:email, role:role||'employee', permissions:permissions||emptyPermissions()};
+        var user = {id:genId(), username:email, displayName:displayName||'', role:role||'employee', permissions:permissions||emptyPermissions()};
         return saveUsers(appUsers.concat([user])).then(function(){ return db.doc('roles/'+email).set({role:user.role}); });
       })
       .then(function(){ return true; })
@@ -2540,6 +2540,22 @@
   }
 
   /* ---------- tasks (reuse the generic date-keyed readings pattern, source='tasks', no systemId) ---------- */
+  function escH(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function myDisplayName(){
+    var u = currentUser ? findUser(currentUser) : null;
+    return (u && u.displayName) ? u.displayName : '';
+  }
+  function userByName(name){
+    var n = String(name||'').trim().toLowerCase();
+    if(!n) return null;
+    return appUsers.filter(function(u){ return String(u.displayName||'').trim().toLowerCase()===n; })[0] || null;
+  }
+  function isMyTask(t){
+    if(!currentUser) return false;
+    if(t.assignedEmail && String(t.assignedEmail).toLowerCase()===String(currentUser).toLowerCase()) return true;
+    var dn = myDisplayName();
+    return namesMatch(t.assignedTo, currentUser) || (dn && namesMatch(t.assignedTo, dn));
+  }
   function namesMatch(a,b){
     return String(a||'').trim().toLowerCase() === String(b||'').trim().toLowerCase();
   }
@@ -2578,7 +2594,7 @@
   function addTask(dateKey, data){
     var entry = {
       id:genId(), ts:dateKey+'T00:00',
-      greenhouse:data.greenhouse||'', assignedTo:data.assignedTo||'', title:data.title||'', note:data.note||'',
+      greenhouse:data.greenhouse||'', assignedTo:data.assignedTo||'', assignedEmail:data.assignedEmail||'', title:data.title||'', note:data.note||'',
       sopId:data.sopId||'', sopTitle:data.sopTitle||'',
       recur: data.recur || null,
       status:'pending', createdBy:currentUser||'', createdAt:Date.now(), completedAt:null
@@ -2601,7 +2617,7 @@
         var nextDate = computeNextRecurDate(dateKey, original.recur.weekdays);
         if(nextDate){
           addTask(nextDate, {
-            greenhouse: original.greenhouse, assignedTo: original.assignedTo, title: original.title, note: original.note,
+            greenhouse: original.greenhouse, assignedTo: original.assignedTo, assignedEmail: original.assignedEmail||'', title: original.title, note: original.note,
             sopId: original.sopId, sopTitle: original.sopTitle, recur: original.recur
           });
         }
@@ -3504,7 +3520,7 @@
       }).join(' · ');
       return '<div class="systems-list-row" style="align-items:flex-start;flex-direction:column;gap:6px;">'+
         '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;">'+
-          '<strong class="ltr" style="direction:ltr;unicode-bidi:isolate;">'+u.username+'</strong>'+
+          '<span><strong>'+escH(u.displayName||'(بدون اسم تعريفي)')+'</strong> <span class="ltr" style="direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:0.8rem;">'+escH(u.username)+'</span></span>'+
           '<span style="display:flex;gap:6px;">'+
             '<button class="btn-ghost btn-sm user-edit-btn" data-id="'+u.id+'" style="border-radius:8px;">تعديل</button>'+
             '<button class="del-btn user-delete-btn" data-id="'+u.id+'" title="حذف">✕</button>'+
@@ -3538,6 +3554,7 @@
     holder.innerHTML =
       '<form class="entry-form" id="user-form">'+
         '<div class="form-grid">'+
+          '<div class="field-sm"><label>الاسم التعريفي (اللي بيتكتب في المهام)</label><input type="text" id="user-display" maxlength="40" required value="'+escH(existingUser?(existingUser.displayName||''):'')+'" placeholder="مثال: أحمد"></div>'+
           '<div class="field-sm"><label>الإيميل</label><input type="email" class="ltr" id="user-username" required value="'+(existingUser?existingUser.username:'')+'"'+(existingUser?' readonly':'')+'></div>'+
           '<div class="field-sm"><label>كلمة مرور مؤقتة'+(existingUser?' (بتتغيّر من "نسيت كلمة المرور")':'')+'</label><input type="text" class="ltr" id="user-password"'+(existingUser?' disabled':' required minlength="6"')+'></div>'+
           '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="user-is-admin" style="width:auto;"'+(isAdminNow?' checked':'')+'> مدير (كل الصلاحيات + تبويب الإعدادات)</label></div>'+
@@ -3553,23 +3570,28 @@
     $('#user-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var username = $('#user-username').value.trim();
+      var displayName = $('#user-display').value.trim();
+      if(!displayName){ toast('اكتب الاسم التعريفي'); return; }
+      var other = userByName(displayName);
+      if(other && (!existingUser || other.id!==existingUser.id)){ toast('الاسم التعريفي ده مستخدم لموظف تاني'); return; }
       var password = $('#user-password').value;
       var isAdmin = $('#user-is-admin').checked;
       var permissions = {};
       $all('.user-perm-select', holder).forEach(function(sel){ permissions[sel.getAttribute('data-tab')] = sel.value; });
       if(existingUser){
-        var patch = {role: isAdmin?'admin':'employee', permissions: permissions};
+        var patch = {role: isAdmin?'admin':'employee', permissions: permissions, displayName: displayName};
         updateUser(existingUser.id, patch).then(function(){
           toast('اتحفظ الحساب');
           holder.innerHTML='';
           if(currentUser && existingUser.username.toLowerCase()===currentUser.toLowerCase()){
             currentUserRole = patch.role; currentUserPermissions = permissions;
+            $('#hello-user').textContent = 'أهلاً، '+displayName;
             applyTabVisibility();
           }
         });
       } else {
         if(!username || !password){ toast('اكتب الإيميل وكلمة مرور مؤقتة (6 حروف على الأقل)'); return; }
-        addUser(username, password, isAdmin?'admin':'employee', permissions).then(function(ok){
+        addUser(username, password, isAdmin?'admin':'employee', permissions, displayName).then(function(ok){
           if(ok===false) return;
           toast('اتضاف الحساب');
           holder.innerHTML='';
@@ -4237,7 +4259,7 @@
 
     var allTasks = flattenTasks();
     var today = todayStr();
-    var myTasks = allTasks.filter(function(t){ return t.status==='pending' && namesMatch(t.assignedTo, currentUser) && t.ts.slice(0,10)===today; });
+    var myTasks = allTasks.filter(function(t){ return t.status==='pending' && isMyTask(t) && t.ts.slice(0,10)===today; });
 
     var myTasksHtml;
     if(!myTasks.length){
@@ -4259,7 +4281,9 @@
     var isAdminView = currentUserRole==='admin';
     var greenhouseOptions = '<option value="">بدون تحديد</option>' + greenhouseGroups().map(function(g){ return '<option value="'+g.name+'">'+g.name+'</option>'; }).join('');
     var sopOptions = '<option value="">بدون</option>' + sops.map(function(s){ return '<option value="'+s.id+'">'+s.title+'</option>'; }).join('');
-    var namesDatalist = knownNames().map(function(n){ return '<option value="'+n+'"></option>'; }).join('');
+    var dnList = appUsers.filter(function(u){ return u.displayName; }).map(function(u){ return u.displayName; });
+    var namesDatalist = dnList.concat(knownNames().filter(function(n){ return dnList.indexOf(n)<0 && n.indexOf('@')<0; }))
+      .map(function(n){ return '<option value="'+escH(n)+'"></option>'; }).join('');
 
     var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
     var tomorrowStr = tomorrow.getFullYear()+'-'+pad(tomorrow.getMonth()+1)+'-'+pad(tomorrow.getDate());
@@ -4272,7 +4296,7 @@
           '<div class="form-grid">'+
             '<div class="field-sm"><label>التاريخ</label><input type="date" class="ltr" id="task-date" value="'+tomorrowStr+'" required></div>'+
             '<div class="field-sm"><label>الصوبة (اختياري)</label><select id="task-gh">'+greenhouseOptions+'</select></div>'+
-            '<div class="field-sm"><label>الشخص المكلّف</label><input type="text" id="task-assignee" list="known-names-list" required placeholder="اسم الشخص"></div>'+
+            '<div class="field-sm"><label>الشخص المكلّف (الاسم التعريفي)</label><input type="text" id="task-assignee" list="known-names-list" required placeholder="اكتب الاسم التعريفي للموظف" autocomplete="off"></div>'+
             '<div class="field-sm"><label>ربط بإجراء (اختياري)</label><select id="task-sop">'+sopOptions+'</select></div>'+
             '<div class="field-sm full"><label>المهمة</label><input type="text" id="task-title" maxlength="200" required placeholder="وصف المهمة المطلوبة"></div>'+
             '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="task-note" maxlength="200"></div>'+
@@ -4358,12 +4382,16 @@
       if(!dateVal){ toast('اختار تاريخ'); return; }
       var assignee = $('#task-assignee').value.trim();
       if(!assignee){ toast('اكتب اسم الشخص'); return; }
+      var assigneeUser = userByName(assignee);
+      if(assigneeUser){ assignee = assigneeUser.displayName; }
+      else { toast('تنبيه: الاسم ده مش مربوط بحساب موظف، فمش هيظهر لحد في "مهامي"'); }
       var recurDays = ($('#task-recur') && $('#task-recur').checked)
         ? $all('.task-recur-day-chk', body).filter(function(x){ return x.checked; }).map(function(x){ return parseInt(x.value,10); })
         : [];
       addTask(dateVal, {
         greenhouse: $('#task-gh').value,
         assignedTo: assignee,
+        assignedEmail: assigneeUser ? assigneeUser.username : '',
         title: $('#task-title').value.trim(),
         note: $('#task-note').value.trim(),
         sopId: sopId, sopTitle: sopObj ? sopObj.title : '',
@@ -5586,7 +5614,7 @@
       currentUserRole = r.me.role;
       currentUserPermissions = r.me.permissions || {};
       logAudit('login', 'auth', 'تسجيل دخول ('+(r.me.role==='admin'?'مدير':'موظف')+')');
-      $('#hello-user').textContent = 'أهلاً، '+currentUser;
+      $('#hello-user').textContent = 'أهلاً، '+(r.me.displayName||currentUser);
       $('#login-screen').classList.add('hidden');
       $('#app').classList.remove('hidden');
       subscribeDb();
