@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t0DUr9lKVe+m8BJ5LAwA05vb/H66p0eg2vID8T8vKDU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mhHACwBNdCIQI3lOhNDstp21bAUt3JNFae4ycr3Hhsw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -1761,7 +1761,7 @@
     return true;
   }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
-    '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
+    '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
     '#btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
@@ -2252,6 +2252,34 @@
     var existing = getNurseryBatch(id);
     if(!existing) return Promise.resolve();
     return saveNurseryBatch(Object.assign({}, existing, patch, {updatedAt:Date.now()}));
+  }
+  function transplantNurseryBatch(id, count, date, gh, sysId){
+    var b = getNurseryBatch(id);
+    if(!b) return Promise.resolve(null);
+    var total = batchTrays(b);
+    var n = Math.min(Math.max(1, count), total);
+    var remaining = total - n;
+    var now = Date.now();
+    var sys = sysId ? getSystem(sysId) : null;
+    var where = (gh||'')+(sys?(' / '+sys.name):'');
+    var msg;
+    var jobs;
+    if(remaining===0){
+      jobs = [saveNurseryBatch(Object.assign({}, b, {transplantDate:date, greenhouse:gh, systemId:sysId, updatedAt:now}))];
+      msg = 'نزلت كل الصواني ('+n+') من '+(b.cropName||'—')+(where?(' في '+where):'')+' بتاريخ '+date+'، ومفيش حاجة باقية من الصنف ده في المشتل.';
+    } else {
+      var moved = Object.assign({}, b, {id:genId(), trays:n, quantity:n*TRAY_SIZE, transplantDate:date, greenhouse:gh, systemId:sysId,
+        splitFrom:b.id, fromTrays:total, remainingAfter:remaining, by:currentUser||'', createdAt:now, updatedAt:now});
+      var left = Object.assign({}, b, {trays:remaining, quantity:remaining*TRAY_SIZE, updatedAt:now});
+      jobs = [saveNurseryBatch(left), saveNurseryBatch(moved)];
+      msg = 'نزل '+n+' صينية من '+(b.cropName||'—')+(where?(' في '+where):'')+' بتاريخ '+date+'، وباقي '+remaining+' في المشتل.';
+    }
+    auditSuppress++;
+    return Promise.all(jobs).then(function(){
+      auditSuppress--;
+      logAudit('edit', 'nursery', msg);
+      return msg;
+    }, function(e){ auditSuppress--; throw e; });
   }
   function deleteNurseryBatch(id){
     if(!requireAdminForDelete()) return;
@@ -5213,6 +5241,8 @@
   /* ---------- Nursery (seed trays -> transplant tracking) panel ---------- */
   var nurseryFilterStatus = null; // null=all, 'pending'=still in nursery, 'done'=transplanted
   var nurseryEditingId = null;
+  var nurseryTransplantId = null;
+  var nurseryLastMsg = null;
 
   function nurserySystemOptionsHtml(greenhouseName, selectedSystemId){
     if(!greenhouseName) return '<option value="">— اختار الصوبة الأول —</option>';
@@ -5275,6 +5305,54 @@
         nurseryEditingId = null;
         renderNurseryPanel();
       });
+    });
+  }
+
+  function renderNurseryTransplantForm(batch){
+    var holder = $('#nursery-form-holder');
+    if(!holder) return;
+    var total = batchTrays(batch);
+    var ghOptions = '<option value="">— اختار الصوبة —</option>'+greenhouseGroups().map(function(g){
+      return '<option value="'+escH(g.name)+'">'+escH(g.name)+'</option>';
+    }).join('');
+    holder.innerHTML =
+      '<form class="entry-form" id="nursery-transplant-form">'+
+        '<p style="margin:0 0 10px;">الصنف: <strong>'+escH(batch.cropName)+'</strong> — في المشتل دلوقتي: <strong>'+total+'</strong> صينية (عمرها '+batchAgeLabel(batch)+')</p>'+
+        '<div class="form-grid">'+
+          '<div class="field-sm"><label>عدد الصواني اللي هتنزل</label><input type="number" step="1" min="1" max="'+total+'" class="ltr" id="nt-count" value="1" required></div>'+
+          '<div class="field-sm"><label>تاريخ النزول</label><input type="date" class="ltr" id="nt-date" value="'+todayStr()+'" required></div>'+
+          '<div class="field-sm"><label>الصوبة</label><select id="nt-gh" required>'+ghOptions+'</select></div>'+
+          '<div class="field-sm"><label>السيستم</label><select id="nt-sys" required>'+nurserySystemOptionsHtml('', '')+'</select></div>'+
+        '</div>'+
+        '<p id="nt-preview" style="margin:8px 0;color:var(--muted);"></p>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">تأكيد النزول</button> <button type="button" class="btn btn-ghost btn-sm" id="nt-cancel">إلغاء</button></div>'+
+      '</form>';
+
+    function updatePreview(){
+      var n = parseInt($('#nt-count').value,10) || 0;
+      var el = $('#nt-preview');
+      if(n<1 || n>total){ el.textContent = 'العدد لازم يكون من 1 لحد '+total; return; }
+      el.textContent = n===total ? ('هتنزل كل الصواني ('+n+') ومش هيفضل حاجة في المشتل.') : ('هينزل '+n+' ويفضل '+(total-n)+' في المشتل.');
+    }
+    $('#nt-count').addEventListener('input', updatePreview);
+    updatePreview();
+    $('#nt-gh').addEventListener('change', function(){ $('#nt-sys').innerHTML = nurserySystemOptionsHtml(this.value, ''); });
+    $('#nt-cancel').addEventListener('click', function(){ nurseryTransplantId = null; renderNurseryPanel(); });
+    $('#nursery-transplant-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var n = parseInt($('#nt-count').value,10) || 0;
+      var date = $('#nt-date').value;
+      var gh = $('#nt-gh').value, sysId = $('#nt-sys').value;
+      if(n<1 || n>total){ toast('العدد لازم يكون من 1 لحد '+total); return; }
+      if(!date){ toast('اختار تاريخ النزول'); return; }
+      if(batch.sowDate && date < batch.sowDate){ toast('تاريخ النزول قبل تاريخ الزراعة'); return; }
+      if(!gh || !sysId){ toast('اختار الصوبة والسيستم'); return; }
+      transplantNurseryBatch(batch.id, n, date, gh, sysId).then(function(msg){
+        nurseryLastMsg = msg;
+        nurseryTransplantId = null;
+        toast(msg);
+        renderNurseryPanel();
+      }).catch(function(e){ console.error(e); toast('حصل خطأ، حاول تاني'); });
     });
   }
 
@@ -5384,6 +5462,9 @@
       var statusHtml = n.transplantDate
         ? '<span class="status-pill good">اتنقلت '+n.transplantDate+(n.greenhouse?(' — '+n.greenhouse):'')+(sys?(' / '+sys.name):'')+'</span>'
         : '<span class="status-pill alert">لسه في المشتل</span>';
+      if(n.transplantDate && n.fromTrays){
+        statusHtml += '<div style="color:var(--muted);font-size:0.76rem;margin-top:4px;">نزل '+batchTrays(n)+' من '+n.fromTrays+' — باقي '+n.remainingAfter+' في المشتل</div>';
+      }
       return '<tr data-id="'+n.id+'">'+
         '<td class="ltr">'+n.sowDate+'</td>'+
         '<td>'+n.cropName+'</td>'+
@@ -5391,21 +5472,24 @@
         '<td>'+batchAgeLabel(n)+'</td>'+
         '<td>'+statusHtml+'</td>'+
         '<td>'+(n.note||'—')+'</td>'+
-        '<td><button class="btn-ghost btn-sm nursery-edit-btn" style="border-radius:8px;white-space:nowrap;">تعديل</button></td>'+
+        '<td><div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:110px;">'+(n.transplantDate?'':'<button class="btn btn-primary btn-sm nursery-transplant-btn" style="border-radius:8px;white-space:nowrap;">نزّل للسيستم</button>')+'<button class="btn-ghost btn-sm nursery-edit-btn" style="border-radius:8px;white-space:nowrap;">تعديل</button></div></td>'+
         '<td><button class="del-btn nursery-delete-btn" title="حذف">✕</button></td>'+
       '</tr>';
     }).join('') : '';
 
     var editingBatch = nurseryEditingId ? getNurseryBatch(nurseryEditingId) : null;
+    var tBatch = nurseryTransplantId ? getNurseryBatch(nurseryTransplantId) : null;
+    if(tBatch && tBatch.transplantDate){ tBatch = null; nurseryTransplantId = null; }
 
     if(!nurseryPlanSystemId && systems.length) nurseryPlanSystemId = systems[0].id;
     var planSectionHtml = renderNurseryPlanSectionHtml();
 
     body.innerHTML =
       planSectionHtml +
-      '<h2 class="section-title">'+(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة')+'</h2>'+
+      '<h2 class="section-title">'+(tBatch?'نقل صواني للسيستم':(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة'))+'</h2>'+
       '<div id="nursery-form-holder"></div>'+
 
+      (nurseryLastMsg ? '<div class="stat-card" style="margin:12px 0;border-inline-start:4px solid var(--brand);">✅ '+escH(nurseryLastMsg)+'</div>' : '') +
       nurserySummaryHtml(all) +
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
@@ -5413,7 +5497,11 @@
       (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
 
     wireNurseryPlanSection();
-    renderNurseryForm(editingBatch);
+    if(tBatch){
+      renderNurseryTransplantForm(tBatch);
+      var hold = $('#nursery-form-holder');
+      if(hold && hold.scrollIntoView) hold.scrollIntoView({behavior:'smooth', block:'center'});
+    } else renderNurseryForm(editingBatch);
 
     $all('.nursery-filter-pill', body).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -5424,6 +5512,14 @@
     $all('.nursery-edit-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
         nurseryEditingId = btn.closest('tr').getAttribute('data-id');
+        nurseryTransplantId = null;
+        renderNurseryPanel();
+      });
+    });
+    $all('.nursery-transplant-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        nurseryTransplantId = btn.closest('tr').getAttribute('data-id');
+        nurseryEditingId = null;
         renderNurseryPanel();
       });
     });
