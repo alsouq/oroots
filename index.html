@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mhHACwBNdCIQI3lOhNDstp21bAUt3JNFae4ycr3Hhsw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JxioKv5k9/c45QWaCdVL600eI3nJ9pyEWtWhXWhuzlo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -151,6 +151,12 @@
   .btn-danger-ghost{background:transparent;color:var(--alert);border:1px solid var(--alert);padding:8px 12px;font-size:0.85rem;}
   .btn-sm{padding:8px 12px;font-size:0.85rem;border-radius:8px;}
   .login-error{color:#F0A08E;font-size:0.85rem;margin-top:-6px;margin-bottom:14px;min-height:1em;}
+  .cropref-wrap th,.cropref-wrap td{padding:8px 4px;white-space:nowrap;font-size:0.8rem;}
+  .cropref-wrap{max-height:none !important;}
+  .cropref-wrap table{min-width:0 !important;width:100%;}
+  .cropref-wrap td.num{font-family:inherit;}
+  .plan-ov-wrap td:first-child{min-width:92px;}
+  .cropref-wrap td:first-child{white-space:normal;min-width:52px;}
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -507,6 +513,8 @@
         <button type="button" class="btn btn-ghost btn-sm" id="btn-print-weekly">🖨️ طباعة تقرير الأسبوع</button>
       </div>
       <div id="overview-alerts"></div>
+      <div id="overview-crop-refs"></div>
+
       <h2 class="section-title">الصوب والأنظمة</h2>
       <p class="hint" style="margin-top:-4px;">اختار الصوبة، وبعدين اختار النظام، عشان تشوف كل بياناته في مكان واحد.</p>
       <div id="systems-overview"></div>
@@ -656,6 +664,7 @@
         <h3>سجل النشاط (Logs)</h3>
         <p class="hint">أي دخول أو خروج أو إضافة أو تعديل أو حذف أو تصدير من أي حد في الفريق بيتسجّل هنا فورًا بالتاريخ والوقت واسم المستخدم. السجل للعرض والتصدير بس، ومفيش زرار حذف ليه.</p>
         <div class="range-filter" id="audit-range"></div>
+        <div id="audit-date-holder"></div>
         <div class="audit-filters">
           <select id="audit-user"><option value="">كل المستخدمين</option></select>
           <select id="audit-action"><option value="">كل العمليات</option></select>
@@ -757,6 +766,17 @@
   var inventoryItems = [];
   var inventoryFilterType = '';
   var harvestFilterCrop = '';
+  var harvestFrom = '';
+  var harvestTo = '';
+  function harvestInRange(h){
+    var d = String(h.ts||'').slice(0,10);
+    if(harvestFrom && d < harvestFrom) return false;
+    if(harvestTo && d > harvestTo) return false;
+    return true;
+  }
+  function harvestShown(list){
+    return list.filter(function(h){ return (!harvestFilterCrop || h.cropName===harvestFilterCrop) && harvestInRange(h); });
+  }
   var harvestChartCrop = null;
   var harvestCompareLastSeason = false;
   var irrigCalib = [];
@@ -768,6 +788,7 @@
   var auditRangeDays = 7;
   var auditUserFilter = '', auditActionFilter = '', auditAreaFilter = '';
   var nurseryPlans = [];
+  var nurseryPlanLog = [];
   var nurseryPlanCropInput = '';
   var nurseryPlanSystemId = null;
   var currentMix = [];
@@ -940,7 +961,7 @@
     if(!instrumentCalibrations.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['النوع','اسم الجهاز','تاريخ المعايرة','المعايرة القادمة','محلول المعايرة','ملاحظة النتيجة','بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
-    instrumentCalibrations.slice().sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); }).forEach(function(x){
+    instrumentCalibrations.filter(function(x){ return lfInRange('instr', x.calibrationDate); }).sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); }).forEach(function(x){
       lines.push([instrumentTypeLabel(x.instrumentType), x.instrumentName, x.calibrationDate, x.nextDueDate, x.solutionUsed, x.resultNote, x.by].map(csvEscape).join(','));
     });
     downloadsCap.save({filename:'oroots-instrument-calibration-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){
@@ -953,7 +974,7 @@
     var list = instrumentCalibrations.slice().sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); });
     var overdue = overdueInstrumentCalibs();
     var rows = list.length ? list.map(function(x){
-      return '<tr data-id="'+x.id+'"><td>'+instrumentTypeLabel(x.instrumentType)+'</td><td>'+(x.instrumentName||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('instr', x.calibrationDate)+'><td>'+instrumentTypeLabel(x.instrumentType)+'</td><td>'+(x.instrumentName||'—')+'</td>'+
         '<td class="ltr num">'+x.calibrationDate+'</td><td>'+(x.nextDueDate?nextReleaseBadge(x.nextDueDate):'—')+'</td>'+
         '<td>'+(x.solutionUsed||'—')+'</td><td>'+(x.resultNote||'—')+'</td><td>'+(x.by||'—')+'</td>'+
         '<td><button class="del-btn instr-calib-del" title="حذف">✕</button></td></tr>';
@@ -973,6 +994,7 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعايرة</button></div>'+
       '</form>'+
       '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="instr-calib-export">تصدير CSV</button></div>'+
+      lfBarHtml('instr')+
       '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الجهاز</th><th>تاريخ المعايرة</th><th>القادمة</th><th>المحلول</th><th>النتيجة</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 
     $('#instr-cal-date').value = todayStr();
@@ -988,6 +1010,7 @@
       btn.addEventListener('click', function(){ deleteInstrumentCalib(btn.closest('tr').getAttribute('data-id')); });
     });
     $('#instr-calib-export').addEventListener('click', exportInstrumentCalibCSV);
+    lfWire('instr');
   }
 
   /* ---------- سجل النشاط (Audit Log) ---------- */
@@ -1024,11 +1047,6 @@
   function subscribeAudit(){
     if(!db || auditSubscribed) return;
     auditSubscribed = true;
-    db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
-      instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAll();
-    }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
-
     db.collection('auditLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       auditLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       safe(renderAuditPanel);
@@ -1179,6 +1197,7 @@
     else if(auditRangeDays){ cutoff = Date.now() - auditRangeDays*86400000; }
     return auditLog.filter(function(r){
       if((r.createdAt||0) < cutoff) return false;
+      if(!lfInRange('audit', lfLocalDate(r.createdAt || r.ts))) return false;
       if(auditUserFilter && r.user!==auditUserFilter) return false;
       if(auditActionFilter && r.action!==auditActionFilter) return false;
       if(auditAreaFilter && r.area!==auditAreaFilter) return false;
@@ -1463,7 +1482,7 @@
   }
   function exportHarvestCSV(systemId){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var list = harvestForSystem(systemId);
+    var list = harvestShown(harvestForSystem(systemId));
     if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['التاريخ','الصنف','الكمية','الوحدة','بواسطة','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -1658,7 +1677,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog
     };
   }
   function exportFullBackup(){
@@ -1719,12 +1738,12 @@
   function applyBackupDb(backup){
     var writes = [];
     ['readingsDocs','sops','customFertilizers','nutrientRecipes','targetProfiles','pestLog','bioReleases',
-     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations']
+     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations','nurseryPlanLog']
      .forEach(function(k){
        var coll = {readingsDocs:'readings', sops:'sops', customFertilizers:'fertilizers', nutrientRecipes:'nutrientRecipes',
          targetProfiles:'targetProfiles', pestLog:'pestlog', bioReleases:'bioReleases', stickyTraps:'stickyTraps',
          pheromoneTraps:'pheromoneTraps', nurseryLog:'nursery', harvestLog:'harvest', inventoryItems:'inventory',
-         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations'}[k];
+         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations', nurseryPlanLog:'nurseryPlanLog'}[k];
        (backup[k]||[]).forEach(function(item){
          if(item && item.id) writes.push(db.collection(coll).doc(item.id).set(item));
        });
@@ -1732,6 +1751,7 @@
     if(backup.settings) writes.push(db.doc('settings/config').set(Object.assign({}, settings, backup.settings)));
     if(Array.isArray(backup.systems)) writes.push(db.doc('settings/systems').set({list: backup.systems}));
     if(Array.isArray(backup.nurseryPlans)) writes.push(db.doc('settings/nurseryPlans').set({list: backup.nurseryPlans}));
+    if(Array.isArray(backup.cropRefs)) writes.push(db.doc('settings/cropRefs').set({list: backup.cropRefs}));
     return Promise.all(writes);
   }
   function importFullBackup(backup){
@@ -1762,7 +1782,7 @@
   }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
-    '#btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
+    '#btn-plan-snapshot, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
   var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
@@ -1863,7 +1883,7 @@
   }
   function exportCalibCSV(systemId){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var list = calibForSystem(systemId);
+    var list = calibForSystem(systemId).filter(function(c){ return lfInRange('calib', c.ts); });
     if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['الوقت','عدد النقاط المقاسة','الحجم المجمع مل','المدة ثانية','لتر/دقيقة للنقطة','مل/دقيقة للنقطة','إجمالي نقاط النظام','لتر/دقيقة للنظام','بواسطة','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -2195,6 +2215,11 @@
       rows = list.map(function(x){ return [x.placedDate, x.targetPest, x.count, x.by, x.note]; });
       fname = 'oroots-pheromone-traps-';
     }
+    var _bk = kind==='release' ? 'bio' : (kind==='sticky' ? 'sticky' : 'pher');
+    var _dk = kind==='release' ? 'releaseDate' : 'placedDate';
+    var _keep = list.map(function(x){ return lfInRange(_bk, x[_dk]); });
+    list = list.filter(function(x, i){ return _keep[i]; });
+    rows = rows.filter(function(r, i){ return _keep[i]; });
     if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
     var lines = [header.map(csvEscape).join(',')].concat(rows.map(function(r){ return r.map(csvEscape).join(','); }));
     downloadsCap.save({filename:fname+safeDocIdPart(greenhouseName)+'-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){
@@ -2206,6 +2231,65 @@
   function persistLocalNursery(){
     try{ localStorage.setItem('oroots_local_nursery', JSON.stringify(nurseryLog)); }catch(e){}
   }
+  /* ---------- فلتر الفترة (من/إلى) لكل سجل ---------- */
+  var LOGF = {};
+  function lfState(k){ return LOGF[k] || (LOGF[k] = {from:'', to:''}); }
+  function lfInRange(k, v){
+    var r = lfState(k), d = String(v||'').slice(0,10);
+    if(!d) return true;
+    if(r.from && d < r.from) return false;
+    if(r.to && d > r.to) return false;
+    return true;
+  }
+  function lfLocalDate(ms){ var d = new Date(ms); return isNaN(d.getTime()) ? '' : (d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())); }
+  function lfAttr(k, v){ return ' data-lf="'+k+'" data-d="'+escH(String(v||'').slice(0,10))+'"'; }
+  function lfBarHtml(k){
+    var r = lfState(k);
+    return '<div class="lf-bar" data-lfbar="'+k+'" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">'+
+      '<span style="font-weight:600;">الفترة:</span>'+
+      '<label style="display:flex;align-items:center;gap:6px;margin:0;font-weight:400;">من <input type="date" class="ltr lf-from" style="width:auto;" value="'+r.from+'"></label>'+
+      '<label style="display:flex;align-items:center;gap:6px;margin:0;font-weight:400;">إلى <input type="date" class="ltr lf-to" style="width:auto;" value="'+r.to+'"></label>'+
+      '<button type="button" class="range-pill lf-clear">✕ مسح الفترة</button>'+
+      '<span class="hint lf-count" style="margin:0;width:100%;"></span>'+
+    '</div>';
+  }
+  var LF_EXTRA = {};     // شرط إضافي لصف السجل (مثلاً الصنف)
+  var LF_EXTRA_ON = {};  // هل الشرط الإضافي شغال دلوقتي؟
+  function lfApply(k){
+    var rows = $all('[data-lf="'+k+'"]'), shown = 0, trays = 0, hasTrays = false, r = lfState(k);
+    var extra = LF_EXTRA[k], extraOn = LF_EXTRA_ON[k] ? LF_EXTRA_ON[k]() : false;
+    rows.forEach(function(row){
+      var ok = lfInRange(k, row.getAttribute('data-d')) && (!extra || extra(row));
+      row.style.display = ok ? '' : 'none';
+      if(ok){
+        shown++;
+        var tr = row.getAttribute('data-trays');
+        if(tr!==null){ hasTrays = true; trays += parseInt(tr,10) || 0; }
+      }
+    });
+    var cnt = document.querySelector('[data-lfbar="'+k+'"] .lf-count');
+    if(cnt){
+      if(!(r.from || r.to || extraOn)) cnt.textContent = '';
+      else cnt.textContent = rows.length ? (shown ? ('معروض '+shown+' من '+rows.length+(hasTrays?(' — إجمالي الصواني: '+trays):'')) : 'لا توجد سجلات بالفلتر ده.') : '';
+    }
+  }
+  function lfWire(k, applyFn){
+    var bar = document.querySelector('[data-lfbar="'+k+'"]');
+    if(!bar) return;
+    var run = applyFn || function(){ lfApply(k); };
+    var fromEl = bar.querySelector('.lf-from'), toEl = bar.querySelector('.lf-to'), st = lfState(k);
+    fromEl.addEventListener('change', function(){
+      if(this.value && st.to && this.value > st.to){ toast('تاريخ البداية بعد تاريخ النهاية'); this.value = st.from; return; }
+      st.from = this.value; run();
+    });
+    toEl.addEventListener('change', function(){
+      if(this.value && st.from && this.value < st.from){ toast('تاريخ النهاية قبل تاريخ البداية'); this.value = st.to; return; }
+      st.to = this.value; run();
+    });
+    bar.querySelector('.lf-clear').addEventListener('click', function(){ st.from = ''; st.to = ''; fromEl.value = ''; toEl.value = ''; run(); });
+    if(!applyFn) run();
+  }
+
   var TRAY_SIZE = 209;
   function batchTrays(n){ var t = parseInt(n && n.trays, 10); return t>0 ? t : 1; }
   function batchPlants(n){ return parseFloat(n && n.quantity) || (batchTrays(n)*TRAY_SIZE); }
@@ -2274,6 +2358,8 @@
       jobs = [saveNurseryBatch(left), saveNurseryBatch(moved)];
       msg = 'نزل '+n+' صينية من '+(b.cropName||'—')+(where?(' في '+where):'')+' بتاريخ '+date+'، وباقي '+remaining+' في المشتل.';
     }
+    var planJob = buildPlanTransplantLog(b, n, date, sysId);
+    if(planJob) jobs.push(planJob);
     auditSuppress++;
     return Promise.all(jobs).then(function(){
       auditSuppress--;
@@ -2310,6 +2396,164 @@
     persistLocalNurseryPlans();
     renderAll();
     return Promise.resolve();
+  }
+
+  /* ---------- تقدّم الخطة: نازلة / جاهزة / محتاجين نشتلها بالتاريخ ---------- */
+  function planDateStr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function planAddDays(ds, n){ var d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n); return planDateStr(d); }
+  function planBatchReadyDate(n, nd){ return n.sowDate ? planAddDays(n.sowDate, nd) : todayStr(); }
+  function planPendingFor(plan){
+    var ck = cropKey(plan.cropName);
+    return nurseryLog.filter(function(n){
+      return cropKey(n.cropName)===ck && !n.transplantDate && (!n.systemId || n.systemId===plan.systemId);
+    });
+  }
+  function computePlanProgress(plan){
+    var r = computeNurseryPlanResult(plan);
+    var ck = cropKey(plan.cropName);
+    var nd = parseFloat(plan.nurseryDays)||0;
+    var cs = plan.cycleStart || '';
+    var today = todayStr();
+    var moved = nurseryLog.filter(function(n){
+      return cropKey(n.cropName)===ck && n.systemId===plan.systemId && n.transplantDate && (!cs || n.transplantDate>=cs);
+    });
+    var pend = planPendingFor(plan);
+    var ready = 0, growing = 0, groups = {};
+    pend.forEach(function(n){
+      var t = batchTrays(n), rd = planBatchReadyDate(n, nd);
+      if(rd<=today) ready += t; else growing += t;
+      groups[rd] = (groups[rd]||0) + t;
+    });
+    var schedule = Object.keys(groups).sort().map(function(d){
+      return {date:d, trays:groups[d], ready:d<=today, days:dayDiff(today, d)};
+    });
+    var transplanted = sumTrays(moved);
+    var target = r.traysNeeded;
+    var remaining = Math.max(0, target - transplanted);
+    var pendingTotal = ready + growing;
+    var toSow = Math.max(0, remaining - pendingTotal);
+    var deadline = null;
+    if(r.lastTransplant && (parseFloat(plan.harvestDays)||0)>0) deadline = planAddDays(r.lastTransplant, parseFloat(plan.harvestDays)||0);
+    return {target:target, transplanted:transplanted, ready:ready, growing:growing, pendingTotal:pendingTotal,
+      remaining:remaining, toSow:toSow, schedule:schedule, nurseryDays:nd, cycleStart:cs,
+      lastTransplant:r.lastTransplant, deadline:deadline, idealNextSowDate:r.idealNextSowDate};
+  }
+  function saveNurseryPlanLogRec(rec){
+    if(db) return db.collection('nurseryPlanLog').doc(rec.id).set(rec);
+    nurseryPlanLog.push(rec); renderAll(); return Promise.resolve();
+  }
+  function planLogRec(plan, kind, moved, prog){
+    var sys = getSystem(plan.systemId);
+    return {
+      id: genId(), ts: new Date().toISOString(), date: todayStr(), createdAt: Date.now(),
+      systemId: plan.systemId, systemName: sys ? systemLabel(sys) : '', cropName: plan.cropName, kind: kind, moved: moved||0,
+      target: prog.target, transplanted: prog.transplanted, ready: prog.ready, growing: prog.growing,
+      remaining: prog.remaining, toSow: prog.toSow, by: currentUser||''
+    };
+  }
+  /* بتتسجل تلقائي لما صواني تنزل في سيستم ليه خطة لنفس المحصول */
+  function buildPlanTransplantLog(batch, n, date, sysId){
+    var plan = sysId ? getNurseryPlan(sysId) : null;
+    if(!plan || !plan.cropName || cropKey(plan.cropName)!==cropKey(batch.cropName)) return null;
+    var prog = computePlanProgress(plan);
+    var counted = !plan.cycleStart || date>=plan.cycleStart;
+    var nd = parseFloat(plan.nurseryDays)||0;
+    var wasReady = planBatchReadyDate(batch, nd) <= todayStr();
+    var after = Object.assign({}, prog, {
+      transplanted: prog.transplanted + (counted ? n : 0),
+      ready: wasReady ? Math.max(0, prog.ready - n) : prog.ready,
+      growing: wasReady ? prog.growing : Math.max(0, prog.growing - n)
+    });
+    after.remaining = Math.max(0, after.target - after.transplanted);
+    after.pendingTotal = after.ready + after.growing;
+    after.toSow = Math.max(0, after.remaining - after.pendingTotal);
+    var rec = planLogRec(plan, 'transplant', n, after);
+    rec.date = date || rec.date;
+    return saveNurseryPlanLogRec(rec);
+  }
+  function deleteNurseryPlanLog(id){
+    if(!requireAdminForDelete()) return;
+    if(!confirm('تحذف السجل ده؟')) return;
+    if(db){ db.collection('nurseryPlanLog').doc(id).delete().then(function(){ toast('اتحذف'); }); }
+    else { nurseryPlanLog = nurseryPlanLog.filter(function(x){ return x.id!==id; }); renderAll(); toast('اتحذف'); }
+  }
+  function exportPlanLogCSV(){
+    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
+    var list = nurseryPlanLog.filter(function(x){ return x.systemId===nurseryPlanSystemId && lfInRange('planlog', x.date); });
+    if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
+    var lines = [['التاريخ','النوع','النظام','المحصول','صواني منقولة','نزل (إجمالي)','المطلوب','جاهزة','بتحضّن','متبقي للشتل','لسه ما اتزرعش','بواسطة'].map(csvEscape).join(',')];
+    list.forEach(function(x){
+      lines.push([x.date, x.kind==='transplant'?'نقل':'لقطة', x.systemName, x.cropName, x.moved, x.transplanted, x.target, x.ready, x.growing, x.remaining, x.toSow, x.by].map(csvEscape).join(','));
+    });
+    downloadsCap.save({filename:'oroots-nursery-plan-log-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); })
+      .catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
+  }
+  function planStatusText(row){
+    if(row.ready) return row.days===0 ? 'جاهزة النهارده' : ('جاهزة من '+(-row.days)+' يوم');
+    return 'هتجهز بعد '+row.days+' يوم';
+  }
+  function planProgressHtml(plan){
+    if(!plan || !plan.cropName) return '';
+    var pr = computePlanProgress(plan);
+    var chips = '<div class="climate-stats" style="margin-top:14px;">'+
+      climateStatChip('نزل في السيستم', pr.transplanted, 'من '+pr.target+' صينية')+
+      climateStatChip('جاهزة للشتل', pr.ready, 'صينية')+
+      climateStatChip('لسه بتحضّن', pr.growing, 'صينية')+
+      climateStatChip('متبقي للشتل', pr.remaining, 'صينية')+
+    '</div>';
+    var banner = '';
+    if(pr.target>0 && pr.remaining===0) banner = '<div class="view-only-banner" style="background:var(--good-soft);color:var(--good);">✅ الخطة مكتملة: نزل '+pr.transplanted+' من '+pr.target+' صينية.</div>';
+    else if(pr.toSow>0) banner = '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ لسه محتاج تزرع '+pr.toSow+' صينية إضافية عشان تكمل الخطة'+(pr.idealNextSowDate?(' (موعد زراعة الدفعة الجاية: '+pr.idealNextSowDate+')'):'')+'.</div>';
+    else if(pr.ready>0) banner = '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">🌱 عندك '+pr.ready+' صينية جاهزة للشتل دلوقتي.</div>';
+    var sched = pr.schedule.length
+      ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>تاريخ الجاهزية للشتل</th><th>الصواني</th><th>الحالة</th></tr></thead><tbody>'+
+        pr.schedule.map(function(r){
+          return '<tr><td class="ltr num">'+r.date+'</td><td class="num">'+r.trays+'</td><td><span class="status-pill '+(r.ready?'good':'alert')+'">'+planStatusText(r)+'</span></td></tr>';
+        }).join('')+'</tbody></table></div>'
+      : '<p class="empty-note">مفيش صواني في المشتل متخصصة للخطة دي دلوقتي.</p>';
+    var note = '<p class="hint">الجاهزية = تاريخ الزراعة + '+pr.nurseryDays+' يوم تحضين.'+
+      (pr.cycleStart?(' النزول محسوب من '+pr.cycleStart+'.'):'')+
+      (pr.deadline?(' آخر ميعاد لشتل الدفعة الجاية: '+pr.deadline+'.'):'')+
+      ' الصواني اللي ما اتحددلهاش سيستم بتتحسب لكل خطة بنفس المحصول.</p>';
+    return '<h3 class="section-title">الصواني والشتل بالتاريخ</h3>'+chips+banner+sched+note;
+  }
+  function planLogHtml(){
+    var plan = getNurseryPlan(nurseryPlanSystemId);
+    if(!plan || !plan.cropName) return '';
+    var list = nurseryPlanLog.filter(function(x){ return x.systemId===nurseryPlanSystemId; })
+      .sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
+    var rows = list.map(function(x){
+      return '<tr data-id="'+escH(x.id)+'"'+lfAttr('planlog', x.date)+'>'+
+        '<td class="ltr num">'+escH(x.date)+'</td>'+
+        '<td>'+(x.kind==='transplant' ? ('نقل '+x.moved+' صينية') : 'لقطة للوضع')+'</td>'+
+        '<td class="num">'+x.transplanted+' / '+x.target+'</td>'+
+        '<td class="num">'+x.ready+'</td><td class="num">'+x.growing+'</td><td class="num">'+x.remaining+'</td>'+
+        '<td>'+escH(x.by||'—')+'</td>'+
+        '<td><button class="del-btn planlog-del" title="حذف">✕</button></td></tr>';
+    }).join('');
+    return '<div class="table-toolbar"><h3 class="section-title" style="margin:0;">سجل الخطة</h3>'+
+        '<span><button type="button" class="btn btn-primary btn-sm" id="btn-plan-snapshot">📌 سجّل وضع الخطة</button> <button type="button" class="btn btn-ghost btn-sm" id="btn-planlog-export">تصدير CSV</button></span></div>'+
+      '<p class="hint">بيتسجل تلقائي كل ما صواني تنزل في السيستم ده، وتقدر تسجّل لقطة للوضع في أي وقت.</p>'+
+      lfBarHtml('planlog')+
+      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحدث</th><th>نزل / المطلوب</th><th>جاهزة</th><th>بتحضّن</th><th>متبقي</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      (list.length ? '' : '<p class="empty-note">لسه مفيش سجل للخطة دي.</p>');
+  }
+  function planOverviewHtml(){
+    if(!systems.length) return '';
+    var rows = systems.map(function(sy){
+      var plan = getNurseryPlan(sy.id);
+      var sel = sy.id===nurseryPlanSystemId ? ' style="background:var(--surface-2,rgba(0,0,0,0.04));"' : '';
+      if(!plan || !plan.cropName){
+        return '<tr class="plan-ov-row" data-sys="'+escH(sy.id)+'"'+sel+'><td>'+escH(systemLabel(sy))+'</td><td colspan="6" style="color:var(--muted);">مفيش خطة — اضغط وضيف</td></tr>';
+      }
+      var pr = computePlanProgress(plan);
+      var next = pr.schedule.length ? (pr.schedule[0].ready ? 'جاهزة الآن' : pr.schedule[0].date) : '—';
+      return '<tr class="plan-ov-row" data-sys="'+escH(sy.id)+'"'+sel+'><td>'+escH(systemLabel(sy))+'</td><td>'+escH(plan.cropName)+'</td>'+
+        '<td class="num">'+pr.target+'</td><td class="num">'+pr.transplanted+'</td><td class="num">'+pr.ready+'</td><td class="num">'+pr.remaining+'</td><td class="ltr num">'+escH(next)+'</td></tr>';
+    }).join('');
+    return '<h2 class="section-title" style="margin-top:0;">ملخص الخطط لكل الأنظمة</h2>'+
+      '<div class="table-wrap cropref-wrap plan-ov-wrap"><table><thead><tr><th>النظام</th><th>المحصول</th><th>المطلوب</th><th>نزل</th><th>جاهزة</th><th>متبقي</th><th>أقرب شتل</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<p class="hint">الأرقام بالصواني. اضغط على أي نظام عشان تفتح خطته وتعدّلها.</p>';
   }
 
   function computeNurseryPlanResult(plan){
@@ -2718,7 +2962,7 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var rows;
     if(sourceKey){
-      rows = flattenEntries(sourceKey, systemId).map(function(e){ return Object.assign({source:sourceKey, systemId:systemId||''}, e); });
+      rows = flattenEntries(sourceKey, systemId).filter(function(e){ return lfInRange('w-'+sourceKey, e.ts); }).map(function(e){ return Object.assign({source:sourceKey, systemId:systemId||''}, e); });
     } else {
       rows = flattenAllWithSource();
     }
@@ -2735,7 +2979,7 @@
 
   function exportClimateCSV(greenhouseName){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var entries = flattenEntries('climate', greenhouseName);
+    var entries = flattenEntries('climate', greenhouseName).filter(function(e){ return lfInRange('climate', e.ts); });
     if(!entries.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['الوقت','الحرارة °C','الرطوبة %','Lux','VPD kPa','AH g/m3','HD g/m3','الإشعاع W/m2','PPFD','بواسطة','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -3209,7 +3453,120 @@
     '</div>';
   }
 
+
+  /* ---------- جدول القيم المثلى للأصناف (مرجع) ---------- */
+  var DEFAULT_CROP_REFS = [
+    {id:'d-lettuce', name:'خس',     ec:[1.0,1.8], ph:[5.5,6.5], air:[16,24], sol:[18,22]},
+    {id:'d-arugula', name:'جرجير',  ec:[1.2,1.8], ph:[6.0,6.5], air:[15,24], sol:[18,22]},
+    {id:'d-basil',   name:'ريحان',  ec:[1.0,1.6], ph:[5.5,6.5], air:[20,28], sol:[20,24]},
+    {id:'d-mint',    name:'نعناع',  ec:[2.0,2.4], ph:[5.5,6.0], air:[18,24], sol:[18,22]},
+    {id:'d-parsley', name:'بقدونس', ec:[0.8,1.8], ph:[5.5,6.0], air:[15,25], sol:[18,22]},
+    {id:'d-cilantro',name:'كزبرة',  ec:[1.2,1.8], ph:[6.0,6.5], air:[15,22], sol:[18,22]},
+    {id:'d-spinach', name:'سبانخ',  ec:[1.8,2.3], ph:[6.0,7.0], air:[15,22], sol:[16,20]},
+    {id:'d-kale',    name:'كيل',    ec:[1.8,2.5], ph:[5.5,6.5], air:[15,24], sol:[18,22]},
+    {id:'d-strawb',  name:'فراولة', ec:[1.0,1.5], ph:[5.5,6.5], air:[15,26], sol:[18,22]},
+    {id:'d-tomato',  name:'طماطم',  ec:[2.0,3.5], ph:[5.5,6.5], air:[18,28], sol:[20,24]},
+    {id:'d-cucumber',name:'خيار',   ec:[1.7,2.5], ph:[5.5,6.0], air:[20,28], sol:[20,24]},
+    {id:'d-pepper',  name:'فلفل',   ec:[2.0,3.5], ph:[5.5,6.5], air:[20,28], sol:[20,24]}
+  ];
+  var cropRefs = null;          // null = القيم الافتراضية، أو قايمة المدير المحفوظة
+  var cropRefEditId = null;     // 'new' أو id الصف اللي بيتعدّل
+  var cropRefsOpen = true;
+  function getCropRefs(){ return Array.isArray(cropRefs) ? cropRefs : DEFAULT_CROP_REFS; }
+  function fmtRange(r, d){
+    if(!r || r.length<2 || r[0]==null || r[1]==null || r[0]==='' || r[1]==='' || isNaN(Number(r[0])) || isNaN(Number(r[1]))) return '—';
+    return '<span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block;">'+Number(r[0]).toFixed(d)+' – '+Number(r[1]).toFixed(d)+'</span>';
+  }
+  function saveCropRefs(list){
+    cropRefs = list;
+    if(!db) return Promise.resolve();
+    return db.doc('settings/cropRefs').set({list:list});
+  }
+  function renderCropRefs(force){
+    var el = $('#overview-crop-refs');
+    if(!el) return;
+    if(cropRefEditId && !force) return;
+    var isAdminUser = currentUserRole==='admin';
+    var list = getCropRefs();
+    var editing = null;
+    if(cropRefEditId){ editing = cropRefEditId==='new' ? {} : (list.filter(function(x){ return x.id===cropRefEditId; })[0] || null); }
+
+    var rows = list.map(function(r){
+      return '<tr data-id="'+escH(r.id)+'"><td><strong>'+escH(r.name)+'</strong>'+(r.note?'<div style="color:var(--muted);font-size:0.74rem;">'+escH(r.note)+'</div>':'')+'</td>'+
+        '<td class="ltr num">'+fmtRange(r.ec,1)+'</td><td class="ltr num">'+fmtRange(r.ph,1)+'</td>'+
+        '<td class="ltr num">'+fmtRange(r.air,0)+'</td><td class="ltr num">'+fmtRange(r.sol,0)+'</td>'+
+        (isAdminUser ? '<td style="white-space:nowrap;"><button type="button" class="btn-ghost btn-sm cropref-edit-btn" style="border-radius:8px;">تعديل</button> <button type="button" class="del-btn cropref-del-btn" title="حذف">✕</button></td>' : '')+
+      '</tr>';
+    }).join('');
+
+    function num(id, label, v, step){
+      return '<div class="field-sm"><label>'+label+'</label><input type="number" step="'+step+'" class="ltr" id="'+id+'" value="'+(v==null?'':escH(v))+'"></div>';
+    }
+    var formHtml = '';
+    if(isAdminUser && editing){
+      formHtml = '<form class="entry-form" id="cropref-form" style="margin-top:12px;">'+
+        '<div class="form-grid">'+
+          '<div class="field-sm full"><label>اسم الصنف</label><input type="text" id="cr-name" maxlength="60" required value="'+escH(editing.name||'')+'"></div>'+
+          num('cr-ec-min','EC من (mS/cm)',(editing.ec||[])[0],'0.1')+num('cr-ec-max','EC إلى',(editing.ec||[])[1],'0.1')+
+          num('cr-ph-min','pH من',(editing.ph||[])[0],'0.1')+num('cr-ph-max','pH إلى',(editing.ph||[])[1],'0.1')+
+          num('cr-air-min','حرارة الهواء من (°C)',(editing.air||[])[0],'0.5')+num('cr-air-max','حرارة الهواء إلى',(editing.air||[])[1],'0.5')+
+          num('cr-sol-min','حرارة المحلول من (°C)',(editing.sol||[])[0],'0.5')+num('cr-sol-max','حرارة المحلول إلى',(editing.sol||[])[1],'0.5')+
+          '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="cr-note" maxlength="80" value="'+escH(editing.note||'')+'"></div>'+
+        '</div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ</button> <button type="button" class="btn btn-ghost btn-sm" id="cr-cancel">إلغاء</button></div>'+
+      '</form>';
+    }
+    var adminBar = isAdminUser && !editing ? ('<div class="form-actions" style="margin-top:10px;"><button type="button" class="btn btn-ghost btn-sm" id="cr-add">＋ إضافة صنف</button>'+
+      (cropRefs!==null ? ' <button type="button" class="btn btn-ghost btn-sm" id="cr-reset">رجّع القيم الافتراضية</button>' : '')+'</div>') : '';
+
+    el.innerHTML =
+      '<details class="chart-card" id="cropref-details"'+(cropRefsOpen?' open':'')+'>'+
+        '<summary style="cursor:pointer;font-weight:700;font-size:1rem;">📋 القيم المثلى للأصناف (مرجع للقراءات)</summary>'+
+        '<div class="table-wrap cropref-wrap" style="margin-top:10px;"><table><thead><tr><th>الصنف</th><th>EC</th><th>pH</th><th>هواء °C</th><th>محلول °C</th>'+(isAdminUser?'<th></th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        (list.length ? '' : '<p class="empty-note">الجدول فاضي.</p>')+
+        '<p class="hint" style="margin:8px 0 0;">قيم مرجعية عامة للزراعة المائية، وممكن تختلف حسب الصنف والموسم وتوصية المورد. EC بوحدة mS/cm. "هواء" = حرارة جو الصوبة، و"محلول" = حرارة مياه الري/الخزان.'+(isAdminUser?'':' المدير هو اللي بيعدّل الجدول.')+'</p>'+
+        formHtml + adminBar +
+      '</details>';
+
+    var det = $('#cropref-details');
+    if(det) det.addEventListener('toggle', function(){ cropRefsOpen = det.open; });
+    if(!isAdminUser) return;
+    $all('.cropref-edit-btn', el).forEach(function(b){ b.addEventListener('click', function(){ cropRefEditId = b.closest('tr').getAttribute('data-id'); renderCropRefs(true); }); });
+    $all('.cropref-del-btn', el).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.closest('tr').getAttribute('data-id');
+      var r = list.filter(function(x){ return x.id===id; })[0];
+      if(!r || !confirm('تحذف "'+r.name+'" من الجدول؟')) return;
+      saveCropRefs(list.filter(function(x){ return x.id!==id; })).then(function(){ logAudit('delete','settings','حذف صنف من جدول القيم المثلى: '+r.name); toast('اتحذف'); renderCropRefs(true); });
+    }); });
+    var addBtn = $('#cr-add'); if(addBtn) addBtn.addEventListener('click', function(){ cropRefEditId = 'new'; renderCropRefs(true); });
+    var resetBtn = $('#cr-reset'); if(resetBtn) resetBtn.addEventListener('click', function(){
+      if(!confirm('ترجّع الجدول للقيم الافتراضية؟ التعديلات بتاعتك هتتمسح.')) return;
+      cropRefs = null;
+      var pr = db ? db.doc('settings/cropRefs').delete() : Promise.resolve();
+      pr.then(function(){ logAudit('edit','settings','رجّع جدول القيم المثلى للافتراضي'); toast('اترجّعت القيم الافتراضية'); renderCropRefs(true); });
+    });
+    var cancel = $('#cr-cancel'); if(cancel) cancel.addEventListener('click', function(){ cropRefEditId = null; renderCropRefs(true); });
+    var form = $('#cropref-form');
+    if(form) form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var name = $('#cr-name').value.trim();
+      function rng(a,b){ var x = $(a).value, y = $(b).value; if(x===''||y==='') return null; return [parseFloat(x), parseFloat(y)]; }
+      var ec = rng('#cr-ec-min','#cr-ec-max'), ph = rng('#cr-ph-min','#cr-ph-max'), air = rng('#cr-air-min','#cr-air-max'), sol = rng('#cr-sol-min','#cr-sol-max');
+      if(!name){ toast('اكتب اسم الصنف'); return; }
+      var bad = [['EC',ec],['pH',ph],['حرارة الهواء',air],['حرارة المحلول',sol]].filter(function(x){ return x[1] && x[1][0]>x[1][1]; })[0];
+      if(bad){ toast('قيمة "من" أكبر من "إلى" في '+bad[0]); return; }
+      var rec = {id: (editing && editing.id) || genId(), name:name, ec:ec||['',''], ph:ph||['',''], air:air||['',''], sol:sol||['',''], note:$('#cr-note').value.trim()};
+      var next = (editing && editing.id) ? list.map(function(x){ return x.id===rec.id ? rec : x; }) : list.concat([rec]);
+      if(!(editing && editing.id) && list.some(function(x){ return String(x.name).trim().toLowerCase()===name.toLowerCase(); })){ toast('الصنف ده موجود في الجدول'); return; }
+      saveCropRefs(next).then(function(){
+        logAudit(editing && editing.id ? 'edit':'add','settings','جدول القيم المثلى: '+name);
+        toast('اتحفظ'); cropRefEditId = null; renderCropRefs(true);
+      }).catch(function(e){ console.error(e); toast('تعذر الحفظ'); });
+    });
+  }
+
   function renderSystemsOverview(){
+    renderCropRefs();
     renderOverviewAlerts();
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
@@ -3703,6 +4060,7 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة '+sourceObj.label+'</button></div>'+
       '</form>'+
       '<div class="table-toolbar"><h3 style="margin:0;font-size:0.85rem;">السجل</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
+      lfBarHtml('w-'+key)+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الحالة</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-'+key+'-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من الفورم فوق.</p>');
 
@@ -3727,6 +4085,7 @@
       var dateKey = e.ts.slice(0,10);
       var st = overallStatus(e);
       var tr = document.createElement('tr');
+      tr.setAttribute('data-lf', 'w-'+key); tr.setAttribute('data-d', dateKey);
       tr.innerHTML =
         '<td class="ltr num">'+fmtTs(e.ts)+'</td>'+
         '<td class="num ltr" style="'+(metricStatus('ph',e.ph)==='alert'?'color:var(--alert)':'')+'">'+e.ph+'</td>'+
@@ -3743,6 +4102,7 @@
       });
       tbody.appendChild(tr);
     });
+    lfWire('w-'+key);
   }
 
   function renderCalibrationSection(container, systemId){
@@ -3797,6 +4157,7 @@
             '<div class="chart-card"><h3>إجمالي تصرف النظام (لتر/دقيقة)</h3><div class="chart-wrap"><div id="calib-chart-sys" class="svg-chart-holder"></div></div><p class="hint" id="calib-sum-sys" style="margin:6px 0 0;"></p></div>' : '')+
         '</div>' : '')+
       '<div class="table-toolbar"><h3 style="margin:0;font-size:0.85rem;">سجل المعايرة</h3><button class="btn btn-ghost btn-sm" id="calib-export">تصدير CSV</button></div>'+
+      lfBarHtml('calib')+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>نقاط</th><th>الحجم (مل)</th><th>المدة (ث)</th><th>L/min للنقطة</th><th>L/min للنظام</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="calib-tbody"></tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">سجّل أول معايرة من الفورم فوق.</p>');
 
@@ -3873,6 +4234,7 @@
     var tbody = $('#calib-tbody', container);
     list.slice().reverse().forEach(function(c){
       var tr = document.createElement('tr');
+      tr.setAttribute('data-lf', 'calib'); tr.setAttribute('data-d', String(c.ts).slice(0,10));
       tr.innerHTML =
         '<td class="ltr num">'+fmtTs(c.ts)+'</td>'+
         '<td class="num ltr">'+c.points+'</td>'+
@@ -3886,6 +4248,7 @@
       tr.querySelector('.del-btn').addEventListener('click', function(){ deleteIrrigCalib(c.id); });
       tbody.appendChild(tr);
     });
+    lfWire('calib');
   }
 
   var HARVEST_UNITS = ['kg','g','قطعة','صندوق'];
@@ -3915,7 +4278,6 @@
     if(!harvestChartCrop && crops.length) harvestChartCrop = crops[0];
     if(harvestFilterCrop && crops.indexOf(harvestFilterCrop)<0) harvestFilterCrop = '';
 
-    var shownList = harvestFilterCrop ? list.filter(function(h){ return h.cropName===harvestFilterCrop; }) : list;
     var totalsByCropUnit = {};
     list.forEach(function(h){
       var k = h.cropName+'|'+h.unit;
@@ -3950,8 +4312,15 @@
       : '')+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
       (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>' : '')+
+      '<div class="harvest-date-filter" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">'+
+        '<span style="font-weight:600;">الفترة:</span>'+
+        '<label style="display:flex;align-items:center;gap:6px;margin:0;font-weight:400;">من <input type="date" class="ltr" id="hv-from" style="width:auto;" value="'+harvestFrom+'"></label>'+
+        '<label style="display:flex;align-items:center;gap:6px;margin:0;font-weight:400;">إلى <input type="date" class="ltr" id="hv-to" style="width:auto;" value="'+harvestTo+'"></label>'+
+        '<button type="button" class="range-pill" id="hv-date-clear">✕ مسح الفترة</button>'+
+      '</div>'+
+      '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
       '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
-      (shownList.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
+      '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p>';
 
     $('#hv-ts', inner).value = nowLocalInputValue();
 
@@ -4022,19 +4391,47 @@
       }
     }
 
-    var tbody = $('#harvest-tbody', inner);
-    shownList.slice().reverse().forEach(function(h){
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td class="ltr num">'+fmtTs(h.ts)+'</td>'+
-        '<td>'+h.cropName+'</td>'+
-        '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
-        '<td>'+(h.by||'—')+'</td>'+
-        '<td>'+(h.note||'—')+'</td>'+
-        '<td><button class="del-btn" title="حذف">✕</button></td>';
-      tr.querySelector('.del-btn').addEventListener('click', function(){ deleteHarvest(h.id); });
-      tbody.appendChild(tr);
+    function refreshHarvestLog(){
+      var shown = harvestShown(list);
+      var tbody = $('#harvest-tbody', inner);
+      tbody.innerHTML = '';
+      shown.slice().reverse().forEach(function(h){
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="ltr num">'+fmtTs(h.ts)+'</td>'+
+          '<td>'+h.cropName+'</td>'+
+          '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
+          '<td>'+(h.by||'—')+'</td>'+
+          '<td>'+(h.note||'—')+'</td>'+
+          '<td><button class="del-btn" title="حذف">✕</button></td>';
+        tr.querySelector('.del-btn').addEventListener('click', function(){ deleteHarvest(h.id); });
+        tbody.appendChild(tr);
+      });
+      var emp = $('#harvest-empty', inner); if(emp) emp.style.display = shown.length ? 'none' : '';
+      var totEl2 = $('#harvest-log-totals', inner);
+      if(totEl2){
+        if(harvestFrom || harvestTo || harvestFilterCrop){
+          var tt = {};
+          shown.forEach(function(h){ var k = h.cropName+'|'+h.unit; tt[k] = (tt[k]||0) + (parseFloat(h.quantity)||0); });
+          var keys = Object.keys(tt);
+          totEl2.textContent = 'إجمالي المعروض ('+shown.length+' سجل'+(harvestFrom||harvestTo?(' — من '+(harvestFrom||'البداية')+' إلى '+(harvestTo||'النهاية')):'')+'): '+
+            (keys.length ? keys.map(function(k){ var pp = k.split('|'); return pp[0]+' '+(Math.round(tt[k]*100)/100)+' '+HARVEST_UNIT_LABELS[pp[1]]; }).join(' · ') : 'لا يوجد');
+        } else totEl2.textContent = '';
+      }
+      applyPermissionLock(inner, 'harvest');
+    }
+    refreshHarvestLog();
+
+    var hvFrom = $('#hv-from', inner), hvTo = $('#hv-to', inner);
+    hvFrom.addEventListener('change', function(){
+      if(this.value && harvestTo && this.value > harvestTo){ toast('تاريخ البداية بعد تاريخ النهاية'); this.value = harvestFrom; return; }
+      harvestFrom = this.value; refreshHarvestLog();
     });
+    hvTo.addEventListener('change', function(){
+      if(this.value && harvestFrom && this.value < harvestFrom){ toast('تاريخ النهاية قبل تاريخ البداية'); this.value = harvestTo; return; }
+      harvestTo = this.value; refreshHarvestLog();
+    });
+    $('#hv-date-clear', inner).addEventListener('click', function(){ harvestFrom = ''; harvestTo = ''; hvFrom.value = ''; hvTo.value = ''; refreshHarvestLog(); });
 
     applyPermissionLock(inner, 'harvest');
   }
@@ -4199,6 +4596,7 @@
         '<div class="chart-card"><h3>PPFD (µmol/m²/s)</h3><div class="chart-wrap"><div id="cl-chart-ppfd" class="svg-chart-holder"></div></div></div>'+
       '</div>'+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="climate-export">تصدير CSV</button></div>'+
+      lfBarHtml('climate')+
       '<div class="table-wrap"><table><thead><tr>'+
         '<th>الوقت</th><th>حرارة</th><th>رطوبة</th><th>Lux</th><th>VPD</th><th>AH</th><th>HD</th><th>W/m²</th><th>PPFD</th><th>بواسطة</th><th>ملاحظة</th><th></th>'+
       '</tr></thead><tbody id="climate-tbody"></tbody></table></div>'+
@@ -4271,6 +4669,7 @@
       var vpd=climateVPD(e.temp,e.rh), ah=climateAH(e.temp,e.rh), hd=climateHD(e.temp,e.rh);
       var rad=climateRadiationWm2(e.lux), ppfd=climatePPFD(e.lux);
       var tr = document.createElement('tr');
+      tr.setAttribute('data-lf', 'climate'); tr.setAttribute('data-d', String(e.ts).slice(0,10));
       tr.innerHTML =
         '<td class="ltr num">'+fmtTs(e.ts)+'</td>'+
         '<td class="num ltr">'+fmtNum(e.temp)+'</td>'+
@@ -4291,6 +4690,7 @@
       });
       tbody.appendChild(tr);
     });
+    lfWire('climate');
     applyPermissionLock($('#panel-climate'), 'climate');
   }
 
@@ -4357,7 +4757,7 @@
       var sortedAll = allTasks.slice().sort(function(a,b){ return b.ts.localeCompare(a.ts); });
       var tableRowsHtml = sortedAll.map(function(t){
         var dateKey = t.ts.slice(0,10);
-        return '<tr data-taskid="'+t.id+'" data-datekey="'+dateKey+'">'+
+        return '<tr data-taskid="'+t.id+'" data-datekey="'+dateKey+'"'+lfAttr('tasks', dateKey)+'>'+
           '<td class="ltr">'+dateKey+'</td>'+
           '<td>'+(t.greenhouse||'—')+'</td>'+
           '<td>'+(t.assignedTo||'—')+'</td>'+
@@ -4369,6 +4769,7 @@
       }).join('');
       allTasksSectionHtml =
         '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">كل المهام (للمتابعة)</h2><button class="btn btn-ghost btn-sm" id="tasks-export">تصدير CSV</button></div>'+
+        lfBarHtml('tasks')+
         '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>الشخص</th><th>المهمة</th><th>الحالة</th><th></th><th></th></tr></thead><tbody>'+tableRowsHtml+'</tbody></table></div>'+
         (allTasks.length ? '' : '<p class="empty-note">لسه مفيش مهام متسجلة.</p>');
     }
@@ -4394,6 +4795,7 @@
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">الإجراءات القياسية (SOPs)</h2><button class="btn btn-primary btn-sm" id="btn-new-sop">+ إجراء جديد</button></div>'+
       '<div id="sop-form-holder"></div>'+
       '<div id="sop-list">'+sopListHtml+'</div>';
+    lfWire('tasks');
 
     $all('.task-card', body).forEach(function(card){
       var btn = card.querySelector('.task-done-btn');
@@ -4510,7 +4912,7 @@
 
   function exportTasksCSV(){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var allTasks = flattenTasks();
+    var allTasks = flattenTasks().filter(function(t){ return lfInRange('tasks', t.ts); });
     if(!allTasks.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['التاريخ','الصوبة','الشخص المكلّف','المهمة','متكررة','ملاحظة','الإجراء المرتبط','الحالة','بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -4934,7 +5336,7 @@
       var sevBadge = p.severity ? '<span class="status-pill '+(p.severity==='high'?'alert':(p.severity==='medium'?'':'good'))+'" style="'+(p.severity==='medium'?'background:var(--tank-soft);color:var(--tank);':'')+'">'+(p.severity==='high'?'شديدة':(p.severity==='medium'?'متوسطة':'خفيفة'))+'</span>' : '';
       var photoHtml = p.photoAssetId ? ('<img class="pest-photo" src="'+pestPhotoUrl(p.photoAssetId)+'" alt="صورة الإصابة">') : '';
       var treatHtml = p.treated ? '<div class="pest-treatment">🧪 اتعالجت بـ <strong>'+(p.pesticideName||'—')+'</strong>'+(p.dose?(' — الكمية: '+p.dose):'')+'</div>' : '';
-      return '<div class="pest-card" data-id="'+p.id+'">'+
+      return '<div class="pest-card" data-id="'+p.id+'"'+lfAttr('pests', p.ts)+'>'+
         '<div class="pest-card-head"><span class="task-date-badge">'+fmtTs(p.ts)+'</span>'+pestCategoryLabel[p.category]+' '+sevBadge+'</div>'+
         '<div class="task-title">'+(p.problemName||'—')+'</div>'+
         (p.location?('<div class="task-note">📍 '+p.location+'</div>'):'')+
@@ -4971,10 +5373,12 @@
 
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
+      lfBarHtml('pests')+
       '<div class="tasks-list">'+listHtml+'</div>'+
       renderBioControlSectionHtml(gh);
 
     $('#pest-ts').value = nowLocalInputValue();
+    ['pests','bio','sticky','pher'].forEach(function(k){ lfWire(k); });
     $('#pest-treated').addEventListener('change', function(){
       var show = this.checked ? 'block' : 'none';
       $('#pest-pesticide-wrap').style.display = show;
@@ -5098,18 +5502,18 @@
     var soon = relList.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate)>=0 && daysUntil(x.nextReleaseDate)<=3; }).length;
 
     var relRows = relList.length ? relList.map(function(x){
-      return '<tr data-id="'+x.id+'"><td class="ltr num">'+x.releaseDate+'</td><td>'+x.beneficialName+'</td><td>'+(x.targetPest||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+x.beneficialName+'</td><td>'+(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.perM2||'—')+'</td><td>'+(x.nextReleaseDate?nextReleaseBadge(x.nextReleaseDate):'—')+'</td>'+
         '<td>'+(x.note||'—')+'</td><td><button class="del-btn bio-release-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="7" class="empty-note">لا توجد إطلاقات مسجلة لهذه الصوبة.</td></tr>';
 
     var stRows = stList.length ? stList.map(function(x){
-      return '<tr data-id="'+x.id+'"><td class="ltr num">'+x.placedDate+'</td><td>'+stickyColorLabel(x.color)+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('sticky', x.placedDate)+'><td class="ltr num">'+x.placedDate+'</td><td>'+stickyColorLabel(x.color)+'</td>'+
         '<td class="num ltr">'+(x.count||'—')+'</td><td>'+(x.note||'—')+'</td><td><button class="del-btn sticky-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد لاصقات مسجلة.</td></tr>';
 
     var phRows = phList.length ? phList.map(function(x){
-      return '<tr data-id="'+x.id+'"><td class="ltr num">'+x.placedDate+'</td><td>'+(x.targetPest||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('pher', x.placedDate)+'><td class="ltr num">'+x.placedDate+'</td><td>'+(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.count||'—')+'</td><td>'+(x.note||'—')+'</td><td><button class="del-btn pheromone-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد مصائد مسجلة.</td></tr>';
 
@@ -5135,6 +5539,7 @@
           '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الإطلاق</button></div>'+
         '</form>'+
         '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="bio-release-export">تصدير CSV</button></div>'+
+        lfBarHtml('bio')+
         '<div class="table-wrap"><table><thead><tr><th>تاريخ الإطلاق</th><th>العدو الحيوي</th><th>يستهدف</th><th>العدد/م²</th><th>الإطلاق القادم</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+relRows+'</tbody></table></div>'+
       '</details>'+
 
@@ -5149,6 +5554,7 @@
           '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ</button></div>'+
         '</form>'+
         '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="sticky-export">تصدير CSV</button></div>'+
+        lfBarHtml('sticky')+
         '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>اللون</th><th>العدد</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+stRows+'</tbody></table></div>'+
       '</details>'+
 
@@ -5163,6 +5569,7 @@
           '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ</button></div>'+
         '</form>'+
         '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="pheromone-export">تصدير CSV</button></div>'+
+        lfBarHtml('pher')+
         '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>يستهدف</th><th>العدد</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+phRows+'</tbody></table></div>'+
       '</details>'+
     '</div>';
@@ -5219,7 +5626,7 @@
 
   function exportPestlogCSV(greenhouseName){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var incidents = flattenPestlog(greenhouseName);
+    var incidents = flattenPestlog(greenhouseName).filter(function(x){ return lfInRange('pests', x.ts); });
     if(!incidents.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['الوقت','النوع','اسم المرض/الآفة','الشدة','الموقع','تمت المعاملة','المبيد','الكمية','ملاحظة','بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -5239,6 +5646,10 @@
   }
 
   /* ---------- Nursery (seed trays -> transplant tracking) panel ---------- */
+  var nurseryFilterCrop = '';
+  function cropKey(n){ return String(n==null?'':n).trim().toLowerCase(); }
+  LF_EXTRA.nursery = function(row){ return !nurseryFilterCrop || row.getAttribute('data-crop')===nurseryFilterCrop; };
+  LF_EXTRA_ON.nursery = function(){ return !!nurseryFilterCrop; };
   var nurseryFilterStatus = null; // null=all, 'pending'=still in nursery, 'done'=transplanted
   var nurseryEditingId = null;
   var nurseryTransplantId = null;
@@ -5377,6 +5788,7 @@
         '<div class="field-sm"><label>نسبة الفاقد المتوقع (%)</label><input type="number" step="0.5" min="0" max="90" class="ltr" id="plan-loss" value="'+(plan.lossPercent!=null?plan.lossPercent:'')+'"></div>'+
         '<div class="field-sm"><label>مدة موسم الحصاد (يوم)</label><input type="number" step="1" min="0" class="ltr" id="plan-harvest-days" value="'+(plan.harvestDays!=null?plan.harvestDays:'')+'"></div>'+
         '<div class="field-sm"><label>عدد أيام التحضين بالمشتل</label><input type="number" step="1" min="0" class="ltr" id="plan-nursery-days" value="'+(plan.nurseryDays!=null?plan.nurseryDays:'')+'"></div>'+
+        '<div class="field-sm"><label>بداية الدورة (اختياري)</label><input type="date" class="ltr" id="plan-cycle-start" value="'+(plan.cycleStart||'')+'"></div>'+
       '</div>'+
       '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="btn-calc-plan">احسب واحفظ الخطة</button></div>';
 
@@ -5409,9 +5821,10 @@
       resultsHtml += timingHtml;
     }
 
-    return '<h2 class="section-title" style="margin-top:0;">خطة المشتل — هل أنا مستمر صح؟</h2>'+
+    return planOverviewHtml() +
+      '<h2 class="section-title">خطة المشتل — هل أنا مستمر صح؟</h2>'+
       '<p class="hint">اختار النظام واكتب أرقام دورة الزراعة بتاعتك، وهيوريك لو المشتل هيغطي احتياج النظام أو لأ، ولو معاد الدفعة الجاية قرّب.</p>'+
-      formHtml + resultsHtml;
+      formHtml + resultsHtml + planProgressHtml(plan.cropName ? plan : null) + planLogHtml();
   }
 
   function wireNurseryPlanSection(){
@@ -5433,6 +5846,7 @@
         lossPercent: parseFloat($('#plan-loss').value)||0,
         harvestDays: parseFloat($('#plan-harvest-days').value)||0,
         nurseryDays: parseFloat($('#plan-nursery-days').value)||0,
+        cycleStart: $('#plan-cycle-start').value || '',
         updatedAt: Date.now()
       };
       saveNurseryPlan(plan).then(function(){
@@ -5440,6 +5854,19 @@
         renderNurseryPanel();
       });
     });
+    $all('.plan-ov-row').forEach(function(tr){
+      tr.addEventListener('click', function(){ nurseryPlanSystemId = tr.getAttribute('data-sys'); renderNurseryPanel(); });
+    });
+    var snap = $('#btn-plan-snapshot');
+    if(snap) snap.addEventListener('click', function(){
+      var plan = getNurseryPlan(nurseryPlanSystemId);
+      if(!plan || !plan.cropName) return;
+      var rec = planLogRec(plan, 'snapshot', 0, computePlanProgress(plan));
+      saveNurseryPlanLogRec(rec).then(function(){ logAudit('add','nursery','لقطة لخطة المشتل — '+plan.cropName+' — نزل '+rec.transplanted+' من '+rec.target); toast('اتسجّل وضع الخطة'); });
+    });
+    $all('.planlog-del').forEach(function(b){ b.addEventListener('click', function(){ deleteNurseryPlanLog(b.closest('tr').getAttribute('data-id')); }); });
+    var pex = $('#btn-planlog-export'); if(pex) pex.addEventListener('click', exportPlanLogCSV);
+    lfWire('planlog');
   }
 
   function renderNurseryPanel(){
@@ -5457,6 +5884,15 @@
       return '<button type="button" class="range-pill nursery-filter-pill'+(nurseryFilterStatus===f.key?' active':'')+'" data-key="'+(f.key||'')+'">'+f.label+'</button>';
     }).join('');
 
+    var cropNames = {}, cropOrder = [];
+    all.forEach(function(n){ var k = cropKey(n.cropName); if(k && !cropNames[k]){ cropNames[k] = String(n.cropName).trim(); cropOrder.push(k); } });
+    cropOrder.sort(function(a,b){ return cropNames[a].localeCompare(cropNames[b], 'ar'); });
+    if(nurseryFilterCrop && !cropNames[nurseryFilterCrop]) nurseryFilterCrop = '';
+    var cropPillsHtml = cropOrder.length
+      ? '<div class="range-filter" id="nursery-crop-pills"><button type="button" class="range-pill nursery-crop-pill'+(!nurseryFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+
+        cropOrder.map(function(k){ return '<button type="button" class="range-pill nursery-crop-pill'+(k===nurseryFilterCrop?' active':'')+'" data-crop="'+escH(k)+'">'+escH(cropNames[k])+'</button>'; }).join('')+'</div>'
+      : '';
+
     var rowsHtml = list.length ? list.map(function(n){
       var sys = n.systemId ? getSystem(n.systemId) : null;
       var statusHtml = n.transplantDate
@@ -5465,7 +5901,7 @@
       if(n.transplantDate && n.fromTrays){
         statusHtml += '<div style="color:var(--muted);font-size:0.76rem;margin-top:4px;">نزل '+batchTrays(n)+' من '+n.fromTrays+' — باقي '+n.remainingAfter+' في المشتل</div>';
       }
-      return '<tr data-id="'+n.id+'">'+
+      return '<tr data-id="'+n.id+'"'+lfAttr('nursery', n.sowDate)+' data-crop="'+escH(cropKey(n.cropName))+'" data-trays="'+batchTrays(n)+'">'+
         '<td class="ltr">'+n.sowDate+'</td>'+
         '<td>'+n.cropName+'</td>'+
         '<td class="num">'+batchTrays(n)+' <span style="color:var(--muted);font-size:0.76rem;">('+batchPlants(n)+' نبات)</span></td>'+
@@ -5493,10 +5929,20 @@
       nurserySummaryHtml(all) +
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
+      cropPillsHtml+
+      lfBarHtml('nursery')+
       '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
 
     wireNurseryPlanSection();
+    lfWire('nursery');
+    $all('.nursery-crop-pill', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        nurseryFilterCrop = btn.getAttribute('data-crop') || '';
+        $all('.nursery-crop-pill', body).forEach(function(b){ b.classList.toggle('active', b===btn); });
+        lfApply('nursery');
+      });
+    });
     if(tBatch){
       renderNurseryTransplantForm(tBatch);
       var hold = $('#nursery-form-holder');
@@ -5558,7 +6004,7 @@
 
   function exportNurseryCSV(){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var all = flattenNursery();
+    var all = flattenNursery().filter(function(n){ return lfInRange('nursery', n.sowDate) && (!nurseryFilterCrop || cropKey(n.cropName)===nurseryFilterCrop); });
     if(!all.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['تاريخ زراعة البذور','الصنف','عدد الصواني','عدد النباتات','العمر (يوم)','تاريخ النزول للسيستم','الصوبة','السيستم','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
@@ -5935,6 +6381,23 @@
     }, function(err){
       console.error('nurseryPlans snapshot error', err);
     });
+
+    db.doc('settings/cropRefs').onSnapshot(function(snap){
+      cropRefs = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : null;
+      renderCropRefs();
+    }, function(err){
+      console.error('cropRefs snapshot error', err);
+    });
+
+    db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+      instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAll();
+    }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
+
+    db.collection('nurseryPlanLog').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+      nurseryPlanLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAll();
+    }, function(err){ console.error('nurseryPlanLog snapshot error', err); });
   }
 
   function watchForDayChange(){
@@ -5952,6 +6415,7 @@
     setupTheme();
     setupTabs();
     setupSettings();
+    var _ah = $('#audit-date-holder'); if(_ah){ _ah.innerHTML = lfBarHtml('audit'); lfWire('audit', function(){ renderAuditPanel(); }); }
     setupLogin();
     fillSettingsForm();
     updateSyncBadge();
