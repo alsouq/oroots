@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-N1yzvGjLWe99V/uhDEmSRGyzlSheM+1P2JGln2xmYlQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-8h+vT+98SirHAkEBIuJseO7ZpAGQ8s6WFgGVRjlzlGc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -6393,6 +6393,109 @@
   /* ---------- render orchestration ---------- */
   function safe(fn){ try{ fn(); }catch(e){ console.error(e); } }
 
+  /* ---------- حماية اللي بتكتبه: إعادة الرسم (لما بيانات جديدة توصل) ما تمسحش الخانات ---------- */
+  var FS = {dirty:{}, depth:0};
+  var FS_SKIP = '[type=file],[type=password],[type=hidden],[type=submit],[type=button],[type=range],.lf-from,.lf-to,#hv-from,#hv-to,#pipe-sim,#pipe-system-select,#plan-system-select,#climate-day-picker,[id^="audit-"]';
+  function fsTracked(el){ return !!(el && el.matches && el.matches('input,select,textarea') && !el.matches(FS_SKIP) && el.closest && el.closest('#app')); }
+  function fsKey(el){
+    if(el.id) return '#'+el.id;
+    var form = el.closest('form'), panel = el.closest('.panel');
+    var scope = form || panel || document.body;
+    var list = [].slice.call(scope.querySelectorAll('input,select,textarea'));
+    return (panel?panel.id:'')+'|'+(form&&form.id?form.id:'')+'|'+(el.name||'')+'|'+list.indexOf(el);
+  }
+  function fsFind(k){
+    if(k.charAt(0)==='#') return document.getElementById(k.slice(1));
+    var parts = k.split('|'), scope = parts[1] ? document.getElementById(parts[1]) : (parts[0] ? document.getElementById(parts[0]) : document.body);
+    if(!scope) return null;
+    return [].slice.call(scope.querySelectorAll('input,select,textarea'))[parseInt(parts[3],10)] || null;
+  }
+  function fsRecord(ev){
+    var el = ev.target;
+    if(!fsTracked(el)) return;
+    FS.dirty[fsKey(el)] = {v:el.value, c:el.checked, def:el.defaultValue};
+  }
+  function fsClearIn(root){
+    if(!root || !root.querySelectorAll) return;
+    [].slice.call(root.querySelectorAll('input,select,textarea')).forEach(function(el){ delete FS.dirty[fsKey(el)]; });
+  }
+  document.addEventListener('input', fsRecord, true);
+  document.addEventListener('change', fsRecord, true);
+  document.addEventListener('submit', function(ev){ fsClearIn(ev.target); }, true);
+  document.addEventListener('reset', function(ev){ fsClearIn(ev.target); }, true);
+  document.addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('button') : null;
+    if(!b) return;
+    var t = (b.textContent||'').trim(), c = (b.className||'')+' '+(b.id||'');
+    if(/إلغاء/.test(t) || /cancel/i.test(c)) fsClearIn(b.closest('form') || b.closest('.panel'));
+    else if(/تعديل/.test(t) || /edit|transplant/i.test(c)) FS.dirty = {};   // بيفتح سجل تاني، فمسودة الفورم القديمة ما تتطبقش عليه
+  }, true);
+  document.addEventListener('change', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id==='plan-system-select' || id==='pipe-system-select') FS.dirty = {};
+  }, true);
+  function fsCapture(){
+    var st = {focusKey:null, sel:null, open:{}};
+    var act = document.activeElement;
+    if(fsTracked(act)){
+      st.focusKey = fsKey(act);
+      try{ st.sel = [act.selectionStart, act.selectionEnd]; }catch(e){}
+    }
+    Object.keys(FS.dirty).forEach(function(k){
+      var el = fsFind(k), d = el && el.closest ? el.closest('details') : null;
+      if(d && d.id) st.open[d.id] = d.open;
+    });
+    return st;
+  }
+  function fsRestore(st){
+    var selects = [];
+    Object.keys(FS.dirty).forEach(function(k){
+      var el = fsFind(k), d = FS.dirty[k];
+      if(!el) return;
+      var timeLike = /^(date|datetime-local|time|month|week)$/.test(el.type);
+      if(!timeLike && el.tagName!=='SELECT' && el.type!=='checkbox' && el.type!=='radio' && el.defaultValue!==d.def) return;
+      var det = el.closest('details');
+      if(det && det.id && st.open[det.id]) det.open = true;
+      if(el.type==='checkbox' || el.type==='radio'){ if(el.checked!==d.c){ el.checked = d.c; el.dispatchEvent(new Event('change',{bubbles:true})); } }
+      else if(el.tagName==='SELECT'){ selects.push([el,d]); }
+      else if(el.value!==d.v){ el.value = d.v; el.dispatchEvent(new Event('input',{bubbles:true})); }
+    });
+    var cascade = /^(nt-gh|nursery-gh|task-gh|pest-category)$/;
+    selects.forEach(function(x){
+      var el = x[0], d = x[1];
+      if([].slice.call(el.options).some(function(o){ return o.value===d.v; }) && el.value!==d.v){
+        el.value = d.v;
+        if(cascade.test(el.id)) el.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    });
+    selects.forEach(function(x){      // تاني: القوايم المعتمدة (زي السيستم بعد الصوبة)
+      var el = x[0], d = x[1];
+      if(el.value!==d.v && [].slice.call(el.options).some(function(o){ return o.value===d.v; })) el.value = d.v;
+    });
+    if(st.focusKey){
+      var f = fsFind(st.focusKey);
+      if(f && f!==document.activeElement){
+        try{
+          f.focus({preventScroll:true});
+          if(st.sel && typeof f.setSelectionRange==='function') f.setSelectionRange(st.sel[0], st.sel[1]);
+        }catch(e){}
+      }
+    }
+  }
+  function fsWrap(fn){
+    return function(){
+      if(FS.depth>0) return fn.apply(this, arguments);
+      FS.depth++;
+      var st = null;
+      try{ st = fsCapture(); }catch(e){}
+      try{ return fn.apply(this, arguments); }
+      finally{
+        FS.depth--;
+        try{ if(st) fsRestore(st); }catch(e){ console.error('fsRestore', e); }
+      }
+    };
+  }
+
   function renderAll(){
     safe(applyTabVisibility);
     safe(renderUsersSettings);
@@ -6620,6 +6723,21 @@
       }).then(function(){ location.reload(); });
     });
   }
+
+  renderAll = fsWrap(renderAll);
+  renderAuditPanel = fsWrap(renderAuditPanel);
+  renderClimatePanel = fsWrap(renderClimatePanel);
+  renderHarvestPanel = fsWrap(renderHarvestPanel);
+  renderInventoryPanel = fsWrap(renderInventoryPanel);
+  renderNurseryPanel = fsWrap(renderNurseryPanel);
+  renderNutrientsPanel = fsWrap(renderNutrientsPanel);
+  renderPestsPanel = fsWrap(renderPestsPanel);
+  renderTasksPanel = fsWrap(renderTasksPanel);
+  renderWaterPanel = fsWrap(renderWaterPanel);
+  renderSystemsOverview = fsWrap(renderSystemsOverview);
+  renderUsersSettings = fsWrap(renderUsersSettings);
+  renderInstrumentCalibSection = fsWrap(renderInstrumentCalibSection);
+  renderCropRefs = fsWrap(renderCropRefs);
 
   /* ---------- init ---------- */
   function subscribeDb(){
