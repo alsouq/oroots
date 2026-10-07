@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-8h+vT+98SirHAkEBIuJseO7ZpAGQ8s6WFgGVRjlzlGc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MqGPUTnXsmCz2fpZ2V9AOVVUpKHS2WwWI2RUAkA5oWE=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -181,6 +181,7 @@
   .pipe-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin:4px 0 8px;} .pipe-legend span{display:inline-flex;align-items:center;gap:5px;}
   .lg{display:inline-block;width:12px;height:12px;border-radius:4px;} .lg-seed{background:#b6e3c0;} .lg-grow{background:#4fb87f;} .lg-almost{background:#2b9a5d;} .lg-ready{background:#0f7a3d;box-shadow:0 0 6px #3fcf7a;} .lg-over{background:#e0a82e;} .lg-empty{border:2px solid var(--border);}
   @media (prefers-reduced-motion:reduce){.pipe-fill,.pipe .lf,.pipe-tube{animation:none !important;transition:none !important;}}
+  .cn-map{box-sizing:border-box;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:0.92rem;}
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -617,6 +618,12 @@
       <h1 class="page-title">الإعدادات</h1>
 
       <div class="settings-card">
+        <h3>الأصناف / المحاصيل</h3>
+        <p class="hint">سجّل أسماء الأصناف هنا مرة واحدة، وكل خانات "الصنف / المحصول" في التطبيق (الحصاد والمشتل والخطة والمواسير) هتبقى قايمة اختيار منها، عشان الكتابة تتوحد ومحدش يغلط في الاسم.</p>
+        <div id="cropnames-box"></div>
+      </div>
+
+      <div class="settings-card">
         <h3>حسابات الموظفين والصلاحيات</h3>
         <p class="hint">لكل موظف حساب مستقل (إيميل وكلمة مرور مؤقتة)، وتقدر تحدد لكل تبويب هل يشوفه بس (عرض) ولا يقدر يضيف/يعدّل فيه (تعديل) ولا يتخفي عنه خالص. حسابك كمدير شايف كل حاجة دايمًا، وتبويب الإعدادات ده مايظهرش غير للمدير.</p>
         <div id="users-list"></div>
@@ -814,6 +821,7 @@
   var nurseryPlans = [];
   var nurseryPlanLog = [];
   var pipeMaps = [];
+  var cropNames = [];
   var pipeSimDays = 0;
   var pipeEditId = null;
   var pipeSel = -1;
@@ -1484,7 +1492,7 @@
   function saveHarvest(rec){
     var isNew = !harvestLog.some(function(h){ return h.id===rec.id; });
     return saveHarvestRaw(rec).then(function(r){
-      logAudit(isNew?'add':'edit', 'harvest', 'حصاد: '+rec.cropName+' — '+rec.quantity+' '+HARVEST_UNIT_LABELS[rec.unit]+' — '+auditSysName(rec.systemId));
+      logAudit(isNew?'add':'edit', 'harvest', 'حصاد: '+rec.cropName+' — '+rec.quantity+' '+HARVEST_UNIT_LABELS[rec.unit]+(rec.pipes?(' — '+rec.pipes+' ماسورة'):'')+' — '+auditSysName(rec.systemId));
       return r;
     });
   }
@@ -1514,10 +1522,10 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var list = harvestShown(harvestForSystem(systemId));
     if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['التاريخ','الصنف','الكمية','الوحدة','بواسطة','ملاحظة'];
+    var header = ['التاريخ','الصنف','الكمية','الوحدة','عدد المواسير','بواسطة','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
     list.forEach(function(h){
-      lines.push([h.ts, h.cropName, h.quantity, HARVEST_UNIT_LABELS[h.unit], h.by||'', h.note||''].map(csvEscape).join(','));
+      lines.push([h.ts, h.cropName, h.quantity, HARVEST_UNIT_LABELS[h.unit], h.pipes||'', h.by||'', h.note||''].map(csvEscape).join(','));
     });
     var csv = '\uFEFF' + lines.join('\r\n');
     downloadsCap.save({filename:'oroots-harvest-'+safeDocIdPart(systemId)+'-'+todayStr()+'.csv', data:csv}).then(function(){
@@ -1707,7 +1715,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames
     };
   }
   function exportFullBackup(){
@@ -1783,6 +1791,7 @@
     if(Array.isArray(backup.nurseryPlans)) writes.push(db.doc('settings/nurseryPlans').set({list: backup.nurseryPlans}));
     if(Array.isArray(backup.cropRefs)) writes.push(db.doc('settings/cropRefs').set({list: backup.cropRefs}));
     if(Array.isArray(backup.pipeMaps)) writes.push(db.doc('settings/pipeMaps').set({list: backup.pipeMaps}));
+    if(Array.isArray(backup.cropNames)) writes.push(db.doc('settings/cropNames').set({list: backup.cropNames}));
     return Promise.all(writes);
   }
   function importFullBackup(backup){
@@ -2751,6 +2760,25 @@
       text:'واتضافت '+want+' ماسورة في إنفوجراف السيستم (مواسير '+(startUsed+1)+'–'+(startUsed+want)+')'};
   }
 
+  function pipeHarvestFromLog(sysId, crop, n){
+    var map = getPipeMap(sysId), key = cropKey(crop);
+    var cands = map.groups.filter(function(g){ return cropKey(g.crop)===key; })
+      .sort(function(a,b){ return String(a.plantDate).localeCompare(String(b.plantDate)); });
+    var avail = cands.reduce(function(sum,g){ return sum + g.pipes; }, 0);
+    if(!avail) return {deducted:0, job:null, text:'مفيش مواسير '+crop+' في إنفوجراف السيستم عشان تتخصم'};
+    var left = n, take = {};
+    cands.forEach(function(g){ if(left<=0) return; var t = Math.min(left, g.pipes); take[g.id] = t; left -= t; });
+    var groups = [];
+    map.groups.forEach(function(g){
+      var t = take[g.id];
+      if(!t) groups.push(g);
+      else if(t < g.pipes) groups.push(Object.assign({}, g, {start:g.start+t, pipes:g.pipes-t}));
+    });
+    var deducted = n - left;
+    return {deducted:deducted, job:savePipeMap(Object.assign({}, map, {groups:groups})),
+      text:'واتخصم '+deducted+' ماسورة من إنفوجراف السيستم'+(left>0?(' (طلبت '+n+' بس الموجود '+avail+')'):'')};
+  }
+
   function pipeInfographicHtml(){
     if(!systems.length) return '';
     var sysOptions = systems.map(function(sy){
@@ -2774,7 +2802,7 @@
       '<h3 class="section-title">مجموعات المواسير</h3><div id="pipe-groups">'+pipeGroupsHtml(map, pipeSimDays)+'</div>'+
       '<details class="chart-card" id="pipe-form-details"'+(editing?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(editing?'✏️ تعديل المجموعة':'＋ ضيف مجموعة مواسير')+'</summary>'+
         '<form class="entry-form" id="pipe-grp-form" style="margin-top:10px;"><div class="form-grid">'+
-          '<div class="field-sm full"><label>المحصول</label><input type="text" id="pg-crop" list="pipe-crops" maxlength="60" required value="'+(editing?escH(editing.crop):'')+'" placeholder="مثال: خس"><datalist id="pipe-crops">'+cropsList+'</datalist></div>'+
+          '<div class="field-sm full"><label>المحصول</label>'+cropFieldHtml('pg-crop', editing?editing.crop:'', true)+'</div>'+
           '<div class="field-sm"><label>عدد المواسير</label><input type="number" step="1" min="1" class="ltr" id="pg-pipes" required value="'+(editing?editing.pipes:'')+'"></div>'+
           '<div class="field-sm"><label>أول ماسورة (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="pg-start" placeholder="تلقائي" value="'+(editing?(editing.start+1):'')+'"></div>'+
           '<div class="field-sm"><label>عمر النبات النهارده (يوم)</label><input type="number" step="1" min="0" class="ltr" id="pg-age" required value="'+defAge+'"></div>'+
@@ -3852,7 +3880,7 @@
     if(isAdminUser && editing){
       formHtml = '<form class="entry-form" id="cropref-form" style="margin-top:12px;">'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>اسم الصنف</label><input type="text" id="cr-name" maxlength="60" required value="'+escH(editing.name||'')+'"></div>'+
+          '<div class="field-sm full"><label>اسم الصنف</label>'+cropFieldHtml('cr-name', editing.name||'', true)+'</div>'+
           num('cr-ec-min','EC من (mS/cm)',(editing.ec||[])[0],'0.1')+num('cr-ec-max','EC إلى',(editing.ec||[])[1],'0.1')+
           num('cr-ph-min','pH من',(editing.ph||[])[0],'0.1')+num('cr-ph-max','pH إلى',(editing.ph||[])[1],'0.1')+
           num('cr-air-min','حرارة الهواء من (°C)',(editing.air||[])[0],'0.5')+num('cr-air-max','حرارة الهواء إلى',(editing.air||[])[1],'0.5')+
@@ -4633,7 +4661,7 @@
       ? '<div class="climate-stats">'+Object.keys(totalsByCropUnit).map(function(k){
           var parts = k.split('|');
           return climateStatChip(parts[0], (Math.round(totalsByCropUnit[k]*100)/100), HARVEST_UNIT_LABELS[parts[1]]);
-        }).join('')+'</div>'
+        }).join('')+(list.some(function(h){ return h.pipes>0; }) ? climateStatChip('مواسير محصودة', list.reduce(function(sum,h){ return sum + (parseInt(h.pipes,10)||0); }, 0), 'ماسورة') : '')+'</div>'
       : '<p class="empty-note">لسه مفيش حصاد مسجل للنظام ده.</p>';
 
     inner.innerHTML =
@@ -4643,9 +4671,12 @@
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>التاريخ والوقت</label><input type="datetime-local" class="ltr" id="hv-ts" required></div>'+
-          '<div class="field-sm"><label>الصنف / المحصول</label><input type="text" id="hv-crop" list="hv-crop-list" placeholder="مثلاً: خس، طماطم" required><datalist id="hv-crop-list">'+crops.map(function(c){ return '<option value="'+c.replace(/"/g,'&quot;')+'">'; }).join('')+'</datalist></div>'+
+          '<div class="field-sm"><label>الصنف / المحصول</label>'+cropFieldHtml('hv-crop','',true)+'</div>'+
           '<div class="field-sm"><label>الكمية</label><input type="number" step="any" min="0.001" class="ltr" id="hv-qty" required></div>'+
           '<div class="field-sm"><label>الوحدة</label><select id="hv-unit">'+HARVEST_UNITS.map(function(u){ return '<option value="'+u+'">'+HARVEST_UNIT_LABELS[u]+'</option>'; }).join('')+'</select></div>'+
+          '<div class="field-sm"><label>عدد المواسير اللي اتحصدت (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="hv-pipes"></div>'+
+          '<div class="field-sm"><label>الإنفوجراف</label><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="hv-pipes-deduct" checked style="width:auto;"> اخصمها من إنفوجراف المواسير</label></div>'+
+          '<p class="hint full" id="hv-pipes-hint" style="margin:0;"></p>'+
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="hv-note"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الحصاد</button></div>'+
@@ -4665,23 +4696,51 @@
         '<button type="button" class="range-pill" id="hv-date-clear">✕ مسح الفترة</button>'+
       '</div>'+
       '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
-      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
       '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p>';
 
     $('#hv-ts', inner).value = nowLocalInputValue();
+
+    function updateHvPipesHint(){
+      var crop = $('#hv-crop', inner).value.trim(), hint = $('#hv-pipes-hint', inner);
+      if(!hint) return;
+      if(!crop){ hint.textContent = ''; return; }
+      var map = getPipeMap(selectedSystemId), key = cropKey(crop), tot = 0, ready = 0;
+      map.groups.forEach(function(g){
+        if(cropKey(g.crop)!==key) return;
+        tot += g.pipes;
+        var st = pipeStage(pipeAgeDays(g, 0), g.harvestDays).st;
+        if(st==='ready' || st==='over') ready += g.pipes;
+      });
+      hint.textContent = tot ? ('في إنفوجراف السيستم: '+tot+' ماسورة '+crop+' ('+ready+' جاهزة للحصاد).') : ('مفيش مواسير '+crop+' في إنفوجراف السيستم.');
+    }
+    $('#hv-crop', inner).addEventListener('input', updateHvPipesHint);
+    $('#hv-crop', inner).addEventListener('change', updateHvPipesHint);
+    updateHvPipesHint();
 
     $('#harvest-form', inner).addEventListener('submit', function(ev){
       ev.preventDefault();
       var crop = $('#hv-crop', inner).value.trim();
       var qty = parseFloat($('#hv-qty', inner).value);
+      var pipesRaw = $('#hv-pipes', inner).value.trim();
+      var pipes = pipesRaw==='' ? 0 : parseFloat(pipesRaw);
+      var deduct = $('#hv-pipes-deduct', inner).checked;
       if(!crop){ toast('اكتب اسم الصنف'); return; }
       if(!(qty>0)){ toast('اكتب كمية صحيحة'); return; }
+      if(pipesRaw!=='' && !(pipes>=1 && Math.floor(pipes)===pipes)){ toast('عدد المواسير لازم يكون رقم صحيح من 1 فوق'); return; }
+      var pipeRes = null;
       saveHarvest({
         id: genId(), systemId: selectedSystemId, ts: $('#hv-ts', inner).value || nowLocalInputValue(),
-        cropName: crop, quantity: qty, unit: $('#hv-unit', inner).value,
+        cropName: crop, quantity: qty, unit: $('#hv-unit', inner).value, pipes: pipes||0,
         note: $('#hv-note', inner).value||'', by: currentUser||'', createdAt: Date.now()
       }).then(function(){
-        toast('تم حفظ الحصاد');
+        if(pipes>0 && deduct){
+          pipeRes = pipeHarvestFromLog(selectedSystemId, crop, pipes);
+          return pipeRes.job;
+        }
+      }).then(function(){
+        if(pipeRes && pipeRes.deducted>0) logAudit('edit','nursery','خصم '+pipeRes.deducted+' ماسورة '+crop+' من الإنفوجراف بعد الحصاد');
+        toast('تم حفظ الحصاد'+(pipeRes?('، '+pipeRes.text):''));
         harvestChartCrop = crop;
         renderHarvestPanel();
       });
@@ -4747,6 +4806,7 @@
           '<td class="ltr num">'+fmtTs(h.ts)+'</td>'+
           '<td>'+h.cropName+'</td>'+
           '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
+          '<td class="num">'+(h.pipes>0 ? h.pipes : '—')+'</td>'+
           '<td>'+(h.by||'—')+'</td>'+
           '<td>'+(h.note||'—')+'</td>'+
           '<td><button class="del-btn" title="حذف">✕</button></td>';
@@ -4760,8 +4820,10 @@
           var tt = {};
           shown.forEach(function(h){ var k = h.cropName+'|'+h.unit; tt[k] = (tt[k]||0) + (parseFloat(h.quantity)||0); });
           var keys = Object.keys(tt);
+          var pipesShown = shown.reduce(function(sum,h){ return sum + (parseInt(h.pipes,10)||0); }, 0);
           totEl2.textContent = 'إجمالي المعروض ('+shown.length+' سجل'+(harvestFrom||harvestTo?(' — من '+(harvestFrom||'البداية')+' إلى '+(harvestTo||'النهاية')):'')+'): '+
-            (keys.length ? keys.map(function(k){ var pp = k.split('|'); return pp[0]+' '+(Math.round(tt[k]*100)/100)+' '+HARVEST_UNIT_LABELS[pp[1]]; }).join(' · ') : 'لا يوجد');
+            (keys.length ? keys.map(function(k){ var pp = k.split('|'); return pp[0]+' '+(Math.round(tt[k]*100)/100)+' '+HARVEST_UNIT_LABELS[pp[1]]; }).join(' · ') : 'لا يوجد')+
+            (pipesShown ? (' — المواسير: '+pipesShown) : '');
         } else totEl2.textContent = '';
       }
       applyPermissionLock(inner, 'harvest');
@@ -6022,7 +6084,7 @@
     holder.innerHTML =
       '<form class="entry-form" id="nursery-form">'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>اسم الصنف/المحصول</label><input type="text" id="nursery-crop" maxlength="150" required value="'+(existingBatch?existingBatch.cropName:'')+'"></div>'+
+          '<div class="field-sm full"><label>اسم الصنف/المحصول</label>'+cropFieldHtml('nursery-crop', existingBatch?existingBatch.cropName:'', true)+'</div>'+
           '<div class="field-sm"><label>عدد الصواني (كل صينية = '+TRAY_SIZE+' نبات)</label><input type="number" step="1" min="1" class="ltr" id="nursery-trays" required value="'+(existingBatch?batchTrays(existingBatch):1)+'"></div>'+
           '<div class="field-sm"><label>تاريخ زراعة البذور</label><input type="date" class="ltr" id="nursery-sow-date" required value="'+(existingBatch?existingBatch.sowDate:todayStr())+'"></div>'+
           '<div class="field-sm"><label>تاريخ نزول الصينية في السيستم (اختياري)</label><input type="date" class="ltr" id="nursery-transplant-date" value="'+(existingBatch?existingBatch.transplantDate:'')+'"></div>'+
@@ -6149,7 +6211,7 @@
     var formHtml =
       '<div class="form-grid" style="margin-bottom:6px;">'+
         '<div class="field-sm full"><label>النظام</label><select id="plan-system-select">'+sysOptions+'</select></div>'+
-        '<div class="field-sm full"><label>اسم المحصول</label><input type="text" id="plan-crop" maxlength="150" value="'+(plan.cropName||'')+'"></div>'+
+        '<div class="field-sm full"><label>اسم المحصول</label>'+cropFieldHtml('plan-crop', plan.cropName||'', false)+'</div>'+
         '<div class="field-sm"><label>عدد الجتر (القنوات)</label><input type="number" step="1" min="0" class="ltr" id="plan-gutters" value="'+(plan.gutterCount!=null?plan.gutterCount:'')+'"></div>'+
         '<div class="field-sm"><label>عدد النباتات في الجتر الواحد</label><input type="number" step="1" min="0" class="ltr" id="plan-plants-per-gutter" value="'+(plan.plantsPerGutter!=null?plan.plantsPerGutter:'')+'"></div>'+
         '<div class="field-sm"><label>عدد النباتات في الصينية الواحدة</label><input type="number" step="1" min="1" class="ltr" id="plan-tray-size" value="'+(plan.traySize!=null?plan.traySize:TRAY_SIZE)+'"></div>'+
@@ -6496,9 +6558,151 @@
     };
   }
 
+  /* ---------- قايمة الأصناف الموحدة ---------- */
+  function cropNameClean(v){ return String(v==null?'':v).replace(/\s+/g,' ').trim(); }
+  function cropNamesList(){
+    return cropNames.map(function(x){ return x.name; }).sort(function(a,b){ return a.localeCompare(b, 'ar'); });
+  }
+  function cropFieldHtml(id, current, req){
+    var names = cropNamesList(), cur = cropNameClean(current), r = req ? ' required' : '';
+    if(!names.length){
+      return '<input type="text" id="'+id+'" list="'+id+'-dl" maxlength="60"'+r+' value="'+escH(cur)+'" placeholder="اكتب الصنف"><datalist id="'+id+'-dl">'+
+        pipeKnownCrops().map(function(c){ return '<option value="'+escH(c)+'"></option>'; }).join('')+'</datalist>';
+    }
+    var has = cur && names.some(function(n){ return cropKey(n)===cropKey(cur); });
+    var opts = '<option value="">— اختار الصنف —</option>'+names.map(function(n){
+      return '<option value="'+escH(n)+'"'+(cur && cropKey(n)===cropKey(cur) ? ' selected' : '')+'>'+escH(n)+'</option>';
+    }).join('');
+    if(cur && !has) opts += '<option value="'+escH(cur)+'" selected>'+escH(cur)+' (اسم قديم — مش في القايمة)</option>';
+    return '<select id="'+id+'"'+r+'>'+opts+'</select>';
+  }
+  function saveCropNames(list){
+    cropNames = list;
+    if(db) return db.doc('settings/cropNames').set({list:list});
+    renderAll(); return Promise.resolve();
+  }
+  function cropDataNames(){
+    var out = {};
+    function add(n){ var k = cropKey(n); if(!k) return; (out[k] || (out[k] = {name:cropNameClean(n), count:0})).count++; }
+    nurseryLog.forEach(function(n){ add(n.cropName); });
+    harvestLog.forEach(function(h){ add(h.cropName); });
+    nurseryPlans.forEach(function(x){ add(x.cropName); });
+    nurseryPlanLog.forEach(function(x){ add(x.cropName); });
+    pipeMaps.forEach(function(m){ (m.groups||[]).forEach(function(g){ add(g.crop); }); });
+    if(Array.isArray(cropRefs)) cropRefs.forEach(function(r){ add(r.name); });
+    return out;
+  }
+  function cropUsageCount(name){
+    var e = cropDataNames()[cropKey(name)];
+    return e ? e.count : 0;
+  }
+  function unifyCropName(oldName, newName){
+    var ok = cropKey(oldName), jobs = [], n = 0;
+    function same(x){ return cropKey(x)===ok; }
+    nurseryLog.filter(function(r){ return same(r.cropName); }).forEach(function(r){ n++; if(db) jobs.push(db.collection('nursery').doc(r.id).set(Object.assign({}, r, {cropName:newName}))); });
+    harvestLog.filter(function(r){ return same(r.cropName); }).forEach(function(r){ n++; if(db) jobs.push(db.collection('harvest').doc(r.id).set(Object.assign({}, r, {cropName:newName}))); });
+    nurseryPlanLog.filter(function(r){ return same(r.cropName); }).forEach(function(r){ n++; if(db) jobs.push(db.collection('nurseryPlanLog').doc(r.id).set(Object.assign({}, r, {cropName:newName}))); });
+    if(nurseryPlans.some(function(x){ return same(x.cropName); })){
+      n += nurseryPlans.filter(function(x){ return same(x.cropName); }).length;
+      var pl = nurseryPlans.map(function(x){ return same(x.cropName) ? Object.assign({}, x, {cropName:newName}) : x; });
+      nurseryPlans = pl; if(db) jobs.push(db.doc('settings/nurseryPlans').set({list:pl}));
+    }
+    var changedMaps = false;
+    var maps = pipeMaps.map(function(m){
+      var groups = (m.groups||[]).map(function(g){ if(same(g.crop)){ n++; changedMaps = true; return Object.assign({}, g, {crop:newName}); } return g; });
+      return Object.assign({}, m, {groups:groups});
+    });
+    if(changedMaps){ pipeMaps = maps; if(db) jobs.push(db.doc('settings/pipeMaps').set({list:maps})); }
+    if(Array.isArray(cropRefs) && cropRefs.some(function(r){ return same(r.name); })){
+      n += cropRefs.filter(function(r){ return same(r.name); }).length;
+      jobs.push(saveCropRefs(cropRefs.map(function(r){ return same(r.name) ? Object.assign({}, r, {name:newName}) : r; })));
+    }
+    return Promise.all(jobs).then(function(){ return n; });
+  }
+  function renderCropNamesSettings(){
+    var box = $('#cropnames-box');
+    if(!box) return;
+    var list = cropNames.slice().sort(function(a,b){ return a.name.localeCompare(b.name, 'ar'); });
+    var inList = {}; list.forEach(function(x){ inList[cropKey(x.name)] = 1; });
+    var data = cropDataNames();
+    var legacy = Object.keys(data).filter(function(k){ return !inList[k]; }).map(function(k){ return data[k]; });
+    var rows = list.map(function(x){
+      return '<div class="cn-row" data-id="'+escH(x.id)+'" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">'+
+        '<strong style="flex:1;">'+escH(x.name)+'</strong><span class="hint" style="margin:0;">'+cropUsageCount(x.name)+' استخدام</span>'+
+        '<button type="button" class="btn btn-ghost btn-sm cn-rename">تعديل</button><button type="button" class="del-btn cn-del" title="حذف">✕</button></div>';
+    }).join('');
+    var legacyHtml = legacy.length
+      ? '<h4 style="margin:16px 0 6px;">أسماء مستخدمة في البيانات ومش في القايمة</h4><p class="hint">وحّدها مع الاسم الصحيح (بيتغيّر في كل السجلات) أو ضيفها للقايمة.</p>'+
+        legacy.map(function(x){
+          return '<div class="cn-legacy" data-name="'+escH(x.name)+'" style="padding:8px 0;border-bottom:1px solid var(--border);">'+
+            '<div><strong>'+escH(x.name)+'</strong> <span class="hint" style="margin:0;">('+x.count+' استخدام)</span></div>'+
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">'+
+              (list.length ? '<select class="cn-map" style="flex:1;min-width:140px;"><option value="">وحّده مع...</option>'+list.map(function(c){ return '<option value="'+escH(c.name)+'">'+escH(c.name)+'</option>'; }).join('')+'</select><button type="button" class="btn btn-primary btn-sm cn-unify">توحيد</button>' : '')+
+              '<button type="button" class="btn btn-ghost btn-sm cn-addlegacy">ضيفه للقايمة</button></div></div>';
+        }).join('')
+      : '';
+    box.innerHTML =
+      (list.length ? rows : '<p class="empty-note">لسه ما سجلتش أصناف. لحد ما تسجّل، خانات الصنف بتفضل كتابة حرة.</p>')+
+      '<form class="entry-form" id="cropname-form" style="margin-top:12px;"><div class="form-grid">'+
+        '<div class="field-sm full"><label>اسم صنف جديد</label><input type="text" id="cn-new" maxlength="40" placeholder="مثال: خس روماني"></div></div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">＋ إضافة للقايمة</button> '+
+        (legacy.length ? '<button type="button" class="btn btn-ghost btn-sm" id="cn-import">استيراد كل الأسماء الموجودة ('+legacy.length+')</button>' : '')+'</div></form>'+legacyHtml;
+
+    var form = $('#cropname-form');
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var name = cropNameClean($('#cn-new').value);
+      if(!name){ toast('اكتب اسم الصنف'); return; }
+      if(inList[cropKey(name)]){ toast('الصنف ده موجود في القايمة'); return; }
+      saveCropNames(cropNames.concat([{id:genId(), name:name}])).then(function(){ logAudit('add','settings','إضافة صنف للقايمة: '+name); toast('اتضاف'); });
+    });
+    var imp = $('#cn-import');
+    if(imp) imp.addEventListener('click', function(){
+      var add = legacy.map(function(x){ return {id:genId(), name:x.name}; });
+      saveCropNames(cropNames.concat(add)).then(function(){ logAudit('add','settings','استيراد '+add.length+' صنف للقايمة'); toast('اتضافوا '+add.length+' صنف'); });
+    });
+    $all('.cn-del', box).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.closest('.cn-row').getAttribute('data-id'), x = cropNames.filter(function(c){ return c.id===id; })[0];
+      if(!x) return;
+      var used = cropUsageCount(x.name);
+      if(!confirm('تحذف "'+x.name+'" من القايمة؟'+(used?(' (مستخدم في '+used+' سجل، السجلات هتفضل بالاسم ده)'):''))) return;
+      saveCropNames(cropNames.filter(function(c){ return c.id!==id; })).then(function(){ logAudit('delete','settings','حذف صنف من القايمة: '+x.name); toast('اتحذف'); });
+    }); });
+    $all('.cn-rename', box).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.closest('.cn-row').getAttribute('data-id'), x = cropNames.filter(function(c){ return c.id===id; })[0];
+      if(!x) return;
+      var nn = prompt('الاسم الجديد لـ "'+x.name+'":', x.name);
+      if(nn===null) return;
+      nn = cropNameClean(nn);
+      if(!nn || nn===x.name) return;
+      if(cropNames.some(function(c){ return c.id!==id && cropKey(c.name)===cropKey(nn); })){ toast('الاسم ده موجود في القايمة'); return; }
+      var used = cropUsageCount(x.name);
+      if(!confirm('هتغيّر "'+x.name+'" إلى "'+nn+'"'+(used?(' في '+used+' سجل'):'')+'؟')) return;
+      unifyCropName(x.name, nn).then(function(n){
+        return saveCropNames(cropNames.map(function(c){ return c.id===id ? {id:c.id, name:nn} : c; })).then(function(){
+          logAudit('edit','settings','تغيير اسم صنف: '+x.name+' ← '+nn+' ('+n+' سجل)'); toast('اتغيّر في '+n+' سجل');
+        });
+      });
+    }); });
+    $all('.cn-legacy', box).forEach(function(row){
+      var old = row.getAttribute('data-name');
+      var un = row.querySelector('.cn-unify');
+      if(un) un.addEventListener('click', function(){
+        var target = row.querySelector('.cn-map').value;
+        if(!target){ toast('اختار الاسم الصحيح الأول'); return; }
+        if(!confirm('هتغيّر "'+old+'" إلى "'+target+'" في '+cropUsageCount(old)+' سجل؟')) return;
+        unifyCropName(old, target).then(function(n){ logAudit('edit','settings','توحيد اسم صنف: '+old+' ← '+target+' ('+n+' سجل)'); toast('اتوحّد في '+n+' سجل'); });
+      });
+      row.querySelector('.cn-addlegacy').addEventListener('click', function(){
+        saveCropNames(cropNames.concat([{id:genId(), name:old}])).then(function(){ logAudit('add','settings','إضافة صنف للقايمة: '+old); toast('اتضاف'); });
+      });
+    });
+  }
+
   function renderAll(){
     safe(applyTabVisibility);
     safe(renderUsersSettings);
+    safe(renderCropNamesSettings);
     safe(renderSystemsOverview);
     safe(renderWaterPanel);
     safe(renderClimatePanel);
@@ -6736,6 +6940,7 @@
   renderWaterPanel = fsWrap(renderWaterPanel);
   renderSystemsOverview = fsWrap(renderSystemsOverview);
   renderUsersSettings = fsWrap(renderUsersSettings);
+  renderCropNamesSettings = fsWrap(renderCropNamesSettings);
   renderInstrumentCalibSection = fsWrap(renderInstrumentCalibSection);
   renderCropRefs = fsWrap(renderCropRefs);
 
@@ -6881,6 +7086,11 @@
       instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
+
+    db.doc('settings/cropNames').onSnapshot(function(snap){
+      cropNames = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
+      renderAll();
+    }, function(err){ console.error('cropNames snapshot error', err); });
 
     db.doc('settings/pipeMaps').onSnapshot(function(snap){
       pipeMaps = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
