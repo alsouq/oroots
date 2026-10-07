@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MqGPUTnXsmCz2fpZ2V9AOVVUpKHS2WwWI2RUAkA5oWE=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ZvkCTx1C+Btmr66Mtsr3xnmLNn4OUvwpPLGWSXSZ8Y8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -4425,7 +4425,7 @@
       '</h2>'+
       '<form class="entry-form" id="ws-'+key+'-form">'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="ws-'+key+'-ts" required></div>'+
+          '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-'+key+'-ts')+'</div>'+
           '<div class="field-sm"><label>الحموضة pH</label><input type="number" step="0.01" min="0" max="14" class="ltr" id="ws-'+key+'-ph" required></div>'+
           '<div class="field-sm"><label>EC (mS/cm)</label><input type="number" step="0.01" min="0" max="15" class="ltr" id="ws-'+key+'-ec" required></div>'+
           '<div class="field-sm"><label>حرارة الماء (°C)</label><input type="number" step="0.1" min="0" max="45" class="ltr" id="ws-'+key+'-temp" required></div>'+
@@ -4438,11 +4438,10 @@
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الحالة</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-'+key+'-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من الفورم فوق.</p>');
 
-    document.getElementById('ws-'+key+'-ts').value = nowLocalInputValue();
     document.getElementById('ws-'+key+'-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       addReading(key, {
-        ts: document.getElementById('ws-'+key+'-ts').value || nowLocalInputValue(),
+        ts: nowLocalInputValue(),
         ph: document.getElementById('ws-'+key+'-ph').value,
         ec: document.getElementById('ws-'+key+'-ec').value,
         temp: document.getElementById('ws-'+key+'-temp').value,
@@ -4512,7 +4511,7 @@
       '<p class="hint" style="margin:6px 0 10px;">حط وعاء تحت عدد من النقاط، سيب الري شغال مدة معلومة، وقيس الحجم المتجمع. السيستم بيحسب لتر/دقيقة للنقطة الواحدة.</p>'+
       '<form class="entry-form" id="calib-form">'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="calib-ts" required></div>'+
+          '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('calib-ts')+'</div>'+
           '<div class="field-sm"><label>عدد النقاط اللي اتقاس عليها</label><input type="number" step="1" min="1" class="ltr" id="calib-points" required></div>'+
           '<div class="field-sm"><label>الحجم المتجمع (مل)</label><input type="number" step="1" min="1" class="ltr" id="calib-volume" required></div>'+
           '<div class="field-sm"><label>مدة الري (ثانية)</label><input type="number" step="1" min="1" class="ltr" id="calib-duration" value="60" required></div>'+
@@ -4535,7 +4534,6 @@
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>نقاط</th><th>الحجم (مل)</th><th>المدة (ث)</th><th>L/min للنقطة</th><th>L/min للنظام</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="calib-tbody"></tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">سجّل أول معايرة من الفورم فوق.</p>');
 
-    $('#calib-ts', container).value = nowLocalInputValue();
     if(last && last.totalPoints) $('#calib-total', container).value = last.totalPoints;
 
     function updatePreview(){
@@ -4552,7 +4550,7 @@
     $('#calib-form', container).addEventListener('submit', function(ev){
       ev.preventDefault();
       addIrrigCalib(systemId, {
-        ts: $('#calib-ts', container).value || nowLocalInputValue(),
+        ts: nowLocalInputValue(),
         points: $('#calib-points', container).value,
         volumeMl: $('#calib-volume', container).value,
         durationSec: $('#calib-duration', container).value,
@@ -4985,7 +4983,7 @@
       '<h2 class="section-title">تسجيل قراءة مناخ جديدة</h2>'+
       '<form class="entry-form" id="climate-form">'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="climate-ts" required></div>'+
+          '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('climate-ts')+'</div>'+
           '<div class="field-sm"><label>الحرارة (°C)</label><input type="number" step="0.1" min="-10" max="60" class="ltr" id="climate-temp" required></div>'+
           '<div class="field-sm"><label>الرطوبة النسبية (%)</label><input type="number" step="0.1" min="0" max="100" class="ltr" id="climate-rh" required></div>'+
           '<div class="field-sm"><label>شدة الإضاءة (Lux)</label><input type="number" step="1" min="0" class="ltr" id="climate-lux" required></div>'+
@@ -5028,11 +5026,10 @@
     renderSvgChart(document.getElementById('cl-chart-dli'), [{label:'DLI', color:'#2C8C6F', points:filterPointsByRange(dailySeriesFor(entries,'dli'), climateDailyRangeDays)}], {height:170});
     renderSvgChart(document.getElementById('cl-chart-radsum'), [{label:'الإشعاع التراكمي', color:'#8C6FA2', points:filterPointsByRange(dailySeriesFor(entries,'radiation'), climateDailyRangeDays)}], {height:170});
 
-    $('#climate-ts').value = nowLocalInputValue();
     $('#climate-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       addClimateReading(gh, {
-        ts: $('#climate-ts').value || nowLocalInputValue(),
+        ts: nowLocalInputValue(),
         temp: $('#climate-temp').value, rh: $('#climate-rh').value, lux: $('#climate-lux').value,
         note: $('#climate-note').value
       }).then(function(){
@@ -6455,9 +6452,26 @@
   /* ---------- render orchestration ---------- */
   function safe(fn){ try{ fn(); }catch(e){ console.error(e); } }
 
+  /* ---------- وقت التسجيل تلقائي (ساعة لايف) ---------- */
+  function liveNowStr(){
+    var d = new Date();
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  function liveClockHtml(id){
+    return '<input type="text" class="ltr live-clock" id="'+id+'" readonly tabindex="-1" value="'+liveNowStr()+'" style="cursor:default;">';
+  }
+  var liveClockTimer = null;
+  function startLiveClock(){
+    if(liveClockTimer) return;
+    liveClockTimer = setInterval(function(){
+      var v = liveNowStr();
+      $all('.live-clock').forEach(function(e){ e.value = v; });
+    }, 1000);
+  }
+
   /* ---------- حماية اللي بتكتبه: إعادة الرسم (لما بيانات جديدة توصل) ما تمسحش الخانات ---------- */
   var FS = {dirty:{}, depth:0};
-  var FS_SKIP = '[type=file],[type=password],[type=hidden],[type=submit],[type=button],[type=range],.lf-from,.lf-to,#hv-from,#hv-to,#pipe-sim,#pipe-system-select,#plan-system-select,#climate-day-picker,[id^="audit-"]';
+  var FS_SKIP = '.live-clock,[type=file],[type=password],[type=hidden],[type=submit],[type=button],[type=range],.lf-from,.lf-to,#hv-from,#hv-to,#pipe-sim,#pipe-system-select,#plan-system-select,#climate-day-picker,[id^="audit-"]';
   function fsTracked(el){ return !!(el && el.matches && el.matches('input,select,textarea') && !el.matches(FS_SKIP) && el.closest && el.closest('#app')); }
   function fsKey(el){
     if(el.id) return '#'+el.id;
@@ -6879,6 +6893,7 @@
       $('#app').classList.remove('hidden');
       subscribeDb();
       startPipeDayWatcher();
+      startLiveClock();
       if(currentUserRole==='admin') subscribeAudit();
       applyTabVisibility();
       $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='overview'); });
