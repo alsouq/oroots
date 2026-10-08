@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ZvkCTx1C+Btmr66Mtsr3xnmLNn4OUvwpPLGWSXSZ8Y8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-unbJXb/GOYb28xayMEEbHr8X17m1Op5JMx+NMCjLhUQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -177,11 +177,13 @@
   .st-ready .pipe-tube::after,.st-over .pipe-tube::after{content:'✓';position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:.72rem;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);}
   @keyframes pipeGlow{0%,100%{box-shadow:0 0 0 rgba(47,191,113,0)}50%{box-shadow:0 0 12px rgba(47,191,113,.7)}}
   @keyframes pipeGlowY{0%,100%{box-shadow:0 0 0 rgba(224,168,46,0)}50%{box-shadow:0 0 10px rgba(224,168,46,.7)}}
+  .pipe-cut{position:absolute;top:2px;right:2px;min-width:13px;height:13px;border-radius:7px;background:#fff;color:#0f7a3d;font-style:normal;font-size:.55rem;font-weight:800;line-height:13px;text-align:center;box-shadow:0 0 0 1px rgba(0,0,0,.18);z-index:2;}
   .pipe-n{font-size:.58rem;color:var(--muted);margin-top:3px;} .pipe.sel .pipe-tube{outline:2px solid var(--brand);outline-offset:2px;}
   .pipe-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin:4px 0 8px;} .pipe-legend span{display:inline-flex;align-items:center;gap:5px;}
   .lg{display:inline-block;width:12px;height:12px;border-radius:4px;} .lg-seed{background:#b6e3c0;} .lg-grow{background:#4fb87f;} .lg-almost{background:#2b9a5d;} .lg-ready{background:#0f7a3d;box-shadow:0 0 6px #3fcf7a;} .lg-over{background:#e0a82e;} .lg-empty{border:2px solid var(--border);}
   @media (prefers-reduced-motion:reduce){.pipe-fill,.pipe .lf,.pipe-tube{animation:none !important;transition:none !important;}}
   .cn-map{box-sizing:border-box;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:0.92rem;}
+  .wt-group{margin-top:22px;padding-top:8px;border-top:2px solid var(--border);}
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -2633,6 +2635,60 @@
     if(p >= 0.34) return {st:'grow', p:p};
     return {st:'seed', p:Math.max(p, 0.1)};
   }
+  /* ---------- القطفات المتعددة (جرجير/ريحان...): الماسورة بتتقطف وتتجدد ---------- */
+  function cropConfig(name){
+    var k = cropKey(name), c = cropNames.filter(function(x){ return cropKey(x.name)===k; })[0];
+    return {maxCuts: Math.max(1, parseInt(c && c.maxCuts, 10) || 1), regrowDays: parseFloat(c && c.regrowDays) || 0};
+  }
+  function pipeClock(g, sim){
+    var ref = g.lastCutDate || g.plantDate, done = parseInt(g.cuts,10) || 0;
+    var target = done>0 ? (parseFloat(g.regrowDays) || parseFloat(g.harvestDays) || 0) : (parseFloat(g.harvestDays) || 0);
+    return {age: dayDiff(ref, planAddDays(todayStr(), sim||0)), target:target, done:done, max:Math.max(1, parseInt(g.maxCuts,10)||1), ref:ref};
+  }
+  function pipeStageOf(g, sim){
+    var c = pipeClock(g, sim), r = pipeStage(c.age, c.target);
+    r.clock = c;
+    return r;
+  }
+  function pipeSameState(a, b){
+    return cropKey(a.crop)===cropKey(b.crop) && a.plantDate===b.plantDate && String(a.harvestDays)===String(b.harvestDays) &&
+      String(a.regrowDays||'')===String(b.regrowDays||'') && (parseInt(a.maxCuts,10)||1)===(parseInt(b.maxCuts,10)||1) &&
+      (parseInt(a.cuts,10)||0)===(parseInt(b.cuts,10)||0) && (a.lastCutDate||'')===(b.lastCutDate||'');
+  }
+  function pipeMergeGroups(groups){
+    var sorted = groups.slice().sort(function(a,b){ return a.start-b.start; }), out = [];
+    sorted.forEach(function(g){
+      var prev = out[out.length-1];
+      if(prev && prev.start+prev.pipes===g.start && pipeSameState(prev, g)) out[out.length-1] = Object.assign({}, prev, {pipes:prev.pipes+g.pipes});
+      else out.push(g);
+    });
+    return out;
+  }
+  /* بيطبّق قطفة على m ماسورة من المجموعة: لو لسه فيه قطفات بتتجدد، لو القطفة الأخيرة بتفضى */
+  function pipeCutRaw(groups, gid, m, today){
+    var out = [], info = null;
+    groups.forEach(function(g){
+      if(g.id!==gid){ out.push(g); return; }
+      var max = Math.max(1, parseInt(g.maxCuts,10)||1), done = parseInt(g.cuts,10)||0, no = done+1, fin = no>=max;
+      var take = Math.min(m, g.pipes);
+      info = {crop:g.crop, pipes:take, no:no, max:max, final:fin, regrow:parseFloat(g.regrowDays)||parseFloat(g.harvestDays)||0};
+      if(take>=g.pipes){
+        if(!fin) out.push(Object.assign({}, g, {cuts:no, lastCutDate:today}));
+      } else if(fin){
+        out.push(Object.assign({}, g, {start:g.start+take, pipes:g.pipes-take}));
+      } else {
+        out.push(Object.assign({}, g, {id:genId(), pipes:take, cuts:no, lastCutDate:today}));
+        out.push(Object.assign({}, g, {start:g.start+take, pipes:g.pipes-take}));
+      }
+    });
+    return {groups:out, info:info};
+  }
+  function pipeCutText(info, today){
+    if(!info) return '';
+    if(info.final) return 'اتحصدت '+info.pipes+' ماسورة '+info.crop+(info.max>1?(' — القطفة الأخيرة ('+info.no+' من '+info.max+')'):'');
+    return 'اتسجّلت قطفة '+info.no+' من '+info.max+' لـ '+info.pipes+' ماسورة '+info.crop+' — هتجهز تاني بعد '+info.regrow+' يوم ('+planAddDays(today, info.regrow)+')';
+  }
+
   function pipeSlots(map, ignoreId){
     var slots = [], i;
     for(i=0;i<map.totalPipes;i++) slots.push(-1);
@@ -2653,7 +2709,7 @@
   function pipeSummary(map, sim){
     var o = {ready:0, over:0, almost:0, grow:0, seed:0, future:0, used:0, byCrop:{}};
     map.groups.forEach(function(g){
-      var st = pipeStage(pipeAgeDays(g, sim), g.harvestDays).st;
+      var st = pipeStageOf(g, sim).st;
       o[st] += g.pipes; o.used += g.pipes;
       if(st==='ready' || st==='over'){
         var k = cropKey(g.crop);
@@ -2686,34 +2742,39 @@
     var slots = pipeSlots(map), html = '';
     for(var i=0;i<map.totalPipes;i++){
       var gi = slots[i], g = gi>=0 ? map.groups[gi] : null, st = 'empty', p = 0, title = 'ماسورة '+(i+1)+' — فاضية';
-      var gc = '';
+      var gc = '', cutBadge = '';
       if(g){
-        var age = pipeAgeDays(g, sim), r = pipeStage(age, g.harvestDays);
+        var age = pipeAgeDays(g, sim), r = pipeStageOf(g, sim), cl = r.clock;
         st = r.st; p = r.p; gc = PIPE_COLORS[(g.color||0) % PIPE_COLORS.length];
-        title = 'ماسورة '+(i+1)+' — '+g.crop+' — عمر '+Math.max(0,age)+' يوم';
+        title = 'ماسورة '+(i+1)+' — '+g.crop+' — عمر '+Math.max(0,age)+' يوم'+(cl.max>1?(' — قطفة '+Math.min(cl.done+1, cl.max)+' من '+cl.max):'');
+        if(cl.done>0) cutBadge = '<i class="pipe-cut">'+cl.done+'</i>';
       }
       html += '<div class="pipe st-'+st+(pipeSel===i?' sel':'')+'" data-i="'+i+'" style="--p:'+p.toFixed(3)+';--i:'+i+(gc?(';--gc:'+gc):'')+'" title="'+escH(title)+'">'+
-        '<span class="pipe-cap"></span><div class="pipe-tube"><div class="pipe-fill"><b class="lf l1"></b><b class="lf l2"></b><b class="lf l3"></b></div></div><span class="pipe-n">'+(i+1)+'</span></div>';
+        '<span class="pipe-cap"></span><div class="pipe-tube"><div class="pipe-fill"><b class="lf l1"></b><b class="lf l2"></b><b class="lf l3"></b></div>'+cutBadge+'</div><span class="pipe-n">'+(i+1)+'</span></div>';
     }
     return html;
   }
   function pipeGroupsHtml(map, sim){
     if(!map.groups.length) return '<p class="empty-note">لسه ما ضفتش مجموعات. ضيف أول مجموعة مواسير من تحت.</p>';
     return map.groups.map(function(g){
-      var age = pipeAgeDays(g, sim), r = pipeStage(age, g.harvestDays), hd = parseFloat(g.harvestDays)||0;
-      var left = hd - age, readyDate = planAddDays(g.plantDate, hd);
+      var r = pipeStageOf(g, sim), c = r.clock, age = pipeAgeDays(g, sim);
+      var left = c.target - c.age, readyDate = planAddDays(c.ref, c.target), nextNo = Math.min(c.done+1, c.max);
+      var what = c.done>0 ? ('القطفة '+nextNo) : 'الحصاد';
       var txt;
       if(r.st==='future') txt = 'لسه ما اتزرعتش (هتتزرع '+g.plantDate+')';
-      else if(r.st==='over') txt = 'عدّت ميعاد الحصاد بـ '+(age-hd)+' يوم ⚠️';
-      else if(r.st==='ready') txt = left===0 ? 'جاهزة للحصاد '+pipeDayLabel(sim)+' ✅' : 'جاهزة للحصاد ✅';
-      else txt = 'تجهز بعد '+left+' يوم ('+readyDate+')';
+      else if(r.st==='over') txt = 'عدّت ميعاد '+what+' بـ '+(c.age-c.target)+' يوم ⚠️';
+      else if(r.st==='ready') txt = (c.max>1 ? ('جاهزة للقطفة '+nextNo+' من '+c.max) : 'جاهزة للحصاد')+(left===0?(' '+pipeDayLabel(sim)):'')+' ✅';
+      else txt = (c.done>0 ? 'بتتجدد — ' : '')+'تجهز لـ '+what+' بعد '+left+' يوم ('+readyDate+')';
       var rng = (g.start+1)+(g.pipes>1?('–'+(g.start+g.pipes)):'');
+      var multi = c.max>1;
+      var cutsLine = multi ? ('<div class="hint" style="margin:4px 0;">✂️ قطفة '+nextNo+' من '+c.max+(c.done?(' — اتقطفت '+c.done+(c.done>1?' مرات':' مرة')+' (آخر قطفة '+g.lastCutDate+')'):'')+' — بتتقطف كل '+(parseFloat(g.regrowDays)||'—')+' يوم</div>') : '';
       return '<div class="stat-card pipe-grp" data-gid="'+escH(g.id)+'" style="margin:8px 0;border-inline-start:5px solid '+PIPE_COLORS[(g.color||0)%PIPE_COLORS.length]+';">'+
         '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><strong>'+escH(g.crop)+' — مواسير '+rng+'</strong><span class="hint" style="margin:0;">'+g.pipes+' ماسورة ≈ '+(g.pipes*map.plantsPerPipe).toLocaleString('en-US')+' نبتة</span></div>'+
-        '<div class="hint" style="margin:4px 0;">عمر '+Math.max(0,age)+' يوم من '+g.plantDate+' — الحصاد بعد '+hd+' يوم</div>'+
+        '<div class="hint" style="margin:4px 0;">عمر النبات '+Math.max(0,age)+' يوم من '+g.plantDate+' — أول حصاد بعد '+(parseFloat(g.harvestDays)||0)+' يوم</div>'+
+        cutsLine+
         '<div style="height:8px;border-radius:6px;background:var(--border);overflow:hidden;margin:6px 0;"><div style="height:100%;width:'+Math.round(r.p*100)+'%;background:'+(r.st==='over'?'#e0a82e':'var(--brand)')+';transition:width .8s;"></div></div>'+
         '<div style="font-weight:600;">'+txt+'</div>'+
-        '<div class="form-actions" style="margin-top:8px;"><button type="button" class="btn btn-ghost btn-sm pipe-grp-edit">تعديل</button> <button type="button" class="btn btn-primary btn-sm pipe-grp-harvest">✂️ حصاد</button> <button type="button" class="del-btn pipe-grp-del" title="حذف">✕</button></div>'+
+        '<div class="form-actions" style="margin-top:8px;"><button type="button" class="btn btn-ghost btn-sm pipe-grp-edit">تعديل</button> <button type="button" class="btn btn-primary btn-sm pipe-grp-harvest">✂️ '+(multi?'قطفة':'حصاد')+'</button> <button type="button" class="del-btn pipe-grp-del" title="حذف">✕</button></div>'+
       '</div>';
     }).join('');
   }
@@ -2741,7 +2802,7 @@
   function pipeAddFromTransplant(sysId, crop, want, date, hd, trays){
     var map = getPipeMap(sysId), key = cropKey(crop), slots = pipeSlots(map);
     var groups = map.groups.slice(), startUsed = -1;
-    var ext = map.groups.filter(function(g){ return cropKey(g.crop)===key && g.plantDate===date && parseFloat(g.harvestDays)===hd; })[0];
+    var ext = map.groups.filter(function(g){ return cropKey(g.crop)===key && g.plantDate===date && parseFloat(g.harvestDays)===hd && !(parseInt(g.cuts,10)>0); })[0];
     if(ext){
       var end = ext.start + ext.pipes, fits = end + want <= map.totalPipes;
       for(var k=end; fits && k<end+want; k++){ if(slots[k]!==-1) fits = false; }
@@ -2753,30 +2814,36 @@
     if(startUsed<0){
       var st = pipeFreeRun(map, want);
       if(st<0) return {job:null, text:'مفيش '+want+' مواسير فاضية ورا بعض في إنفوجراف السيستم، ضيفهم يدوي'};
-      groups.push({id:genId(), crop:crop, start:st, pipes:want, plantDate:date, harvestDays:hd, color:groups.length % PIPE_COLORS.length, trays:trays, source:'nursery'});
+      var cfg = cropConfig(crop);
+      groups.push({id:genId(), crop:crop, start:st, pipes:want, plantDate:date, harvestDays:hd, maxCuts:cfg.maxCuts, regrowDays:cfg.regrowDays, cuts:0, lastCutDate:'', color:groups.length % PIPE_COLORS.length, trays:trays, source:'nursery'});
       startUsed = st;
     }
     return {job: savePipeMap(Object.assign({}, map, {groups:groups})),
       text:'واتضافت '+want+' ماسورة في إنفوجراف السيستم (مواسير '+(startUsed+1)+'–'+(startUsed+want)+')'};
   }
 
-  function pipeHarvestFromLog(sysId, crop, n){
-    var map = getPipeMap(sysId), key = cropKey(crop);
-    var cands = map.groups.filter(function(g){ return cropKey(g.crop)===key; })
-      .sort(function(a,b){ return String(a.plantDate).localeCompare(String(b.plantDate)); });
+  function pipeHarvestFromLog(sysId, crop, n, dateStr){
+    var map = getPipeMap(sysId), key = cropKey(crop), day = dateStr || todayStr();
+    function rank(g){ var r = pipeStageOf(g, 0), ready = (r.st==='ready' || r.st==='over'); return {ready:ready, v: ready ? (r.clock.age - r.clock.target) : r.p}; }
+    var cands = map.groups.filter(function(g){ return cropKey(g.crop)===key; }).sort(function(a,b){
+      var x = rank(a), y = rank(b);
+      if(x.ready!==y.ready) return x.ready ? -1 : 1;
+      return y.v - x.v;
+    });
     var avail = cands.reduce(function(sum,g){ return sum + g.pipes; }, 0);
     if(!avail) return {deducted:0, job:null, text:'مفيش مواسير '+crop+' في إنفوجراف السيستم عشان تتخصم'};
-    var left = n, take = {};
-    cands.forEach(function(g){ if(left<=0) return; var t = Math.min(left, g.pipes); take[g.id] = t; left -= t; });
-    var groups = [];
-    map.groups.forEach(function(g){
-      var t = take[g.id];
-      if(!t) groups.push(g);
-      else if(t < g.pipes) groups.push(Object.assign({}, g, {start:g.start+t, pipes:g.pipes-t}));
+    var left = n, groups = map.groups, cutPipes = 0, finalPipes = 0, lastInfo = null;
+    cands.forEach(function(g){
+      if(left<=0) return;
+      var take = Math.min(left, g.pipes), res = pipeCutRaw(groups, g.id, take, day);
+      groups = res.groups; left -= take; lastInfo = res.info;
+      if(res.info.final) finalPipes += take; else cutPipes += take;
     });
-    var deducted = n - left;
-    return {deducted:deducted, job:savePipeMap(Object.assign({}, map, {groups:groups})),
-      text:'واتخصم '+deducted+' ماسورة من إنفوجراف السيستم'+(left>0?(' (طلبت '+n+' بس الموجود '+avail+')'):'')};
+    var deducted = n - left, parts = [];
+    if(cutPipes) parts.push('اتسجّلت قطفة لـ '+cutPipes+' ماسورة وهتتجدد'+(lastInfo && !lastInfo.final ? (' (قطفة '+lastInfo.no+' من '+lastInfo.max+'، تجهز تاني بعد '+lastInfo.regrow+' يوم)') : ''));
+    if(finalPipes) parts.push('واتخصم '+finalPipes+' ماسورة فضيت');
+    return {deducted:deducted, job:savePipeMap(Object.assign({}, map, {groups: pipeMergeGroups(groups)})),
+      text:parts.join(' و')+' في إنفوجراف السيستم'+(left>0?(' (طلبت '+n+' بس الموجود '+avail+')'):'')};
   }
 
   function pipeInfographicHtml(){
@@ -2789,6 +2856,8 @@
     var plan = getNurseryPlan(nurseryPlanSystemId);
     var defHd = editing ? editing.harvestDays : ((plan && parseFloat(plan.harvestDays)) ? parseFloat(plan.harvestDays) : 30);
     var defAge = editing ? Math.max(0, pipeAgeDays(editing, 0)) : 0;
+    var defMax = editing ? (parseInt(editing.maxCuts,10)||1) : 1, defRegrow = editing ? (parseFloat(editing.regrowDays)||'') : '';
+    var defCuts = editing ? (parseInt(editing.cuts,10)||0) : 0, defLast = editing ? (editing.lastCutDate||'') : '';
     var cropsList = pipeKnownCrops().map(function(c){ return '<option value="'+escH(c)+'"></option>'; }).join('');
     return '<h2 class="section-title" style="margin-top:0;">🌿 إنفوجراف المواسير</h2>'+
       '<p class="hint">كل ماسورة بتكبر وتتلوّن حسب عمر النبات، والمواسير الجاهزة للحصاد بتنوّر. اختار السيستم وشوف كام ماسورة جاهزة النهارده.</p>'+
@@ -2807,7 +2876,11 @@
           '<div class="field-sm"><label>أول ماسورة (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="pg-start" placeholder="تلقائي" value="'+(editing?(editing.start+1):'')+'"></div>'+
           '<div class="field-sm"><label>عمر النبات النهارده (يوم)</label><input type="number" step="1" min="0" class="ltr" id="pg-age" required value="'+defAge+'"></div>'+
           '<div class="field-sm"><label>أو تاريخ الزراعة في السيستم</label><input type="date" class="ltr" id="pg-date" value="'+(editing?editing.plantDate:todayStr())+'"></div>'+
-          '<div class="field-sm"><label>أيام لحد الحصاد</label><input type="number" step="1" min="1" class="ltr" id="pg-hd" required value="'+defHd+'"></div>'+
+          '<div class="field-sm"><label>أيام لحد الحصاد (أول قطفة)</label><input type="number" step="1" min="1" class="ltr" id="pg-hd" required value="'+defHd+'"></div>'+
+          '<div class="field-sm"><label>عدد القطفات في الموسم</label><input type="number" step="1" min="1" max="20" class="ltr" id="pg-maxcuts" required value="'+defMax+'"></div>'+
+          '<div class="field-sm"><label>أيام التجدد بين القطفات</label><input type="number" step="1" min="1" class="ltr" id="pg-regrow" value="'+defRegrow+'" placeholder="لو أكتر من قطفة"></div>'+
+          '<div class="field-sm"><label>قطفات اتعملت</label><input type="number" step="1" min="0" class="ltr" id="pg-cuts" value="'+defCuts+'"></div>'+
+          '<div class="field-sm"><label>تاريخ آخر قطفة</label><input type="date" class="ltr" id="pg-lastcut" value="'+defLast+'"></div>'+
         '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(editing?'حفظ التعديل':'ضيف المجموعة')+'</button>'+(editing?' <button type="button" class="btn btn-ghost btn-sm" id="pg-cancel">إلغاء</button>':'')+'</div></form>'+
       '</details>'+
       '<details class="chart-card" style="margin-top:8px;"><summary style="cursor:pointer;font-weight:700;">⚙️ إعدادات السيستم</summary>'+
@@ -2824,7 +2897,7 @@
     $all('#pipe-grid .pipe').forEach(function(el){
       var i = parseInt(el.getAttribute('data-i'),10), gi = slots[i], g = gi>=0 ? map.groups[gi] : null;
       var st = 'empty', p = 0;
-      if(g){ var r = pipeStage(pipeAgeDays(g, sim), g.harvestDays); st = r.st; p = r.p; }
+      if(g){ var r = pipeStageOf(g, sim); st = r.st; p = r.p; }
       el.className = 'pipe st-'+st+(pipeSel===i?' sel':'');
       el.style.setProperty('--p', p.toFixed(3));
     });
@@ -2839,9 +2912,9 @@
     $all('#pipe-grid .pipe').forEach(function(x){ x.classList.toggle('sel', parseInt(x.getAttribute('data-i'),10)===i); });
     if(!el) return;
     if(gi<0){ el.textContent = 'ماسورة '+(i+1)+': فاضية.'; return; }
-    var g = map.groups[gi], age = pipeAgeDays(g, pipeSimDays), r = pipeStage(age, g.harvestDays), hd = parseFloat(g.harvestDays)||0;
-    el.textContent = 'ماسورة '+(i+1)+' — '+g.crop+' — '+map.plantsPerPipe+' نبتة — عمر '+Math.max(0,age)+' يوم — '+
-      (r.st==='ready' ? 'جاهزة للحصاد ✅' : (r.st==='over' ? 'متأخرة عن الحصاد ⚠️' : (r.st==='future' ? 'لسه ما اتزرعتش' : 'تجهز بعد '+(hd-age)+' يوم')));
+    var g = map.groups[gi], r = pipeStageOf(g, pipeSimDays), c = r.clock, age = pipeAgeDays(g, pipeSimDays), left = c.target - c.age;
+    el.textContent = 'ماسورة '+(i+1)+' — '+g.crop+' — '+map.plantsPerPipe+' نبتة — عمر '+Math.max(0,age)+' يوم'+(c.max>1?(' — قطفة '+Math.min(c.done+1,c.max)+' من '+c.max):'')+' — '+
+      (r.st==='ready' ? (c.max>1 ? 'جاهزة للقطفة ✅' : 'جاهزة للحصاد ✅') : (r.st==='over' ? (c.max>1 ? 'متأخرة عن القطفة ⚠️' : 'متأخرة عن الحصاد ⚠️') : (r.st==='future' ? 'لسه ما اتزرعتش' : 'تجهز بعد '+left+' يوم')));
   }
   function pipeOpenEdit(id){ pipeEditId = id; renderNurseryPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
   function wirePipeGroups(){
@@ -2855,16 +2928,16 @@
   function pipeHarvestGroup(id){
     var map = getPipeMap(nurseryPlanSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
     if(!g) return;
-    var ans = prompt('كام ماسورة اتحصدت من "'+g.crop+'"؟ (من 1 لحد '+g.pipes+')', String(g.pipes));
+    var max = Math.max(1, parseInt(g.maxCuts,10)||1), no = (parseInt(g.cuts,10)||0)+1;
+    var ans = prompt('كام ماسورة اتحصدت من "'+g.crop+'"'+(max>1?(' (قطفة '+no+' من '+max+')'):'')+'؟ (من 1 لحد '+g.pipes+')', String(g.pipes));
     if(ans===null) return;
     var m = parseInt(ans,10);
     if(!(m>=1) || m>g.pipes){ toast('اكتب رقم من 1 لحد '+g.pipes); return; }
-    var next = Object.assign({}, map, {groups: map.groups.map(function(x){ return x; })});
-    if(m===g.pipes) next.groups = map.groups.filter(function(x){ return x.id!==id; });
-    else next.groups = map.groups.map(function(x){ return x.id===id ? Object.assign({}, x, {start:x.start+m, pipes:x.pipes-m}) : x; });
-    savePipeMap(next).then(function(){
-      logAudit('edit','nursery','حصاد '+m+' ماسورة '+g.crop+' من '+(getSystem(map.systemId)?systemLabel(getSystem(map.systemId)):''));
-      toast('اتحصدت '+m+' ماسورة '+g.crop+(m<g.pipes?(' — فاضل '+(g.pipes-m)):' — المواسير فضيت'));
+    var today = todayStr(), res = pipeCutRaw(map.groups, id, m, today);
+    var text = pipeCutText(res.info, today) + (res.info && res.info.final ? (m<g.pipes ? (' — فاضل '+(g.pipes-m)) : ' — المواسير فضيت') : '');
+    savePipeMap(Object.assign({}, map, {groups: pipeMergeGroups(res.groups)})).then(function(){
+      logAudit('edit','nursery',text+' — '+(getSystem(map.systemId)?systemLabel(getSystem(map.systemId)):''));
+      toast(text);
       renderNurseryPanel();
     });
   }
@@ -2889,6 +2962,12 @@
     var age = $('#pg-age'), dt = $('#pg-date');
     age.addEventListener('input', function(){ var a = parseInt(this.value,10); if(a>=0) dt.value = planAddDays(todayStr(), -a); });
     dt.addEventListener('change', function(){ if(this.value){ var a = dayDiff(this.value, todayStr()); age.value = a<0 ? 0 : a; } });
+    $('#pg-crop').addEventListener('change', function(){
+      if(pipeEditId) return;
+      var cfg = cropConfig(this.value);
+      $('#pg-maxcuts').value = cfg.maxCuts;
+      $('#pg-regrow').value = cfg.regrowDays || '';
+    });
     var cancel = $('#pg-cancel'); if(cancel) cancel.addEventListener('click', function(){ pipeEditId = null; renderNurseryPanel(); });
     $('#pipe-grp-form').addEventListener('submit', function(ev){
       ev.preventDefault();
@@ -2899,6 +2978,13 @@
       if(!(n>=1)){ toast('اكتب عدد المواسير'); return; }
       if(!(hd>=1)){ toast('اكتب أيام لحد الحصاد'); return; }
       if(!(a>=0) && !$('#pg-date').value){ toast('اكتب العمر أو تاريخ الزراعة'); return; }
+      var maxCuts = parseInt($('#pg-maxcuts').value,10), regrow = parseFloat($('#pg-regrow').value) || 0;
+      var cutsDone = parseInt($('#pg-cuts').value,10) || 0, lastCut = $('#pg-lastcut').value || '';
+      if(!(maxCuts>=1)){ toast('اكتب عدد القطفات (1 أو أكتر)'); return; }
+      if(maxCuts>1 && !(regrow>=1)){ toast('اكتب أيام التجدد بين القطفات'); return; }
+      if(cutsDone<0 || cutsDone>maxCuts-1){ toast('القطفات اللي اتعملت لازم تكون أقل من عدد القطفات الكلي'); return; }
+      if(cutsDone>0 && !lastCut){ toast('اكتب تاريخ آخر قطفة'); return; }
+      if(cutsDone===0) lastCut = '';
       var startRaw = $('#pg-start').value, start;
       if(n > map.totalPipes){ toast('العدد أكبر من إجمالي المواسير ('+map.totalPipes+')'); return; }
       if(startRaw!==''){
@@ -2910,7 +2996,7 @@
         start = pipeFreeRun(map, n, pipeEditId);
         if(start<0){ toast('مفيش '+n+' مواسير فاضية ورا بعض'); return; }
       }
-      var rec = {id: pipeEditId || genId(), crop:crop, start:start, pipes:n, plantDate:dstr, harvestDays:hd,
+      var rec = {id: pipeEditId || genId(), crop:crop, start:start, pipes:n, plantDate:dstr, harvestDays:hd, maxCuts:maxCuts, regrowDays:regrow, cuts:cutsDone, lastCutDate:lastCut,
         color: pipeEditId ? ((map.groups.filter(function(g){ return g.id===pipeEditId; })[0]||{}).color||0) : (map.groups.length % PIPE_COLORS.length)};
       var groups = pipeEditId ? map.groups.map(function(g){ return g.id===pipeEditId ? rec : g; }) : map.groups.concat([rec]);
       var wasEdit = !!pipeEditId;
@@ -4416,13 +4502,13 @@
     });
   }
 
-  function renderSourceSection(container, sourceObj, systemId){
+  function renderSourceSection(parts, sourceObj, systemId){
     var key = sourceObj.key;
     var entries = flattenEntries(key, systemId).slice().reverse();
-    container.innerHTML =
-      '<h2 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
+    parts.form.innerHTML =
+      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
         '<span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>'+sourceObj.title+
-      '</h2>'+
+      '</h3>'+
       '<form class="entry-form" id="ws-'+key+'-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-'+key+'-ts')+'</div>'+
@@ -4432,8 +4518,9 @@
           '<div class="field-sm"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-'+key+'-note" placeholder="أي ملاحظة على القراءة"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة '+sourceObj.label+'</button></div>'+
-      '</form>'+
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.85rem;">السجل</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
+      '</form>';
+    parts.table.innerHTML =
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>سجل '+sourceObj.title+'</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
       lfBarHtml('w-'+key)+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الحالة</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-'+key+'-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من الفورم فوق.</p>');
@@ -4478,7 +4565,7 @@
     lfWire('w-'+key);
   }
 
-  function renderCalibrationSection(container, systemId){
+  function renderCalibrationSection(parts, systemId){
     function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function f3(v){ return (Math.round(v*1000)/1000).toString(); }
     var list = calibForSystem(systemId);
@@ -4503,10 +4590,10 @@
       statsHtml = '<p class="empty-note">لسه مفيش معايرة مسجلة للنظام ده.</p>';
     }
 
-    container.innerHTML =
-      '<h2 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
+    parts.form.innerHTML =
+      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
         '<span class="tab-dot" style="background:var(--water)"></span>معايرة ماء الري (تصرف النقاط)'+
-      '</h2>'+
+      '</h3>'+
       statsHtml+
       '<p class="hint" style="margin:6px 0 10px;">حط وعاء تحت عدد من النقاط، سيب الري شغال مدة معلومة، وقيس الحجم المتجمع. السيستم بيحسب لتر/دقيقة للنقطة الواحدة.</p>'+
       '<form class="entry-form" id="calib-form">'+
@@ -4520,48 +4607,50 @@
         '</div>'+
         '<p class="hint" id="calib-preview" style="margin:8px 0 0;"></p>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعايرة</button></div>'+
-      '</form>'+
+      '</form>';
+    parts.chart.innerHTML =
       (list.length ?
-        '<h3 style="margin:14px 0 8px;font-size:0.85rem;">الاتجاه عبر الزمن</h3>'+
+        '<h3 style="margin:14px 0 8px;font-size:0.9rem;">اتجاه تصرف النقاط عبر الزمن (معايرة الري)</h3>'+
         '<div class="range-filter" id="calib-range"></div>'+
         '<div class="mini-charts">'+
           '<div class="chart-card"><h3>تصرف النقطة الواحدة (مل/دقيقة)</h3><div class="chart-wrap"><div id="calib-chart-point" class="svg-chart-holder"></div></div><p class="hint" id="calib-sum-point" style="margin:6px 0 0;"></p></div>'+
           (list.some(function(c){ return c.systemLpm!==null && c.systemLpm!==undefined; }) ?
             '<div class="chart-card"><h3>إجمالي تصرف النظام (لتر/دقيقة)</h3><div class="chart-wrap"><div id="calib-chart-sys" class="svg-chart-holder"></div></div><p class="hint" id="calib-sum-sys" style="margin:6px 0 0;"></p></div>' : '')+
-        '</div>' : '')+
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.85rem;">سجل المعايرة</h3><button class="btn btn-ghost btn-sm" id="calib-export">تصدير CSV</button></div>'+
+        '</div>' : '');
+    parts.table.innerHTML =
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:var(--water)"></span>سجل معايرة ماء الري (تصرف النقاط)</h3><button class="btn btn-ghost btn-sm" id="calib-export">تصدير CSV</button></div>'+
       lfBarHtml('calib')+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>نقاط</th><th>الحجم (مل)</th><th>المدة (ث)</th><th>L/min للنقطة</th><th>L/min للنظام</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="calib-tbody"></tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">سجّل أول معايرة من الفورم فوق.</p>');
 
-    if(last && last.totalPoints) $('#calib-total', container).value = last.totalPoints;
+    if(last && last.totalPoints) $('#calib-total').value = last.totalPoints;
 
     function updatePreview(){
-      var v = calcPerPointLpm($('#calib-volume', container).value, $('#calib-points', container).value, $('#calib-duration', container).value);
-      var t = parseFloat($('#calib-total', container).value);
-      var el = $('#calib-preview', container);
+      var v = calcPerPointLpm($('#calib-volume').value, $('#calib-points').value, $('#calib-duration').value);
+      var t = parseFloat($('#calib-total').value);
+      var el = $('#calib-preview');
       if(v===null){ el.textContent = ''; return; }
       el.textContent = 'النتيجة: '+f3(v)+' لتر/دقيقة للنقطة ('+fmtNum(v*1000)+' مل/دقيقة)'+(t>0 ? ' — إجمالي النظام: '+f3(v*t)+' لتر/دقيقة' : '');
     }
     ['calib-volume','calib-points','calib-duration','calib-total'].forEach(function(id){
-      $('#'+id, container).addEventListener('input', updatePreview);
+      $('#'+id).addEventListener('input', updatePreview);
     });
 
-    $('#calib-form', container).addEventListener('submit', function(ev){
+    $('#calib-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       addIrrigCalib(systemId, {
         ts: nowLocalInputValue(),
-        points: $('#calib-points', container).value,
-        volumeMl: $('#calib-volume', container).value,
-        durationSec: $('#calib-duration', container).value,
-        totalPoints: $('#calib-total', container).value,
-        note: $('#calib-note', container).value
+        points: $('#calib-points').value,
+        volumeMl: $('#calib-volume').value,
+        durationSec: $('#calib-duration').value,
+        totalPoints: $('#calib-total').value,
+        note: $('#calib-note').value
       }).then(function(){
         toast('تم حفظ المعايرة');
         renderWaterPanel();
       }).catch(function(){ toast('راجع الأرقام المدخلة'); });
     });
-    $('#calib-export', container).addEventListener('click', function(){ exportCalibCSV(systemId); });
+    $('#calib-export').addEventListener('click', function(){ exportCalibCSV(systemId); });
 
     function calibSummary(points, unit, digits){
       if(!points.length) return '';
@@ -4571,7 +4660,7 @@
       return points.length+' معايرة — المتوسط '+r(avg)+' '+unit+' — أقل '+r(Math.min.apply(null,ys))+' — أعلى '+r(Math.max.apply(null,ys));
     }
     function drawCalibCharts(){
-      $all('#calib-range .range-pill', container).forEach(function(b){
+      $all('#calib-range .range-pill').forEach(function(b){
         var d = b.getAttribute('data-days');
         b.classList.toggle('active', (d?parseInt(d,10):null)===calibRangeDays);
       });
@@ -4603,7 +4692,7 @@
       drawCalibCharts();
     }
 
-    var tbody = $('#calib-tbody', container);
+    var tbody = $('#calib-tbody');
     list.slice().reverse().forEach(function(c){
       var tr = document.createElement('tr');
       tr.setAttribute('data-lf', 'calib'); tr.setAttribute('data-d', String(c.ts).slice(0,10));
@@ -4707,7 +4796,7 @@
       map.groups.forEach(function(g){
         if(cropKey(g.crop)!==key) return;
         tot += g.pipes;
-        var st = pipeStage(pipeAgeDays(g, 0), g.harvestDays).st;
+        var st = pipeStageOf(g, 0).st;
         if(st==='ready' || st==='over') ready += g.pipes;
       });
       hint.textContent = tot ? ('في إنفوجراف السيستم: '+tot+' ماسورة '+crop+' ('+ready+' جاهزة للحصاد).') : ('مفيش مواسير '+crop+' في إنفوجراف السيستم.');
@@ -4733,7 +4822,7 @@
         note: $('#hv-note', inner).value||'', by: currentUser||'', createdAt: Date.now()
       }).then(function(){
         if(pipes>0 && deduct){
-          pipeRes = pipeHarvestFromLog(selectedSystemId, crop, pipes);
+          pipeRes = pipeHarvestFromLog(selectedSystemId, crop, pipes, String($('#hv-ts', inner).value||'').slice(0,10) || todayStr());
           return pipeRes.job;
         }
       }).then(function(){
@@ -4877,26 +4966,22 @@
 
     body.innerHTML =
       '<div class="system-header"><h2>'+systemLabel(sys)+'</h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div>'+
-      '<div id="water-compare"></div>'+
-      '<div id="water-sections"></div>';
+      '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div>'+
+      '<h2 class="section-title wt-group">📈 الشارتس</h2><div id="water-compare"></div><div id="water-calib-charts"></div>'+
+      '<h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div>';
 
     $('#btn-delete-system').addEventListener('click', function(){ deleteSystem(selectedSystemId); });
 
     renderSystemComparisonCharts($('#water-compare'), selectedSystemId);
 
-    var sectionsEl = $('#water-sections');
-    SOURCES.forEach(function(s){
-      var block = document.createElement('div');
-      block.className = 'water-source-block';
-      sectionsEl.appendChild(block);
-      renderSourceSection(block, s, selectedSystemId);
-      if(s.key==='irrigation'){
-        var calibBlock = document.createElement('div');
-        calibBlock.className = 'water-source-block';
-        sectionsEl.appendChild(calibBlock);
-        renderCalibrationSection(calibBlock, selectedSystemId);
-      }
+    var formsEl = $('#water-forms'), tablesEl = $('#water-tables');
+    function mkBlock(parent){ var d = document.createElement('div'); d.className = 'water-source-block'; parent.appendChild(d); return d; }
+    // الترتيب: خزان التغذية (Silo) ← ماء الصرف ← ماء الري ← معايرة النقاط
+    ['tank','drainage','irrigation'].forEach(function(k){
+      var src = SOURCES.filter(function(x){ return x.key===k; })[0];
+      renderSourceSection({form: mkBlock(formsEl), table: mkBlock(tablesEl)}, src, selectedSystemId);
     });
+    renderCalibrationSection({form: mkBlock(formsEl), chart: $('#water-calib-charts'), table: mkBlock(tablesEl)}, selectedSystemId);
     applyPermissionLock($('#panel-water'), 'water');
   }
 
@@ -6642,7 +6727,7 @@
     var legacy = Object.keys(data).filter(function(k){ return !inList[k]; }).map(function(k){ return data[k]; });
     var rows = list.map(function(x){
       return '<div class="cn-row" data-id="'+escH(x.id)+'" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">'+
-        '<strong style="flex:1;">'+escH(x.name)+'</strong><span class="hint" style="margin:0;">'+cropUsageCount(x.name)+' استخدام</span>'+
+        '<strong style="flex:1;">'+escH(x.name)+(parseInt(x.maxCuts,10)>1?(' <span class="hint" style="margin:0;">✂️ '+x.maxCuts+' قطفات كل '+(parseFloat(x.regrowDays)||'—')+' يوم</span>'):'')+'</strong><span class="hint" style="margin:0;">'+cropUsageCount(x.name)+' استخدام</span>'+
         '<button type="button" class="btn btn-ghost btn-sm cn-rename">تعديل</button><button type="button" class="del-btn cn-del" title="حذف">✕</button></div>';
     }).join('');
     var legacyHtml = legacy.length
@@ -6657,11 +6742,36 @@
       : '';
     box.innerHTML =
       (list.length ? rows : '<p class="empty-note">لسه ما سجلتش أصناف. لحد ما تسجّل، خانات الصنف بتفضل كتابة حرة.</p>')+
+      (list.length ? '<h4 style="margin:14px 0 6px;">✂️ القطفات المتعددة (جرجير، ريحان...)</h4><p class="hint">لو الصنف بيتقطف أكتر من مرة في الموسم، حدّد عدد القطفات وأيام التجدد، والماسورة في الإنفوجراف هتفضل وتتجدد بدل ما تفضى بعد كل قطفة.</p>'+
+        '<form class="entry-form" id="cropcuts-form"><div class="form-grid">'+
+          '<div class="field-sm full"><label>الصنف</label><select id="cc-crop"><option value="">— اختار الصنف —</option>'+list.map(function(c){ return '<option value="'+escH(c.id)+'">'+escH(c.name)+'</option>'; }).join('')+'</select></div>'+
+          '<div class="field-sm"><label>عدد القطفات في الموسم</label><input type="number" step="1" min="1" max="20" class="ltr" id="cc-max" value="1"></div>'+
+          '<div class="field-sm"><label>أيام التجدد بين القطفات</label><input type="number" step="1" min="1" class="ltr" id="cc-regrow"></div></div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ</button></div></form>' : '')+
       '<form class="entry-form" id="cropname-form" style="margin-top:12px;"><div class="form-grid">'+
         '<div class="field-sm full"><label>اسم صنف جديد</label><input type="text" id="cn-new" maxlength="40" placeholder="مثال: خس روماني"></div></div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">＋ إضافة للقايمة</button> '+
         (legacy.length ? '<button type="button" class="btn btn-ghost btn-sm" id="cn-import">استيراد كل الأسماء الموجودة ('+legacy.length+')</button>' : '')+'</div></form>'+legacyHtml;
 
+    var ccForm = $('#cropcuts-form');
+    if(ccForm){
+      $('#cc-crop').addEventListener('change', function(){
+        var x = cropNames.filter(function(c){ return c.id===this.value; }.bind(this))[0];
+        $('#cc-max').value = x ? (parseInt(x.maxCuts,10)||1) : 1;
+        $('#cc-regrow').value = x ? (parseFloat(x.regrowDays)||'') : '';
+      });
+      ccForm.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var id = $('#cc-crop').value, mx = parseInt($('#cc-max').value,10), rg = parseFloat($('#cc-regrow').value) || 0;
+        if(!id){ toast('اختار الصنف'); return; }
+        if(!(mx>=1)){ toast('اكتب عدد القطفات'); return; }
+        if(mx>1 && !(rg>=1)){ toast('اكتب أيام التجدد بين القطفات'); return; }
+        var x = cropNames.filter(function(c){ return c.id===id; })[0];
+        saveCropNames(cropNames.map(function(c){ return c.id===id ? Object.assign({}, c, {maxCuts:mx, regrowDays:mx>1?rg:0}) : c; })).then(function(){
+          logAudit('edit','settings','قطفات '+x.name+': '+mx+(mx>1?(' كل '+rg+' يوم'):'')); toast('اتحفظت إعدادات القطفات');
+        });
+      });
+    }
     var form = $('#cropname-form');
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
@@ -6693,7 +6803,7 @@
       var used = cropUsageCount(x.name);
       if(!confirm('هتغيّر "'+x.name+'" إلى "'+nn+'"'+(used?(' في '+used+' سجل'):'')+'؟')) return;
       unifyCropName(x.name, nn).then(function(n){
-        return saveCropNames(cropNames.map(function(c){ return c.id===id ? {id:c.id, name:nn} : c; })).then(function(){
+        return saveCropNames(cropNames.map(function(c){ return c.id===id ? Object.assign({}, c, {name:nn}) : c; })).then(function(){
           logAudit('edit','settings','تغيير اسم صنف: '+x.name+' ← '+nn+' ('+n+' سجل)'); toast('اتغيّر في '+n+' سجل');
         });
       });
