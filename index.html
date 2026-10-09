@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-unbJXb/GOYb28xayMEEbHr8X17m1Op5JMx+NMCjLhUQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1P5GFrZW3LML4VxgdkzifizQ14Pq1ya3pZBel70iF48=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -184,6 +184,19 @@
   @media (prefers-reduced-motion:reduce){.pipe-fill,.pipe .lf,.pipe-tube{animation:none !important;transition:none !important;}}
   .cn-map{box-sizing:border-box;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:0.92rem;}
   .wt-group{margin-top:22px;padding-top:8px;border-top:2px solid var(--border);}
+  .notif-bell{position:relative;} .notif-badge{position:absolute;top:-4px;inset-inline-end:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--alert);color:#fff;font-size:.62rem;font-weight:800;line-height:17px;text-align:center;}
+  .notif-bar{margin:10px 12px 0;border-radius:14px;border:1px solid var(--border);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-card);}
+  .notif-bar.lv-danger{border-color:var(--alert);} .notif-bar.lv-warn{border-color:#e0a82e;} .notif-bar.lv-info{border-color:var(--tank);}
+  .notif-head{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:transparent;border:none;color:var(--ink);font:inherit;font-weight:700;cursor:pointer;text-align:start;}
+  .notif-bar.lv-danger .notif-head{background:var(--alert-soft);color:var(--alert);} .notif-bar.lv-warn .notif-head{background:rgba(224,168,46,.14);} .notif-bar.lv-info .notif-head{background:var(--tank-soft);color:var(--tank);}
+  .notif-sum{flex:1;} .notif-caret{opacity:.7;}
+  .notif-list{max-height:55vh;overflow-y:auto;padding:4px 10px 10px;}
+  .notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);}
+  .notif-item:last-of-type{border-bottom:none;} .notif-item.fresh{background:rgba(59,130,246,.07);border-radius:10px;padding-inline:8px;}
+  .notif-ico{font-size:1.15rem;line-height:1.3;} .notif-txt{flex:1;min-width:0;} .notif-title{font-weight:700;font-size:.88rem;} .notif-detail{color:var(--muted);font-size:.78rem;margin-top:2px;word-break:break-word;}
+  .notif-item.lv-danger .notif-title{color:var(--alert);} .notif-acts{display:flex;flex-direction:column;gap:6px;}
+  .notif-new{background:var(--brand);color:#fff;border-radius:6px;padding:1px 6px;font-size:.65rem;margin-inline-end:4px;}
+  .notif-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:10px;}
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -301,7 +314,14 @@
   .task-sop-link{font-size:0.75rem;color:var(--muted);margin-bottom:8px;}
   .pest-card{background:var(--surface);border:1px solid var(--border);border-inline-start:4px solid var(--alert);border-radius:14px;padding:12px 14px;}
   .pest-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
-  .pest-photo{max-width:100%;max-height:220px;border-radius:10px;margin:8px 0;display:block;object-fit:cover;}
+  .pest-photo{max-width:100%;max-height:220px;border-radius:10px;margin:8px 0;display:block;object-fit:cover;cursor:zoom-in;}
+  .pest-treat-row{padding:4px 0;border-top:1px dashed rgba(0,0,0,.12);font-size:0.82rem;} .pest-treat-row:first-of-type{border-top:none;}
+  #photo-viewer{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.94);display:flex;flex-direction:column;touch-action:none;}
+  #photo-viewer .pv-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));} #photo-viewer .pv-btns{display:flex;gap:8px;}
+  #photo-viewer .pv-btn{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;}
+  #photo-viewer .pv-stage{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;}
+  #photo-viewer #pv-img{max-width:100%;max-height:100%;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-select:none;will-change:transform;}
+  #photo-viewer .pv-hint{color:rgba(255,255,255,.7);font-size:.78rem;text-align:center;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));}
   .pest-treatment{font-size:0.82rem;background:var(--good-soft);color:var(--good);border-radius:8px;padding:6px 10px;margin:6px 0;}
   .sop-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:10px;}
   .sop-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
@@ -513,6 +533,7 @@
     </div>
     <div class="header-actions">
       <span class="hello" id="hello-user"></span>
+      <button class="icon-btn notif-bell" id="btn-notif" title="التنبيهات" aria-label="التنبيهات">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
       <button class="icon-btn" id="btn-theme" title="تبديل المظهر">◐</button>
       <button class="icon-btn" id="btn-logout" title="تسجيل الخروج">⎋</button>
     </div>
@@ -530,6 +551,7 @@
     <button class="tab-btn" data-tab="inventory" style="--tab-color:var(--water)">المخازن</button>
     <button class="tab-btn" data-tab="settings">الإعدادات</button>
   </nav>
+  <div id="notif-bar" class="notif-bar hidden"></div>
 
   <main>
     <span class="sync-badge" id="sync-badge"><span class="sync-dot" id="sync-dot"></span><span id="sync-text">جارِ الاتصال بالتخزين…</span></span>
@@ -824,6 +846,14 @@
   var nurseryPlanLog = [];
   var pipeMaps = [];
   var cropNames = [];
+  var myNotifs = [];
+  var notifSeen = {};
+  var notifFirstLoad = true;
+  var notifOpen = false;
+  var swReg = null;
+  var BASE_TITLE = document.title;
+  var pestEditId = null;
+  var pestTreatId = null;
   var pipeSimDays = 0;
   var pipeEditId = null;
   var pipeSel = -1;
@@ -1824,7 +1854,7 @@
   }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
-    '#btn-plan-snapshot, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
+    '#btn-plan-snapshot, .pest-edit-btn, .pest-treat-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
   var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
@@ -2139,6 +2169,29 @@
     persistLocalPestlog();
     renderAll();
     return Promise.resolve();
+  }
+  function savePestIncident(inc){
+    if(db) return db.collection('pestlog').doc(inc.id).set(inc);
+    pestLog = pestLog.map(function(x){ return x.id===inc.id ? inc : x; });
+    persistLocalPestlog(); renderAll(); return Promise.resolve();
+  }
+  function pestTreatmentsOf(p){ return Array.isArray(p.treatments) ? p.treatments : []; }
+  function addPestTreatment(incId, tr){
+    var inc = pestLog.filter(function(x){ return x.id===incId; })[0];
+    if(!inc) return Promise.reject(new Error('incident missing'));
+    var next = Object.assign({}, inc, {treatments: pestTreatmentsOf(inc).concat([tr]), updatedAt: Date.now()});
+    return savePestIncident(next).then(function(r){
+      logAudit('add','pests','معاملة جديدة على: '+(inc.problemName||'—')+' — '+(tr.pesticideName||'—')+(tr.dose?(' — '+tr.dose):''));
+      return r;
+    });
+  }
+  function deletePestTreatment(incId, trId){
+    if(!requireAdminForDelete()) return;
+    if(!confirm('تحذف المعاملة دي؟')) return;
+    var inc = pestLog.filter(function(x){ return x.id===incId; })[0];
+    if(!inc) return;
+    var next = Object.assign({}, inc, {treatments: pestTreatmentsOf(inc).filter(function(t){ return t.id!==trId; }), updatedAt: Date.now()});
+    savePestIncident(next).then(function(){ logAudit('delete','pests','حذف معاملة من: '+(inc.problemName||'—')); toast('اتحذفت المعاملة'); });
   }
   function deletePestIncident(id){
     if(!requireAdminForDelete()) return;
@@ -3113,7 +3166,7 @@
   function uploadPestPhoto(file){
     if(!file) return Promise.resolve('');
     if(!assetsCap) return Promise.reject({code:'not_granted', message:'رفع الصور مش متاح دلوقتي'});
-    return compressImageToBlob(file, 640, 0.5).then(function(blob){
+    return compressImageToBlob(file, 1100, 0.6).then(function(blob){
       if(!blob) return '';
       return assetsCap.upload(blob, {type:'image/jpeg'}).then(function(res){ return res.id; });
     });
@@ -3349,7 +3402,11 @@
     var existing = findDoc('tasks', dateKey);
     var entries = existing ? existing.entries.slice() : [];
     entries.push(entry);
-    return saveDoc('tasks', dateKey, entries);
+    return saveDoc('tasks', dateKey, entries).then(function(r){
+      var to = entry.assignedEmail || (userByName(entry.assignedTo) || {}).username || '';
+      if(to) notifyUser(to, 'task', 'مهمة جديدة ليك', entry.title+' — '+dateKey+(entry.greenhouse?(' — '+entry.greenhouse):'')+(entry.recur?' (متكررة)':''), {taskId:entry.id});
+      return r;
+    });
   }
   function setTaskStatus(dateKey, taskId, status){
     var existing = findDoc('tasks', dateKey);
@@ -5798,6 +5855,99 @@
   var pestCategoryLabel = {fungal:'فطري 🍄', insect:'حشري 🐛', other:'أخرى'};
   var pestFilterCategory = null;
 
+  /* ---------- عارض الصور: تكبير/تصغير/تحريك ---------- */
+  function closePhotoViewer(){
+    var v = document.getElementById('photo-viewer');
+    if(v){ if(v._onKey) document.removeEventListener('keydown', v._onKey); v.remove(); }
+  }
+  function openPhotoViewer(src){
+    closePhotoViewer();
+    var v = document.createElement('div');
+    v.id = 'photo-viewer';
+    v.innerHTML =
+      '<div class="pv-bar"><button type="button" class="pv-btn" id="pv-close" aria-label="إغلاق">✕</button>'+
+      '<span class="pv-btns"><button type="button" class="pv-btn" id="pv-out" aria-label="تصغير">−</button><button type="button" class="pv-btn" id="pv-reset" aria-label="الحجم الأصلي">⟲</button><button type="button" class="pv-btn" id="pv-in" aria-label="تكبير">＋</button></span></div>'+
+      '<div class="pv-stage" id="pv-stage"><img id="pv-img" alt="" draggable="false"></div>'+
+      '<div class="pv-hint">اقرص بإصبعين أو دوس مرتين للتكبير، واسحب للتحريك</div>';
+    document.body.appendChild(v);
+    var img = v.querySelector('#pv-img'), stage = v.querySelector('#pv-stage');
+    img.src = src;
+    var st = {s:1, x:0, y:0}, pts = {}, pinch0 = null, drag0 = null, lastTap = 0;
+    var MAX = 8;
+    function clampPan(){
+      var w = stage.clientWidth, h = stage.clientHeight;
+      var iw = img.clientWidth * st.s, ih = img.clientHeight * st.s;
+      var mx = Math.max(0, (iw - w)/2), my = Math.max(0, (ih - h)/2);
+      st.x = Math.min(mx, Math.max(-mx, st.x)); st.y = Math.min(my, Math.max(-my, st.y));
+    }
+    function apply(){
+      if(st.s<=1){ st.s = 1; st.x = 0; st.y = 0; } else clampPan();
+      img.style.transform = 'translate('+st.x+'px,'+st.y+'px) scale('+st.s+')';
+    }
+    function zoomTo(ns){ st.s = Math.min(MAX, Math.max(1, ns)); apply(); }
+    v.querySelector('#pv-in').addEventListener('click', function(){ zoomTo(st.s*1.5); });
+    v.querySelector('#pv-out').addEventListener('click', function(){ zoomTo(st.s/1.5); });
+    v.querySelector('#pv-reset').addEventListener('click', function(){ st.x = 0; st.y = 0; zoomTo(1); });
+    v.querySelector('#pv-close').addEventListener('click', closePhotoViewer);
+    v._onKey = function(ev){ if(ev.key==='Escape') closePhotoViewer(); else if(ev.key==='+'||ev.key==='=') zoomTo(st.s*1.5); else if(ev.key==='-') zoomTo(st.s/1.5); };
+    document.addEventListener('keydown', v._onKey);
+    stage.addEventListener('wheel', function(ev){ ev.preventDefault(); zoomTo(st.s * (ev.deltaY<0 ? 1.2 : 1/1.2)); }, {passive:false});
+    stage.addEventListener('dblclick', function(){ if(st.s>1){ st.x = 0; st.y = 0; zoomTo(1); } else zoomTo(2.5); });
+    var downOnBackdrop = false;
+    stage.addEventListener('click', function(){ if(downOnBackdrop && st.s<=1) closePhotoViewer(); });
+    function dist(){ var k = Object.keys(pts); if(k.length<2) return 0; var a = pts[k[0]], b = pts[k[1]]; return Math.hypot(a.x-b.x, a.y-b.y); }
+    stage.addEventListener('pointerdown', function(ev){
+      try{ stage.setPointerCapture(ev.pointerId); }catch(e){}
+      pts[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
+      var n = Object.keys(pts).length;
+      downOnBackdrop = (n===1 && ev.target===stage);
+      if(n===2){ pinch0 = {d:dist(), s:st.s}; drag0 = null; }
+      else if(n===1){
+        drag0 = {x:ev.clientX, y:ev.clientY, ox:st.x, oy:st.y};
+        var now = Date.now();
+        if(ev.pointerType==='touch' && now-lastTap<300){ if(st.s>1){ st.x = 0; st.y = 0; zoomTo(1); } else zoomTo(2.5); lastTap = 0; } else lastTap = now;
+      }
+    });
+    stage.addEventListener('pointermove', function(ev){
+      if(!pts[ev.pointerId]) return;
+      pts[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
+      var n = Object.keys(pts).length;
+      if(n>=2 && pinch0 && pinch0.d>0){ zoomTo(pinch0.s * dist()/pinch0.d); }
+      else if(n===1 && drag0 && st.s>1){ st.x = drag0.ox + (ev.clientX-drag0.x); st.y = drag0.oy + (ev.clientY-drag0.y); apply(); }
+    });
+    function up(ev){ delete pts[ev.pointerId]; pinch0 = null; if(Object.keys(pts).length===1){ var k = Object.keys(pts)[0]; drag0 = {x:pts[k].x, y:pts[k].y, ox:st.x, oy:st.y}; } else drag0 = null; }
+    stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+    apply();
+  }
+  document.addEventListener('click', function(ev){
+    var im = ev.target && ev.target.closest ? ev.target.closest('img.pest-photo') : null;
+    if(im && im.getAttribute('src')) openPhotoViewer(im.getAttribute('src'));
+  });
+
+  /* ---------- سجل المعاملات على الإصابة ---------- */
+  function pestTreatmentsHtml(p){
+    var rows = [];
+    if(p.treated) rows.push({first:true, ts:p.ts, pesticideName:p.pesticideName, dose:p.dose, note:'', by:p.by});
+    pestTreatmentsOf(p).forEach(function(t){ rows.push(t); });
+    if(!rows.length) return '';
+    return '<div class="pest-treatment"><div style="font-weight:700;margin-bottom:4px;">🧪 سجل المعاملات ('+rows.length+')</div>'+
+      rows.map(function(t, i){
+        return '<div class="pest-treat-row" data-tid="'+escH(t.id||'')+'"><span class="ltr num">'+escH(fmtTs(t.ts))+'</span> — '+
+          '<strong>'+escH(t.pesticideName||'—')+'</strong>'+(t.dose?(' — '+escH(t.dose)):'')+(t.note?(' — '+escH(t.note)):'')+
+          (t.first ? ' <span class="hint" style="margin:0;">(المعاملة الأولى)</span>' : (' <button type="button" class="del-btn pest-treat-del" title="حذف المعاملة">✕</button>'))+'</div>';
+      }).join('')+'</div>';
+  }
+  function pestTreatFormHtml(p){
+    var opts = '<option value="">اختار من المخزن</option>'+inventoryItems.filter(function(x){ return x.type==='pesticide'; }).map(function(x){ return '<option value="'+escH(x.id)+'">'+escH(x.name)+'</option>'; }).join('')+'<option value="__other__">أخرى (اكتب يدوي)</option>';
+    return '<form class="entry-form" id="pt-form" data-id="'+escH(p.id)+'" style="margin-top:8px;"><div class="form-grid">'+
+      '<div class="field-sm full"><label>وقت المعاملة</label><input type="datetime-local" class="ltr" id="pt-ts" required></div>'+
+      '<div class="field-sm full"><label>المبيد</label><select id="pt-sel">'+opts+'</select><input type="text" id="pt-other" maxlength="150" style="margin-top:8px;display:none;" placeholder="اسم المبيد"><p class="hint" id="pt-info" style="margin:6px 0 0;"></p></div>'+
+      '<div class="field-sm"><label>الكمية/الجرعة</label><input type="text" id="pt-dose" maxlength="80" placeholder="مثال: 2 مل/لتر"></div>'+
+      '<div class="field-sm" id="pt-used-wrap" style="display:none;"><label id="pt-used-label">الكمية من المخزون (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="pt-used" placeholder="0"></div>'+
+      '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="pt-note" maxlength="200" placeholder="مثال: رشة تانية بعد 5 أيام"></div>'+
+      '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعاملة</button> <button type="button" class="btn btn-ghost btn-sm" id="pt-cancel">إلغاء</button></div></form>';
+  }
+
   function renderPestsPanel(){
     var ghPicker = $('#pests-greenhouse-picker');
     var body = $('#pests-body');
@@ -5825,7 +5975,7 @@
     var listHtml = incidents.length ? incidents.map(function(p){
       var sevBadge = p.severity ? '<span class="status-pill '+(p.severity==='high'?'alert':(p.severity==='medium'?'':'good'))+'" style="'+(p.severity==='medium'?'background:var(--tank-soft);color:var(--tank);':'')+'">'+(p.severity==='high'?'شديدة':(p.severity==='medium'?'متوسطة':'خفيفة'))+'</span>' : '';
       var photoHtml = p.photoAssetId ? ('<img class="pest-photo" src="'+pestPhotoUrl(p.photoAssetId)+'" alt="صورة الإصابة">') : '';
-      var treatHtml = p.treated ? '<div class="pest-treatment">🧪 اتعالجت بـ <strong>'+(p.pesticideName||'—')+'</strong>'+(p.dose?(' — الكمية: '+p.dose):'')+'</div>' : '';
+      var treatHtml = pestTreatmentsHtml(p);
       return '<div class="pest-card" data-id="'+p.id+'"'+lfAttr('pests', p.ts)+'>'+
         '<div class="pest-card-head"><span class="task-date-badge">'+fmtTs(p.ts)+'</span>'+pestCategoryLabel[p.category]+' '+sevBadge+'</div>'+
         '<div class="task-title">'+(p.problemName||'—')+'</div>'+
@@ -5833,15 +5983,22 @@
         photoHtml+
         treatHtml+
         (p.note?('<div class="task-note">'+p.note+'</div>'):'')+
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">'+
-          '<span style="color:var(--muted);font-size:0.72rem;">بواسطة '+(p.by||'—')+'</span>'+
-          '<button class="del-btn pest-delete-btn" title="حذف">✕</button>'+
+        (pestTreatId===p.id ? pestTreatFormHtml(p) : '')+
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;">'+
+          '<span style="color:var(--muted);font-size:0.72rem;">بواسطة '+(p.by||'—')+(p.updatedAt?' · اتعدّلت':'')+'</span>'+
+          '<span style="display:flex;gap:6px;align-items:center;">'+
+            '<button type="button" class="btn btn-primary btn-sm pest-treat-btn">➕ معاملة</button>'+
+            '<button type="button" class="btn btn-ghost btn-sm pest-edit-btn">✏️ تعديل</button>'+
+            '<button class="del-btn pest-delete-btn" title="حذف">✕</button>'+
+          '</span>'+
         '</div>'+
       '</div>';
     }).join('') : '<p class="empty-note">لا توجد سجلات لهذه الصوبة.</p>';
 
+    var pestEditing = pestEditId ? pestLog.filter(function(x){ return x.id===pestEditId; })[0] : null;
+    if(pestEditId && !pestEditing) pestEditId = null;
     body.innerHTML =
-      '<h2 class="section-title" style="margin-top:0;">تسجيل إصابة/معاملة جديدة</h2>'+
+      '<h2 class="section-title" style="margin-top:0;" id="pest-form-title">'+(pestEditing?'✏️ تعديل إصابة':'تسجيل إصابة/معاملة جديدة')+'</h2>'+
       '<form class="entry-form" id="pest-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="pest-ts" required></div>'+
@@ -5849,7 +6006,8 @@
           '<div class="field-sm"><label>شدة الإصابة (اختياري)</label><select id="pest-severity"><option value="">—</option><option value="low">خفيفة</option><option value="medium">متوسطة</option><option value="high">شديدة</option></select></div>'+
           '<div class="field-sm full"><label>اسم المرض/الآفة</label><input type="text" id="pest-name" maxlength="150" required placeholder="مثال: البياض الدقيقي، المن، ذبابة بيضاء"></div>'+
           '<div class="field-sm full"><label>الموقع داخل الصوبة (اختياري)</label><input type="text" id="pest-location" maxlength="150" placeholder="مثال: نظام 3 - الصف الثاني"></div>'+
-          '<div class="field-sm full"><label>صورة الإصابة (اختياري)'+(assetsCap?'':' — مش متاحة دلوقتي')+'</label><input type="file" accept="image/*" id="pest-photo"'+(assetsCap?'':' disabled')+'></div>'+
+          '<div class="field-sm full"><label>صورة الإصابة (اختياري)'+(assetsCap?'':' — مش متاحة دلوقتي')+'</label><input type="file" accept="image/*" id="pest-photo"'+(assetsCap?'':' disabled')+'>'+
+            (pestEditing && pestEditing.photoAssetId ? ('<img class="pest-photo" src="'+pestPhotoUrl(pestEditing.photoAssetId)+'" alt="الصورة الحالية" style="max-height:120px;margin-top:8px;"><label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-weight:400;"><input type="checkbox" id="pest-photo-remove" style="width:auto;"> احذف الصورة الحالية (أو اختار صورة جديدة فوق لتغييرها)</label>') : '')+'</div>'+
           '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="pest-treated" style="width:auto;"> تمت المعاملة/الرش</label></div>'+
           '<div class="field-sm" id="pest-pesticide-wrap" style="display:none;"><label>اسم المبيد</label><select id="pest-pesticide-select"><option value="">اختار من المخزن</option>'+inventoryItems.filter(function(x){ return x.type==='pesticide'; }).map(function(x){ return '<option value="'+x.id+'">'+x.name+'</option>'; }).join('')+'<option value="__other__">أخرى (اكتب يدوي)</option></select>'+
             '<input type="text" id="pest-pesticide" maxlength="150" style="margin-top:8px;display:none;" placeholder="اسم المبيد">'+
@@ -5858,7 +6016,7 @@
           '<div class="field-sm" id="pest-stock-used-wrap" style="display:none;"><label id="pest-stock-used-label">الكمية المستخدمة من المخزون (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="pest-stock-used" placeholder="0"></div>'+
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="pest-note" maxlength="200"></div>'+
         '</div>'+
-        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">حفظ</button></div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">'+(pestEditing?'حفظ التعديل':'حفظ')+'</button>'+(pestEditing?' <button type="button" class="btn btn-ghost btn-sm" id="pest-edit-cancel">إلغاء</button>':'')+'</div>'+
       '</form>'+
 
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
@@ -5907,6 +6065,36 @@
       });
     }
 
+    function pestCapturePesticide(selId, otherId){
+      var el = $(selId);
+      if(!el) return '';
+      if(el.value==='__other__') return $(otherId).value.trim();
+      if(el.value){ var it = getInventoryItem(el.value); return it ? it.name : ''; }
+      return '';
+    }
+    if(pestEditing){
+      $('#pest-ts').value = pestEditing.ts || nowLocalInputValue();
+      $('#pest-category').value = pestEditing.category || 'other';
+      $('#pest-severity').value = pestEditing.severity || '';
+      $('#pest-name').value = pestEditing.problemName || '';
+      $('#pest-location').value = pestEditing.location || '';
+      $('#pest-note').value = pestEditing.note || '';
+      if(pestEditing.treated){
+        $('#pest-treated').checked = true;
+        $('#pest-pesticide-wrap').style.display = 'block'; $('#pest-dose-wrap').style.display = 'block';
+        var selEl = $('#pest-pesticide-select');
+        if(selEl){
+          var inv = inventoryItems.filter(function(x){ return x.type==='pesticide' && x.name===pestEditing.pesticideName; })[0];
+          selEl.value = inv ? inv.id : '__other__';
+          selEl.dispatchEvent(new Event('change', {bubbles:true}));
+          if(!inv) $('#pest-pesticide').value = pestEditing.pesticideName || '';
+        }
+        $('#pest-dose').value = pestEditing.dose || '';
+      }
+      var sw = $('#pest-stock-used-wrap'); if(sw) sw.style.display = 'none';
+      var cEl = $('#pest-edit-cancel'); if(cEl) cEl.addEventListener('click', function(){ pestEditId = null; renderPestsPanel(); });
+    }
+
     $('#pest-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var submitBtn = $('#pest-submit-btn');
@@ -5918,13 +6106,27 @@
       var pestSelEl = $('#pest-pesticide-select');
       var capturedSelId = pestSelEl ? pestSelEl.value : '';
       var capturedUsedQty = parseFloat($('#pest-stock-used') ? $('#pest-stock-used').value : '');
-      var capturedPesticideName = (function(){
-        if(!pestSelEl) return '';
-        if(pestSelEl.value==='__other__') return $('#pest-pesticide').value.trim();
-        if(pestSelEl.value){ var it=getInventoryItem(pestSelEl.value); return it?it.name:''; }
-        return '';
-      })();
+      var capturedPesticideName = pestCapturePesticide('#pest-pesticide-select', '#pest-pesticide');
+      var wasEditing = pestEditing;
+      var removePhoto = !!($('#pest-photo-remove') && $('#pest-photo-remove').checked);
       uploadPestPhoto(file).then(function(photoAssetId){
+        if(wasEditing){
+          var treated = $('#pest-treated').checked;
+          var inc = Object.assign({}, wasEditing, {
+            ts: $('#pest-ts').value || wasEditing.ts,
+            category: $('#pest-category').value,
+            problemName: $('#pest-name').value.trim(),
+            severity: $('#pest-severity').value,
+            location: $('#pest-location').value.trim(),
+            photoAssetId: photoAssetId ? photoAssetId : (removePhoto ? '' : (wasEditing.photoAssetId||'')),
+            treated: treated,
+            pesticideName: treated ? capturedPesticideName : '',
+            dose: treated ? $('#pest-dose').value.trim() : '',
+            note: $('#pest-note').value.trim(),
+            updatedAt: Date.now(), editedBy: currentUser||''
+          });
+          return savePestIncident(inc).then(function(r){ logAudit('edit','pests','تعديل مشكلة: '+(inc.problemName||'—')+(wasEditing.greenhouse?(' — '+wasEditing.greenhouse):'')); return r; });
+        }
         return addPestIncident({
           ts: $('#pest-ts').value || nowLocalInputValue(),
           greenhouse: gh,
@@ -5944,7 +6146,8 @@
           return r;
         });
       }).then(function(){
-        toast('اتسجّل');
+        toast(wasEditing ? 'اتحفظ التعديل' : 'اتسجّل');
+        pestEditId = null;
         renderPestsPanel();
       }).catch(function(err){
         console.error(err);
@@ -5958,6 +6161,63 @@
         submitBtn.textContent = originalText;
       });
     });
+
+    $all('.pest-edit-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        pestEditId = btn.closest('.pest-card').getAttribute('data-id'); pestTreatId = null;
+        renderPestsPanel();
+        var f = $('#pest-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+    $all('.pest-treat-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.pest-card').getAttribute('data-id');
+        pestTreatId = pestTreatId===id ? null : id; pestEditId = null;
+        renderPestsPanel();
+        var f = $('#pt-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'center'});
+      });
+    });
+    $all('.pest-treat-del', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var card = btn.closest('.pest-card'), row = btn.closest('.pest-treat-row');
+        deletePestTreatment(card.getAttribute('data-id'), row.getAttribute('data-tid'));
+      });
+    });
+    var ptForm = $('#pt-form');
+    if(ptForm){
+      var incId = ptForm.getAttribute('data-id');
+      $('#pt-ts').value = nowLocalInputValue();
+      $('#pt-cancel').addEventListener('click', function(){ pestTreatId = null; renderPestsPanel(); });
+      $('#pt-sel').addEventListener('change', function(){
+        var v = this.value, other = $('#pt-other'), info = $('#pt-info'), used = $('#pt-used-wrap'), dose = $('#pt-dose');
+        if(v==='__other__'){ other.style.display = ''; info.textContent = ''; used.style.display = 'none'; $('#pt-used').value = ''; }
+        else if(v){
+          other.style.display = 'none'; other.value = '';
+          var it = getInventoryItem(v);
+          if(it){
+            var parts = [];
+            if(it.activeIngredient) parts.push('المادة الفعالة: '+it.activeIngredient);
+            if(it.dose) parts.push('الجرعة الموصى بها: '+it.dose);
+            if(it.quantity!=null) parts.push('المتاح بالمخزن: '+it.quantity+' '+(it.unit||''));
+            info.textContent = parts.join(' — ');
+            if(it.dose && !dose.value) dose.value = it.dose;
+            if(it.quantity!=null){ used.style.display = ''; $('#pt-used-label').textContent = 'الكمية من المخزون ('+(it.unit||'')+') — اختياري'; }
+            else { used.style.display = 'none'; $('#pt-used').value = ''; }
+          }
+        } else { other.style.display = 'none'; other.value = ''; info.textContent = ''; used.style.display = 'none'; $('#pt-used').value = ''; }
+      });
+      ptForm.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var selId = $('#pt-sel').value, name = pestCapturePesticide('#pt-sel', '#pt-other'), usedQty = parseFloat($('#pt-used').value);
+        if(!name){ toast('اختار المبيد أو اكتب اسمه'); return; }
+        var tr = {id: genId(), ts: $('#pt-ts').value || nowLocalInputValue(), pesticideName: name, dose: $('#pt-dose').value.trim(), note: $('#pt-note').value.trim(), by: currentUser||'', createdAt: Date.now()};
+        addPestTreatment(incId, tr).then(function(){
+          if(selId && selId!=='__other__' && usedQty>0) return deductInventoryQty(selId, usedQty);
+        }).then(function(){
+          toast('اتسجّلت المعاملة'); pestTreatId = null; renderPestsPanel();
+        }).catch(function(e){ console.error(e); toast('تعذر حفظ المعاملة'); });
+      });
+    }
 
     $all('.pest-filter-pill', body).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -6118,12 +6378,15 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var incidents = flattenPestlog(greenhouseName).filter(function(x){ return lfInRange('pests', x.ts); });
     if(!incidents.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['الوقت','النوع','اسم المرض/الآفة','الشدة','الموقع','تمت المعاملة','المبيد','الكمية','ملاحظة','بواسطة'];
+    var header = ['الوقت','النوع','اسم المرض/الآفة','الشدة','الموقع','تمت المعاملة','المبيد','الكمية','عدد المعاملات','تفاصيل المعاملات','ملاحظة','بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
     incidents.forEach(function(p){
       lines.push([
         p.ts, pestCategoryLabel[p.category]||p.category, p.problemName, p.severity, p.location,
-        (p.treated?'نعم':'لا'), p.pesticideName, p.dose, p.note, p.by
+        (p.treated?'نعم':'لا'), p.pesticideName, p.dose,
+        (p.treated?1:0)+pestTreatmentsOf(p).length,
+        pestTreatmentsOf(p).map(function(t){ return String(t.ts).replace('T',' ')+': '+(t.pesticideName||'')+(t.dose?(' ('+t.dose+')'):'')+(t.note?(' — '+t.note):''); }).join(' | '),
+        p.note, p.by
       ].map(csvEscape).join(','));
     });
     var csv = '\uFEFF' + lines.join('\r\n');
@@ -6823,6 +7086,176 @@
     });
   }
 
+  /* ---------- الإشعارات والتنبيهات ---------- */
+  function notifyUser(toEmail, kind, title, body, extra){
+    var to = String(toEmail||'').toLowerCase();
+    if(!db || !to || to===String(currentUser||'').toLowerCase()) return Promise.resolve();
+    var rec = Object.assign({id:genId(), to:to, kind:kind, title:title, body:body||'', from:currentUser||'', fromName:myDisplayName()||currentUser||'', createdAt:Date.now(), read:false}, extra||{});
+    return db.collection('notifications').doc(rec.id).set(rec).catch(function(e){ console.error('notify failed', e); });
+  }
+  function notifMarkRead(ids){
+    ids = [].concat(ids);
+    myNotifs = myNotifs.map(function(n){ return ids.indexOf(n.id)>=0 ? Object.assign({}, n, {read:true}) : n; });
+    if(db) return Promise.all(ids.map(function(id){ return db.collection('notifications').doc(id).update({read:true, readAt:Date.now()}).catch(function(){}); }));
+    return Promise.resolve();
+  }
+  function notifCleanup(){
+    var cutoff = Date.now() - 30*86400000;
+    myNotifs.filter(function(n){ return n.read && (n.createdAt||0) < cutoff; }).slice(0,20).forEach(function(n){
+      if(db) db.collection('notifications').doc(n.id).delete().catch(function(){});
+    });
+  }
+  /* إشعارات الجهاز: بتشتغل والتطبيق مفتوح (حتى لو في الخلفية) */
+  function deviceNotifSupported(){ return typeof window.Notification !== 'undefined'; }
+  function initDeviceNotif(){
+    if(!deviceNotifSupported() || Notification.permission!=='granted' || swReg) return;
+    try{
+      if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+        navigator.serviceWorker.register('sw.js').then(function(r){ swReg = r; }).catch(function(){});
+      }
+    }catch(e){}
+  }
+  function deviceNotify(title, body, tag){
+    if(!deviceNotifSupported() || Notification.permission!=='granted') return;
+    var opts = {body:body||'', tag:tag||'oroots', dir:'rtl', lang:'ar', renotify:true, vibrate:[200,100,200]};
+    try{
+      if(swReg && swReg.showNotification){ swReg.showNotification(title, opts); return; }
+    }catch(e){}
+    try{ new Notification(title, opts); }catch(e){}
+  }
+  function notifEnableDevice(){
+    if(!deviceNotifSupported()){ toast('المتصفح ده مش بيدعم إشعارات الجهاز'); return; }
+    Notification.requestPermission().then(function(perm){
+      if(perm==='granted'){ initDeviceNotif(); toast('اتفعّلت إشعارات الجهاز'); deviceNotify('O\'Roots', 'الإشعارات شغالة ✅', 'welcome'); }
+      else toast('الإشعارات مقفولة، فعّلها من إعدادات المتصفح');
+      renderNotifBar();
+    });
+  }
+
+  function notifItems(){
+    var items = [], today = todayStr();
+    var isAdminU = currentUserRole==='admin';
+    // 1) رسائل ليا لسه ما اتقراتش
+    myNotifs.filter(function(n){ return !n.read; }).sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); }).forEach(function(n){
+      items.push({key:'n:'+n.id, level:'info', fresh:true, icon:n.kind==='task'?'📋':'💬', title:n.title, detail:n.body+(n.fromName?(' — من '+n.fromName):''), tab:n.kind==='task'?'tasks':'', notifId:n.id, mine:true, rank:0});
+    });
+    // 2) مهامي
+    var pend = flattenTasks().filter(function(t){ return t.status==='pending'; });
+    var mine = pend.filter(isMyTask);
+    var mineRows = [];
+    mine.forEach(function(t){
+      var d = t.ts.slice(0,10), diff = dayDiff(today, d);
+      if(diff<0) mineRows.push({o:diff, level:'danger', icon:'⏰', title:'مهمة متأخرة: '+t.title, detail:'متأخرة '+(-diff)+' يوم'+(t.greenhouse?(' — '+t.greenhouse):''), rank:1});
+      else if(diff===0) mineRows.push({o:0, level:'warn', icon:'📋', title:'مهمة النهارده: '+t.title, detail:(t.greenhouse||'')+(t.note?((t.greenhouse?' — ':'')+t.note):''), rank:2});
+      else if(diff===1) mineRows.push({o:1, level:'info', icon:'🗓️', title:'مهمة بكرة: '+t.title, detail:t.greenhouse||'', rank:3});
+    });
+    mineRows.sort(function(a,b){ return a.o-b.o; });
+    mineRows.slice(0,6).forEach(function(r,i){ r.key='mt:'+i; r.tab='tasks'; r.mine=true; items.push(r); });
+    if(mineRows.length>6) items.push({key:'mt:more', level:'warn', icon:'📋', title:'+'+(mineRows.length-6)+' مهمة تانية ليك', detail:'افتح المهام والإجراءات', tab:'tasks', mine:true, rank:2});
+    // مهام متأخرة على الفريق (للمدير)
+    if(isAdminU){
+      var teamLate = pend.filter(function(t){ return !isMyTask(t) && t.ts.slice(0,10) < today; });
+      if(teamLate.length) items.push({key:'team', level:'danger', icon:'👥', title:teamLate.length+' مهمة متأخرة على الفريق', detail:'راجع المهام والإجراءات', tab:'tasks', rank:1});
+    }
+    // 3) معايرة الأجهزة
+    overdueInstrumentCalibs().slice(0,4).forEach(function(x,i){
+      items.push({key:'ic:'+i, level:'danger', icon:'🔧', title:'معايرة جهاز متأخرة', detail:instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+' (كانت '+x.nextDueDate+')', tab:'water', rank:1});
+    });
+    // 4) الإطلاق الحيوي
+    bioReleases.forEach(function(x){
+      if(!x.nextReleaseDate) return;
+      var du = daysUntil(x.nextReleaseDate);
+      if(du<0) items.push({key:'br:'+x.id, level:'danger', icon:'🐞', title:'إطلاق حيوي متأخر', detail:x.beneficialName+' — '+(x.greenhouse||'')+' (كان '+x.nextReleaseDate+')', tab:'pests', rank:1});
+      else if(du<=1) items.push({key:'br:'+x.id, level:'warn', icon:'🐞', title:'إطلاق حيوي '+(du===0?'النهارده':'بكرة'), detail:x.beneficialName+' — '+(x.greenhouse||''), tab:'pests', rank:2});
+    });
+    // 5) المشتل: صواني جاهزة للشتل
+    nurseryPlans.forEach(function(pl){
+      if(!pl || !pl.cropName || !getSystem(pl.systemId)) return;
+      var pr = computePlanProgress(pl);
+      if(pr.ready>0) items.push({key:'np:'+pl.systemId, level:'warn', icon:'🌱', title:pr.ready+' صينية '+pl.cropName+' جاهزة للشتل', detail:systemLabel(getSystem(pl.systemId)), tab:'nursery', rank:2});
+    });
+    // 6) المواسير الجاهزة للحصاد
+    pipeMaps.forEach(function(m){
+      var sys = getSystem(m.systemId); if(!sys || !(m.groups||[]).length) return;
+      var sm = pipeSummary(Object.assign({totalPipes:100, plantsPerPipe:30}, m), 0);
+      if(sm.over>0) items.push({key:'po:'+m.systemId, level:'danger', icon:'✂️', title:sm.over+' ماسورة عدّت ميعاد الحصاد/القطفة', detail:systemLabel(sys), tab:'nursery', rank:1});
+      if(sm.ready>0){
+        var crops = Object.keys(sm.byCrop).map(function(k){ return sm.byCrop[k].name; }).join('، ');
+        items.push({key:'pr:'+m.systemId, level:'warn', icon:'🥬', title:sm.ready+' ماسورة جاهزة للحصاد النهارده', detail:systemLabel(sys)+(crops?(' — '+crops):''), tab:'nursery', rank:2});
+      }
+    });
+    // 7) قراءة مياه الري الأخيرة خارج المدى
+    var LBL = {ph:'pH', ec:'EC', temp:'الحرارة'};
+    systems.forEach(function(sy){
+      var ents = flattenEntries('irrigation', sy.id);
+      var e = ents[ents.length-1];
+      if(!e || !e.ts) return;
+      var ageH = (Date.now() - new Date(e.ts).getTime())/3600000;
+      if(!(ageH<=36)) return;
+      var bad = ['ph','ec','temp'].filter(function(k){ return metricStatus(k, e[k])==='alert'; });
+      if(bad.length) items.push({key:'rd:'+sy.id, level:'danger', icon:'💧', title:'قراءة ري خارج المدى', detail:systemLabel(sy)+': '+bad.map(function(k){ return LBL[k]+' '+e[k]; }).join('، '), tab:'water', rank:1});
+    });
+    var lv = {danger:0, warn:1, info:2};
+    items.sort(function(a,b){ return (a.rank-b.rank) || (lv[a.level]-lv[b.level]); });
+    return items;
+  }
+
+  function renderNotifBar(){
+    var bar = $('#notif-bar'), badge = $('#notif-badge');
+    if(!bar) return;
+    var items = notifItems();
+    var n = items.length;
+    if(badge){ badge.textContent = n>99 ? '99+' : n; badge.classList.toggle('hidden', !n); }
+    document.title = (n ? '('+n+') ' : '') + BASE_TITLE;
+    try{ if(navigator.setAppBadge){ n ? navigator.setAppBadge(n) : navigator.clearAppBadge(); } }catch(e){}
+    if(!n){ bar.classList.add('hidden'); bar.innerHTML = ''; return; }
+    var worst = items.some(function(i){ return i.level==='danger'; }) ? 'danger' : (items.some(function(i){ return i.level==='warn'; }) ? 'warn' : 'info');
+    var mineN = items.filter(function(i){ return i.mine; }).length, unread = items.filter(function(i){ return i.fresh; }).length;
+    var summary = 'عندك '+n+(n===1?' تنبيه':' تنبيهات')+(mineN?(' — '+mineN+' ليك'):'')+(unread?(' • '+unread+' جديد'):'');
+    var canTab = function(tab){ var b = tab ? document.querySelector('.tab-btn[data-tab="'+tab+'"]') : null; return !!(b && b.offsetParent!==null); };
+    var rows = items.map(function(i){
+      return '<div class="notif-item lv-'+i.level+(i.fresh?' fresh':'')+'" data-key="'+escH(i.key)+'"'+(i.tab?(' data-tab="'+i.tab+'"'):'')+'>'+
+        '<span class="notif-ico">'+i.icon+'</span>'+
+        '<div class="notif-txt"><div class="notif-title">'+(i.fresh?'<span class="notif-new">جديد</span> ':'')+escH(i.title)+'</div>'+(i.detail?('<div class="notif-detail">'+escH(i.detail)+'</div>'):'')+'</div>'+
+        '<div class="notif-acts">'+(i.tab && canTab(i.tab) ? '<button type="button" class="btn btn-ghost btn-sm notif-go">افتح</button>' : '')+
+        (i.notifId ? '<button type="button" class="btn btn-primary btn-sm notif-read" data-nid="'+escH(i.notifId)+'">تمام ✓</button>' : '')+'</div></div>';
+    }).join('');
+    var perm = deviceNotifSupported() ? Notification.permission : 'unsupported';
+    var deviceRow = perm==='granted'
+      ? '<span class="hint" style="margin:0;">إشعارات الجهاز شغالة ✓</span> <button type="button" class="btn btn-ghost btn-sm" id="notif-test">جرّب إشعار</button>'
+      : (perm==='denied' ? '<span class="hint" style="margin:0;">إشعارات الجهاز مقفولة من إعدادات المتصفح</span>'
+        : (perm==='unsupported' ? '' : '<button type="button" class="btn btn-ghost btn-sm" id="notif-enable">🔔 فعّل إشعارات الجهاز</button>'));
+    bar.className = 'notif-bar lv-'+worst;
+    bar.innerHTML =
+      '<button type="button" class="notif-head" id="notif-toggle" aria-expanded="'+(notifOpen?'true':'false')+'"><span class="notif-ico">🔔</span><span class="notif-sum">'+escH(summary)+'</span><span class="notif-caret">'+(notifOpen?'▴':'▾')+'</span></button>'+
+      (notifOpen ? '<div class="notif-list">'+rows+'<div class="notif-foot">'+deviceRow+(unread?' <button type="button" class="btn btn-ghost btn-sm" id="notif-readall">اعتبر الكل مقروء</button>':'')+'</div></div>' : '');
+
+    $('#notif-toggle').addEventListener('click', function(){ notifOpen = !notifOpen; renderNotifBar(); });
+    $all('.notif-go', bar).forEach(function(b){ b.addEventListener('click', function(){
+      var tab = b.closest('.notif-item').getAttribute('data-tab'), btn = tab ? document.querySelector('.tab-btn[data-tab="'+tab+'"]') : null;
+      if(btn){ btn.click(); window.scrollTo({top:0, behavior:'smooth'}); }
+    }); });
+    $all('.notif-read', bar).forEach(function(b){ b.addEventListener('click', function(){ notifMarkRead(b.getAttribute('data-nid')).then(function(){ renderNotifBar(); }); renderNotifBar(); }); });
+    var ra = $('#notif-readall'); if(ra) ra.addEventListener('click', function(){ notifMarkRead(myNotifs.filter(function(x){ return !x.read; }).map(function(x){ return x.id; })).then(function(){ renderNotifBar(); }); renderNotifBar(); });
+    var en = $('#notif-enable'); if(en) en.addEventListener('click', notifEnableDevice);
+    var te = $('#notif-test'); if(te) te.addEventListener('click', function(){ deviceNotify('O\'Roots', 'ده إشعار تجريبي ✅', 'test'); toast('اتبعت إشعار تجريبي'); });
+  }
+  /* ملخص يومي مرة واحدة: مهامي النهارده والمتأخرة */
+  function notifDailySummary(){
+    try{
+      var key = 'oroots_notif_day_'+String(currentUser).toLowerCase(), today = todayStr();
+      if(localStorage.getItem(key)===today) return;
+      var mine = flattenTasks().filter(function(t){ return t.status==='pending' && isMyTask(t) && t.ts.slice(0,10) <= today; });
+      var unread = myNotifs.filter(function(n){ return !n.read; }).length;
+      if(!mine.length && !unread) return;
+      localStorage.setItem(key, today);
+      var late = mine.filter(function(t){ return t.ts.slice(0,10) < today; }).length;
+      var body = (mine.length ? (mine.length+' مهمة ليك'+(late?(' ('+late+' متأخرة)'):'')) : '')+(unread?((mine.length?' — ':'')+unread+' رسالة جديدة'):'');
+      deviceNotify('O\'Roots — صباح الخير 👋', body, 'daily');
+      toast('🔔 '+body);
+    }catch(e){}
+  }
+
   function renderAll(){
     safe(applyTabVisibility);
     safe(renderUsersSettings);
@@ -6838,6 +7271,7 @@
     safe(renderInventoryPanel);
     safe(renderInstrumentCalibSection);
     safe(renderAuditPanel);
+    safe(renderNotifBar);
     safe(updateSyncBadge);
   }
 
@@ -7004,6 +7438,8 @@
       subscribeDb();
       startPipeDayWatcher();
       startLiveClock();
+      initDeviceNotif();
+      setTimeout(notifDailySummary, 4000);
       if(currentUserRole==='admin') subscribeAudit();
       applyTabVisibility();
       $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='overview'); });
@@ -7046,6 +7482,8 @@
     var printBtn = $('#btn-print-weekly');
     if(printBtn) printBtn.addEventListener('click', buildAndPrintWeeklyReport);
 
+    var bellBtn = $('#btn-notif');
+    if(bellBtn) bellBtn.addEventListener('click', function(){ notifOpen = !notifOpen; renderNotifBar(); window.scrollTo({top:0, behavior:'smooth'}); });
     $('#btn-logout').addEventListener('click', function(){
       Promise.resolve(logAudit('logout', 'auth', 'تسجيل خروج')).then(function(){
         return fbAuth ? fbAuth.signOut() : null;
@@ -7211,6 +7649,24 @@
       instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
+
+    db.collection('notifications').where('to','==',String(currentUser).toLowerCase()).onSnapshot(function(snap){
+      var list = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      var fresh = list.filter(function(n){ return !n.read && !notifSeen[n.id]; });
+      list.forEach(function(n){ notifSeen[n.id] = 1; });
+      var wasFirst = notifFirstLoad;
+      notifFirstLoad = false;
+      myNotifs = list;
+      if(wasFirst){ if(fresh.length) notifOpen = true; }
+      else if(fresh.length){
+        notifOpen = true;
+        fresh.forEach(function(n){ deviceNotify(n.title, n.body, n.id); });
+        toast('🔔 '+fresh[0].title+(fresh.length>1?(' (+'+(fresh.length-1)+')'):''));
+        try{ if(navigator.vibrate) navigator.vibrate([180,90,180]); }catch(e){}
+      }
+      notifCleanup();
+      renderAll();
+    }, function(err){ console.error('notifications snapshot error', err); });
 
     db.doc('settings/cropNames').onSnapshot(function(snap){
       cropNames = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
