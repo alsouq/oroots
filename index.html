@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1P5GFrZW3LML4VxgdkzifizQ14Pq1ya3pZBel70iF48=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kV/jzoKdAlh04UR/UgFXfOkLInYaeEbVa5nCagnct1w=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -199,6 +199,15 @@
   .notif-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:10px;}
   .chart-card,#overview-alerts,#overview-alerts>*{min-width:0;max-width:100%;box-sizing:border-box;}
   #overview-alerts .table-wrap{max-width:100%;overflow-x:auto;}
+  .sp-nav{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;} .sp-nav .btn{flex:0 0 auto;padding-inline:10px;white-space:nowrap;} .sp-nav input[type=date]{width:auto;flex:1;min-width:0;}
+  .sp-matrix td,.sp-matrix th{text-align:center;} .sp-matrix td:first-child,.sp-matrix th:first-child{text-align:start;white-space:normal;min-width:70px;}
+  .sp-dayh{cursor:pointer;line-height:1.2;} .sp-dayh.sel{background:rgba(47,158,99,.2);} .sp-dayh.today{color:var(--brand);} .sp-cell{cursor:pointer;}
+  .sp-dot{display:inline-block;min-width:22px;height:22px;line-height:22px;border-radius:11px;color:#fff;font-weight:700;font-size:.75rem;}
+  .sp-dot.st-done{background:#2f9e63;} .sp-dot.st-late{background:var(--alert);} .sp-dot.st-today{background:#e0a82e;} .sp-dot.st-planned{background:#8a97a3;}
+  .sp-item{border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--surface);border-inline-start:5px solid #8a97a3;}
+  .sp-item.st-done{border-inline-start-color:#2f9e63;opacity:.85;} .sp-item.st-late{border-inline-start-color:var(--alert);} .sp-item.st-today{border-inline-start-color:#e0a82e;}
+  .sp-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .sp-kind{font-weight:700;} .sp-prod{margin:4px 0;}
+  .sp-halls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .sp-hall-box{display:inline-flex;gap:6px;align-items:center;font-weight:400;border:1px solid var(--border);border-radius:10px;padding:6px 10px;background:var(--surface);}
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -546,6 +555,7 @@
     <button class="tab-btn" data-tab="water" style="--tab-color:var(--brand)">بيانات المياه</button>
     <button class="tab-btn" data-tab="climate" style="--tab-color:var(--tank)">بيانات المناخ</button>
     <button class="tab-btn" data-tab="tasks" style="--tab-color:var(--water)">المهام والإجراءات</button>
+    <button class="tab-btn" data-tab="spray" style="--tab-color:var(--brand)">الرش والتسميد</button>
     <button class="tab-btn" data-tab="nutrients" style="--tab-color:var(--brand)">المعادلات السمادية</button>
     <button class="tab-btn" data-tab="pests" style="--tab-color:var(--alert)">المكافحة</button>
     <button class="tab-btn" data-tab="nursery" style="--tab-color:var(--good)">المشتل</button>
@@ -607,6 +617,11 @@
       <h1 class="page-title">بيانات المناخ</h1>
       <div class="system-picker" id="climate-greenhouse-picker"></div>
       <div id="climate-body"></div>
+    </section>
+
+    <section class="panel" id="panel-spray">
+      <h1 class="page-title">الرش والتسميد</h1>
+      <div id="spray-body"></div>
     </section>
 
     <section class="panel" id="panel-tasks">
@@ -849,6 +864,9 @@
   var pipeMaps = [];
   var cropNames = [];
   var myNotifs = [];
+  var sprayPlan = [];
+  var sprayDate = '';
+  var sprayEditId = null;
   var notifSeen = {};
   var notifFirstLoad = true;
   var notifOpen = false;
@@ -885,8 +903,8 @@
   var currentUser = null;
   var currentUserRole = null;
   var currentUserPermissions = {};
-  var TAB_KEYS = ['water','climate','tasks','nutrients','pests','nursery','harvest','inventory'];
-  var TAB_LABELS = {water:'بيانات المياه', climate:'بيانات المناخ', tasks:'المهام والإجراءات', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', inventory:'المخازن'};
+  var TAB_KEYS = ['water','climate','tasks','spray','nutrients','pests','nursery','harvest','inventory'];
+  var TAB_LABELS = {water:'بيانات المياه', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', inventory:'المخازن'};
   var appUsers = [];
   var localMode = false;
   var sourceVisibility = {irrigation:true, drainage:true, tank:true};
@@ -1749,7 +1767,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, sprayPlan: sprayPlan
     };
   }
   function exportFullBackup(){
@@ -1810,12 +1828,12 @@
   function applyBackupDb(backup){
     var writes = [];
     ['readingsDocs','sops','customFertilizers','nutrientRecipes','targetProfiles','pestLog','bioReleases',
-     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations','nurseryPlanLog']
+     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations','nurseryPlanLog','sprayPlan']
      .forEach(function(k){
        var coll = {readingsDocs:'readings', sops:'sops', customFertilizers:'fertilizers', nutrientRecipes:'nutrientRecipes',
          targetProfiles:'targetProfiles', pestLog:'pestlog', bioReleases:'bioReleases', stickyTraps:'stickyTraps',
          pheromoneTraps:'pheromoneTraps', nurseryLog:'nursery', harvestLog:'harvest', inventoryItems:'inventory',
-         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations', nurseryPlanLog:'nurseryPlanLog'}[k];
+         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations', nurseryPlanLog:'nurseryPlanLog', sprayPlan:'sprayPlan'}[k];
        (backup[k]||[]).forEach(function(item){
          if(item && item.id) writes.push(db.collection(coll).doc(item.id).set(item));
        });
@@ -1856,7 +1874,7 @@
   }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
-    '#btn-plan-snapshot, .pest-edit-btn, .pest-treat-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
+    '#btn-plan-snapshot, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
   var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
@@ -3393,22 +3411,27 @@
   function flattenTasks(){
     return flattenEntries('tasks').slice().sort(function(a,b){ return a.ts.localeCompare(b.ts); });
   }
-  function addTask(dateKey, data){
-    var entry = {
+  function makeTaskEntry(dateKey, data){
+    return {
       id:genId(), ts:dateKey+'T00:00',
       greenhouse:data.greenhouse||'', assignedTo:data.assignedTo||'', assignedEmail:data.assignedEmail||'', title:data.title||'', note:data.note||'',
       sopId:data.sopId||'', sopTitle:data.sopTitle||'',
       recur: data.recur || null,
       status:'pending', createdBy:currentUser||'', createdAt:Date.now(), completedAt:null
     };
+  }
+  function addTask(dateKey, data){
+    var entry = makeTaskEntry(dateKey, data);
     var existing = findDoc('tasks', dateKey);
     var entries = existing ? existing.entries.slice() : [];
     entries.push(entry);
-    return saveDoc('tasks', dateKey, entries).then(function(r){
+    var pr = saveDoc('tasks', dateKey, entries).then(function(r){
       var to = entry.assignedEmail || (userByName(entry.assignedTo) || {}).username || '';
-      if(to) notifyUser(to, 'task', 'مهمة جديدة ليك', entry.title+' — '+dateKey+(entry.greenhouse?(' — '+entry.greenhouse):'')+(entry.recur?' (متكررة)':''), {taskId:entry.id});
+      if(to && !data.silent) notifyUser(to, 'task', data.notifyTitle || 'مهمة جديدة ليك', data.notifyBody || (entry.title+' — '+dateKey+(entry.greenhouse?(' — '+entry.greenhouse):'')+(entry.recur?' (متكررة)':'')), {taskId:entry.id});
       return r;
     });
+    pr.taskId = entry.id;
+    return pr;
   }
   function setTaskStatus(dateKey, taskId, status){
     var existing = findDoc('tasks', dateKey);
@@ -6821,7 +6844,7 @@
 
   /* ---------- حماية اللي بتكتبه: إعادة الرسم (لما بيانات جديدة توصل) ما تمسحش الخانات ---------- */
   var FS = {dirty:{}, depth:0};
-  var FS_SKIP = '.live-clock,[type=file],[type=password],[type=hidden],[type=submit],[type=button],[type=range],.lf-from,.lf-to,#hv-from,#hv-to,#pipe-sim,#pipe-system-select,#plan-system-select,#climate-day-picker,[id^="audit-"]';
+  var FS_SKIP = '.live-clock,#sp-pick,[type=file],[type=password],[type=hidden],[type=submit],[type=button],[type=range],.lf-from,.lf-to,#hv-from,#hv-to,#pipe-sim,#pipe-system-select,#plan-system-select,#climate-day-picker,[id^="audit-"]';
   function fsTracked(el){ return !!(el && el.matches && el.matches('input,select,textarea') && !el.matches(FS_SKIP) && el.closest && el.closest('#app')); }
   function fsKey(el){
     if(el.id) return '#'+el.id;
@@ -7159,6 +7182,12 @@
       var teamLate = pend.filter(function(t){ return !isMyTask(t) && t.ts.slice(0,10) < today; });
       if(teamLate.length) items.push({key:'team', level:'danger', icon:'👥', title:teamLate.length+' مهمة متأخرة على الفريق', detail:'راجع المهام والإجراءات', tab:'tasks', rank:1});
     }
+    if(isAdminU){
+      var spOpen = sprayPlan.filter(function(e){ return sprayState(e)!=='done' && !e.taskId; });
+      var spToday = spOpen.filter(function(e){ return e.date===today; }).length, spLate = spOpen.filter(function(e){ return e.date<today; }).length;
+      if(spLate) items.push({key:'sp-late', level:'danger', icon:'🍃', title:spLate+' رش/تسميد متأخر وملهوش حد', detail:'افتح الرش والتسميد وعيّن حد أو سجّل إنه اتنفّذ', tab:'spray', rank:1});
+      if(spToday) items.push({key:'sp-today', level:'warn', icon:'🍃', title:spToday+' رش/تسميد النهارده ومش معيّن لحد', detail:'عيّنه على حد من الفريق', tab:'spray', rank:2});
+    }
     // 3) معايرة الأجهزة
     overdueInstrumentCalibs().slice(0,4).forEach(function(x,i){
       items.push({key:'ic:'+i, level:'danger', icon:'🔧', title:'معايرة جهاز متأخرة', detail:instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+' (كانت '+x.nextDueDate+')', tab:'water', rank:1});
@@ -7258,6 +7287,237 @@
     }catch(e){}
   }
 
+  /* ---------- الرش الورقي والتسميد: جدول يومي لكل صالة، مربوط بالمهام والإشعارات ---------- */
+  var SPRAY_KINDS = {foliar:{label:'رش ورقي', icon:'🍃'}, fertilizer:{label:'تسميد', icon:'🌿'}};
+  var SPRAY_SLOTS = {am:'صباحاً', noon:'ظهراً', pm:'مساءً'};
+  function sprayDateStr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function sprayAdd(ds, n){ var d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n); return sprayDateStr(d); }
+  function sprayWeekStart(ds){ var d = new Date(ds+'T00:00:00'); var back = (d.getDay()+1)%7; d.setDate(d.getDate()-back); return sprayDateStr(d); } // السبت أول الأسبوع
+  var SPRAY_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  function sprayHalls(){
+    var names = greenhouseGroups().map(function(g){ return g.name; });
+    sprayPlan.forEach(function(e){ (e.halls||[]).forEach(function(h){ if(names.indexOf(h)<0) names.push(h); }); });
+    return names;
+  }
+  function sprayTaskOf(e){
+    if(!e.taskId) return null;
+    return flattenTasks().filter(function(t){ return t.id===e.taskId; })[0] || null;
+  }
+  function sprayState(e){
+    var t = sprayTaskOf(e), done = t ? t.status==='done' : !!e.done, today = todayStr();
+    if(done) return 'done';
+    if(e.date < today) return 'late';
+    if(e.date === today) return 'today';
+    return 'planned';
+  }
+  function sprayTitle(e){ return (SPRAY_KINDS[e.kind]||SPRAY_KINDS.foliar).label+': '+e.product+(e.dose?(' ('+e.dose+')'):''); }
+  function sprayTaskNote(e){
+    return [(e.halls||[]).join(' + '), e.slot?SPRAY_SLOTS[e.slot]:'', e.dose?('الجرعة: '+e.dose):'', e.note||''].filter(Boolean).join(' — ');
+  }
+  function saveSprayEntry(e){
+    if(db) return db.collection('sprayPlan').doc(e.id).set(e);
+    sprayPlan = sprayPlan.filter(function(x){ return x.id!==e.id; }).concat([e]); renderAll(); return Promise.resolve();
+  }
+  function removeSprayEntryDoc(id){
+    if(db) return db.collection('sprayPlan').doc(id).delete();
+    sprayPlan = sprayPlan.filter(function(x){ return x.id!==id; }); renderAll(); return Promise.resolve();
+  }
+  /* مسح المهمة المربوطة (من غير شرط إنك مدير، لأنها جزء من تعديل الجدول) */
+  function removeLinkedTask(e){
+    if(!e.taskId || !e.taskDate) return Promise.resolve();
+    var doc = findDoc('tasks', e.taskDate);
+    if(!doc) return Promise.resolve();
+    return saveDoc('tasks', e.taskDate, doc.entries.filter(function(t){ return t.id!==e.taskId; }));
+  }
+  function createSprayEntries(base, dates, assignee){
+    if(!db) return Promise.reject(new Error('offline'));
+    var silent = dates.length>1, kind = SPRAY_KINDS[base.kind] || SPRAY_KINDS.foliar;
+    var items = dates.map(function(date){
+      var e = Object.assign({}, base, {id:genId(), date:date, createdBy:currentUser||'', createdAt:Date.now(), done:false, taskId:'', taskDate:'', assignedTo:'', assignedEmail:''});
+      var te = null;
+      if(assignee){
+        te = makeTaskEntry(date, {title:sprayTitle(e), greenhouse:(e.halls||[]).join(' + '), assignedTo:assignee.displayName, assignedEmail:assignee.username, note:sprayTaskNote(e), sopTitle:'رش وتسميد'});
+        e.taskId = te.id; e.taskDate = date; e.assignedTo = assignee.displayName; e.assignedEmail = assignee.username;
+      }
+      return {e:e, te:te};
+    });
+    var batch = db.batch();   // كل الأيام في كتابة واحدة: أسرع، ومن غير إعادة رسم كل مرة
+    items.forEach(function(x){
+      if(x.te){
+        var ex = findDoc('tasks', x.e.date);
+        batch.set(db.collection('readings').doc(docId('tasks', x.e.date)), {source:'tasks', date:x.e.date, entries:(ex ? ex.entries.slice() : []).concat([x.te])});
+      }
+      batch.set(db.collection('sprayPlan').doc(x.e.id), x.e);
+    });
+    return batch.commit().then(function(){
+      if(!assignee) return;
+      if(silent) notifyUser(assignee.username, 'task', kind.label+' مجدول ليك', dates.length+' يوم من '+dates[0]+' لحد '+dates[dates.length-1]+' — '+base.product+' — '+(base.halls||[]).join(' + '), {});
+      else notifyUser(assignee.username, 'task', kind.label+' جديد ليك', sprayTitle(items[0].e)+' — '+dates[0]+' — '+(base.halls||[]).join(' + ')+(base.slot?(' — '+SPRAY_SLOTS[base.slot]):''), {taskId:items[0].te.id});
+    });
+  }
+  function sprayMarkDone(e, done){
+    var t = sprayTaskOf(e);
+    if(t) return setTaskStatus(e.taskDate, e.taskId, done?'done':'pending').then(function(){ return saveSprayEntry(Object.assign({}, e, {done:done, doneAt:done?Date.now():null, doneBy:done?(currentUser||''):''})); });
+    return saveSprayEntry(Object.assign({}, e, {done:done, doneAt:done?Date.now():null, doneBy:done?(currentUser||''):''}));
+  }
+
+  function sprayProductOptions(current){
+    var inv = function(type){ return inventoryItems.filter(function(x){ return x.type===type; }); };
+    var opt = function(name, extra){ return '<option value="'+escH(name)+'"'+(current && cropKey(current)===cropKey(name)?' selected':'')+'>'+escH(name)+(extra||'')+'</option>'; };
+    var html = '<option value="">— اختار المنتج —</option>';
+    var f = inv('fertilizer'), m = inv('pesticide');
+    if(f.length) html += '<optgroup label="أسمدة (المخزن)">'+f.map(function(x){ return opt(x.name, x.dose?(' — '+x.dose):''); }).join('')+'</optgroup>';
+    if(customFertilizers.length) html += '<optgroup label="أسمدة المعادلات">'+customFertilizers.map(function(x){ return opt(x.name||x.id); }).join('')+'</optgroup>';
+    if(m.length) html += '<optgroup label="مبيدات (المخزن)">'+m.map(function(x){ return opt(x.name, x.dose?(' — '+x.dose):''); }).join('')+'</optgroup>';
+    html += '<option value="__other__">أخرى (اكتب يدوي)</option>';
+    return html;
+  }
+  function sprayItemHtml(e, hall){
+    var st = sprayState(e), t = sprayTaskOf(e), k = SPRAY_KINDS[e.kind]||SPRAY_KINDS.foliar;
+    var chip = {done:'<span class="status-pill good">تم ✓</span>', late:'<span class="status-pill alert">متأخر</span>', today:'<span class="status-pill" style="background:rgba(224,168,46,.2);color:#9a6b00;">النهارده</span>', planned:'<span class="status-pill">مجدول</span>'}[st];
+    var others = (e.halls||[]).filter(function(h){ return h!==hall; });
+    return '<div class="sp-item st-'+st+'" data-id="'+escH(e.id)+'">'+
+      '<div class="sp-head"><span class="sp-kind">'+k.icon+' '+k.label+'</span>'+chip+(e.slot?('<span class="hint" style="margin:0;">'+SPRAY_SLOTS[e.slot]+'</span>'):'')+'</div>'+
+      '<div class="sp-prod"><strong>'+escH(e.product)+'</strong>'+(e.dose?(' — '+escH(e.dose)):'')+'</div>'+
+      (others.length?('<div class="hint" style="margin:2px 0;">معاها: '+escH(others.join('، '))+'</div>'):'')+
+      (e.note?('<div class="hint" style="margin:2px 0;">'+escH(e.note)+'</div>'):'')+
+      '<div class="hint" style="margin:4px 0;">'+(e.assignedTo?('👤 '+escH(e.assignedTo)+(t?' (على مهامه)':'')):'👤 لسه ما اتعيّنش لحد')+(st==='done'&&(e.doneAt||(t&&t.completedAt))?(' — اتنفّذ '+escH(fmtTs(new Date(e.doneAt||t.completedAt).toISOString().slice(0,16)))):'')+'</div>'+
+      '<div class="form-actions" style="margin-top:6px;">'+
+        (st==='done' ? '<button type="button" class="btn btn-ghost btn-sm sp-undo">↩ رجّعه</button>' : '<button type="button" class="btn btn-primary btn-sm sp-done">✓ تم</button> <button type="button" class="btn btn-ghost btn-sm sp-edit">✏️ تعديل</button>')+
+        ' <button type="button" class="del-btn sp-del" title="حذف">✕</button></div></div>';
+  }
+  function renderSprayPanel(){
+    var body = $('#spray-body');
+    if(!body) return;
+    if(!sprayDate) sprayDate = todayStr();
+    var halls = sprayHalls(), today = todayStr();
+    if(!halls.length){ body.innerHTML = '<p class="empty-note">ضيف صوبة أو نظام الأول (من تبويب بيانات المياه) عشان تقدر تعمل جدول رش وتسميد لكل صالة.</p>'; return; }
+    var editing = sprayEditId ? sprayPlan.filter(function(x){ return x.id===sprayEditId; })[0] : null;
+    if(sprayEditId && !editing) sprayEditId = null;
+    var ws = sprayWeekStart(sprayDate), days = []; for(var i=0;i<7;i++) days.push(sprayAdd(ws,i));
+    var dayEntries = sprayPlan.filter(function(e){ return e.date===sprayDate; });
+    var cnt = {done:0, late:0, today:0, planned:0};
+    sprayPlan.filter(function(e){ return e.date>=days[0] && e.date<=days[6]; }).forEach(function(e){ cnt[sprayState(e)]++; });
+
+    // مصفوفة الأسبوع
+    var matrix = '<div class="table-wrap cropref-wrap sp-matrix"><table><thead><tr><th>الصالة</th>'+days.map(function(dd){
+      var dt = new Date(dd+'T00:00:00');
+      return '<th class="sp-dayh'+(dd===sprayDate?' sel':'')+(dd===today?' today':'')+'" data-d="'+dd+'">'+SPRAY_DAYS[dt.getDay()].slice(0,3)+'<br><span class="num">'+dd.slice(8)+'</span></th>';
+    }).join('')+'</tr></thead><tbody>'+halls.map(function(h){
+      return '<tr><td><strong>'+escH(h)+'</strong></td>'+days.map(function(dd){
+        var es = sprayPlan.filter(function(e){ return e.date===dd && (e.halls||[]).indexOf(h)>=0; });
+        if(!es.length) return '<td class="sp-cell" data-d="'+dd+'"></td>';
+        var worst = es.some(function(e){ return sprayState(e)==='late'; }) ? 'late' : (es.every(function(e){ return sprayState(e)==='done'; }) ? 'done' : (es.some(function(e){ return sprayState(e)==='today'; }) ? 'today' : 'planned'));
+        return '<td class="sp-cell has" data-d="'+dd+'"><span class="sp-dot st-'+worst+'">'+es.length+'</span></td>';
+      }).join('')+'</tr>';
+    }).join('')+'</tbody></table></div>';
+
+    // الجدول اليومي لكل صالة
+    var dayHtml = halls.map(function(h){
+      var es = dayEntries.filter(function(e){ return (e.halls||[]).indexOf(h)>=0; });
+      if(!es.length) return '';
+      return '<div class="sp-hall"><h3 class="section-title" style="margin:10px 0 4px;">🏭 '+escH(h)+'</h3>'+es.map(function(e){ return sprayItemHtml(e, h); }).join('')+'</div>';
+    }).join('') || '<p class="empty-note">مفيش رش أو تسميد مجدول في اليوم ده.</p>';
+
+    // الفورم
+    var users = appUsers.filter(function(u){ return u.displayName; });
+    var assignedOpts = '<option value="">من غير تعيين (بس في الجدول)</option>'+users.map(function(u){ return '<option value="'+escH(u.username)+'"'+(editing && editing.assignedEmail===u.username?' selected':'')+'>'+escH(u.displayName)+'</option>'; }).join('');
+    var hallBoxes = halls.map(function(h,i){
+      return '<label class="sp-hall-box"><input type="checkbox" id="sp-hall-'+i+'" data-hall="'+escH(h)+'"'+(editing ? ((editing.halls||[]).indexOf(h)>=0?' checked':'') : '')+' style="width:auto;"> '+escH(h)+'</label>';
+    }).join('');
+    var formHtml =
+      '<form class="entry-form" id="sp-form" style="margin-top:10px;"><div class="form-grid">'+
+        '<div class="field-sm"><label>التاريخ</label><input type="date" class="ltr" id="sp-date" required value="'+(editing?editing.date:sprayDate)+'"></div>'+
+        '<div class="field-sm"><label>النوع</label><select id="sp-kind"><option value="foliar"'+(editing&&editing.kind==='fertilizer'?'':' selected')+'>🍃 رش ورقي</option><option value="fertilizer"'+(editing&&editing.kind==='fertilizer'?' selected':'')+'>🌿 تسميد</option></select></div>'+
+        '<div class="field-sm full"><label>الصالات</label><div class="sp-halls">'+hallBoxes+'<button type="button" class="btn btn-ghost btn-sm" id="sp-all-halls">كل الصالات</button></div></div>'+
+        '<div class="field-sm full"><label>المنتج</label><select id="sp-product">'+sprayProductOptions(editing?editing.product:'')+'</select><input type="text" id="sp-other" maxlength="120" style="margin-top:8px;display:none;" placeholder="اسم المنتج"></div>'+
+        '<div class="field-sm"><label>الجرعة / التركيز</label><input type="text" id="sp-dose" maxlength="80" placeholder="مثال: 2 جم/لتر" value="'+escH(editing?editing.dose||'':'')+'"></div>'+
+        '<div class="field-sm"><label>الوقت</label><select id="sp-slot"><option value="">— أي وقت —</option>'+Object.keys(SPRAY_SLOTS).map(function(k){ return '<option value="'+k+'"'+(editing&&editing.slot===k?' selected':'')+'>'+SPRAY_SLOTS[k]+'</option>'; }).join('')+'</select></div>'+
+        '<div class="field-sm full"><label>تعيين على (بيوصله على المهام وإشعار)</label><select id="sp-assign">'+assignedOpts+'</select></div>'+
+        (editing?'':'<div class="field-sm"><label>تكرار</label><select id="sp-repeat"><option value="0">من غير تكرار</option><option value="1">كل يوم</option><option value="2">كل يومين</option><option value="3">كل 3 أيام</option><option value="7">كل أسبوع</option></select></div><div class="field-sm"><label>لحد تاريخ</label><input type="date" class="ltr" id="sp-until"></div>')+
+        '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="sp-note" maxlength="200" value="'+escH(editing?editing.note||'':'')+'"></div>'+
+      '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(editing?'حفظ التعديل':'ضيف للجدول')+'</button>'+(editing?' <button type="button" class="btn btn-ghost btn-sm" id="sp-cancel">إلغاء</button>':'')+'</div></form>';
+
+    body.innerHTML =
+      '<div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div>'+
+      '<h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
+      '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, 'الأسبوع ده')+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, 'الأسبوع ده')+climateStatChip('جاي', cnt.planned, 'مجدول')+'</div>'+
+      '<h3 class="section-title">📅 جدول الأسبوع (اضغط على يوم)</h3>'+matrix+
+      '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div>'+
+      '<h3 class="section-title" id="sp-form-title">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml;
+
+    // ربط الأحداث
+    $('#sp-prev').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,-1); renderSprayPanel(); });
+    $('#sp-next').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,1); renderSprayPanel(); });
+    $('#sp-today').addEventListener('click', function(){ sprayDate = todayStr(); renderSprayPanel(); });
+    $('#sp-pick').addEventListener('change', function(){ if(this.value){ sprayDate = this.value; renderSprayPanel(); } });
+    $all('.sp-dayh, .sp-cell', body).forEach(function(c){ c.addEventListener('click', function(){ sprayDate = c.getAttribute('data-d'); renderSprayPanel(); }); });
+    $all('.sp-item', body).forEach(function(card){
+      var id = card.getAttribute('data-id'), e = sprayPlan.filter(function(x){ return x.id===id; })[0];
+      if(!e) return;
+      var d = card.querySelector('.sp-done'); if(d) d.addEventListener('click', function(){ sprayMarkDone(e, true).then(function(){ toast('اتسجّل إنه اتنفّذ'); }); });
+      var u = card.querySelector('.sp-undo'); if(u) u.addEventListener('click', function(){ sprayMarkDone(e, false).then(function(){ toast('اترجّع'); }); });
+      var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
+      var dl = card.querySelector('.sp-del'); if(dl) dl.addEventListener('click', function(){
+        if(!requireAdminForDelete()) return;
+        if(!confirm('تمسح "'+sprayTitle(e)+'" من الجدول؟'+(e.taskId?' (وهتتمسح من مهام '+(e.assignedTo||'الموظف')+' كمان)':''))) return;
+        removeLinkedTask(e).then(function(){ return removeSprayEntryDoc(e.id); }).then(function(){ logAudit('delete','spray','مسح من جدول الرش/التسميد: '+sprayTitle(e)); toast('اتمسح'); });
+      });
+    });
+    $('#sp-product').addEventListener('change', function(){
+      var other = $('#sp-other'), dose = $('#sp-dose');
+      other.style.display = this.value==='__other__' ? '' : 'none';
+      if(this.value && this.value!=='__other__'){
+        var it = inventoryItems.filter(function(x){ return x.name===this.value; }.bind(this))[0];
+        if(it && it.dose && !dose.value) dose.value = it.dose;
+      }
+    });
+    $('#sp-all-halls').addEventListener('click', function(){ $all('#sp-form input[data-hall]').forEach(function(c){ c.checked = true; }); });
+    if(editing){
+      var known = [].slice.call($('#sp-product').options).some(function(o){ return o.value===editing.product; });
+      if(!known){ $('#sp-product').value = '__other__'; $('#sp-other').style.display = ''; $('#sp-other').value = editing.product; }
+      var c = $('#sp-cancel'); if(c) c.addEventListener('click', function(){ sprayEditId = null; renderSprayPanel(); });
+    }
+    $('#sp-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var date = $('#sp-date').value, hallsSel = [].slice.call(document.querySelectorAll('#sp-form input[data-hall]:checked')).map(function(c){ return c.getAttribute('data-hall'); });
+      var prodSel = $('#sp-product').value, product = prodSel==='__other__' ? $('#sp-other').value.trim() : prodSel;
+      if(!date){ toast('اختار التاريخ'); return; }
+      if(!hallsSel.length){ toast('اختار صالة واحدة على الأقل'); return; }
+      if(!product){ toast('اختار المنتج أو اكتب اسمه'); return; }
+      var assignEmail = $('#sp-assign').value, assignee = assignEmail ? findUser(assignEmail) : null;
+      var base = {kind:$('#sp-kind').value, halls:hallsSel, product:product, dose:$('#sp-dose').value.trim(), slot:$('#sp-slot').value, note:$('#sp-note').value.trim()};
+      var btn = this.querySelector('button[type=submit]'); btn.disabled = true;
+      var wasEditing = editing, done;
+      if(wasEditing){
+        var upd = Object.assign({}, wasEditing, base, {date:date, updatedAt:Date.now()});
+        var relink = removeLinkedTask(wasEditing);
+        done = relink.then(function(){
+          upd.taskId = ''; upd.taskDate = ''; upd.assignedTo = ''; upd.assignedEmail = '';
+          if(assignee){
+            var tp = addTask(date, {title:sprayTitle(upd), greenhouse:hallsSel.join(' + '), assignedTo:assignee.displayName, assignedEmail:assignee.username, note:sprayTaskNote(upd), sopTitle:'رش وتسميد',
+              notifyTitle:'تعديل في '+(SPRAY_KINDS[upd.kind]||{}).label+' ليك', notifyBody:sprayTitle(upd)+' — '+date+' — '+hallsSel.join(' + ')});
+            upd.taskId = tp.taskId; upd.taskDate = date; upd.assignedTo = assignee.displayName; upd.assignedEmail = assignee.username;
+            return tp;
+          }
+        }).then(function(){ return saveSprayEntry(upd); }).then(function(){ logAudit('edit','spray','تعديل رش/تسميد: '+sprayTitle(upd)); });
+      } else {
+        var every = parseInt(($('#sp-repeat')||{}).value,10) || 0, until = ($('#sp-until')||{}).value || '';
+        var dates = [date];
+        if(every>0){
+          if(!until || until<date){ toast('اختار "لحد تاريخ" بعد تاريخ البداية'); btn.disabled = false; return; }
+          for(var dd = sprayAdd(date, every); dd<=until && dates.length<60; dd = sprayAdd(dd, every)) dates.push(dd);
+        }
+        done = createSprayEntries(base, dates, assignee).then(function(){ logAudit('add','spray','جدول رش/تسميد: '+sprayTitle(base)+' — '+dates.length+' يوم'+(assignee?(' — على '+assignee.displayName):'')); });
+      }
+      done.then(function(){
+        toast(wasEditing ? 'اتحفظ التعديل' : 'اتضاف للجدول'+(assignee?(' واتبعت لـ '+assignee.displayName):''));
+        sprayEditId = null; sprayDate = date; renderSprayPanel();
+      }).catch(function(e){ console.error(e); toast('حصل خطأ، حاول تاني'); btn.disabled = false; });
+    });
+    applyPermissionLock(body, 'spray');
+  }
+
   function renderAll(){
     safe(applyTabVisibility);
     safe(renderUsersSettings);
@@ -7266,6 +7526,7 @@
     safe(renderWaterPanel);
     safe(renderClimatePanel);
     safe(renderTasksPanel);
+    safe(renderSprayPanel);
     safe(renderNutrientsPanel);
     safe(renderPestsPanel);
     safe(renderNurseryPanel);
@@ -7292,11 +7553,11 @@
   function setupTabs(){
     var panelMap = {
       overview:'#panel-overview', water:'#panel-water', climate:'#panel-climate',
-      tasks:'#panel-tasks', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', inventory:'#panel-inventory', settings:'#panel-settings'
+      tasks:'#panel-tasks', spray:'#panel-spray', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', inventory:'#panel-inventory', settings:'#panel-settings'
     };
     var renderMap = {
       overview: renderSystemsOverview, water: renderWaterPanel, climate: renderClimatePanel,
-      tasks: renderTasksPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
+      tasks: renderTasksPanel, spray: renderSprayPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
       harvest: renderHarvestPanel, inventory: renderInventoryPanel, settings: renderAuditPanel
     };
     $all('.tab-btn').forEach(function(btn){
@@ -7494,6 +7755,7 @@
   }
 
   renderAll = fsWrap(renderAll);
+  renderSprayPanel = fsWrap(renderSprayPanel);
   renderAuditPanel = fsWrap(renderAuditPanel);
   renderClimatePanel = fsWrap(renderClimatePanel);
   renderHarvestPanel = fsWrap(renderHarvestPanel);
@@ -7669,6 +7931,11 @@
       notifCleanup();
       renderAll();
     }, function(err){ console.error('notifications snapshot error', err); });
+
+    db.collection('sprayPlan').orderBy('date','desc').limit(600).onSnapshot(function(snap){
+      sprayPlan = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAll();
+    }, function(err){ console.error('sprayPlan snapshot error', err); });
 
     db.doc('settings/cropNames').onSnapshot(function(snap){
       cropNames = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
