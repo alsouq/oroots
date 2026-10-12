@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kV/jzoKdAlh04UR/UgFXfOkLInYaeEbVa5nCagnct1w=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uet59XxJ0CVckSZGrc0/qPB77dPhaRwptW4OZE8a1TY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -199,7 +199,12 @@
   .notif-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:10px;}
   .chart-card,#overview-alerts,#overview-alerts>*{min-width:0;max-width:100%;box-sizing:border-box;}
   #overview-alerts .table-wrap{max-width:100%;overflow-x:auto;}
-  .sp-nav{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;} .sp-nav .btn{flex:0 0 auto;padding-inline:10px;white-space:nowrap;} .sp-nav input[type=date]{width:auto;flex:1;min-width:0;}
+  .sp-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;} .sp-nav .btn{flex:0 0 auto;padding-inline:10px;white-space:nowrap;} .sp-nav input[type=date]{flex:1 1 140px;width:auto;min-width:0;max-width:100%;}
+  #panel-spray,#spray-body{min-width:0;max-width:100%;}
+  .sp-mnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 4px;} .sp-mtitle{font-size:1rem;}
+  .sp-matrix.month{max-height:none;} .sp-matrix.month table{min-width:0;width:max-content;} .sp-matrix.month th,.sp-matrix.month td{padding:6px 3px;min-width:30px;font-size:.72rem;}
+  .sp-matrix.month td:first-child,.sp-matrix.month th:first-child{position:sticky;inset-inline-start:0;background:var(--surface);z-index:2;min-width:74px;box-shadow:0 0 0 1px var(--border);}
+  .sp-dayh.fri{background:rgba(0,0,0,.04);} .sp-matrix.month .sp-dot{min-width:20px;height:20px;line-height:20px;font-size:.68rem;}
   .sp-matrix td,.sp-matrix th{text-align:center;} .sp-matrix td:first-child,.sp-matrix th:first-child{text-align:start;white-space:normal;min-width:70px;}
   .sp-dayh{cursor:pointer;line-height:1.2;} .sp-dayh.sel{background:rgba(47,158,99,.2);} .sp-dayh.today{color:var(--brand);} .sp-cell{cursor:pointer;}
   .sp-dot{display:inline-block;min-width:22px;height:22px;line-height:22px;border-radius:11px;color:#fff;font-weight:700;font-size:.75rem;}
@@ -208,6 +213,18 @@
   .sp-item.st-done{border-inline-start-color:#2f9e63;opacity:.85;} .sp-item.st-late{border-inline-start-color:var(--alert);} .sp-item.st-today{border-inline-start-color:#e0a82e;}
   .sp-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .sp-kind{font-weight:700;} .sp-prod{margin:4px 0;}
   .sp-halls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .sp-hall-box{display:inline-flex;gap:6px;align-items:center;font-weight:400;border:1px solid var(--border);border-radius:10px;padding:6px 10px;background:var(--surface);}
+  @media print{
+    html,body{background:#fff !important;background-image:none !important;}
+    #print-report,#print-report table,#print-report th,#print-report td,#print-report .pr-hall{background:#fff !important;box-shadow:none !important;}
+    #print-report th{background:#f2f2f2 !important;}
+    #print-report .pr-hall{margin-bottom:14px;} #print-report .pr-newpage{page-break-before:always;}
+    #print-report tr{page-break-inside:avoid;} #print-report thead{display:table-header-group;}
+    #print-report .pr-small{font-size:0.72rem;color:#555;font-weight:400;}
+    #print-report .pr-box{text-align:center;font-size:1.25rem;width:34px;} #print-report .pr-note{min-width:90px;}
+    #print-report tr.pr-done td{color:#444;background:#efefef !important;}
+    #print-report .pr-sign{display:flex;gap:40px;margin-top:22px;} #print-report .pr-sign > div{flex:1;display:flex;align-items:flex-end;gap:8px;font-weight:700;}
+    #print-report .pr-line{flex:1;border-bottom:1px solid #333;height:18px;}
+  }
   .login-card #btn-forgot{display:block;width:100%;margin:10px 0 0;padding:10px;background:transparent;border:none;color:#9FE3C4;font-size:0.9rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .login-card #btn-forgot:hover{background:rgba(159,227,196,0.08);color:#C7F5DF;}
   .login-note{position:relative;z-index:1;color:#7C8570;font-size:0.78rem;margin-top:16px;}
@@ -481,7 +498,7 @@
   .panel.active :is(.stat-card,.nut-card,.chart-card,.settings-card):nth-child(n+4){animation-delay:.15s;}
   @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985);}to{opacity:1;transform:none;}}
   #login-screen{background:radial-gradient(900px 520px at 85% -10%,rgba(47,214,161,.30),transparent 70%),radial-gradient(700px 500px at 0% 110%,rgba(26,127,166,.28),transparent 70%),#08120E;}
-  .toast,#toast{border-radius:14px;backdrop-filter:blur(10px);box-shadow:var(--shadow-raised);}
+  .toast,#toast{border-radius:14px;backdrop-filter:blur(10px);box-shadow:var(--shadow-raised);;pointer-events:none;}
   .ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.25;transform:scale(0);animation:ripple .55s ease-out forwards;pointer-events:none;}
   @keyframes ripple{to{transform:scale(3.2);opacity:0;}}
   #to-top{position:fixed;bottom:18px;left:18px;width:44px;height:44px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--brand),var(--brand-strong));color:var(--on-brand);font-size:1.2rem;box-shadow:var(--shadow-raised);opacity:0;transform:translateY(16px);pointer-events:none;transition:all .3s var(--ease);z-index:30;}
@@ -867,6 +884,7 @@
   var sprayPlan = [];
   var sprayDate = '';
   var sprayEditId = null;
+  var sprayView = 'week';
   var notifSeen = {};
   var notifFirstLoad = true;
   var notifOpen = false;
@@ -7294,6 +7312,21 @@
   function sprayAdd(ds, n){ var d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n); return sprayDateStr(d); }
   function sprayWeekStart(ds){ var d = new Date(ds+'T00:00:00'); var back = (d.getDay()+1)%7; d.setDate(d.getDate()-back); return sprayDateStr(d); } // السبت أول الأسبوع
   var SPRAY_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  var SPRAY_DAYS_SHORT = ['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+  var SPRAY_DAY1 = ['ح','ن','ث','ر','خ','ج','س'];
+  var SPRAY_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  function sprayMonthDays(ds){
+    var d = new Date(ds+'T00:00:00'), y = d.getFullYear(), m = d.getMonth(), n = new Date(y, m+1, 0).getDate(), out = [];
+    for(var i=1;i<=n;i++) out.push(y+'-'+pad(m+1)+'-'+pad(i));
+    return out;
+  }
+  function sprayAddMonths(ds, k){
+    var d = new Date(ds+'T00:00:00'), day = d.getDate();
+    d.setDate(1); d.setMonth(d.getMonth()+k);
+    var n = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+    d.setDate(Math.min(day, n));
+    return sprayDateStr(d);
+  }
   function sprayHalls(){
     var names = greenhouseGroups().map(function(g){ return g.name; });
     sprayPlan.forEach(function(e){ (e.halls||[]).forEach(function(h){ if(names.indexOf(h)<0) names.push(h); }); });
@@ -7386,6 +7419,52 @@
         (st==='done' ? '<button type="button" class="btn btn-ghost btn-sm sp-undo">↩ رجّعه</button>' : '<button type="button" class="btn btn-primary btn-sm sp-done">✓ تم</button> <button type="button" class="btn btn-ghost btn-sm sp-edit">✏️ تعديل</button>')+
         ' <button type="button" class="del-btn sp-del" title="حذف">✕</button></div></div>';
   }
+  /* ---------- طباعة جدول الرش والتسميد كتقرير ---------- */
+  function sprayReportRange(scope){
+    if(scope==='day') return {from:sprayDate, to:sprayDate, label:SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate};
+    if(scope==='month'){
+      var md = sprayMonthDays(sprayDate), d0 = new Date(sprayDate+'T00:00:00');
+      return {from:md[0], to:md[md.length-1], label:'شهر '+SPRAY_MONTHS[d0.getMonth()]+' '+d0.getFullYear()+' ('+md[0]+' إلى '+md[md.length-1]+')'};
+    }
+    var ws = sprayWeekStart(sprayDate);
+    return {from:ws, to:sprayAdd(ws,6), label:'أسبوع من '+ws+' إلى '+sprayAdd(ws,6)};
+  }
+  function buildAndPrintSprayReport(scope, hallName){
+    var r = sprayReportRange(scope), halls = hallName ? [hallName] : sprayHalls(), slotRank = {am:0, noon:1, pm:2, '':3};
+    var inRange = sprayPlan.filter(function(e){ return e.date>=r.from && e.date<=r.to; });
+    var total = 0, doneN = 0;
+    var logoEl = document.querySelector('header img'), logo = logoEl ? logoEl.getAttribute('src') : '';
+    var sections = halls.map(function(h, idx){
+      var es = inRange.filter(function(e){ return (e.halls||[]).indexOf(h)>=0; }).sort(function(a,b){
+        return a.date.localeCompare(b.date) || ((slotRank[a.slot||'']) - (slotRank[b.slot||'']));
+      });
+      if(!es.length) return '';
+      total += es.length;
+      var rows = es.map(function(e){
+        var st = sprayState(e), done = st==='done', k = SPRAY_KINDS[e.kind] || SPRAY_KINDS.foliar;
+        if(done) doneN++;
+        var others = (e.halls||[]).filter(function(x){ return x!==h; });
+        return '<tr class="'+(done?'pr-done':'')+'"><td>'+SPRAY_DAYS[new Date(e.date+'T00:00:00').getDay()]+'<br>'+escH(e.date)+'</td>'+
+          '<td>'+(e.slot?SPRAY_SLOTS[e.slot]:'—')+'</td><td>'+k.label+'</td>'+
+          '<td><strong>'+escH(e.product)+'</strong>'+(others.length?('<div class="pr-small">مع: '+escH(others.join('، '))+'</div>'):'')+'</td>'+
+          '<td>'+escH(e.dose||'—')+'</td><td>'+escH(e.assignedTo||'—')+'</td>'+
+          '<td class="pr-box">'+(done?'✓':'☐')+'</td><td class="pr-note">'+escH(e.note||'')+'</td></tr>';
+      }).join('');
+      return '<div class="pr-hall'+(scope==='month' && idx>0 ? ' pr-newpage' : '')+'"><h2>🏭 '+escH(h)+' <span class="pr-small">('+es.length+' رشة/تسميد)</span></h2>'+
+        (es.length ? '<table><thead><tr><th>اليوم</th><th>الوقت</th><th>النوع</th><th>المنتج</th><th>الجرعة</th><th>المسؤول</th><th>تم</th><th>ملاحظات</th></tr></thead><tbody>'+rows+'</tbody></table>' : '<p class="pr-empty">مفيش رش أو تسميد مجدول.</p>')+'</div>';
+    }).join('');
+    if(!sections){ toast('مفيش رش أو تسميد في الفترة دي عشان تتطبع'); return; }
+    var reportBody =
+      '<div class="pr-header">'+(logo?('<img src="'+logo+'" alt="O\'Roots">'):'')+'<div class="pr-title"><h1 style="margin:0;">جدول الرش الورقي والتسميد</h1>'+
+        '<div class="pr-meta" style="margin:2px 0 0;">'+escH(r.label)+(hallName?(' — '+escH(hallName)):' — كل الصالات')+'</div>'+
+        '<div class="pr-meta" style="margin:0;">طُبع بتاريخ '+escH(fmtTs(nowLocalInputValue()))+' بواسطة '+escH(currentUser||'')+'</div></div></div>'+
+      sections;
+    var footerHtml = '<div class="pr-sign"><div><span>المسؤول عن التنفيذ:</span><span class="pr-line"></span></div><div><span>مدير الموقع:</span><span class="pr-line"></span></div></div>';
+    $('#print-report').innerHTML = '<table class="pr-outer"><tbody><tr><td>'+reportBody+'</td></tr></tbody><tfoot><tr><td>'+footerHtml+'</td></tr></tfoot></table>';
+    logAudit('export','spray','طباعة جدول الرش والتسميد: '+r.label+(hallName?(' — '+hallName):'')+' ('+total+' عنصر)');
+    setTimeout(function(){ window.print(); }, 80);
+  }
+
   function renderSprayPanel(){
     var body = $('#spray-body');
     if(!body) return;
@@ -7394,15 +7473,17 @@
     if(!halls.length){ body.innerHTML = '<p class="empty-note">ضيف صوبة أو نظام الأول (من تبويب بيانات المياه) عشان تقدر تعمل جدول رش وتسميد لكل صالة.</p>'; return; }
     var editing = sprayEditId ? sprayPlan.filter(function(x){ return x.id===sprayEditId; })[0] : null;
     if(sprayEditId && !editing) sprayEditId = null;
-    var ws = sprayWeekStart(sprayDate), days = []; for(var i=0;i<7;i++) days.push(sprayAdd(ws,i));
+    var isMonth = sprayView==='month', ws = sprayWeekStart(sprayDate), days = [];
+    if(isMonth) days = sprayMonthDays(sprayDate); else for(var i=0;i<7;i++) days.push(sprayAdd(ws,i));
+    var periodLabel = isMonth ? 'الشهر ده' : 'الأسبوع ده';
     var dayEntries = sprayPlan.filter(function(e){ return e.date===sprayDate; });
     var cnt = {done:0, late:0, today:0, planned:0};
-    sprayPlan.filter(function(e){ return e.date>=days[0] && e.date<=days[6]; }).forEach(function(e){ cnt[sprayState(e)]++; });
+    sprayPlan.filter(function(e){ return e.date>=days[0] && e.date<=days[days.length-1]; }).forEach(function(e){ cnt[sprayState(e)]++; });
 
     // مصفوفة الأسبوع
-    var matrix = '<div class="table-wrap cropref-wrap sp-matrix"><table><thead><tr><th>الصالة</th>'+days.map(function(dd){
+    var matrix = '<div class="table-wrap cropref-wrap sp-matrix'+(isMonth?' month':'')+'"><table><thead><tr><th>الصالة</th>'+days.map(function(dd){
       var dt = new Date(dd+'T00:00:00');
-      return '<th class="sp-dayh'+(dd===sprayDate?' sel':'')+(dd===today?' today':'')+'" data-d="'+dd+'">'+SPRAY_DAYS[dt.getDay()].slice(0,3)+'<br><span class="num">'+dd.slice(8)+'</span></th>';
+      return '<th class="sp-dayh'+(dd===sprayDate?' sel':'')+(dd===today?' today':'')+(dt.getDay()===5?' fri':'')+'" data-d="'+dd+'">'+(isMonth ? SPRAY_DAY1[dt.getDay()] : SPRAY_DAYS_SHORT[dt.getDay()])+'<br><span class="num">'+(isMonth ? String(parseInt(dd.slice(8),10)) : dd.slice(8))+'</span></th>';
     }).join('')+'</tr></thead><tbody>'+halls.map(function(h){
       return '<tr><td><strong>'+escH(h)+'</strong></td>'+days.map(function(dd){
         var es = sprayPlan.filter(function(e){ return e.date===dd && (e.halls||[]).indexOf(h)>=0; });
@@ -7441,8 +7522,15 @@
     body.innerHTML =
       '<div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div>'+
       '<h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
-      '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, 'الأسبوع ده')+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, 'الأسبوع ده')+climateStatChip('جاي', cnt.planned, 'مجدول')+'</div>'+
-      '<h3 class="section-title">📅 جدول الأسبوع (اضغط على يوم)</h3>'+matrix+
+      '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, periodLabel)+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, periodLabel)+climateStatChip('جاي', cnt.planned, 'مجدول')+'</div>'+
+      '<details class="chart-card" id="sp-print-box" style="margin-top:12px;"><summary style="cursor:pointer;font-weight:700;">🖨️ طباعة الجدول كتقرير</summary>'+
+        '<div class="form-grid" style="margin-top:10px;">'+
+          '<div class="field-sm"><label>الفترة</label><select id="sp-pr-scope"><option value="day">اليوم المفتوح ('+sprayDate+')</option><option value="week"'+(isMonth?'':' selected')+'>الأسبوع</option><option value="month"'+(isMonth?' selected':'')+'>الشهر كامل</option></select></div>'+
+          '<div class="field-sm"><label>الصالة</label><select id="sp-pr-hall"><option value="">كل الصالات</option>'+halls.map(function(h){ return '<option value="'+escH(h)+'">'+escH(h)+'</option>'; }).join('')+'</select></div>'+
+        '</div><div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="sp-pr-go">🖨️ اطبع / احفظ PDF</button></div></details>'+
+      '<div class="range-filter" id="sp-view" style="margin-top:12px;"><button type="button" class="range-pill'+(isMonth?'':' active')+'" data-v="week">📅 الأسبوع</button><button type="button" class="range-pill'+(isMonth?' active':'')+'" data-v="month">🗓️ الشهر كامل</button></div>'+
+      (isMonth ? '<div class="sp-mnav"><button type="button" class="btn btn-ghost btn-sm" id="sp-mprev">‹ الشهر السابق</button><strong class="sp-mtitle">'+SPRAY_MONTHS[new Date(sprayDate+'T00:00:00').getMonth()]+' '+new Date(sprayDate+'T00:00:00').getFullYear()+'</strong><button type="button" class="btn btn-ghost btn-sm" id="sp-mnext">الشهر التالي ›</button></div>' : '')+
+      '<h3 class="section-title">'+(isMonth ? '🗓️ جدول الشهر كامل (اضغط على يوم)' : '📅 جدول الأسبوع (اضغط على يوم)')+'</h3>'+matrix+
       '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div>'+
       '<h3 class="section-title" id="sp-form-title">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml;
 
@@ -7450,6 +7538,11 @@
     $('#sp-prev').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,-1); renderSprayPanel(); });
     $('#sp-next').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,1); renderSprayPanel(); });
     $('#sp-today').addEventListener('click', function(){ sprayDate = todayStr(); renderSprayPanel(); });
+    $('#sp-pr-go').addEventListener('click', function(){ buildAndPrintSprayReport($('#sp-pr-scope').value, $('#sp-pr-hall').value); });
+    $all('#sp-view .range-pill', body).forEach(function(b){ b.addEventListener('click', function(){ sprayView = b.getAttribute('data-v'); renderSprayPanel(); }); });
+    var mp = $('#sp-mprev'), mn = $('#sp-mnext');
+    if(mp) mp.addEventListener('click', function(){ sprayDate = sprayAddMonths(sprayDate, -1); renderSprayPanel(); });
+    if(mn) mn.addEventListener('click', function(){ sprayDate = sprayAddMonths(sprayDate, 1); renderSprayPanel(); });
     $('#sp-pick').addEventListener('change', function(){ if(this.value){ sprayDate = this.value; renderSprayPanel(); } });
     $all('.sp-dayh, .sp-cell', body).forEach(function(c){ c.addEventListener('click', function(){ sprayDate = c.getAttribute('data-d'); renderSprayPanel(); }); });
     $all('.sp-item', body).forEach(function(card){
