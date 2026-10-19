@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4Oh82PYyCeC1N4YGLx4DeabWYaUJQl6I1GkDRD2eQEk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tNJKuLW2TEn7ib9IivmBCL3kzoR7B/A6mUgtRth0n2s=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -225,6 +225,7 @@
     #print-report .pr-sign{display:flex;gap:40px;margin-top:22px;} #print-report .pr-sign > div{flex:1;display:flex;align-items:flex-end;gap:8px;font-weight:700;}
     #print-report .pr-line{flex:1;border-bottom:1px solid #333;height:18px;}
   }
+  #q-nav{flex-wrap:wrap;} #q-nav .range-pill{flex:0 0 auto;}
   .q-order,.q-comp{border:1px solid var(--border);border-radius:14px;padding:12px;margin:10px 0;background:var(--surface);} .q-comp{border-inline-start:5px solid var(--alert);} .q-comp.st-resolved,.q-comp.st-closed{border-inline-start-color:#2f9e63;opacity:.9;}
   .q-order-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
   .q-item{border:1px dashed var(--border);border-radius:12px;padding:10px;margin:10px 0;} .q-item-head{display:flex;justify-content:space-between;align-items:center;}
@@ -903,6 +904,8 @@
   var sprayDate = '';
   var sprayEditId = null;
   var qOrders = [];
+  var qSorts = [];
+  var qoDraft = null;
   var qComplaints = [];
   var qView = 'orders';
   var qDraft = null;
@@ -1811,7 +1814,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, sprayPlan: sprayPlan, qualityOrders: qOrders, qualityComplaints: qComplaints
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, sprayPlan: sprayPlan, qualityOrders: qOrders, qualitySorting: qSorts, qualityComplaints: qComplaints
     };
   }
   function exportFullBackup(){
@@ -1872,12 +1875,12 @@
   function applyBackupDb(backup){
     var writes = [];
     ['readingsDocs','sops','customFertilizers','nutrientRecipes','targetProfiles','pestLog','bioReleases',
-     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations','nurseryPlanLog','sprayPlan','qualityOrders','qualityComplaints']
+     'stickyTraps','pheromoneTraps','nurseryLog','harvestLog','inventoryItems','irrigCalib','instrumentCalibrations','nurseryPlanLog','sprayPlan','qualityOrders','qualitySorting','qualityComplaints']
      .forEach(function(k){
        var coll = {readingsDocs:'readings', sops:'sops', customFertilizers:'fertilizers', nutrientRecipes:'nutrientRecipes',
          targetProfiles:'targetProfiles', pestLog:'pestlog', bioReleases:'bioReleases', stickyTraps:'stickyTraps',
          pheromoneTraps:'pheromoneTraps', nurseryLog:'nursery', harvestLog:'harvest', inventoryItems:'inventory',
-         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations', nurseryPlanLog:'nurseryPlanLog', sprayPlan:'sprayPlan', qualityOrders:'qualityOrders', qualityComplaints:'qualityComplaints'}[k];
+         irrigCalib:'irrigCalib', auditLog:'auditLog', instrumentCalibrations:'instrumentCalibrations', nurseryPlanLog:'nurseryPlanLog', sprayPlan:'sprayPlan', qualityOrders:'qualityOrders', qualitySorting:'qualitySorting', qualityComplaints:'qualityComplaints'}[k];
        (backup[k]||[]).forEach(function(item){
          if(item && item.id) writes.push(db.collection(coll).doc(item.id).set(item));
        });
@@ -7720,27 +7723,40 @@
       return '<tr><td><strong>'+escH(it.product)+'</strong><div class="hint" style="margin:0;">'+Q_UNITS[it.unit||'kg']+'</div></td><td class="num">'+qFmt(qNum(it.required))+'</td><td class="num">'+qFmt(qNum(it.received))+'</td><td class="num">'+qFmt(qNum(it.sorted))+'</td><td class="num">'+qFmt(w)+'</td><td>'+qPctHtml(wp)+'</td>'+
         (withReasons ? '<td>'+(rs || '—')+(un>0.0001 && w>0 ? '<div class="hint" style="margin:0;">غير موزّع: '+qFmt(un)+'</div>' : '')+(it.note?('<div class="hint" style="margin:0;">'+escH(it.note)+'</div>'):'')+'</td>' : '')+'</tr>';
     }).join('');
-    return '<div class="table-wrap cropref-wrap"><table><thead><tr><th>المنتج</th><th>مطلوب</th><th>جه</th><th>بعد الفرز</th><th>فاقد</th><th>%</th>'+(withReasons?'<th>السبب</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+    return '<div class="table-wrap cropref-wrap"><table><thead><tr><th>المادة الخام</th><th>مطلوب</th><th>جه</th><th>بعد الفرز</th><th>فاقد</th><th>%</th>'+(withReasons?'<th>السبب</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
   }
 
-  /* ----- مسودة الأوردر (بتفضل في الذاكرة لحد الحفظ) ----- */
-  function qNewDraft(){ return {id:'', orderNo:'', customer:'', date:todayStr(), notes:'', items:[qNewItem()], removedPhotos:[]}; }
+  /* ----- الفرز: جلسة فرز للمادة الخام ----- */
+  function qNewDraft(){ return {id:'', date:todayStr(), ref:'', orderId:'', notes:'', items:[qNewItem()], removedPhotos:[], photoRefId:''}; }
   function qNewItem(){ return {uid:qUid(), product:'', unit:'kg', required:'', received:'', sorted:'', reasons:[], note:'', photoIds:[], newPhotos:[]}; }
-  function qDraftFromOrder(o){
+  function qDraftFromSort(o){
     var d = JSON.parse(JSON.stringify(o));
     d.items = (d.items||[]).map(function(it){ it.newPhotos = []; it.photoIds = it.photoIds || []; it.reasons = it.reasons || []; return it; });
-    d.removedPhotos = [];
+    d.removedPhotos = []; d.photoRefId = o.photoRefId || ''; d.orderId = o.orderId || ''; d.ref = o.ref || '';
     return d;
+  }
+  function qSortLabel(o){ return 'فرز '+(o.date||'')+(o.ref?(' — '+o.ref):''); }
+  function qOrderById(id){ return id ? (qOrders.filter(function(x){ return x.id===id; })[0] || null) : null; }
+  function qOrderItemFor(order, material){
+    if(!order || !material) return null;
+    return (order.items||[]).filter(function(it){ return cropKey(it.product)===cropKey(material); })[0] || null;
+  }
+  function qSortedForOrder(order, product, unit){
+    var tot = 0;
+    qSorts.forEach(function(ss){
+      if(ss.orderId!==order.id) return;
+      (ss.items||[]).forEach(function(it){ if(cropKey(it.product)===cropKey(product) && (it.unit||'kg')===(unit||'kg')) tot += qNum(it.sorted); });
+    });
+    return tot;
   }
   function qDraftFormHtml(d){
     var products = cropNamesList();
     var prodSel = function(i, cur){
-      if(!products.length) return '<input type="text" class="q-draft" data-i="'+i+'" data-f="product" maxlength="80" value="'+escH(cur)+'" placeholder="اسم المنتج">';
+      if(!products.length) return '<input type="text" class="q-draft" data-i="'+i+'" data-f="product" maxlength="80" value="'+escH(cur)+'" placeholder="اسم المادة الخام">';
       var has = !cur || products.some(function(n){ return cropKey(n)===cropKey(cur); });
-      return '<select class="q-draft" data-i="'+i+'" data-f="product"><option value="">— المنتج —</option>'+products.map(function(n){ return '<option value="'+escH(n)+'"'+(cropKey(n)===cropKey(cur)?' selected':'')+'>'+escH(n)+'</option>'; }).join('')+(has?'':'<option value="'+escH(cur)+'" selected>'+escH(cur)+' (اسم قديم)</option>')+'</select>';
+      return '<select class="q-draft" data-i="'+i+'" data-f="product"><option value="">— المادة الخام / المحصول —</option>'+products.map(function(n){ return '<option value="'+escH(n)+'"'+(cropKey(n)===cropKey(cur)?' selected':'')+'>'+escH(n)+'</option>'; }).join('')+(has?'':'<option value="'+escH(cur)+'" selected>'+escH(cur)+' (اسم قديم)</option>')+'</select>';
     };
     var items = d.items.map(function(it, i){
-      var w = qWaste(it), rs = qReasonSum(it), diff = w - rs;
       var reasons = (it.reasons||[]).map(function(r, j){
         return '<div class="q-reason-row"><select class="q-draft" data-i="'+i+'" data-j="'+j+'" data-f="reason">'+Q_REASONS.map(function(x){ return '<option'+(x===r.reason?' selected':'')+'>'+escH(x)+'</option>'; }).join('')+'</select>'+
           (r.reason==='أخرى' ? '<input type="text" class="q-draft" data-i="'+i+'" data-j="'+j+'" data-f="other" maxlength="60" placeholder="اكتب السبب" value="'+escH(r.other||'')+'">' : '')+
@@ -7748,27 +7764,29 @@
       }).join('');
       var photos = (it.photoIds||[]).length ? '<div class="hint" style="margin:4px 0;">📷 '+it.photoIds.length+' صورة محفوظة <button type="button" class="btn btn-ghost btn-sm q-show-photos" data-i="'+i+'">اعرضها</button></div><div class="q-photos" id="q-ph-'+it.uid+'"></div>' : '';
       var newp = (it.newPhotos||[]).map(function(src, k){ return '<span class="q-newph"><img class="pest-photo q-thumb" src="'+src+'" alt=""><button type="button" class="del-btn q-rm-newph" data-i="'+i+'" data-k="'+k+'">✕</button></span>'; }).join('');
-      return '<div class="q-item"><div class="q-item-head"><strong>منتج '+(i+1)+'</strong>'+(d.items.length>1?'<button type="button" class="del-btn q-rm-item" data-i="'+i+'" title="شيل المنتج">✕</button>':'')+'</div>'+
-        '<div class="form-grid"><div class="field-sm full"><label>المنتج</label>'+prodSel(i, it.product)+'</div>'+
+      return '<div class="q-item"><div class="q-item-head"><strong>مادة خام '+(i+1)+'</strong>'+(d.items.length>1?'<button type="button" class="del-btn q-rm-item" data-i="'+i+'" title="شيل المادة">✕</button>':'')+'</div>'+
+        '<div class="form-grid"><div class="field-sm full"><label>المادة الخام / المحصول</label>'+prodSel(i, it.product)+'</div>'+
         '<div class="field-sm"><label>الوحدة</label><select class="q-draft" data-i="'+i+'" data-f="unit">'+Object.keys(Q_UNITS).map(function(u){ return '<option value="'+u+'"'+(it.unit===u?' selected':'')+'>'+Q_UNITS[u]+'</option>'; }).join('')+'</select></div>'+
-        '<div class="field-sm"><label>المطلوب</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="required" value="'+escH(it.required)+'"></div>'+
-        '<div class="field-sm"><label>اللي جه</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="received" value="'+escH(it.received)+'"></div>'+
+        '<div class="field-sm"><label>مطلوب منه</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="required" value="'+escH(it.required)+'"></div>'+
+        '<div class="field-sm"><label>جه</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="received" value="'+escH(it.received)+'"></div>'+
         '<div class="field-sm"><label>بعد الفرز</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="sorted" value="'+escH(it.sorted)+'"></div></div>'+
-        '<div class="q-wcalc" id="q-wcalc-'+i+'"></div>'+
+        '<div class="q-reqhint hint" id="q-reqhint-'+i+'" style="margin:2px 0;"></div><div class="q-wcalc" id="q-wcalc-'+i+'"></div>'+
         '<div class="field-sm full"><label>أسباب الفاقد</label>'+reasons+'<button type="button" class="btn btn-ghost btn-sm q-add-reason" data-i="'+i+'">＋ سبب فاقد</button></div>'+
-        '<div class="field-sm full"><label>ملاحظة على المنتج</label><input type="text" class="q-draft" data-i="'+i+'" data-f="note" maxlength="200" value="'+escH(it.note||'')+'"></div>'+
-        '<div class="field-sm full"><label>صور الديفوهات</label>'+photos+'<div class="q-newphs">'+newp+'</div><label class="btn btn-ghost btn-sm" style="display:inline-block;cursor:pointer;">📷 ضيف صور<input type="file" accept="image/*" multiple class="q-file" data-i="'+i+'" style="display:none;"></label></div></div>';
+        '<div class="field-sm full"><label>ملاحظة</label><input type="text" class="q-draft" data-i="'+i+'" data-f="note" maxlength="200" value="'+escH(it.note||'')+'"></div>'+
+        '<div class="field-sm full"><label>صور أسباب الفاقد</label>'+photos+'<div class="q-newphs">'+newp+'</div><label class="btn btn-ghost btn-sm" style="display:inline-block;cursor:pointer;">📷 ضيف صور<input type="file" accept="image/*" multiple class="q-file" data-i="'+i+'" style="display:none;"></label></div></div>';
     }).join('');
+    var ordOpts = '<option value="">— مش مرتبط بأوردر —</option>'+qOrders.slice(0,100).map(function(o){ return '<option value="'+escH(o.id)+'"'+(d.orderId===o.id?' selected':'')+'>'+escH(qOrderLabel(o))+' ('+escH(o.date)+')</option>'; }).join('');
     return '<form class="entry-form" id="q-order-form"><div class="form-grid">'+
-      '<div class="field-sm"><label>رقم الأوردر</label><input type="text" class="q-draft" data-f="orderNo" maxlength="40" required value="'+escH(d.orderNo)+'"></div>'+
-      '<div class="field-sm"><label>التاريخ</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div>'+
-      '<div class="field-sm full"><label>العميل</label><input type="text" class="q-draft" data-f="customer" maxlength="80" required value="'+escH(d.customer)+'"></div></div>'+
+      '<div class="field-sm"><label>تاريخ الفرز</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div>'+
+      '<div class="field-sm"><label>رقم الدفعة / المصدر</label><input type="text" class="q-draft" data-f="ref" maxlength="60" placeholder="اختياري" value="'+escH(d.ref||'')+'"></div>'+
+      '<div class="field-sm full"><label>مرتبط بأوردر (اختياري)</label><select class="q-draft" data-f="orderId">'+ordOpts+'</select></div></div>'+
       items+
-      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm q-add-item-btn">＋ ضيف منتج للأوردر</button></div>'+
-      '<div class="field-sm full"><label>ملاحظات الأوردر</label><input type="text" class="q-draft" data-f="notes" maxlength="250" value="'+escH(d.notes||'')+'"></div>'+
-      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="q-save-btn">'+(d.id?'حفظ التعديل':'حفظ الأوردر')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="q-cancel-btn">إلغاء</button></div></form>';
+      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm q-add-item-btn">＋ ضيف مادة خام</button></div>'+
+      '<div class="field-sm full"><label>ملاحظات الفرز</label><input type="text" class="q-draft" data-f="notes" maxlength="250" value="'+escH(d.notes||'')+'"></div>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="q-save-btn">'+(d.id?'حفظ التعديل':'حفظ الفرز')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="q-cancel-btn">إلغاء</button></div></form>';
   }
   function qUpdateCalc(d){
+    var ord = qOrderById(d.orderId);
     d.items.forEach(function(it, i){
       var el = document.getElementById('q-wcalc-'+i); if(!el) return;
       var w = qWaste(it), rec = qNum(it.received), rs = qReasonSum(it), diff = w - rs;
@@ -7777,6 +7795,12 @@
       else if(w>0 && Math.abs(diff)>0.0001) msg += diff>0 ? ' — لسه <strong>'+qFmt(diff)+'</strong> مش موزّعين على أسباب' : ' — <span style="color:var(--alert)">⚠️ الأسباب أكتر من الفاقد بـ '+qFmt(-diff)+'</span>';
       else if(w>0) msg += ' — ✅ الأسباب متوزّعة';
       el.innerHTML = msg;
+      var h = document.getElementById('q-reqhint-'+i);
+      if(h){
+        var oi = qOrderItemFor(ord, it.product);
+        h.innerHTML = (oi && qNum(it.required)!==qNum(oi.required)) ? ('المطلوب في الأوردر '+escH(qOrderLabel(ord))+': <strong>'+qFmt(qNum(oi.required))+'</strong> '+Q_UNITS[oi.unit||'kg']+' <button type="button" class="btn btn-ghost btn-sm q-use-req" data-i="'+i+'">استخدمه</button>') : '';
+        var ub = h.querySelector('.q-use-req'); if(ub) ub.addEventListener('click', function(){ it.required = qNum(oi.required); it.unit = oi.unit||'kg'; renderQualityPanel(); });
+      }
     });
   }
   function qWireDraftForm(){
@@ -7793,7 +7817,8 @@
         qUpdateCalc(d);
       });
       el.addEventListener('change', function(){
-        if(el.getAttribute('data-f')==='reason'){ el.dispatchEvent(new Event('input')); rerender(); }
+        var f = el.getAttribute('data-f');
+        if(f==='reason' || f==='orderId' || (f==='product')){ el.dispatchEvent(new Event('input')); rerender(); }
       });
     });
     $all('.q-rm-item', form).forEach(function(b){ b.addEventListener('click', function(){ d.items.splice(parseInt(b.getAttribute('data-i'),10), 1); rerender(); }); });
@@ -7802,7 +7827,7 @@
     $all('.q-rm-newph', form).forEach(function(b){ b.addEventListener('click', function(){ d.items[parseInt(b.getAttribute('data-i'),10)].newPhotos.splice(parseInt(b.getAttribute('data-k'),10), 1); rerender(); }); });
     $all('.q-show-photos', form).forEach(function(b){ b.addEventListener('click', function(){
       var it = d.items[parseInt(b.getAttribute('data-i'),10)], holder = document.getElementById('q-ph-'+it.uid);
-      qPhotoStrip(d.id, holder, it.uid);
+      qPhotoStrip(d.photoRefId || d.id, holder, it.uid);
     }); });
     $all('.q-file', form).forEach(function(inp){ inp.addEventListener('change', function(){
       var it = d.items[parseInt(inp.getAttribute('data-i'),10)], files = [].slice.call(inp.files||[]);
@@ -7814,54 +7839,140 @@
     $('#q-cancel-btn', form).addEventListener('click', function(){ qDraft = null; rerender(); });
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
-      if(!d.orderNo.trim() || !d.customer.trim()){ toast('اكتب رقم الأوردر والعميل'); return; }
       var items = d.items.filter(function(it){ return String(it.product||'').trim(); });
-      if(!items.length){ toast('اختار منتج واحد على الأقل'); return; }
+      if(!items.length){ toast('اختار مادة خام واحدة على الأقل'); return; }
       for(var k=0;k<items.length;k++){
         if(qNum(items[k].sorted) > qNum(items[k].received) && qNum(items[k].received)>0){ toast('بعد الفرز أكبر من اللي جه في '+items[k].product); return; }
         if(qReasonSum(items[k]) - qWaste(items[k]) > 0.0001){ toast('أسباب الفاقد أكتر من الفاقد في '+items[k].product); return; }
       }
       if(!db){ toast('محتاج اتصال'); return; }
       var btn = $('#q-save-btn'); btn.disabled = true;
-      var orderId = d.id || genId(), batch = db.batch(), now = Date.now();
+      var sid = d.id || genId(), photoRef = d.photoRefId || sid, batch = db.batch(), now = Date.now(), ord = qOrderById(d.orderId);
       var cleanItems = items.map(function(it){
         var ids = (it.photoIds||[]).slice();
-        (it.newPhotos||[]).forEach(function(src){ var pid = genId(); ids.push(pid); batch.set(db.collection('qualityPhotos').doc(pid), {id:pid, refId:orderId, itemUid:it.uid, data:src, createdAt:now, by:currentUser||''}); });
+        (it.newPhotos||[]).forEach(function(src){ var pid = genId(); ids.push(pid); batch.set(db.collection('qualityPhotos').doc(pid), {id:pid, refId:photoRef, itemUid:it.uid, data:src, createdAt:now, by:currentUser||''}); });
         return {uid:it.uid, product:cropNameClean(it.product), unit:it.unit||'kg', required:qNum(it.required), received:qNum(it.received), sorted:qNum(it.sorted),
           reasons:(it.reasons||[]).filter(function(r){ return qNum(r.qty)>0; }).map(function(r){ return {reason:r.reason, other:r.other||'', qty:qNum(r.qty)}; }), note:it.note||'', photoIds:ids};
       });
-      var rec = {id:orderId, orderNo:d.orderNo.trim(), customer:d.customer.trim(), date:d.date, notes:d.notes||'', items:cleanItems,
+      var rec = {id:sid, date:d.date, ref:(d.ref||'').trim(), orderId:ord?ord.id:'', orderNo:ord?ord.orderNo:'', customer:ord?ord.customer:'', notes:d.notes||'', items:cleanItems, photoRefId:d.photoRefId||'',
         createdBy:d.createdBy||currentUser||'', createdAt:d.createdAt||now, updatedAt:now, editedBy:d.id?(currentUser||''):''};
-      batch.set(db.collection('qualityOrders').doc(orderId), rec);
-      var go = d.id && d.removedPhotos.length ? qDeletePhotos(orderId, d.removedPhotos, batch) : Promise.resolve();
+      batch.set(db.collection('qualitySorting').doc(sid), rec);
+      var go = d.id && d.removedPhotos.length ? qDeletePhotos(photoRef, d.removedPhotos, batch) : Promise.resolve();
       go.then(function(){ return batch.commit(); }).then(function(){
-        delete qPhotoCache[orderId];
-        logAudit(d.id?'edit':'add','quality','أوردر '+qOrderLabel(rec)+' — '+cleanItems.length+' منتج');
-        toast(d.id?'اتحفظ التعديل':'اتسجّل الأوردر'); qDraft = null; renderQualityPanel();
+        delete qPhotoCache[photoRef];
+        logAudit(d.id?'edit':'add','quality',qSortLabel(rec)+' — '+cleanItems.length+' مادة خام');
+        toast(d.id?'اتحفظ التعديل':'اتسجّل الفرز'); qDraft = null; renderQualityPanel();
       }).catch(function(e){ console.error(e); toast('تعذر الحفظ'); btn.disabled = false; });
     });
   }
-
-  /* ----- كروت الأوردرات ----- */
-  function qOrderCardHtml(o){
+  function qSortCardHtml(o){
     var agg = qAggregate([o]), photoCount = (o.items||[]).reduce(function(n,it){ return n + (it.photoIds||[]).length; }, 0);
-    return '<div class="q-order" data-id="'+escH(o.id)+'"'+lfAttr('qord', o.date)+'>'+
-      '<div class="q-order-head"><strong>'+escH(qOrderLabel(o))+'</strong><span class="hint" style="margin:0;">'+escH(o.date)+'</span></div>'+
+    return '<div class="q-order q-sort" data-id="'+escH(o.id)+'"'+lfAttr('qsort', o.date)+'>'+
+      '<div class="q-order-head"><strong>🧺 '+escH(qSortLabel(o))+'</strong><span class="hint" style="margin:0;">'+(o.orderNo?('أوردر #'+escH(o.orderNo)+' — '+escH(o.customer||'')):'من غير أوردر')+'</span></div>'+
       qUnitSummaryHtml(agg.byUnit)+qOrderItemsTable(o, true)+
       (o.notes?('<div class="hint">📝 '+escH(o.notes)+'</div>'):'')+
       '<div class="q-photos" id="q-oph-'+escH(o.id)+'"></div>'+
       '<div class="form-actions" style="margin-top:8px;">'+(photoCount?('<button type="button" class="btn btn-ghost btn-sm q-photos-btn">📷 الصور ('+photoCount+')</button> '):'')+
         '<button type="button" class="btn btn-ghost btn-sm q-edit">✏️ تعديل</button> <button type="button" class="btn btn-ghost btn-sm q-print-order">🖨️ طباعة</button> <button type="button" class="del-btn q-del" title="حذف">✕</button></div></div>';
   }
+  function qSortViewHtml(){
+    var list = qSorts.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||0)-(a.createdAt||0); });
+    return '<details class="chart-card" id="q-form-details"'+(qDraft?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(qDraft && qDraft.id ? '✏️ تعديل فرز' : '＋ فرز جديد')+'</summary><div id="q-form-holder" style="margin-top:10px;">'+(qDraft ? qDraftFormHtml(qDraft) : '<button type="button" class="btn btn-primary btn-sm" id="q-new-btn">＋ ابدأ فرز جديد</button>')+'</div></details>'+
+      '<h3 class="section-title">🧺 جلسات الفرز ('+list.length+')</h3>'+lfBarHtml('qsort')+
+      (list.length ? list.map(qSortCardHtml).join('') : '<p class="empty-note">لسه ما سجلتش فرز. سجّل المادة الخام: مطلوب / جه / بعد الفرز / الفاقد.</p>');
+  }
+
+  /* ----- الأوردرات: بيانات الأوردر والكميات المطلوبة بس ----- */
+  function qoNew(){ return {id:'', orderNo:'', customer:'', date:todayStr(), notes:'', items:[{uid:qUid(), product:'', unit:'kg', required:''}]}; }
+  function qoFormHtml(d){
+    var products = cropNamesList();
+    var rows = d.items.map(function(it, i){
+      var psel = products.length
+        ? '<select class="q-draft" data-i="'+i+'" data-f="product"><option value="">— الصنف المطلوب —</option>'+products.map(function(n){ return '<option value="'+escH(n)+'"'+(cropKey(n)===cropKey(it.product)?' selected':'')+'>'+escH(n)+'</option>'; }).join('')+(it.product && !products.some(function(n){ return cropKey(n)===cropKey(it.product); }) ? '<option value="'+escH(it.product)+'" selected>'+escH(it.product)+' (اسم قديم)</option>' : '')+'</select>'
+        : '<input type="text" class="q-draft" data-i="'+i+'" data-f="product" maxlength="80" value="'+escH(it.product)+'" placeholder="الصنف">';
+      return '<div class="q-item"><div class="q-item-head"><strong>صنف '+(i+1)+'</strong>'+(d.items.length>1?'<button type="button" class="del-btn q-rm-item" data-i="'+i+'" title="شيل الصنف">✕</button>':'')+'</div>'+
+        '<div class="form-grid"><div class="field-sm full"><label>الصنف المطلوب</label>'+psel+'</div>'+
+        '<div class="field-sm"><label>الكمية المطلوبة</label><input type="number" step="any" min="0" class="ltr q-draft" data-i="'+i+'" data-f="required" value="'+escH(it.required)+'"></div>'+
+        '<div class="field-sm"><label>الوحدة</label><select class="q-draft" data-i="'+i+'" data-f="unit">'+Object.keys(Q_UNITS).map(function(u){ return '<option value="'+u+'"'+(it.unit===u?' selected':'')+'>'+Q_UNITS[u]+'</option>'; }).join('')+'</select></div></div></div>';
+    }).join('');
+    return '<form class="entry-form" id="q-order-form"><div class="form-grid">'+
+      '<div class="field-sm"><label>رقم الأوردر</label><input type="text" class="q-draft" data-f="orderNo" maxlength="40" required value="'+escH(d.orderNo)+'"></div>'+
+      '<div class="field-sm"><label>تاريخ الأوردر</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div>'+
+      '<div class="field-sm full"><label>العميل</label><input type="text" class="q-draft" data-f="customer" maxlength="80" required value="'+escH(d.customer)+'"></div></div>'+
+      rows+'<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm q-add-item-btn">＋ ضيف صنف للأوردر</button></div>'+
+      '<div class="field-sm full"><label>ملاحظات الأوردر</label><input type="text" class="q-draft" data-f="notes" maxlength="250" value="'+escH(d.notes||'')+'"></div>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="q-save-btn">'+(d.id?'حفظ التعديل':'حفظ الأوردر')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="q-cancel-btn">إلغاء</button></div></form>';
+  }
+  function qoWire(){
+    var form = $('#q-order-form'); if(!form || !qoDraft) return;
+    var d = qoDraft;
+    function rerender(){ renderQualityPanel(); }
+    $all('.q-draft', form).forEach(function(el){
+      el.addEventListener('input', function(){ var f = el.getAttribute('data-f'), i = el.getAttribute('data-i'); if(i===null) d[f] = el.value; else d.items[i][f] = el.value; });
+      el.addEventListener('change', function(){ el.dispatchEvent(new Event('input')); });
+    });
+    $all('.q-rm-item', form).forEach(function(b){ b.addEventListener('click', function(){ d.items.splice(parseInt(b.getAttribute('data-i'),10), 1); rerender(); }); });
+    $('.q-add-item-btn', form).addEventListener('click', function(){ d.items.push({uid:qUid(), product:'', unit:'kg', required:''}); rerender(); });
+    $('#q-cancel-btn', form).addEventListener('click', function(){ qoDraft = null; rerender(); });
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      if(!d.orderNo.trim() || !d.customer.trim()){ toast('اكتب رقم الأوردر والعميل'); return; }
+      var items = d.items.filter(function(it){ return String(it.product||'').trim(); });
+      if(!items.length){ toast('اختار صنف واحد على الأقل'); return; }
+      for(var k=0;k<items.length;k++){ if(!(qNum(items[k].required)>0)){ toast('اكتب الكمية المطلوبة لـ '+items[k].product); return; } }
+      if(!db){ toast('محتاج اتصال'); return; }
+      var btn = $('#q-save-btn'); btn.disabled = true, now = Date.now();
+      var now = Date.now(), id = d.id || genId();
+      var rec = Object.assign({}, d.id ? (qOrderById(d.id)||{}) : {}, {id:id, orderNo:d.orderNo.trim(), customer:d.customer.trim(), date:d.date, notes:d.notes||'',
+        items:items.map(function(it){ return {uid:it.uid, product:cropNameClean(it.product), unit:it.unit||'kg', required:qNum(it.required)}; }),
+        createdBy:d.createdBy||currentUser||'', createdAt:d.createdAt||now, updatedAt:now});
+      db.collection('qualityOrders').doc(id).set(rec).then(function(){
+        logAudit(d.id?'edit':'add','quality','أوردر '+qOrderLabel(rec)+' — '+rec.items.length+' صنف'); toast(d.id?'اتحفظ التعديل':'اتسجّل الأوردر'); qoDraft = null; renderQualityPanel();
+      }).catch(function(e){ console.error(e); toast('تعذر الحفظ'); btn.disabled = false; });
+    });
+  }
+  function qLegacyOrders(){
+    return qOrders.filter(function(o){ return !o.legacyMoved && (o.items||[]).some(function(it){ return it.received!=null || it.sorted!=null || (it.photoIds||[]).length; }); });
+  }
+  function qMigrateLegacy(){
+    var list = qLegacyOrders(); if(!list.length || !db) return Promise.resolve();
+    var batch = db.batch(), now = Date.now();
+    list.forEach(function(o){
+      var sid = genId();
+      batch.set(db.collection('qualitySorting').doc(sid), {id:sid, date:o.date, ref:'من أوردر '+o.orderNo, orderId:o.id, orderNo:o.orderNo, customer:o.customer, notes:o.notes||'', photoRefId:o.id,
+        items:(o.items||[]).map(function(it){ return {uid:it.uid, product:it.product, unit:it.unit||'kg', required:qNum(it.required), received:qNum(it.received), sorted:qNum(it.sorted), reasons:it.reasons||[], note:it.note||'', photoIds:it.photoIds||[]}; }),
+        createdBy:o.createdBy||'', createdAt:now, updatedAt:now});
+      batch.set(db.collection('qualityOrders').doc(o.id), Object.assign({}, o, {legacyMoved:true, items:(o.items||[]).map(function(it){ return {uid:it.uid, product:it.product, unit:it.unit||'kg', required:qNum(it.required)}; })}));
+    });
+    return batch.commit().then(function(){ logAudit('edit','quality','نقل بيانات فرز قديمة من '+list.length+' أوردر إلى قسم الفرز'); return list.length; });
+  }
+  function qOrderCardHtml(o){
+    var rows = (o.items||[]).map(function(it){
+      var req = qNum(it.required), got = qSortedForOrder(o, it.product, it.unit), pct = qPct(got, req);
+      var cls = pct>=100 ? 'good' : (pct>0 ? 'warn' : '');
+      return '<tr><td><strong>'+escH(it.product)+'</strong></td><td class="num">'+qFmt(req)+' '+Q_UNITS[it.unit||'kg']+'</td><td class="num">'+qFmt(got)+'</td><td><span class="status-pill '+cls+'">'+qFmt(pct)+'%</span></td></tr>';
+    }).join('');
+    var nSort = qSorts.filter(function(x){ return x.orderId===o.id; }).length;
+    return '<div class="q-order" data-id="'+escH(o.id)+'"'+lfAttr('qord', o.date)+'>'+
+      '<div class="q-order-head"><strong>'+escH(qOrderLabel(o))+'</strong><span class="hint" style="margin:0;">'+escH(o.date)+'</span></div>'+
+      '<div class="table-wrap cropref-wrap"><table><thead><tr><th>الصنف</th><th>المطلوب</th><th>اتفرز</th><th>التنفيذ</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<div class="hint" style="margin:4px 0;">'+(nSort?('🧺 مرتبط بـ '+nSort+' جلسة فرز'):'لسه ما اتفرزش لأوردر ده')+'</div>'+
+      (o.notes?('<div class="hint">📝 '+escH(o.notes)+'</div>'):'')+
+      '<div class="form-actions" style="margin-top:8px;"><button type="button" class="btn btn-ghost btn-sm q-edit">✏️ تعديل</button> <button type="button" class="btn btn-ghost btn-sm q-print-order">🖨️ طباعة</button> <button type="button" class="del-btn q-del" title="حذف">✕</button></div></div>';
+  }
   function qOrdersViewHtml(){
     var list = qOrders.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||0)-(a.createdAt||0); });
-    return '<details class="chart-card" id="q-form-details"'+(qDraft?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(qDraft && qDraft.id ? '✏️ تعديل أوردر' : '＋ أوردر جديد')+'</summary><div id="q-form-holder" style="margin-top:10px;">'+(qDraft ? qDraftFormHtml(qDraft) : '<button type="button" class="btn btn-primary btn-sm" id="q-new-btn">＋ ابدأ أوردر جديد</button>')+'</div></details>'+
+    var legacy = qLegacyOrders();
+    return (legacy.length && currentUserRole==='admin' ? '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">فيه '+legacy.length+' أوردر فيه بيانات فرز قديمة (جه / بعد الفرز / فاقد / صور) كانت متسجلة جوه الأوردر. <button type="button" class="btn btn-primary btn-sm" id="q-migrate">🔄 انقلها لقسم الفرز</button></div>' : '')+
+      '<details class="chart-card" id="q-form-details"'+(qoDraft?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(qoDraft && qoDraft.id ? '✏️ تعديل أوردر' : '＋ أوردر جديد')+'</summary><div id="q-form-holder" style="margin-top:10px;">'+(qoDraft ? qoFormHtml(qoDraft) : '<button type="button" class="btn btn-primary btn-sm" id="q-new-btn">＋ ابدأ أوردر جديد</button>')+'</div></details>'+
       '<h3 class="section-title">📦 الأوردرات ('+list.length+')</h3>'+lfBarHtml('qord')+
-      (list.length ? list.map(qOrderCardHtml).join('') : '<p class="empty-note">لسه ما سجلتش أوردرات.</p>');
+      (list.length ? list.map(qOrderCardHtml).join('') : '<p class="empty-note">لسه ما سجلتش أوردرات. سجّل الأوردر بالأصناف والكميات المطلوبة.</p>');
   }
 
   /* ----- التقارير ----- */
-  function qRepOrders(){ return qOrders.filter(function(o){ return (!qRep.from || o.date>=qRep.from) && (!qRep.to || o.date<=qRep.to); }); }
+  function qInRange(d){ return (!qRep.from || d>=qRep.from) && (!qRep.to || d<=qRep.to); }
+  function qRepSorts(){ return qSorts.filter(function(o){ return qInRange(o.date); }); }
+  function qRepOrdersList(){ return qOrders.filter(function(o){ return qInRange(o.date); }); }
   function qReasonBars(byReason){
     return Object.keys(byReason).map(function(u){
       var ents = Object.keys(byReason[u]).map(function(k){ return {k:k, v:byReason[u][k]}; }).sort(function(a,b){ return b.v-a.v; });
@@ -7873,41 +7984,61 @@
     }).join('');
   }
   function qReportHtml(){
-    var os = qRepOrders(), agg = qAggregate(os, qRep.product);
+    var ss = qRepSorts(), agg = qAggregate(ss, qRep.product), ords = qRepOrdersList();
     var prodRows = Object.keys(agg.byProduct).map(function(k){ return agg.byProduct[k]; }).sort(function(a,b){ return qPct(b.waste,b.rec)-qPct(a.waste,a.rec); }).map(function(x){
-      return '<tr><td><strong>'+escH(x.product)+'</strong><div class="hint" style="margin:0;">'+Q_UNITS[x.unit]+' — '+x.orders+' أوردر</div></td><td class="num">'+qFmt(x.req)+'</td><td class="num">'+qFmt(x.rec)+'</td><td class="num">'+qFmt(x.srt)+'</td><td class="num">'+qFmt(x.waste)+'</td><td>'+qPctHtml(qPct(x.waste, x.rec))+'</td><td>'+qPctHtml(Math.min(999,qPct(x.srt, x.req)) ).replace('alert','good').replace('warn','good')+'</td></tr>';
+      return '<tr><td><strong>'+escH(x.product)+'</strong><div class="hint" style="margin:0;">'+Q_UNITS[x.unit]+' — '+x.orders+' مرة</div></td><td class="num">'+qFmt(x.req)+'</td><td class="num">'+qFmt(x.rec)+'</td><td class="num">'+qFmt(x.srt)+'</td><td class="num">'+qFmt(x.waste)+'</td><td>'+qPctHtml(qPct(x.waste, x.rec))+'</td></tr>';
     }).join('');
-    var ordRows = agg.orders.map(function(r){
-      var u = Object.keys(r.byUnit).map(function(k){ var x = r.byUnit[k]; return qFmt(x.srt)+'/'+qFmt(x.req)+' '+Q_UNITS[k]+' — فاقد '+qFmt(x.waste)+' ('+qFmt(qPct(x.waste, x.rec))+'%)'; }).join('<br>');
-      return '<tr><td>'+escH(qOrderLabel(r.o))+'<div class="hint" style="margin:0;">'+escH(r.o.date)+'</div></td><td>'+u+'</td></tr>';
+    var sortRows = agg.orders.map(function(r){
+      var u = Object.keys(r.byUnit).map(function(k){ var x = r.byUnit[k]; return qFmt(x.srt)+'/'+qFmt(x.rec)+' '+Q_UNITS[k]+' — فاقد '+qFmt(x.waste)+' ('+qFmt(qPct(x.waste, x.rec))+'%)'; }).join('<br>');
+      return '<tr><td>'+escH(qSortLabel(r.o))+(r.o.orderNo?('<div class="hint" style="margin:0;">أوردر #'+escH(r.o.orderNo)+'</div>'):'')+'</td><td>'+u+'</td></tr>';
     }).join('');
-    var cs = qComplaints.filter(function(c){ return (!qRep.from || c.date>=qRep.from) && (!qRep.to || c.date<=qRep.to); });
+    var ordRows = ords.map(function(o){
+      var lines = (o.items||[]).filter(function(it){ return !qRep.product || cropKey(it.product)===cropKey(qRep.product); }).map(function(it){
+        var req = qNum(it.required), got = qSortedForOrder(o, it.product, it.unit);
+        return escH(it.product)+': مطلوب '+qFmt(req)+' '+Q_UNITS[it.unit||'kg']+' — اتفرز '+qFmt(got)+' ('+qFmt(qPct(got, req))+'%)';
+      }).join('<br>');
+      return lines ? '<tr><td>'+escH(qOrderLabel(o))+'<div class="hint" style="margin:0;">'+escH(o.date)+'</div></td><td>'+lines+'</td></tr>' : '';
+    }).join('');
+    var cs = qComplaints.filter(function(c){ return qInRange(c.date); });
     var byType = {}; cs.forEach(function(c){ byType[c.type||'أخرى'] = (byType[c.type||'أخرى']||0) + 1; });
     var open = cs.filter(function(c){ return c.status==='new' || c.status==='review'; }).length;
-    return (agg.items ? qUnitSummaryHtml(agg.byUnit) : '<p class="empty-note">مفيش أوردرات في الفترة دي.</p>')+
-      (prodRows ? '<h3 class="section-title">حسب المنتج (الأعلى فاقد أولاً)</h3><div class="table-wrap cropref-wrap"><table><thead><tr><th>المنتج</th><th>مطلوب</th><th>جه</th><th>بعد الفرز</th><th>فاقد</th><th>فاقد %</th><th>تنفيذ %</th></tr></thead><tbody>'+prodRows+'</tbody></table></div>' : '')+
-      (agg.items ? '<h3 class="section-title">أسباب الفاقد</h3>'+(qReasonBars(agg.byReason) || '<p class="empty-note">مفيش أسباب متسجلة.</p>') : '')+
-      (ordRows ? '<h3 class="section-title">حسب الأوردر</h3><div class="table-wrap cropref-wrap"><table><thead><tr><th>الأوردر</th><th>اتنفّذ / مطلوب والفاقد</th></tr></thead><tbody>'+ordRows+'</tbody></table></div>' : '')+
-      '<h3 class="section-title">الشكاوى في الفترة</h3><p>'+cs.length+' شكوى — مفتوحة: '+open+(Object.keys(byType).length?(' — '+Object.keys(byType).map(function(k){ return escH(k)+': '+byType[k]; }).join('، ')):'')+'</p>';
+    return '<h3 class="section-title">🧺 الفرز — المادة الخام والفاقد</h3>'+(agg.items ? qUnitSummaryHtml(agg.byUnit) : '<p class="empty-note">مفيش فرز في الفترة دي.</p>')+
+      (prodRows ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>المادة الخام</th><th>مطلوب</th><th>جه</th><th>بعد الفرز</th><th>فاقد</th><th>فاقد %</th></tr></thead><tbody>'+prodRows+'</tbody></table></div>' : '')+
+      (agg.items ? (qReasonBars(agg.byReason) || '<p class="empty-note">مفيش أسباب متسجلة.</p>') : '')+
+      (sortRows ? '<h3 class="section-title">حسب جلسة الفرز</h3><div class="table-wrap cropref-wrap"><table><thead><tr><th>الجلسة</th><th>بعد الفرز / اللي جه والفاقد</th></tr></thead><tbody>'+sortRows+'</tbody></table></div>' : '')+
+      '<h3 class="section-title">📦 الأوردرات في الفترة ('+ords.length+')</h3>'+(ordRows ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>الأوردر</th><th>المطلوب واللي اتفرز</th></tr></thead><tbody>'+ordRows+'</tbody></table></div>' : '<p class="empty-note">مفيش أوردرات في الفترة دي.</p>')+
+      '<h3 class="section-title">📣 الشكاوى في الفترة</h3><p>'+cs.length+' شكوى — مفتوحة: '+open+(Object.keys(byType).length?(' — '+Object.keys(byType).map(function(k){ return escH(k)+': '+byType[k]; }).join('، ')):'')+'</p>';
   }
   function qReportsViewHtml(){
-    var prods = {}; qOrders.forEach(function(o){ (o.items||[]).forEach(function(it){ prods[cropKey(it.product)] = cropNameClean(it.product); }); });
+    var prods = {}; qSorts.forEach(function(o){ (o.items||[]).forEach(function(it){ prods[cropKey(it.product)] = cropNameClean(it.product); }); }); qOrders.forEach(function(o){ (o.items||[]).forEach(function(it){ prods[cropKey(it.product)] = cropNameClean(it.product); }); });
     return '<div class="form-grid"><div class="field-sm"><label>من</label><input type="date" class="ltr q-draft" id="qr-from" value="'+qRep.from+'"></div><div class="field-sm"><label>إلى</label><input type="date" class="ltr q-draft" id="qr-to" value="'+qRep.to+'"></div>'+
-      '<div class="field-sm full"><label>المنتج</label><select class="q-draft" id="qr-product"><option value="">كل المنتجات</option>'+Object.keys(prods).map(function(k){ return '<option value="'+escH(prods[k])+'"'+(cropKey(qRep.product)===k?' selected':'')+'>'+escH(prods[k])+'</option>'; }).join('')+'</select></div></div>'+
-      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="qr-clear">✕ مسح الفلتر</button> <button type="button" class="btn btn-ghost btn-sm" id="qr-csv">تصدير CSV</button> <button type="button" class="btn btn-primary btn-sm" id="qr-print">🖨️ اطبع التقرير</button></div>'+
+      '<div class="field-sm full"><label>المادة الخام / الصنف</label><select class="q-draft" id="qr-product"><option value="">الكل</option>'+Object.keys(prods).map(function(k){ return '<option value="'+escH(prods[k])+'"'+(cropKey(qRep.product)===k?' selected':'')+'>'+escH(prods[k])+'</option>'; }).join('')+'</select></div></div>'+
+      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="qr-clear">✕ مسح الفلتر</button> <button type="button" class="btn btn-ghost btn-sm" id="qr-csv">تصدير الفرز CSV</button> <button type="button" class="btn btn-ghost btn-sm" id="qr-csv-orders">تصدير الأوردرات CSV</button> <button type="button" class="btn btn-primary btn-sm" id="qr-print">🖨️ اطبع التقرير</button></div>'+
       '<div id="q-report">'+qReportHtml()+'</div>';
   }
-  function qExportCSV(){
+  function qSaveCsv(lines, name){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var lines = [['التاريخ','رقم الأوردر','العميل','المنتج','الوحدة','المطلوب','اللي جه','بعد الفرز','الفاقد','فاقد %','تنفيذ %','أسباب الفاقد','ملاحظة'].map(csvEscape).join(',')];
-    qRepOrders().forEach(function(o){ (o.items||[]).forEach(function(it){
+    if(lines.length<2){ toast('لا توجد بيانات للتصدير'); return; }
+    downloadsCap.save({filename:name+'-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); }).catch(function(e){ if(e && e.code==='declined') return; toast('تعذر حفظ الملف'); });
+  }
+  function qExportCSV(){
+    var lines = [['التاريخ','الدفعة','رقم الأوردر','العميل','المادة الخام','الوحدة','المطلوب','جه','بعد الفرز','الفاقد','فاقد %','تنفيذ %','أسباب الفاقد','ملاحظة'].map(csvEscape).join(',')];
+    qRepSorts().forEach(function(o){ (o.items||[]).forEach(function(it){
       if(qRep.product && cropKey(it.product)!==cropKey(qRep.product)) return;
       var w = qWaste(it);
-      lines.push([o.date, o.orderNo, o.customer, it.product, Q_UNITS[it.unit||'kg'], it.required, it.received, it.sorted, w, Math.round(qPct(w, qNum(it.received))*100)/100, Math.round(qPct(qNum(it.sorted), qNum(it.required))*100)/100,
+      lines.push([o.date, o.ref||'', o.orderNo||'', o.customer||'', it.product, Q_UNITS[it.unit||'kg'], it.required, it.received, it.sorted, w, Math.round(qPct(w, qNum(it.received))*100)/100, Math.round(qPct(qNum(it.sorted), qNum(it.required))*100)/100,
         (it.reasons||[]).map(function(r){ return qReasonName(r)+' ('+r.qty+')'; }).join(' | '), it.note||''].map(csvEscape).join(','));
     }); });
-    if(lines.length<2){ toast('لا توجد بيانات للتصدير'); return; }
-    downloadsCap.save({filename:'oroots-quality-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); }).catch(function(e){ if(e && e.code==='declined') return; toast('تعذر حفظ الملف'); });
+    qSaveCsv(lines, 'oroots-sorting');
+  }
+  function qExportOrdersCSV(){
+    var lines = [['التاريخ','رقم الأوردر','العميل','الصنف','الوحدة','المطلوب','اتفرز','التنفيذ %','ملاحظة'].map(csvEscape).join(',')];
+    qRepOrdersList().forEach(function(o){ (o.items||[]).forEach(function(it){
+      if(qRep.product && cropKey(it.product)!==cropKey(qRep.product)) return;
+      var got = qSortedForOrder(o, it.product, it.unit);
+      lines.push([o.date, o.orderNo, o.customer, it.product, Q_UNITS[it.unit||'kg'], it.required, got, Math.round(qPct(got, qNum(it.required))*100)/100, o.notes||''].map(csvEscape).join(','));
+    }); });
+    qSaveCsv(lines, 'oroots-orders');
   }
   function qPrintHtml(title, meta, bodyHtml){
     var logoEl = document.querySelector('header img'), logo = logoEl ? logoEl.getAttribute('src') : '';
@@ -7920,19 +8051,26 @@
     var meta = (qRep.from||qRep.to) ? ('الفترة: '+(qRep.from||'البداية')+' إلى '+(qRep.to||'النهاية')) : 'كل الفترات';
     meta += qRep.product ? (' — '+escH(qRep.product)) : '';
     logAudit('export','quality','طباعة تقرير الجودة — '+meta);
-    qPrintHtml('تقرير الجودة والفاقد', meta, qReportHtml());
+    qPrintHtml('تقرير الجودة والفرز والفاقد', meta, qReportHtml());
   }
-  function qPrintOrder(o){
-    var refs = [];
-    qLoadPhotos(o.id).then(function(list){
+  function qPrintSort(o){
+    qLoadPhotos(o.photoRefId || o.id).then(function(list){
       var body = qUnitSummaryHtml(qAggregate([o]).byUnit)+qOrderItemsTable(o, true);
       var ph = (o.items||[]).map(function(it){
         var mine = list.filter(function(x){ return x.itemUid===it.uid; });
-        return mine.length ? '<div class="pr-hall"><h2>📷 صور ديفوهات — '+escH(it.product)+'</h2><div class="pr-photos">'+mine.map(function(x){ return '<img src="'+x.data+'" alt="">'; }).join('')+'</div></div>' : '';
+        return mine.length ? '<div class="pr-hall"><h2>📷 صور أسباب الفاقد — '+escH(it.product)+'</h2><div class="pr-photos">'+mine.map(function(x){ return '<img src="'+x.data+'" alt="">'; }).join('')+'</div></div>' : '';
       }).join('');
-      logAudit('export','quality','طباعة أوردر '+qOrderLabel(o));
-      qPrintHtml('تقرير فرز أوردر', escH(qOrderLabel(o))+' — '+escH(o.date)+(o.notes?(' — '+escH(o.notes)):''), body+ph);
-    }).catch(function(){ qPrintHtml('تقرير فرز أوردر', escH(qOrderLabel(o)), qOrderItemsTable(o, true)); });
+      logAudit('export','quality','طباعة '+qSortLabel(o));
+      qPrintHtml('تقرير فرز المادة الخام', escH(qSortLabel(o))+(o.orderNo?(' — أوردر #'+escH(o.orderNo)+' '+escH(o.customer||'')):'')+(o.notes?(' — '+escH(o.notes)):''), body+ph);
+    }).catch(function(){ qPrintHtml('تقرير فرز المادة الخام', escH(qSortLabel(o)), qOrderItemsTable(o, true)); });
+  }
+  function qPrintOrder(o){
+    var rows = (o.items||[]).map(function(it){
+      var req = qNum(it.required), got = qSortedForOrder(o, it.product, it.unit);
+      return '<tr><td><strong>'+escH(it.product)+'</strong></td><td class="num">'+qFmt(req)+' '+Q_UNITS[it.unit||'kg']+'</td><td class="num">'+qFmt(got)+'</td><td class="num">'+qFmt(qPct(got, req))+'%</td></tr>';
+    }).join('');
+    logAudit('export','quality','طباعة أوردر '+qOrderLabel(o));
+    qPrintHtml('أوردر', escH(qOrderLabel(o))+' — '+escH(o.date)+(o.notes?(' — '+escH(o.notes)):''), '<table><thead><tr><th>الصنف</th><th>المطلوب</th><th>اتفرز</th><th>التنفيذ</th></tr></thead><tbody>'+rows+'</tbody></table>');
   }
 
   /* ----- الشكاوى ----- */
@@ -8016,30 +8154,49 @@
   function renderQualityPanel(){
     var body = $('#quality-body');
     if(!body) return;
-    var nav = '<div class="range-filter" id="q-nav"><button type="button" class="range-pill'+(qView==='orders'?' active':'')+'" data-v="orders">📦 الأوردرات والفرز</button><button type="button" class="range-pill'+(qView==='reports'?' active':'')+'" data-v="reports">📊 التقارير</button><button type="button" class="range-pill'+(qView==='complaints'?' active':'')+'" data-v="complaints">📣 الشكاوى</button></div>';
-    body.innerHTML = nav + '<div id="q-view">'+(qView==='reports' ? qReportsViewHtml() : (qView==='complaints' ? qComplaintsViewHtml() : qOrdersViewHtml()))+'</div>';
+    var pill = function(v, label){ return '<button type="button" class="range-pill'+(qView===v?' active':'')+'" data-v="'+v+'">'+label+'</button>'; };
+    var nav = '<div class="range-filter" id="q-nav">'+pill('orders','📦 الأوردرات')+pill('sorting','🧺 الفرز')+pill('reports','📊 التقارير')+pill('complaints','📣 الشكاوى')+'</div>';
+    body.innerHTML = nav + '<div id="q-view">'+(qView==='reports' ? qReportsViewHtml() : (qView==='complaints' ? qComplaintsViewHtml() : (qView==='sorting' ? qSortViewHtml() : qOrdersViewHtml())))+'</div>';
     $all('#q-nav .range-pill', body).forEach(function(b){ b.addEventListener('click', function(){ qView = b.getAttribute('data-v'); renderQualityPanel(); }); });
     if(qView==='orders'){
-      var nb = $('#q-new-btn'); if(nb) nb.addEventListener('click', function(){ qDraft = qNewDraft(); renderQualityPanel(); });
-      qWireDraftForm();
+      var nb = $('#q-new-btn'); if(nb) nb.addEventListener('click', function(){ qoDraft = qoNew(); renderQualityPanel(); });
+      var mg = $('#q-migrate'); if(mg) mg.addEventListener('click', function(){ mg.disabled = true; qMigrateLegacy().then(function(n){ toast('اتنقلت بيانات '+n+' أوردر لقسم الفرز'); }).catch(function(e){ console.error(e); toast('تعذر النقل'); mg.disabled = false; }); });
+      qoWire();
       $all('.q-order', body).forEach(function(card){
-        var id = card.getAttribute('data-id'), o = qOrders.filter(function(x){ return x.id===id; })[0]; if(!o) return;
-        var pb = card.querySelector('.q-photos-btn'); if(pb) pb.addEventListener('click', function(){
-          var holder = card.querySelector('.q-photos'); holder.innerHTML = '<span class="hint">بيحمّل الصور...</span>';
-          qLoadPhotos(id).then(function(list){ holder.innerHTML = list.length ? list.map(function(x){ var it = (o.items||[]).filter(function(i){ return i.uid===x.itemUid; })[0]; return '<figure class="q-fig"><img class="pest-photo q-thumb" src="'+x.data+'" alt=""><figcaption>'+escH(it?it.product:'')+'</figcaption></figure>'; }).join('') : '<span class="hint">مفيش صور.</span>'; });
-        });
+        var id = card.getAttribute('data-id'), o = qOrderById(id); if(!o) return;
         card.querySelector('.q-edit').addEventListener('click', function(){
-          qDraft = qDraftFromOrder(o); renderQualityPanel(); var f = $('#q-order-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
+          qoDraft = JSON.parse(JSON.stringify(o)); qoDraft.items = (qoDraft.items||[]).map(function(it){ return {uid:it.uid||qUid(), product:it.product, unit:it.unit||'kg', required:it.required}; });
+          renderQualityPanel(); var f = $('#q-order-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
         });
         card.querySelector('.q-print-order').addEventListener('click', function(){ qPrintOrder(o); });
         card.querySelector('.q-del').addEventListener('click', function(){
           if(!requireAdminForDelete()) return;
-          if(!confirm('تمسح الأوردر '+qOrderLabel(o)+' وصوره؟')) return;
-          var batch = db.batch(); batch.delete(db.collection('qualityOrders').doc(o.id));
-          qDeletePhotos(o.id, null, batch).then(function(){ return batch.commit(); }).then(function(){ delete qPhotoCache[o.id]; logAudit('delete','quality','مسح أوردر '+qOrderLabel(o)); toast('اتمسح'); });
+          if(!confirm('تمسح الأوردر '+qOrderLabel(o)+'؟ (جلسات الفرز المرتبطة بيه هتفضل زي ما هي)')) return;
+          db.collection('qualityOrders').doc(o.id).delete().then(function(){ logAudit('delete','quality','مسح أوردر '+qOrderLabel(o)); toast('اتمسح'); });
         });
       });
       lfWire('qord');
+    } else if(qView==='sorting'){
+      var nb2 = $('#q-new-btn'); if(nb2) nb2.addEventListener('click', function(){ qDraft = qNewDraft(); renderQualityPanel(); });
+      qWireDraftForm();
+      $all('.q-sort', body).forEach(function(card){
+        var id = card.getAttribute('data-id'), o = qSorts.filter(function(x){ return x.id===id; })[0]; if(!o) return;
+        var pb = card.querySelector('.q-photos-btn'); if(pb) pb.addEventListener('click', function(){
+          var holder = card.querySelector('.q-photos'); holder.innerHTML = '<span class="hint">بيحمّل الصور...</span>';
+          qLoadPhotos(o.photoRefId || id).then(function(list){ holder.innerHTML = list.length ? list.map(function(x){ var it = (o.items||[]).filter(function(i){ return i.uid===x.itemUid; })[0]; return '<figure class="q-fig"><img class="pest-photo q-thumb" src="'+x.data+'" alt=""><figcaption>'+escH(it?it.product:'')+'</figcaption></figure>'; }).join('') : '<span class="hint">مفيش صور.</span>'; });
+        });
+        card.querySelector('.q-edit').addEventListener('click', function(){
+          qDraft = qDraftFromSort(o); renderQualityPanel(); var f = $('#q-order-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
+        });
+        card.querySelector('.q-print-order').addEventListener('click', function(){ qPrintSort(o); });
+        card.querySelector('.q-del').addEventListener('click', function(){
+          if(!requireAdminForDelete()) return;
+          if(!confirm('تمسح '+qSortLabel(o)+' وصوره؟')) return;
+          var batch = db.batch(), ref = o.photoRefId || o.id; batch.delete(db.collection('qualitySorting').doc(o.id));
+          qDeletePhotos(ref, null, batch).then(function(){ return batch.commit(); }).then(function(){ delete qPhotoCache[ref]; logAudit('delete','quality','مسح '+qSortLabel(o)); toast('اتمسح'); });
+        });
+      });
+      lfWire('qsort');
     } else if(qView==='reports'){
       var rf = function(){ renderQualityPanel(); };
       $('#qr-from').addEventListener('change', function(){ qRep.from = this.value; rf(); });
@@ -8047,6 +8204,7 @@
       $('#qr-product').addEventListener('change', function(){ qRep.product = this.value; rf(); });
       $('#qr-clear').addEventListener('click', function(){ qRep = {from:'', to:'', product:''}; rf(); });
       $('#qr-csv').addEventListener('click', qExportCSV);
+      $('#qr-csv-orders').addEventListener('click', qExportOrdersCSV);
       $('#qr-print').addEventListener('click', qPrintReport);
     } else {
       var cn = $('#qc-new-btn'); if(cn) cn.addEventListener('click', function(){ qCDraft = qNewComplaint(); renderQualityPanel(); });
@@ -8511,6 +8669,10 @@
       qOrders = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('qualityOrders snapshot error', err); });
+    db.collection('qualitySorting').orderBy('date','desc').limit(300).onSnapshot(function(snap){
+      qSorts = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAll();
+    }, function(err){ console.error('qualitySorting snapshot error', err); });
     db.collection('qualityComplaints').orderBy('date','desc').limit(300).onSnapshot(function(snap){
       qComplaints = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
