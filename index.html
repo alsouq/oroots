@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0Io/eKZPWd3mptrhlQp8jEhDy341YReS0cV6ZWcf4mA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-smzYTdfMuNTjfSGiSaYiW47tBLLFFKA2WwTejisIC5Q=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -565,6 +565,20 @@
   .settings-card .card-body{margin-top:10px;}
   .settings-card > h3{margin-bottom:0;}
   #panel-settings .table-wrap{max-height:360px;overflow:auto;}
+
+  /* ---- خطة المشتل: مربعات الأنظمة ---- */
+  .nur-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin:10px 0 18px;}
+  .nur-tile{margin:0;}
+  .nur-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+  .nur-row{padding:10px 0;border-top:1px solid var(--border);}
+  .nur-head + .nur-row{border-top:0;}
+  .nur-crop{font-weight:700;margin-bottom:8px;}
+  .nur-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;text-align:center;}
+  .nur-stats > div{background:var(--surface-2);border-radius:8px;padding:6px 2px;}
+  .nur-stats span{display:block;font-size:.68rem;color:var(--muted);line-height:1.25;min-height:2.2em;}
+  .nur-stats b{font-size:1.1rem;font-variant-numeric:tabular-nums;}
+  .nur-stats .nur-ok{background:var(--good-soft);} .nur-stats .nur-ok b{color:var(--good);}
+  .nur-stats .nur-bad{background:var(--alert-soft);} .nur-stats .nur-bad b{color:var(--alert);}
 </style>
 </head>
 <body>
@@ -957,6 +971,7 @@
   var pestEditId = null;
   var pestTreatId = null;
   var pipeSimDays = 0;
+  var pipeSectionClosed = false;
   var pipeEditId = null;
   var pipeSel = -1;
   var pipeLastDay = '';
@@ -2769,7 +2784,7 @@
     pipeLastDay = todayStr();
     pipeWatcher = setInterval(function(){
       var t = todayStr();
-      if(t !== pipeLastDay){ pipeLastDay = t; safe(renderNurseryPanel); }
+      if(t !== pipeLastDay){ pipeLastDay = t; safe(renderNurseryPanel); safe(renderHarvestPanel); }
     }, 60000);
   }
   function getPipeMap(sysId){
@@ -3007,19 +3022,17 @@
   function pipeInfographicHtml(){
     if(!systems.length) return '';
     var sysOptions = systems.map(function(sy){
-      return '<option value="'+escH(sy.id)+'"'+(sy.id===nurseryPlanSystemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>';
+      return '<option value="'+escH(sy.id)+'"'+(sy.id===selectedSystemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>';
     }).join('');
-    var map = getPipeMap(nurseryPlanSystemId);
+    var map = getPipeMap(selectedSystemId);
     var editing = pipeEditId ? map.groups.filter(function(g){ return g.id===pipeEditId; })[0] : null;
-    var plan = getNurseryPlan(nurseryPlanSystemId);
+    var plan = getNurseryPlan(selectedSystemId);
     var defHd = editing ? editing.harvestDays : ((plan && parseFloat(plan.harvestDays)) ? parseFloat(plan.harvestDays) : 30);
     var defAge = editing ? Math.max(0, pipeAgeDays(editing, 0)) : 0;
     var defMax = editing ? (parseInt(editing.maxCuts,10)||1) : 1, defRegrow = editing ? (parseFloat(editing.regrowDays)||'') : '';
     var defCuts = editing ? (parseInt(editing.cuts,10)||0) : 0, defLast = editing ? (editing.lastCutDate||'') : '';
     var cropsList = pipeKnownCrops().map(function(c){ return '<option value="'+escH(c)+'"></option>'; }).join('');
-    return '<h2 class="section-title" style="margin-top:0;">🌿 إنفوجراف المواسير</h2>'+
-      '<p class="hint">كل ماسورة بتكبر وتتلوّن حسب عمر النبات، والمواسير الجاهزة للحصاد بتنوّر. اختار السيستم وشوف كام ماسورة جاهزة النهارده.</p>'+
-      '<div class="form-grid" style="margin-bottom:6px;"><div class="field-sm full"><label>السيستم</label><select id="pipe-system-select">'+sysOptions+'</select></div></div>'+
+    return '<p class="hint">كل ماسورة بتكبر وتتلوّن حسب عمر النبات، والمواسير الجاهزة للحصاد بتنوّر. بتتعرض للسيستم المختار فوق.</p>'+
       '<div id="pipe-summary">'+pipeSummaryHtml(map, pipeSimDays)+'</div>'+
       '<div class="pipe-sim"><label for="pipe-sim">⏩ شوف الوضع بعد: <strong id="pipe-sim-val">'+pipeDayLabel(pipeSimDays)+'</strong> <span class="hint" id="pipe-sim-date" style="margin:0;"></span></label>'+
         '<input type="range" id="pipe-sim" min="0" max="45" step="1" value="'+pipeSimDays+'"></div>'+
@@ -3046,11 +3059,10 @@
           '<div class="field-sm"><label>إجمالي المواسير</label><input type="number" step="1" min="1" max="400" class="ltr" id="pipe-total" required value="'+map.totalPipes+'"></div>'+
           '<div class="field-sm"><label>نباتات في الماسورة</label><input type="number" step="1" min="1" max="200" class="ltr" id="pipe-ppp" required value="'+map.plantsPerPipe+'"></div>'+
         '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pipe-cfg-save">حفظ</button></div></form>'+
-      '</details>'+
-      '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">';
+      '</details>';
   }
   function pipeRefresh(){
-    var map = getPipeMap(nurseryPlanSystemId), sim = pipeSimDays;
+    var map = getPipeMap(selectedSystemId), sim = pipeSimDays;
     var slots = pipeSlots(map);
     $all('#pipe-grid .pipe').forEach(function(el){
       var i = parseInt(el.getAttribute('data-i'),10), gi = slots[i], g = gi>=0 ? map.groups[gi] : null;
@@ -3065,7 +3077,7 @@
     var dt = $('#pipe-sim-date'); if(dt) dt.textContent = sim ? ('('+planAddDays(todayStr(), sim)+')') : '';
   }
   function pipeShowInfo(i){
-    var map = getPipeMap(nurseryPlanSystemId), slots = pipeSlots(map), gi = slots[i], el = $('#pipe-info');
+    var map = getPipeMap(selectedSystemId), slots = pipeSlots(map), gi = slots[i], el = $('#pipe-info');
     pipeSel = i;
     $all('#pipe-grid .pipe').forEach(function(x){ x.classList.toggle('sel', parseInt(x.getAttribute('data-i'),10)===i); });
     if(!el) return;
@@ -3074,7 +3086,7 @@
     el.textContent = 'ماسورة '+(i+1)+' — '+g.crop+' — '+map.plantsPerPipe+' نبتة — عمر '+Math.max(0,age)+' يوم'+(c.max>1?(' — قطفة '+Math.min(c.done+1,c.max)+' من '+c.max):'')+' — '+
       (r.st==='ready' ? (c.max>1 ? 'جاهزة للقطفة ✅' : 'جاهزة للحصاد ✅') : (r.st==='over' ? (c.max>1 ? 'متأخرة عن القطفة ⚠️' : 'متأخرة عن الحصاد ⚠️') : (r.st==='future' ? 'لسه ما اتزرعتش' : 'تجهز بعد '+left+' يوم')));
   }
-  function pipeOpenEdit(id){ pipeEditId = id; renderNurseryPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
+  function pipeOpenEdit(id){ pipeEditId = id; renderHarvestPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
   function wirePipeGroups(){
     $all('.pipe-grp').forEach(function(card){
       var id = card.getAttribute('data-gid');
@@ -3084,7 +3096,7 @@
     });
   }
   function pipeHarvestGroup(id){
-    var map = getPipeMap(nurseryPlanSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
+    var map = getPipeMap(selectedSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
     if(!g) return;
     var max = Math.max(1, parseInt(g.maxCuts,10)||1), no = (parseInt(g.cuts,10)||0)+1;
     var ans = prompt('كام ماسورة اتحصدت من "'+g.crop+'"'+(max>1?(' (قطفة '+no+' من '+max+')'):'')+'؟ (من 1 لحد '+g.pipes+')', String(g.pipes));
@@ -3096,20 +3108,18 @@
     savePipeMap(Object.assign({}, map, {groups: pipeMergeGroups(res.groups)})).then(function(){
       logAudit('edit','nursery',text+' — '+(getSystem(map.systemId)?systemLabel(getSystem(map.systemId)):''));
       toast(text);
-      renderNurseryPanel();
+      renderHarvestPanel();
     });
   }
   function pipeDeleteGroup(id){
-    var map = getPipeMap(nurseryPlanSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
+    var map = getPipeMap(selectedSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
     if(!g || !confirm('تمسح مجموعة "'+g.crop+'" ('+g.pipes+' ماسورة)؟ المواسير هتبقى فاضية.')) return;
     savePipeMap(Object.assign({}, map, {groups: map.groups.filter(function(x){ return x.id!==id; })})).then(function(){
-      logAudit('delete','nursery','مسح مجموعة مواسير '+g.crop); toast('اتمسحت'); renderNurseryPanel();
+      logAudit('delete','nursery','مسح مجموعة مواسير '+g.crop); toast('اتمسحت'); renderHarvestPanel();
     });
   }
   function wirePipeInfographic(){
-    var sel = $('#pipe-system-select'); if(!sel) return;
-    sel.addEventListener('change', function(){ nurseryPlanSystemId = this.value; pipeEditId = null; pipeSel = -1; renderNurseryPanel(); });
-    var sim = $('#pipe-sim');
+    var sim = $('#pipe-sim'); if(!sim) return;
     sim.addEventListener('input', function(){ pipeSimDays = parseInt(this.value,10)||0; pipeRefresh(); });
     $('#pipe-grid').addEventListener('click', function(ev){
       var el = ev.target.closest ? ev.target.closest('.pipe') : null;
@@ -3126,10 +3136,10 @@
       $('#pg-maxcuts').value = cfg.maxCuts;
       $('#pg-regrow').value = cfg.regrowDays || '';
     });
-    var cancel = $('#pg-cancel'); if(cancel) cancel.addEventListener('click', function(){ pipeEditId = null; renderNurseryPanel(); });
+    var cancel = $('#pg-cancel'); if(cancel) cancel.addEventListener('click', function(){ pipeEditId = null; renderHarvestPanel(); });
     $('#pipe-grp-form').addEventListener('submit', function(ev){
       ev.preventDefault();
-      var map = getPipeMap(nurseryPlanSystemId);
+      var map = getPipeMap(selectedSystemId);
       var crop = $('#pg-crop').value.trim(), n = parseInt($('#pg-pipes').value,10), hd = parseFloat($('#pg-hd').value);
       var a = parseInt($('#pg-age').value,10), dstr = $('#pg-date').value || planAddDays(todayStr(), -(a||0));
       if(!crop){ toast('اكتب اسم المحصول'); return; }
@@ -3160,17 +3170,17 @@
       var wasEdit = !!pipeEditId;
       savePipeMap(Object.assign({}, map, {groups:groups})).then(function(){
         logAudit(wasEdit?'edit':'add','nursery',(wasEdit?'تعديل':'إضافة')+' مجموعة مواسير: '+crop+' — '+n+' ماسورة');
-        toast(wasEdit?'اتحفظ التعديل':'اتضافت المجموعة'); pipeEditId = null; renderNurseryPanel();
+        toast(wasEdit?'اتحفظ التعديل':'اتضافت المجموعة'); pipeEditId = null; renderHarvestPanel();
       }).catch(function(e){ console.error(e); toast('تعذر الحفظ'); });
     });
     $('#pipe-cfg-form').addEventListener('submit', function(ev){
       ev.preventDefault();
-      var map = getPipeMap(nurseryPlanSystemId);
+      var map = getPipeMap(selectedSystemId);
       var total = parseInt($('#pipe-total').value,10), ppp = parseInt($('#pipe-ppp').value,10);
       if(!(total>=1) || !(ppp>=1)){ toast('اكتب أرقام صحيحة'); return; }
       var maxEnd = map.groups.reduce(function(m,g){ return Math.max(m, g.start+g.pipes); }, 0);
       if(total < maxEnd){ toast('فيه مجموعات بتوصل لماسورة '+maxEnd+'، قلّل المجموعات الأول'); return; }
-      savePipeMap(Object.assign({}, map, {totalPipes:total, plantsPerPipe:ppp})).then(function(){ toast('اتحفظت الإعدادات'); renderNurseryPanel(); });
+      savePipeMap(Object.assign({}, map, {totalPipes:total, plantsPerPipe:ppp})).then(function(){ toast('اتحفظت الإعدادات'); renderHarvestPanel(); });
     });
   }
 
@@ -5054,6 +5064,7 @@
 
     inner.innerHTML =
       '<div class="system-header"><h2>'+systemLabel(sys)+' — سجل الحصاد</h2></div>'+
+      '<details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 إنفوجراف المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details>'+
       statsHtml+
       '<h2 class="section-title">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
@@ -5088,6 +5099,8 @@
       '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p>';
 
     $('#hv-ts', inner).value = nowLocalInputValue();
+    var pipeDet = $('#pipe-section', inner); if(pipeDet) pipeDet.addEventListener('toggle', function(){ pipeSectionClosed = !pipeDet.open; });
+    wirePipeInfographic();
 
     function updateHvPipesHint(){
       var crop = $('#hv-crop', inner).value.trim(), hint = $('#hv-pipes-hint', inner);
@@ -6840,14 +6853,12 @@
       resultsHtml += timingHtml;
     }
 
-    return pipeInfographicHtml() + planOverviewHtml() +
-      '<h2 class="section-title">خطة المشتل — هل أنا مستمر صح؟</h2>'+
+    return '<h2 class="section-title" style="margin-top:0;">خطة المشتل — هل أنا مستمر صح؟</h2>'+
       '<p class="hint">اختار النظام واكتب أرقام دورة الزراعة بتاعتك، وهيوريك لو المشتل هيغطي احتياج النظام أو لأ، ولو معاد الدفعة الجاية قرّب.</p>'+
       formHtml + resultsHtml + planProgressHtml(plan.cropName ? plan : null) + planLogHtml();
   }
 
   function wireNurseryPlanSection(){
-    wirePipeInfographic();
     var sel = $('#plan-system-select');
     if(!sel) return;
     sel.addEventListener('change', function(){
@@ -6889,6 +6900,82 @@
     lfWire('planlog');
   }
 
+  /* ---------- خطة المشتل: مربع لكل نظام (الصنف المزروع، المواسير، النباتات، الصواني المطلوبة/الموجودة/الناقصة) ---------- */
+  function nurseryTilesData(){
+    var pending = nurseryLog.filter(function(n){ return !n.transplantDate; });
+    var tiles = systems.map(function(sy){
+      var map = getPipeMap(sy.id), ppp = parseFloat(map.plantsPerPipe) || 30, byCrop = {}, order = [], used = 0;
+      (map.groups||[]).forEach(function(g){
+        var k = cropKey(g.crop), p = parseFloat(g.pipes) || 0; if(!k) return;
+        var e = byCrop[k]; if(!e){ e = byCrop[k] = {key:k, name:g.crop, pipes:0}; order.push(k); }
+        e.pipes += p; used += p;
+      });
+      var rows = order.map(function(k){
+        var e = byCrop[k];
+        e.plants = e.pipes * ppp;
+        e.need = Math.ceil(e.plants / TRAY_SIZE);
+        e.have = sumTrays(pending.filter(function(n){ return n.systemId===sy.id && cropKey(n.cropName)===k; }));
+        e.pool = 0; e.extra = false;
+        return e;
+      });
+      // صواني متخصصة للسيستم لصنف مالوش مواسير لسه
+      var seen = {}; rows.forEach(function(r){ seen[r.key] = 1; });
+      pending.forEach(function(n){
+        var k = cropKey(n.cropName);
+        if(n.systemId!==sy.id || !k || seen[k]) return;
+        seen[k] = 1;
+        rows.push({key:k, name:n.cropName, pipes:0, plants:0, need:0, pool:0, extra:true,
+          have:sumTrays(pending.filter(function(m){ return m.systemId===sy.id && cropKey(m.cropName)===k; }))});
+      });
+      return {sys:sy, ppp:ppp, total:parseFloat(map.totalPipes) || 0, used:used, rows:rows};
+    });
+    // الصواني اللي من غير سيستم محدد بتتوزّع على الأنظمة الناقصة بالترتيب
+    var pool = {};
+    pending.forEach(function(n){ if(!n.systemId){ var k = cropKey(n.cropName); if(k) pool[k] = (pool[k]||0) + batchTrays(n); } });
+    tiles.forEach(function(t){
+      t.rows.forEach(function(r){
+        var miss = Math.max(0, r.need - r.have), take = Math.min(miss, pool[r.key] || 0);
+        if(take > 0){ r.pool = take; r.have += take; pool[r.key] -= take; }
+      });
+    });
+    var spare = Object.keys(pool).filter(function(k){ return pool[k] > 0; }).map(function(k){
+      var nm = (pending.filter(function(n){ return cropKey(n.cropName)===k; })[0] || {}).cropName || k;
+      return {name:nm, trays:pool[k]};
+    });
+    return {tiles:tiles, spare:spare};
+  }
+  function nurseryTilesHtml(){
+    var head = '<h2 class="section-title" style="margin-top:0;">🌱 خطة المشتل — احتياج كل نظام من الصواني</h2>';
+    if(!systems.length) return head + '<p class="empty-note">ضيف نظام الأول (من "بيانات المياه" أو "الإعدادات") عشان تظهر خطة المشتل.</p>';
+    var data = nurseryTilesData(), fmt = function(n){ return Number(n).toLocaleString('en-US'); };
+    var tiles = data.tiles.map(function(t){
+      var rows = t.rows.map(function(r){
+        var miss = Math.max(0, r.need - r.have), ok = !r.extra && miss===0;
+        var st = function(label, val, cls){ return '<div class="'+(cls||'')+'"><span>'+label+'</span><b>'+val+'</b></div>'; };
+        return '<div class="nur-row">'+
+          '<div class="nur-crop">🌿 '+escH(r.name)+(r.extra ? ' <small class="hint">(صواني متخصصة من غير مواسير مسجلة)</small>' : '')+'</div>'+
+          '<div class="nur-stats">'+
+            st('مواسير', r.extra ? '—' : fmt(r.pipes))+
+            st('نباتات', r.extra ? '—' : fmt(r.plants))+
+            st('صواني مطلوبة', r.extra ? '—' : fmt(r.need))+
+            st('في المشتل', fmt(r.have))+
+            st('ناقص', r.extra ? '—' : fmt(miss), r.extra ? '' : (ok ? 'nur-ok' : 'nur-bad'))+
+          '</div>'+
+          (r.pool>0 ? '<div class="hint" style="margin:4px 0 0;">منهم '+fmt(r.pool)+' صينية من غير سيستم محدد.</div>' : '')+
+        '</div>';
+      }).join('');
+      var free = Math.max(0, t.total - t.used);
+      return '<div class="stat-card nur-tile"><div class="nur-head"><strong>'+escH(systemLabel(t.sys))+'</strong>'+
+        '<span class="hint" style="margin:0;">'+fmt(t.total)+' ماسورة × '+fmt(t.ppp)+' نبتة</span></div>'+
+        (rows || '<p class="empty-note" style="margin:8px 0;">مفيش مواسير مسجلة للسيستم ده. سجّلها من تاب الحصاد (إنفوجراف المواسير).</p>')+
+        (t.rows.length && free>0 ? '<div class="hint" style="margin:8px 0 0;">'+fmt(free)+' ماسورة فاضية.</div>' : '')+
+      '</div>';
+    }).join('');
+    var spare = data.spare.length ? '<div class="hint" style="margin:10px 0;">صواني في المشتل زيادة عن احتياج الأنظمة (من غير سيستم محدد): '+data.spare.map(function(s){ return escH(s.name)+' ('+fmt(s.trays)+')'; }).join('، ')+'</div>' : '';
+    return head +
+      '<p class="hint">الصواني المطلوبة = (عدد المواسير × نباتات الماسورة) ÷ '+TRAY_SIZE+' نبتة في الصينية، مقرّبة لفوق. "في المشتل" = صواني الصنف اللي لسه ما اتنقلتش للسيستم ده، والصواني اللي من غير سيستم محدد بتتوزّع على الأنظمة الناقصة.</p>'+
+      '<div class="nur-grid">'+tiles+'</div>'+spare;
+  }
   function renderNurseryPanel(){
     var body = $('#nursery-body');
     if(!body) return;
@@ -6938,7 +7025,7 @@
     if(tBatch && tBatch.transplantDate){ tBatch = null; nurseryTransplantId = null; }
 
     if(!nurseryPlanSystemId && systems.length) nurseryPlanSystemId = systems[0].id;
-    var planSectionHtml = renderNurseryPlanSectionHtml();
+    var planSectionHtml = nurseryTilesHtml();
 
     body.innerHTML =
       planSectionHtml +
@@ -6954,7 +7041,6 @@
       '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
 
-    wireNurseryPlanSection();
     lfWire('nursery');
     $all('.nursery-crop-pill', body).forEach(function(btn){
       btn.addEventListener('click', function(){
