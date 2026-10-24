@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jXpbix6cr7x/CZnDgebS7k6EBZN+o4XNnEFhN7Zrjfw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ix+O8VYGlQ6tABFlsgcAP3QWo2O2h/kQHCilhJjp0A8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -605,6 +605,9 @@
   .inv-wrap td.num{white-space:nowrap;}
   .inv-wrap .status-pill{font-size:.64rem;padding:1px 7px;margin-top:3px;display:inline-block;}
   .inv-wrap .del-btn{padding:2px 6px;min-width:0;}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0 14px;}
+  .kpi-card{margin:0;}
 </style>
 </head>
 <body>
@@ -670,6 +673,7 @@
       <div class="form-actions" style="justify-content:flex-end;margin-bottom:6px;">
         <button type="button" class="btn btn-ghost btn-sm" id="btn-print-weekly">🖨️ طباعة تقرير الأسبوع</button>
       </div>
+      <div id="overview-kpis"></div>
       <div id="overview-alerts"></div>
       <div id="overview-crop-refs"></div>
 
@@ -841,6 +845,12 @@
         <span class="save-msg hidden" id="msg-demo">تم</span>
       </div>
 
+      <div class="settings-card" id="trash-card">
+        <h3>سلة المحذوفات (آخر ٣٠ يوم)</h3>
+        <p class="hint">أي سجل بيتحذف (حصاد، مخزن، مشتل، مكافحة، معايرات...) بتتحفظ منه نسخة هنا ٣٠ يوم، وتقدر ترجّعه بضغطة. بعد ٣٠ يوم بيتمسح نهائي. (الأوردرات والشكاوى بصورها مش بتدخل السلة.)</p>
+        <div id="trash-box"></div>
+      </div>
+
       <div class="settings-card" id="audit-card">
         <h3>سجل النشاط (Logs)</h3>
         <p class="hint">أي دخول أو خروج أو إضافة أو تعديل أو حذف أو تصدير من أي حد في الفريق بيتسجّل هنا فورًا بالتاريخ والوقت واسم المستخدم. السجل للعرض والتصدير بس، ومفيش زرار حذف ليه.</p>
@@ -973,7 +983,8 @@
   var pipeMaps = [];
   var cropNames = [];
   var orderProducts = [];
-  var nurseryTiles = {};
+  var nurseryTiles = {}, nurseryTilesLegacy = {}, nurseryTilesNew = null;
+  function syncNurseryTiles(){ nurseryTiles = nurseryTilesNew || nurseryTilesLegacy || {}; }
   var nurseryTileGh = null;
   var myNotifs = [];
   var sprayPlan = [];
@@ -1164,7 +1175,7 @@
     var it = instrumentCalibrations.filter(function(x){ return x.id===id; })[0];
     if(it) logAudit('delete', 'instruments', 'معايرة '+instrumentTypeLabel(it.instrumentType)+' — '+it.instrumentName);
     if(db){
-      db.collection('instrumentCalibrations').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('instrumentCalibrations', id).then(function(){ toast('اتحذف'); });
     } else {
       instrumentCalibrations = instrumentCalibrations.filter(function(x){ return x.id!==id; });
       persistLocalInstrumentCalib(); renderAll(); toast('اتحذف');
@@ -1536,7 +1547,7 @@
     var it = getInventoryItem(id);
     if(it) logAudit('delete', 'inventory', (it.type==='pesticide'?'مبيد':'سماد')+': '+it.name);
     if(db){
-      db.collection('inventory').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('inventory', id).then(function(){ toast('اتحذف'); });
     } else {
       inventoryItems = inventoryItems.filter(function(x){ return x.id!==id; });
       persistLocalInventory(); renderAll(); toast('اتحذف');
@@ -1616,9 +1627,9 @@
 
     var rows = list.length ? list.map(function(x){
       return '<tr data-id="'+x.id+'">'+
-        '<td><strong>'+x.name+'</strong><div><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></div></td>'+
-        '<td>'+(x.activeIngredient||'—')+'<div class="hint" dir="rtl" style="margin:2px 0 0;">يستهدف: '+(x.targets||'—')+'</div></td>'+
-        '<td>'+(x.dose||'—')+(x.type==='pesticide' ? '<div class="hint" dir="rtl" style="margin:2px 0 0;">الطور: '+pestStageLabels(x.stages)+'</div>' : '')+'</td>'+
+        '<td><strong>'+escH(x.name)+'</strong><div><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></div></td>'+
+        '<td>'+escH(x.activeIngredient||'—')+'<div class="hint" dir="rtl" style="margin:2px 0 0;">يستهدف: '+escH(x.targets||'—')+'</div></td>'+
+        '<td>'+escH(x.dose||'—')+(x.type==='pesticide' ? '<div class="hint" dir="rtl" style="margin:2px 0 0;">الطور: '+pestStageLabels(x.stages)+'</div>' : '')+'</td>'+
         '<td class="num ltr">'+(x.quantity!=null?(x.quantity+' '+(x.unit||'')):'—')+'</td>'+
         '<td><button class="del-btn inv-edit-btn" title="تعديل">✎</button> <button class="del-btn inv-delete-btn" title="حذف">✕</button></td>'+
       '</tr>';
@@ -1678,7 +1689,7 @@
     var h = harvestLog.filter(function(x){ return x.id===id; })[0];
     if(h) logAudit('delete', 'harvest', 'حصاد: '+h.cropName+' — '+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+' — '+auditSysName(h.systemId));
     if(db){
-      db.collection('harvest').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('harvest', id).then(function(){ toast('اتحذف'); });
     } else {
       harvestLog = harvestLog.filter(function(x){ return x.id!==id; });
       persistLocalHarvest();
@@ -1899,6 +1910,7 @@
     var data = JSON.stringify(buildBackupObject(), null, 0);
     downloadsCap.save({filename:'oroots-backup-'+todayStr()+'.json', data:data}).then(function(){
       logAudit('export', 'admin', 'تصدير نسخة احتياطية كاملة');
+      try{ localStorage.setItem('oroots-last-backup', String(Date.now())); }catch(e){}
       toast('اتحفظت النسخة الاحتياطية');
     }).catch(function(err){
       if(err && err.code==='declined') return;
@@ -1969,7 +1981,7 @@
     if(Array.isArray(backup.pipeMaps)) writes.push(db.doc('settings/pipeMaps').set({list: backup.pipeMaps}));
     if(Array.isArray(backup.cropNames)) writes.push(db.doc('settings/cropNames').set({list: backup.cropNames}, {merge:true}));
     if(Array.isArray(backup.orderProducts)) writes.push(db.doc('settings/cropNames').set({orderProducts: backup.orderProducts}, {merge:true}));
-    if(backup.nurseryTiles && typeof backup.nurseryTiles==='object') writes.push(db.doc('settings/cropNames').set({nurseryTiles: backup.nurseryTiles}, {merge:true}));
+    if(backup.nurseryTiles && typeof backup.nurseryTiles==='object') writes.push(db.doc('settings/nurseryTiles').set({tiles: backup.nurseryTiles}));
     return Promise.all(writes);
   }
   function importFullBackup(backup){
@@ -2091,7 +2103,7 @@
     var _c = irrigCalib.filter(function(x){ return x.id===id; })[0];
     logAudit('delete', 'water', 'معايرة ري — '+(_c?(auditSysName(_c.systemId)+': '+(Math.round(_c.perPointLpm*1000)/1000)+' لتر/دقيقة للنقطة'):id));
     if(db){
-      db.collection('irrigCalib').doc(id).delete().then(function(){ toast('اتحذفت'); });
+      trashDelete('irrigCalib', id).then(function(){ toast('اتحذفت'); });
     } else {
       irrigCalib = irrigCalib.filter(function(c){ return c.id!==id; });
       persistLocalCalib();
@@ -2154,7 +2166,7 @@
     if(!confirm('تحذف الإجراء ده؟')) return;
     var _s = getSop(id); logAudit('delete', 'tasks', 'إجراء (SOP): '+(_s?_s.title:id));
     if(db){
-      db.collection('sops').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('sops', id).then(function(){ toast('اتحذف'); });
     } else {
       sops = sops.filter(function(s){ return s.id!==id; });
       persistLocalSops();
@@ -2195,7 +2207,7 @@
     if(!confirm('تحذف السماد ده من المكتبة؟')) return;
     var _f = getFertilizer(id); logAudit('delete', 'nutrients', 'سماد: '+(_f?_f.name:id));
     if(db){
-      db.collection('fertilizers').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('fertilizers', id).then(function(){ toast('اتحذف'); });
     } else {
       customFertilizers = customFertilizers.filter(function(f){ return f.id!==id; });
       persistLocalFertilizers();
@@ -2235,7 +2247,7 @@
     var pr = targetProfiles.filter(function(x){ return x.id===id; })[0];
     if(pr) logAudit('delete', 'nutrients', 'هدف غذائي: '+pr.name);
     if(db){
-      db.collection('targetProfiles').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('targetProfiles', id).then(function(){ toast('اتحذف'); });
     } else {
       targetProfiles = targetProfiles.filter(function(x){ return x.id!==id; });
       persistLocalTargetProfiles();
@@ -2282,7 +2294,7 @@
     if(!confirm('تحذف الخلطة المحفوظة دي؟')) return;
     var _r = nutrientRecipes.filter(function(x){ return x.id===id; })[0]; logAudit('delete', 'nutrients', 'خلطة سمادية: '+(_r?_r.name:id));
     if(db){
-      db.collection('nutrientRecipes').doc(id).delete().then(function(){ toast('اتحذفت'); });
+      trashDelete('nutrientRecipes', id).then(function(){ toast('اتحذفت'); });
     } else {
       nutrientRecipes = nutrientRecipes.filter(function(r){ return r.id!==id; });
       persistLocalRecipes();
@@ -2344,7 +2356,7 @@
     if(!confirm('تحذف السجل ده؟')) return;
     var _p = pestLog.filter(function(x){ return x.id===id; })[0]; logAudit('delete', 'pests', 'مشكلة: '+(_p?_p.problemName:id));
     if(db){
-      db.collection('pestlog').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('pestlog', id).then(function(){ toast('اتحذف'); });
     } else {
       pestLog = pestLog.filter(function(p){ return p.id!==id; });
       persistLocalPestlog();
@@ -2394,7 +2406,7 @@
     if(!confirm('تحذف سجل الإطلاق ده؟')) return;
     var r = bioReleases.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'إطلاق حيوي: '+r.beneficialName+' — '+(r.greenhouse||''));
-    if(db){ db.collection('bioReleases').doc(id).delete().then(function(){ toast('اتحذف'); }); }
+    if(db){ trashDelete('bioReleases', id).then(function(){ toast('اتحذف'); }); }
     else { bioReleases = bioReleases.filter(function(x){ return x.id!==id; }); persistLocalBio(); renderAll(); toast('اتحذف'); }
   }
   function addStickyTrapRaw(data){
@@ -2414,7 +2426,7 @@
     if(!confirm('تحذف سجل اللاصقات ده؟')) return;
     var r = stickyTraps.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'لاصقة '+r.color+' — '+(r.greenhouse||''));
-    if(db){ db.collection('stickyTraps').doc(id).delete().then(function(){ toast('اتحذف'); }); }
+    if(db){ trashDelete('stickyTraps', id).then(function(){ toast('اتحذف'); }); }
     else { stickyTraps = stickyTraps.filter(function(x){ return x.id!==id; }); persistLocalSticky(); renderAll(); toast('اتحذف'); }
   }
   function addPheromoneTrapRaw(data){
@@ -2434,7 +2446,7 @@
     if(!confirm('تحذف سجل المصيدة ده؟')) return;
     var r = pheromoneTraps.filter(function(x){ return x.id===id; })[0];
     if(r) logAudit('delete', 'pests', 'مصيدة فيرمونية — '+(r.greenhouse||''));
-    if(db){ db.collection('pheromoneTraps').doc(id).delete().then(function(){ toast('اتحذف'); }); }
+    if(db){ trashDelete('pheromoneTraps', id).then(function(){ toast('اتحذف'); }); }
     else { pheromoneTraps = pheromoneTraps.filter(function(x){ return x.id!==id; }); persistLocalPheromone(); renderAll(); toast('اتحذف'); }
   }
   function exportBioCSV(kind, greenhouseName){
@@ -2618,7 +2630,7 @@
     if(!confirm('تحذف سجل الصينية ده؟')) return;
     var _n = getNurseryBatch(id); logAudit('delete', 'nursery', 'صينية: '+(_n?_n.cropName:id));
     if(db){
-      db.collection('nursery').doc(id).delete().then(function(){ toast('اتحذف'); });
+      trashDelete('nursery', id).then(function(){ toast('اتحذف'); });
     } else {
       nurseryLog = nurseryLog.filter(function(n){ return n.id!==id; });
       persistLocalNursery();
@@ -2720,7 +2732,7 @@
   function deleteNurseryPlanLog(id){
     if(!requireAdminForDelete()) return;
     if(!confirm('تحذف السجل ده؟')) return;
-    if(db){ db.collection('nurseryPlanLog').doc(id).delete().then(function(){ toast('اتحذف'); }); }
+    if(db){ trashDelete('nurseryPlanLog', id).then(function(){ toast('اتحذف'); }); }
     else { nurseryPlanLog = nurseryPlanLog.filter(function(x){ return x.id!==id; }); renderAll(); toast('اتحذف'); }
   }
   function exportPlanLogCSV(){
@@ -4117,7 +4129,7 @@
       '<h2>المهام المعلّقة ('+pendingTasks.length+')</h2>'+
       (pendingTasks.length ?
         '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المهمة</th><th>المكلّف</th></tr></thead><tbody>'+
-          pendingTasks.slice(0,30).map(function(t){ return '<tr><td>'+t.ts.slice(0,10)+'</td><td>'+(t.greenhouse||'—')+'</td><td>'+t.title+'</td><td>'+(t.assignedTo||'—')+'</td></tr>'; }).join('')+
+          pendingTasks.slice(0,30).map(function(t){ return '<tr><td>'+t.ts.slice(0,10)+'</td><td>'+(t.greenhouse||'—')+'</td><td>'+escH(t.title)+'</td><td>'+(t.assignedTo||'—')+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد مهام معلّقة.</p>')+
 
       '<h2>الحصاد هذا الأسبوع</h2>'+
@@ -4281,9 +4293,61 @@
     });
   }
 
+  /* ---------- مؤشرات سريعة (آخر ٣٠ يوم مقارنة بالـ٣٠ يوم اللي قبلها) ---------- */
+  function kpiSpark(vals, color){
+    var W = 120, H = 34, n = vals.length, mx = Math.max.apply(null, vals.concat([0.0001])), step = n>1 ? (W-8)/(n-1) : 0;
+    var pts = vals.map(function(v,i){ return (4+i*step).toFixed(1)+','+(H-4-(H-8)*(v/mx)).toFixed(1); }).join(' ');
+    return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:34px;display:block;direction:ltr;"><polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+  function kpiCard(label, value, unit, cur, prev, lowerBetter, spark){
+    var trend = '<span class="hint" style="margin:0;">—</span>';
+    if(prev>0){
+      var pct = Math.round((cur-prev)/prev*100), up = pct>0, good = lowerBetter ? !up : up;
+      trend = pct===0 ? '<span class="hint" style="margin:0;">زي الفترة اللي قبلها</span>' :
+        '<span class="status-pill '+(good?'good':'alert')+'">'+(up?'↑ +':'↓ ')+pct+'٪ عن الفترة اللي قبلها</span>';
+    }
+    return '<div class="stat-card kpi-card"><div class="hint" style="margin:0;">'+label+'</div>'+
+      '<div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;font-variant-numeric:tabular-nums;">'+value+'<small style="font-size:.8rem;margin-inline-start:4px;">'+unit+'</small></div>'+
+      '<div style="margin:4px 0;">'+trend+'</div>'+(spark||'')+'</div>';
+  }
+  function renderOverviewKpis(){
+    var el = $('#overview-kpis'); if(!el) return;
+    var D = 86400000, now = Date.now(), fmt = function(n){ return Number(Math.round(n*10)/10).toLocaleString('en-US'); };
+    var inWin = function(ts, a, b){ var t = new Date(ts).getTime(); return !isNaN(t) && t >= now-a*D && t < now-b*D; };
+    var kg = function(h){ var q = parseFloat(h.quantity)||0; return h.unit==='kg' ? q : (h.unit==='g' ? q/1000 : 0); };
+    var cards = [];
+    // الحصاد (كجم + جرام بس)
+    var hCur = 0, hPrev = 0, buckets = [0,0,0,0,0,0];
+    harvestLog.forEach(function(h){
+      if(inWin(h.ts, 30, 0)){ hCur += kg(h); var bi = Math.min(5, Math.floor((now-new Date(h.ts).getTime())/(5*D))); buckets[5-bi] += kg(h); }
+      else if(inWin(h.ts, 60, 30)) hPrev += kg(h);
+    });
+    cards.push(kpiCard('الحصاد', fmt(hCur), 'كجم', hCur, hPrev, false, kpiSpark(buckets, '#6AA84F')));
+    // كجم لكل ماسورة (من المواسير المسجّلة في تاب الحصاد)
+    var pipes = pipeMaps.reduce(function(s,m){ return s + (parseFloat(m.totalPipes)||0); }, 0);
+    if(pipes>0 && hCur>0) cards.push(kpiCard('إنتاج الماسورة', fmt(hCur/pipes), 'كجم/ماسورة', hCur/pipes, hPrev/pipes, false, ''));
+    // إنجاز المهام
+    var today = todayStr(), tasks = flattenTasks(), tc = {a:0,d:0}, tp = {a:0,d:0};
+    tasks.forEach(function(t){
+      var diff = dayDiff(today, t.ts.slice(0,10)), o = (diff<=0 && diff>=-30) ? tc : ((diff<-30 && diff>=-60) ? tp : null);
+      if(!o) return; o.a++; if(t.status==='done') o.d++;
+    });
+    if(tc.a) cards.push(kpiCard('إنجاز المهام', Math.round(tc.d/tc.a*100), '٪', tc.d/tc.a, tp.a ? tp.d/tp.a : 0, false, ''));
+    // المكافحة (عدد المشاكل المسجّلة — الأقل أحسن)
+    var pc = 0, pp = 0;
+    pestLog.forEach(function(p){ if(inWin(p.ts, 30, 0)) pc++; else if(inWin(p.ts, 60, 30)) pp++; });
+    cards.push(kpiCard('مشاكل المكافحة', pc, 'مشكلة', pc, pp, true, ''));
+    // نقص الصواني (من خطة المشتل)
+    var miss = 0, hasPlan = false;
+    try{ nurseryTilesData().tiles.forEach(function(t){ t.rows.forEach(function(r){ if(r.need>0){ hasPlan = true; miss += Math.max(0, r.need - r.have); } }); }); }catch(e){}
+    if(hasPlan) cards.push('<div class="stat-card kpi-card"><div class="hint" style="margin:0;">نقص صواني المشتل</div><div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;">'+fmt(miss)+'<small style="font-size:.8rem;margin-inline-start:4px;">صينية</small></div><div style="margin:4px 0;"><span class="status-pill '+(miss>0?'alert':'good')+'">'+(miss>0?'محتاج شتل':'مكتمل')+'</span></div></div>');
+    el.innerHTML = '<h2 class="section-title" style="margin-top:6px;">مؤشرات آخر ٣٠ يوم</h2><div class="kpi-grid">'+cards.join('')+'</div>'+
+      '<p class="hint" style="margin-top:-6px;">الحصاد بيحسب الكيلو والجرام بس. المقارنة مع الـ٣٠ يوم اللي قبلهم.</p>';
+  }
   function renderSystemsOverview(){
     renderCropRefs();
     renderOverviewAlerts();
+    safe(renderOverviewKpis);
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
     if(!el) return;
@@ -4415,7 +4479,7 @@
     var pendingTasksList = flattenTasks().filter(function(t){ return t.greenhouse===gh && t.status==='pending'; }).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
     var tasksHtml = '<div class="chart-card"><h3>مهام معلّقة للصوبة</h3>'+
       (pendingTasksList.length ? '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المهمة</th><th>المكلّف</th></tr></thead><tbody>'+
-        pendingTasksList.slice(0,8).map(function(t){ return '<tr><td class="ltr num">'+t.ts.slice(0,10)+'</td><td>'+t.title+'</td><td>'+(t.assignedTo||'—')+'</td></tr>'; }).join('')+
+        pendingTasksList.slice(0,8).map(function(t){ return '<tr><td class="ltr num">'+t.ts.slice(0,10)+'</td><td>'+escH(t.title)+'</td><td>'+(t.assignedTo||'—')+'</td></tr>'; }).join('')+
       '</tbody></table></div>' : '<p class="empty-note">لا توجد مهام معلّقة.</p>')+
     '</div>';
 
@@ -4522,7 +4586,7 @@
     el.innerHTML = '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الاسم</th><th>المادة الفعالة</th><th>يستهدف</th><th>الجرعة</th><th>الكمية</th></tr></thead><tbody>'+
       list.map(function(x){
         return '<tr><td><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></td>'+
-          '<td>'+x.name+'</td><td>'+(x.activeIngredient||'—')+'</td><td>'+(x.targets||'—')+'</td><td class="ltr">'+(x.dose||'—')+'</td>'+
+          '<td>'+x.name+'</td><td>'+escH(x.activeIngredient||'—')+'</td><td>'+escH(x.targets||'—')+'</td><td class="ltr">'+escH(x.dose||'—')+'</td>'+
           '<td class="num ltr">'+(x.quantity!=null?(x.quantity+' '+(x.unit||'')):'—')+'</td></tr>';
       }).join('')+'</tbody></table></div>';
   }
@@ -4865,6 +4929,8 @@
 
     document.getElementById('ws-'+key+'-form').addEventListener('submit', function(ev){
       ev.preventDefault();
+      var odd = qeUnusual(key, systemId, {ph:document.getElementById('ws-'+key+'-ph').value, ec:document.getElementById('ws-'+key+'-ec').value, temp:document.getElementById('ws-'+key+'-temp').value});
+      if(odd.length && !confirm('القراءة بعيدة عن آخر قراءة:\n\n'+odd.join('\n')+'\n\nتحفظ برضه؟')) return;
       addReading(key, {
         ts: nowLocalInputValue(),
         ph: document.getElementById('ws-'+key+'-ph').value,
@@ -5272,6 +5338,61 @@
     applyPermissionLock(inner, 'harvest');
   }
 
+  /* ---------- تنبيه القيم الغريبة + إدخال سريع لكل أنظمة الصوبة ---------- */
+  var QE_JUMP = {ph:1.5, ec:1.5, temp:8};
+  function qeUnusual(sourceKey, systemId, d){
+    var last = flattenEntries(sourceKey, systemId).slice(-1)[0], msgs = [];
+    if(!last) return msgs;
+    METRICS.forEach(function(k){
+      var v = parseFloat(d[k]), p = parseFloat(last[k]);
+      if(!isNaN(v) && !isNaN(p) && Math.abs(v-p) > QE_JUMP[k]) msgs.push(LBL[k]+' '+v+' (آخر قراءة '+p+')');
+    });
+    return msgs;
+  }
+  var qeSource = 'irrigation';
+  function quickEntryHtml(){
+    var groups = greenhouseGroups();
+    var g = groups.filter(function(x){ return x.name===selectedGreenhouse; })[0] || groups[0];
+    if(!g || !g.systems.length) return '';
+    var rows = g.systems.map(function(sy){
+      var inp = function(k, step, max){ return '<td><input type="number" class="ltr qe-in" data-k="'+k+'" step="'+step+'" min="0" max="'+max+'" inputmode="decimal" style="width:100%;min-width:56px;"></td>'; };
+      return '<tr data-sys="'+escH(sy.id)+'"><td><strong>'+escH(sy.name || systemLabel(sy))+'</strong></td>'+inp('ph','0.01',14)+inp('ec','0.01',15)+inp('temp','0.1',45)+'</tr>';
+    }).join('');
+    var srcOpts = SOURCES.map(function(s){ return '<option value="'+s.key+'"'+(s.key===qeSource?' selected':'')+'>'+s.label+'</option>'; }).join('');
+    return '<details class="chart-card" id="qe-det" style="margin:0 0 14px;"><summary style="cursor:pointer;font-weight:700;">⚡ إدخال سريع لكل أنظمة '+escH(g.name)+'</summary>'+
+      '<div class="field-sm" style="max-width:240px;margin-top:10px;"><label>المصدر</label><select id="qe-source">'+srcOpts+'</select></div>'+
+      '<div class="table-wrap cropref-wrap scroll-8" style="margin-top:8px;"><table><thead><tr><th>النظام</th><th>pH</th><th>EC</th><th>الحرارة</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<p class="hint" style="margin-top:8px;">اكتب القراءات الثلاثة للنظام (pH وEC والحرارة). الصفوف الفاضية بتتخطّى، والصف الناقص بيتوقف الحفظ ويقولك مين. الوقت بيتسجّل لحظة الحفظ.</p>'+
+      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="qe-save">حفظ كل الصفوف المكتوبة</button></div></details>';
+  }
+  function wireQuickEntry(root){
+    var det = $('#qe-det', root); if(!det) return;
+    var src = $('#qe-source', root);
+    src.addEventListener('change', function(){ qeSource = src.value; });
+    $('#qe-save', root).addEventListener('click', function(){
+      var batch = [], incomplete = [], odd = [];
+      $all('tbody tr', det).forEach(function(tr){
+        var d = {}, filled = 0;
+        $all('.qe-in', tr).forEach(function(i){ d[i.getAttribute('data-k')] = i.value; if(i.value!=='') filled++; });
+        var name = tr.querySelector('strong').textContent, sid = tr.getAttribute('data-sys');
+        if(filled===0) return;
+        if(filled<3){ incomplete.push(name); return; }
+        var m = qeUnusual(qeSource, sid, d);
+        if(m.length) odd.push(name+': '+m.join('، '));
+        batch.push({sid:sid, d:d});
+      });
+      if(incomplete.length){ toast('كمّل قراءات: '+incomplete.join('، ')); return; }
+      if(!batch.length){ toast('مفيش قراءات مكتوبة'); return; }
+      if(odd.length && !confirm('في قراءات بعيدة عن آخر قراءة:\n\n'+odd.join('\n')+'\n\nتحفظ برضه؟')) return;
+      var ts = nowLocalInputValue();
+      batch.reduce(function(p, b){
+        return p.then(function(){ return addReading(qeSource, {ts:ts, ph:b.d.ph, ec:b.d.ec, temp:b.d.temp, note:''}, b.sid); });
+      }, Promise.resolve()).then(function(){
+        toast('اتحفظ '+batch.length+' قراءة');
+        renderWaterPanel();
+      }).catch(function(){ toast('حصلت مشكلة في الحفظ — راجع القراءات'); });
+    });
+  }
   function renderWaterPanel(){
     renderSystemsSettingsList();
 
@@ -5306,12 +5427,14 @@
     var sys = getSystem(selectedSystemId);
 
     body.innerHTML =
+      (canEdit('water') ? quickEntryHtml() : '')+
       '<div class="system-header"><h2>'+systemLabel(sys)+'</h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div>'+
       '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div>'+
       '<h2 class="section-title wt-group">📈 الشارتس</h2><div id="water-compare"></div><div id="water-calib-charts"></div>'+
       '<h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div>';
 
     $('#btn-delete-system').addEventListener('click', function(){ deleteSystem(selectedSystemId); });
+    wireQuickEntry(body);
 
     renderSystemComparisonCharts($('#water-compare'), selectedSystemId);
 
@@ -5527,6 +5650,28 @@
 
 
   /* ---------- Tasks & SOPs panel ---------- */
+  /* ---------- أداء الموظفين في المهام (آخر ٣٠ يوم) — للمدير ---------- */
+  var tsOpen = false;
+  function taskStatsHtml(allTasks, isAdminView){
+    if(!isAdminView) return '';
+    var today = todayStr(), by = {}, order = [];
+    allTasks.forEach(function(t){
+      var d = t.ts.slice(0,10), diff = dayDiff(today, d);
+      if(diff>0 || diff<-30) return;
+      var k = String(t.assignedTo||'').trim() || '—';
+      var e = by[k]; if(!e){ e = by[k] = {name:k, total:0, done:0, late:0}; order.push(k); }
+      e.total++;
+      if(t.status==='done') e.done++; else if(diff<0) e.late++;
+    });
+    order.sort(function(a,b){ return by[b].total - by[a].total; });
+    var rows = order.map(function(k){
+      var e = by[k], pct = e.total ? Math.round(e.done/e.total*100) : 0;
+      return '<tr><td><strong>'+escH(e.name)+'</strong></td><td class="num">'+e.total+'</td><td class="num">'+e.done+'</td><td class="num" style="'+(e.late?'color:var(--alert);font-weight:700;':'')+'">'+e.late+'</td><td class="num" style="font-weight:700;">'+pct+'٪</td></tr>';
+    }).join('');
+    return '<details class="chart-card" id="ts-det"'+(tsOpen?' open':'')+' style="margin:14px 0;"><summary style="cursor:pointer;font-weight:700;">أداء الموظفين في المهام (آخر ٣٠ يوم)</summary>'+
+      (rows ? '<div class="table-wrap cropref-wrap scroll-8" style="margin-top:10px;"><table><thead><tr><th>الموظف</th><th>مكلّف</th><th>تم</th><th>متأخر</th><th>الإنجاز</th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '<p class="empty-note">مفيش مهام في آخر ٣٠ يوم.</p>')+
+      '<p class="hint" style="margin-top:8px;">"مكلّف" = المهام اللي تاريخها من آخر ٣٠ يوم لحد النهارده. "متأخر" = لسه ما اتعملتش وفات تاريخها.</p></details>';
+  }
   /* ---------- إرسال المهام على واتساب (رسالة جاهزة بتتفتح على واتساب الموظف) ---------- */
   var waDay = null, waOpen = false, waSent = {};
   function waPhone(p){
@@ -5584,9 +5729,9 @@
         var dateKey = t.ts.slice(0,10);
         var dateLabel = dateKey===today ? 'النهاردة' : fmtTs(t.ts).split(' ')[0];
         return '<div class="task-card" data-taskid="'+t.id+'" data-datekey="'+dateKey+'">'+
-          '<div class="task-card-head"><span class="task-date-badge">'+dateLabel+'</span>'+(t.greenhouse?('<span class="task-gh">'+t.greenhouse+'</span>'):'')+'</div>'+
+          '<div class="task-card-head"><span class="task-date-badge">'+dateLabel+'</span>'+(t.greenhouse?('<span class="task-gh">'+escH(t.greenhouse)+'</span>'):'')+'</div>'+
           '<div class="task-title">'+t.title+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' <span class="hint" style="font-weight:400;">🔁 '+recurDaysLabel(t.recur)+'</span>':'')+'</div>'+
-          (t.note ? '<div class="task-note">'+t.note+'</div>' : '')+
+          (t.note ? '<div class="task-note">'+escH(t.note)+'</div>' : '')+
           (t.sopTitle ? '<div class="task-sop-link">📋 الإجراء المرجعي: '+t.sopTitle+'</div>' : '')+
           '<button class="btn btn-primary btn-sm task-done-btn">تم ✓</button>'+
           '</div>';
@@ -5662,6 +5807,7 @@
       '<div class="tasks-list">'+myTasksHtml+'</div>'+
 
       assignSectionHtml+
+      taskStatsHtml(allTasks, isAdminView)+
       waSectionHtml(allTasks, tomorrowStr, isAdminView)+
       allTasksSectionHtml+
 
@@ -5673,6 +5819,8 @@
     if(waDate) waDate.addEventListener('change', function(){ waDay = this.value || null; waOpen = true; renderTasksPanel(); });
     var waDet = $('#wa-det', body);
     if(waDet) waDet.addEventListener('toggle', function(){ waOpen = waDet.open; });
+    var tsDet = $('#ts-det', body);
+    if(tsDet) tsDet.addEventListener('toggle', function(){ tsOpen = tsDet.open; });
     $all('.wa-send', body).forEach(function(a){
       a.addEventListener('click', function(){ waSent[a.getAttribute('data-key')] = true; a.textContent = 'اتبعت ✓ — ابعت تاني'; });
     });
@@ -5900,8 +6048,8 @@
       '<p class="hint" style="margin-top:-4px;">لو بتخلط على قوة الري مباشرة من غير حقن، سيب نسبة التخفيف = ١.</p>'+
       '<div class="form-actions" style="flex-wrap:wrap;">'+
         '<select id="nutrient-preset" style="padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);">'+
-          '<optgroup label="جاهزة">'+PRESETS.map(function(x,i){ return '<option value="b'+i+'">'+x.name+'</option>'; }).join('')+'</optgroup>'+
-          (targetProfiles.length ? '<optgroup label="أهدافي المحفوظة">'+targetProfiles.map(function(x){ return '<option value="c'+x.id+'">'+x.name+'</option>'; }).join('')+'</optgroup>' : '')+
+          '<optgroup label="جاهزة">'+PRESETS.map(function(x,i){ return '<option value="b'+i+'">'+escH(x.name)+'</option>'; }).join('')+'</optgroup>'+
+          (targetProfiles.length ? '<optgroup label="أهدافي المحفوظة">'+targetProfiles.map(function(x){ return '<option value="c'+x.id+'">'+escH(x.name)+'</option>'; }).join('')+'</optgroup>' : '')+
         '</select>'+
         '<button type="button" class="btn btn-ghost btn-sm" id="btn-apply-preset">تحميل للأهداف</button>'+
         '<button type="button" class="btn btn-ghost btn-sm" id="btn-save-target-profile">حفظ الأهداف الحالية باسم</button>'+
@@ -6342,7 +6490,7 @@
           '<div class="field-sm full"><label>صورة الإصابة (اختياري)'+(assetsCap?'':' — مش متاحة دلوقتي')+'</label><input type="file" accept="image/*" id="pest-photo"'+(assetsCap?'':' disabled')+'>'+
             (pestEditing && pestEditing.photoAssetId ? ('<img class="pest-photo" src="'+pestPhotoUrl(pestEditing.photoAssetId)+'" alt="الصورة الحالية" style="max-height:120px;margin-top:8px;"><label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-weight:400;"><input type="checkbox" id="pest-photo-remove" style="width:auto;"> احذف الصورة الحالية (أو اختار صورة جديدة فوق لتغييرها)</label>') : '')+'</div>'+
           '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="pest-treated" style="width:auto;"> تمت المعاملة/الرش</label></div>'+
-          '<div class="field-sm" id="pest-pesticide-wrap" style="display:none;"><label>اسم المبيد</label><select id="pest-pesticide-select"><option value="">اختار من المخزن</option>'+inventoryItems.filter(function(x){ return x.type==='pesticide'; }).map(function(x){ return '<option value="'+x.id+'">'+x.name+'</option>'; }).join('')+'<option value="__other__">أخرى (اكتب يدوي)</option></select>'+
+          '<div class="field-sm" id="pest-pesticide-wrap" style="display:none;"><label>اسم المبيد</label><select id="pest-pesticide-select"><option value="">اختار من المخزن</option>'+inventoryItems.filter(function(x){ return x.type==='pesticide'; }).map(function(x){ return '<option value="'+x.id+'">'+escH(x.name)+'</option>'; }).join('')+'<option value="__other__">أخرى (اكتب يدوي)</option></select>'+
             '<input type="text" id="pest-pesticide" maxlength="150" style="margin-top:8px;display:none;" placeholder="اسم المبيد">'+
             '<p class="hint" id="pest-pesticide-info" style="margin:6px 0 0;"></p></div>'+
           '<div class="field-sm" id="pest-dose-wrap" style="display:none;"><label>الكمية/الجرعة</label><input type="text" id="pest-dose" maxlength="80" placeholder="مثال: 2 مل/لتر"></div>'+
@@ -6978,7 +7126,7 @@
 
   /* ---------- خطة المشتل: مربع لكل نظام، بتدخل فيه (الصنف، عدد المواسير، نباتات الماسورة) والبرنامج يحسب الصواني ---------- */
   function saveNurseryTiles(){
-    if(db) return db.doc('settings/cropNames').set({nurseryTiles:nurseryTiles}, {merge:true});
+    if(db) return db.doc('settings/nurseryTiles').set({tiles:nurseryTiles}).catch(function(e){ console.error('nurseryTiles save failed', e); toast('ما اتحفظش — مفيش صلاحية أو النت واقع'); });
     renderAll(); return Promise.resolve();
   }
   function tileRows(sysId){ return Array.isArray(nurseryTiles[sysId]) ? nurseryTiles[sysId] : []; }
@@ -7864,6 +8012,11 @@
       var bad = ['ph','ec','temp'].filter(function(k){ return metricStatus(k, e[k])==='alert'; });
       if(bad.length) items.push({key:'rd:'+sy.id, level:'danger', icon:'💧', title:'قراءة ري خارج المدى', detail:systemLabel(sy)+': '+bad.map(function(k){ return LBL[k]+' '+e[k]; }).join('، '), tab:'water', rank:1});
     });
+    if(isAdminU){
+      var lb = 0; try{ lb = parseInt(localStorage.getItem('oroots-last-backup')||'0', 10) || 0; }catch(e){}
+      var ageD = lb ? Math.floor((Date.now()-lb)/86400000) : null;
+      if(ageD===null || ageD>=7) items.push({key:'bk', level:'warn', icon:'💾', title:'خد نسخة احتياطية من البيانات', detail: ageD===null ? 'ما اتعملتش نسخة احتياطية على الجهاز ده لسه' : ('آخر نسخة من '+ageD+' يوم'), tab:'settings', rank:2});
+    }
     var lv = {danger:0, warn:1, info:2};
     items.sort(function(a,b){ return (a.rank-b.rank) || (lv[a.level]-lv[b.level]); });
     return items;
@@ -8872,24 +9025,75 @@
     applyPermissionLock(body, 'quality');
   }
 
+  function panelOn(id){ var p = document.getElementById(id); return !!(p && p.classList.contains('active')); }
+  /* ---------- سلة المحذوفات (المدير): أي حذف بيتحفظ منه نسخة ٣٠ يوم ---------- */
+  var trashItems = [], trashSubbed = false;
+  var TRASH_LABELS = {harvest:'حصاد', inventory:'مخزن', nursery:'مشتل — صينية', pestlog:'مكافحة', bioReleases:'إطلاق حيوي', stickyTraps:'مصيدة لاصقة', pheromoneTraps:'مصيدة فيرمونية', sops:'إجراء SOP', fertilizers:'سماد', targetProfiles:'هدف غذائي', nutrientRecipes:'وصفة سمادية', irrigCalib:'معايرة ري', instrumentCalibrations:'معايرة جهاز', nurseryPlanLog:'سجل خطة المشتل'};
+  function trashLabel(d){ return d.name || d.title || d.problemName || d.cropName || d.instrumentName || d.beneficialName || d.note || ''; }
+  function trashDelete(coll, id){
+    var ref = db.collection(coll).doc(id);
+    return ref.get().then(function(snap){
+      if(!snap.exists) return ref.delete();
+      var d = snap.data();
+      var rec = {id:genId(), coll:coll, docId:id, data:JSON.stringify(d), label:String(trashLabel(d)).slice(0,120), deletedAt:new Date().toISOString(), createdAt:Date.now(), deletedBy:currentUser||''};
+      return db.collection('trash').doc(rec.id).set(rec).then(function(){ return ref.delete(); }, function(err){
+        console.error('trash save failed', err); toast('تحذير: النسخة ما اتحفظتش في السلة'); return ref.delete();
+      });
+    }, function(){ return ref.delete(); });
+  }
+  function subscribeTrash(){
+    if(!db || trashSubbed) return;
+    trashSubbed = true;
+    db.collection('trash').orderBy('createdAt','desc').limit(300).onSnapshot(function(snap){
+      trashItems = snap.docs.map(function(d){ return d.data(); });
+      var cutoff = Date.now() - 30*86400000;
+      trashItems.filter(function(t){ return (t.createdAt||0) < cutoff; }).forEach(function(t){ db.collection('trash').doc(t.id).delete().catch(function(){}); });
+      safe(renderTrashPanel);
+    }, function(err){ console.error('trash snapshot error', err); });
+  }
+  function renderTrashPanel(){
+    var box = $('#trash-box');
+    if(!box) return;
+    if(currentUserRole!=='admin'){ box.innerHTML = ''; return; }
+    var list = trashItems.filter(function(t){ return (t.createdAt||0) >= Date.now() - 30*86400000; });
+    box.innerHTML = list.length ? list.map(function(t){
+      return '<div class="trash-row" data-id="'+escH(t.id)+'" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--border);">'+
+        '<div><strong>'+escH(TRASH_LABELS[t.coll]||t.coll)+(t.label ? ' — '+escH(t.label) : '')+'</strong><div class="hint" style="margin:0;">اتحذف '+escH(new Date(t.deletedAt).toLocaleString('ar-EG'))+(t.deletedBy ? ' بواسطة '+escH(t.deletedBy) : '')+'</div></div>'+
+        '<div style="display:flex;gap:6px;"><button type="button" class="btn btn-primary btn-sm trash-restore">استرجاع</button><button type="button" class="del-btn trash-purge" title="مسح نهائي">✕</button></div></div>';
+    }).join('') : '<p class="empty-note">السلة فاضية.</p>';
+    $all('.trash-restore', box).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.closest('.trash-row').getAttribute('data-id'), t = trashItems.filter(function(x){ return x.id===id; })[0];
+      if(!t) return;
+      var data; try{ data = JSON.parse(t.data); }catch(e){ toast('البيانات تالفة'); return; }
+      db.collection(t.coll).doc(t.docId).set(data).then(function(){ return db.collection('trash').doc(t.id).delete(); }).then(function(){
+        logAudit('edit', 'admin', 'استرجاع من السلة: '+(TRASH_LABELS[t.coll]||t.coll)+(t.label ? ' — '+t.label : ''));
+        toast('اتسترجع');
+      }).catch(function(){ toast('تعذر الاسترجاع'); });
+    }); });
+    $all('.trash-purge', box).forEach(function(b){ b.addEventListener('click', function(){
+      if(!requireAdminForDelete()) return;
+      if(!confirm('تمسح العنصر ده نهائي من السلة؟')) return;
+      var id = b.closest('.trash-row').getAttribute('data-id');
+      db.collection('trash').doc(id).delete().then(function(){ toast('اتمسح'); }).catch(function(){ toast('تعذر المسح'); });
+    }); });
+  }
+  function renderSettingsPanels(){ safe(renderUsersSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
+  function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
+  /* بيرسم التاب المفتوح بس — باقي التابات بتترسم أول ما تفتحها (setupTabs) */
   function renderAll(){
     safe(applyTabVisibility);
-    safe(renderUsersSettings);
-    safe(renderCropNamesSettings);
-    safe(renderOrderProductsSettings);
-    safe(renderSystemsOverview);
-    safe(renderWaterPanel);
-    safe(renderClimatePanel);
-    safe(renderTasksPanel);
-    safe(renderSprayPanel);
-    safe(renderQualityPanel);
-    safe(renderNutrientsPanel);
-    safe(renderPestsPanel);
-    safe(renderNurseryPanel);
-    safe(renderHarvestPanel);
-    safe(renderInventoryPanel);
-    safe(renderInstrumentCalibSection);
-    safe(renderAuditPanel);
+    if(panelOn('panel-settings')) renderSettingsPanels();
+    if(panelOn('panel-overview')) safe(renderSystemsOverview);
+    if(panelOn('panel-water')) renderWaterTab();
+    if(panelOn('panel-climate')) safe(renderClimatePanel);
+    if(panelOn('panel-tasks')) safe(renderTasksPanel);
+    if(panelOn('panel-spray')) safe(renderSprayPanel);
+    if(panelOn('panel-quality')) safe(renderQualityPanel);
+    if(panelOn('panel-nutrients')) safe(renderNutrientsPanel);
+    if(panelOn('panel-pests')) safe(renderPestsPanel);
+    if(panelOn('panel-nursery')) safe(renderNurseryPanel);
+    if(panelOn('panel-harvest')) safe(renderHarvestPanel);
+    if(panelOn('panel-inventory')) safe(renderInventoryPanel);
     safe(renderNotifBar);
     safe(updateSyncBadge);
   }
@@ -8912,9 +9116,9 @@
       tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', inventory:'#panel-inventory', settings:'#panel-settings'
     };
     var renderMap = {
-      overview: renderSystemsOverview, water: renderWaterPanel, climate: renderClimatePanel,
+      overview: renderSystemsOverview, water: renderWaterTab, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
-      harvest: renderHarvestPanel, inventory: renderInventoryPanel, settings: renderAuditPanel
+      harvest: renderHarvestPanel, inventory: renderInventoryPanel, settings: renderSettingsPanels
     };
     $all('.tab-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -9059,7 +9263,7 @@
       startLiveClock();
       initDeviceNotif();
       setTimeout(notifDailySummary, 4000);
-      if(currentUserRole==='admin') subscribeAudit();
+      if(currentUserRole==='admin'){ subscribeAudit(); subscribeTrash(); }
       applyTabVisibility();
       $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='overview'); });
       $all('.panel').forEach(function(p){ p.classList.remove('active'); });
@@ -9202,78 +9406,78 @@
       console.error('users snapshot error', err);
     });
 
-    db.collection('sops').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
+    db.collection('sops').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       sops = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('sops snapshot error', err);
     });
 
-    db.collection('fertilizers').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
+    db.collection('fertilizers').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       customFertilizers = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('fertilizers snapshot error', err);
     });
 
-    db.collection('targetProfiles').orderBy('createdAt','desc').limit(100).onSnapshot(function(snap){
+    db.collection('targetProfiles').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       targetProfiles = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('targetProfiles snapshot error', err);
     });
 
-    db.collection('nutrientRecipes').orderBy('createdAt','desc').limit(100).onSnapshot(function(snap){
+    db.collection('nutrientRecipes').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       nutrientRecipes = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('nutrientRecipes snapshot error', err);
     });
 
-    db.collection('pestlog').orderBy('createdAt','desc').limit(300).onSnapshot(function(snap){
+    db.collection('pestlog').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('pestlog snapshot error', err);
     });
 
-    db.collection('bioReleases').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('bioReleases').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       bioReleases = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('bioReleases snapshot error', err); });
 
-    db.collection('stickyTraps').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('stickyTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       stickyTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('stickyTraps snapshot error', err); });
 
-    db.collection('pheromoneTraps').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('pheromoneTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pheromoneTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('pheromoneTraps snapshot error', err); });
 
-    db.collection('nursery').orderBy('createdAt','desc').limit(300).onSnapshot(function(snap){
+    db.collection('nursery').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       nurseryLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('nursery snapshot error', err);
     });
 
-    db.collection('irrigCalib').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('irrigCalib').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       irrigCalib = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('irrigCalib snapshot error', err);
     });
 
-    db.collection('inventory').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('inventory').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       inventoryItems = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
       console.error('inventory snapshot error', err);
     });
 
-    db.collection('harvest').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('harvest').orderBy('createdAt','desc').limit(5000).onSnapshot(function(snap){
       harvestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){
@@ -9294,7 +9498,7 @@
       console.error('cropRefs snapshot error', err);
     });
 
-    db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
@@ -9315,20 +9519,20 @@
       renderAll();
     }, function(err){ console.error('notifications snapshot error', err); });
 
-    db.collection('qualityOrders').orderBy('date','desc').limit(300).onSnapshot(function(snap){
+    db.collection('qualityOrders').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qOrders = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('qualityOrders snapshot error', err); });
-    db.collection('qualitySorting').orderBy('date','desc').limit(300).onSnapshot(function(snap){
+    db.collection('qualitySorting').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qSorts = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('qualitySorting snapshot error', err); });
-    db.collection('qualityComplaints').orderBy('date','desc').limit(300).onSnapshot(function(snap){
+    db.collection('qualityComplaints').orderBy('date','desc').limit(2000).onSnapshot(function(snap){
       qComplaints = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('qualityComplaints snapshot error', err); });
 
-    db.collection('sprayPlan').orderBy('date','desc').limit(600).onSnapshot(function(snap){
+    db.collection('sprayPlan').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       sprayPlan = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('sprayPlan snapshot error', err); });
@@ -9336,16 +9540,23 @@
     db.doc('settings/cropNames').onSnapshot(function(snap){
       cropNames = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
       orderProducts = (snap.exists && Array.isArray(snap.data().orderProducts)) ? snap.data().orderProducts : [];
-      nurseryTiles = (snap.exists && snap.data().nurseryTiles && typeof snap.data().nurseryTiles==='object') ? snap.data().nurseryTiles : {};
+      nurseryTilesLegacy = (snap.exists && snap.data().nurseryTiles && typeof snap.data().nurseryTiles==='object') ? snap.data().nurseryTiles : {};
+      syncNurseryTiles();
       renderAll();
     }, function(err){ console.error('cropNames snapshot error', err); });
+
+    db.doc('settings/nurseryTiles').onSnapshot(function(snap){
+      nurseryTilesNew = (snap.exists && snap.data().tiles && typeof snap.data().tiles==='object') ? snap.data().tiles : null;
+      syncNurseryTiles();
+      renderAll();
+    }, function(err){ console.error('nurseryTiles snapshot error', err); });
 
     db.doc('settings/pipeMaps').onSnapshot(function(snap){
       pipeMaps = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
       renderAll();
     }, function(err){ console.error('pipeMaps snapshot error', err); });
 
-    db.collection('nurseryPlanLog').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    db.collection('nurseryPlanLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       nurseryPlanLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       renderAll();
     }, function(err){ console.error('nurseryPlanLog snapshot error', err); });
