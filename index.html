@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tPDWSO/3ha6PTWDg5jiwygvu+ntyEt8eW7nnA6ZPGVQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jXpbix6cr7x/CZnDgebS7k6EBZN+o4XNnEFhN7Zrjfw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -593,6 +593,18 @@
   .np-close{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
   .np-body{overflow-y:auto;padding:4px 10px;flex:1;min-height:0;}
   .notif-pop .notif-foot{padding:8px 12px 10px;border-top:1px solid var(--border);}
+
+  /* ---- جداول مضغوطة / بسكرول ---- */
+  .cropref-wrap.scroll-5{max-height:250px !important;overflow-y:auto;}
+  .cropref-wrap.scroll-8{max-height:340px !important;overflow-y:auto;}
+  .cropref-wrap.scroll-5 tfoot td{position:sticky;bottom:0;background:var(--surface-2);}
+  .inv-wrap{overflow-x:visible;max-height:none;}
+  .inv-wrap table{min-width:0 !important;width:100%;}
+  .inv-wrap th,.inv-wrap td{padding:7px 4px;font-size:.76rem;line-height:1.4;white-space:normal;word-break:break-word;vertical-align:top;}
+  .inv-wrap th{font-size:.7rem;}
+  .inv-wrap td.num{white-space:nowrap;}
+  .inv-wrap .status-pill{font-size:.64rem;padding:1px 7px;margin-top:3px;display:inline-block;}
+  .inv-wrap .del-btn{padding:2px 6px;min-width:0;}
 </style>
 </head>
 <body>
@@ -1604,16 +1616,13 @@
 
     var rows = list.length ? list.map(function(x){
       return '<tr data-id="'+x.id+'">'+
-        '<td><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></td>'+
-        '<td>'+x.name+'</td>'+
-        '<td>'+(x.activeIngredient||'—')+'</td>'+
-        '<td>'+(x.targets||'—')+'</td>'+
-        '<td class="ltr">'+(x.dose||'—')+'</td>'+
-        '<td>'+(x.type==='pesticide'?pestStageLabels(x.stages):'—')+'</td>'+
+        '<td><strong>'+x.name+'</strong><div><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></div></td>'+
+        '<td>'+(x.activeIngredient||'—')+'<div class="hint" dir="rtl" style="margin:2px 0 0;">يستهدف: '+(x.targets||'—')+'</div></td>'+
+        '<td>'+(x.dose||'—')+(x.type==='pesticide' ? '<div class="hint" dir="rtl" style="margin:2px 0 0;">الطور: '+pestStageLabels(x.stages)+'</div>' : '')+'</td>'+
         '<td class="num ltr">'+(x.quantity!=null?(x.quantity+' '+(x.unit||'')):'—')+'</td>'+
         '<td><button class="del-btn inv-edit-btn" title="تعديل">✎</button> <button class="del-btn inv-delete-btn" title="حذف">✕</button></td>'+
       '</tr>';
-    }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد أصناف بعد. ضيف سماد أو مبيد من الفورم فوق.</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد أصناف بعد. ضيف سماد أو مبيد من الفورم فوق.</td></tr>';
 
     body.innerHTML =
       '<p class="hint">سجّل هنا كل الأسمدة والمبيدات المتاحة عندك بالمخزن، مع المادة الفعالة وإيه اللي بتعالجه والجرعة الموصى بها. المبيدات هنا بتظهر تلقائي كدروب داون في تاب المكافحة لما تسجل معاملة.</p>'+
@@ -1626,7 +1635,7 @@
       '<div class="form-actions" style="margin:10px 0;"><button type="button" class="btn btn-primary btn-sm" id="btn-new-inventory">+ إضافة صنف جديد</button></div>'+
       '<div id="inventory-form-holder"></div>'+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">قائمة المخزن</h2><button class="btn btn-ghost btn-sm" id="inventory-export">تصدير CSV</button></div>'+
-      '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الاسم</th><th>المادة الفعالة</th><th>يستهدف</th><th>الجرعة</th><th>الطور المستهدف</th><th>الكمية</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+      '<div class="table-wrap inv-wrap"><table><thead><tr><th>الاسم / النوع</th><th>المادة الفعالة / يستهدف</th><th>الجرعة / الطور</th><th>الكمية</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 
     $all('.inv-filter-pill', body).forEach(function(btn){
       btn.addEventListener('click', function(){ inventoryFilterType = btn.getAttribute('data-type')||''; renderInventoryPanel(); });
@@ -4229,7 +4238,7 @@
     el.innerHTML =
       '<details class="chart-card" id="cropref-details"'+(cropRefsOpen?' open':'')+'>'+
         '<summary style="cursor:pointer;font-weight:700;font-size:1rem;">📋 القيم المثلى للأصناف (مرجع للقراءات)</summary>'+
-        '<div class="table-wrap cropref-wrap" style="margin-top:10px;"><table><thead><tr><th>الصنف</th><th>EC</th><th>pH</th><th>هواء °C</th><th>محلول °C</th>'+(isAdminUser?'<th></th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        '<div class="table-wrap cropref-wrap scroll-8" style="margin-top:10px;"><table><thead><tr><th>الصنف</th><th>EC</th><th>pH</th><th>هواء °C</th><th>محلول °C</th>'+(isAdminUser?'<th></th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
         (list.length ? '' : '<p class="empty-note">الجدول فاضي.</p>')+
         '<p class="hint" style="margin:8px 0 0;">قيم مرجعية عامة للزراعة المائية، وممكن تختلف حسب الصنف والموسم وتوصية المورد. EC بوحدة mS/cm. "هواء" = حرارة جو الصوبة، و"محلول" = حرارة مياه الري/الخزان.'+(isAdminUser?'':' المدير هو اللي بيعدّل الجدول.')+'</p>'+
         formHtml + adminBar +
@@ -7035,7 +7044,7 @@
       return '<tr><td><strong>'+escH(e.name)+'</strong></td><td class="num">'+fmt(e.need)+'</td><td class="num">'+fmt(e.have)+'</td><td class="num" style="'+missColor(e.miss)+'">'+fmt(e.miss)+'</td></tr>';
     }).join('');
     var totalsHtml = '<div class="chart-card" style="margin:0 0 14px;"><h3>إجمالي النواقص من الصواني لكل صنف (كل الصوب)</h3>'+
-      (totRows ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>الصنف</th><th>مطلوب</th><th>في المشتل</th><th>ناقص</th></tr></thead><tbody>'+totRows+'</tbody>'+
+      (totRows ? '<div class="table-wrap cropref-wrap scroll-5"><table><thead><tr><th>الصنف</th><th>مطلوب</th><th>في المشتل</th><th>ناقص</th></tr></thead><tbody>'+totRows+'</tbody>'+
         '<tfoot><tr><td><strong>الإجمالي</strong></td><td class="num"><strong>'+fmt(tN)+'</strong></td><td class="num"><strong>'+fmt(tH)+'</strong></td><td class="num" style="'+missColor(tM)+'">'+fmt(tM)+'</td></tr></tfoot></table></div>'
         : '<p class="empty-note">لما تكتب بيانات الأنظمة (الصنف والمواسير والنباتات) هيظهر هنا إجمالي النواقص.</p>')+'</div>';
     var tilesHtml = grp.systems.map(function(sy){
