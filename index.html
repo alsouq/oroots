@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-smzYTdfMuNTjfSGiSaYiW47tBLLFFKA2WwTejisIC5Q=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ptUMN70XsZ8jOf0XVV+GJ89R1pxKMV5WrOImI7InoNs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -579,6 +579,11 @@
   .nur-stats b{font-size:1.1rem;font-variant-numeric:tabular-nums;}
   .nur-stats .nur-ok{background:var(--good-soft);} .nur-stats .nur-ok b{color:var(--good);}
   .nur-stats .nur-bad{background:var(--alert-soft);} .nur-stats .nur-bad b{color:var(--alert);}
+
+  .nur-inputs{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:end;margin-bottom:8px;}
+  .nur-inputs .field-sm label{font-size:.68rem;}
+  .nur-inputs .field-sm input,.nur-inputs .field-sm select{width:100%;min-width:0;}
+  .nur-row .nur-crop{display:none;}
 </style>
 </head>
 <body>
@@ -947,6 +952,8 @@
   var pipeMaps = [];
   var cropNames = [];
   var orderProducts = [];
+  var nurseryTiles = {};
+  var nurseryTileGh = null;
   var myNotifs = [];
   var sprayPlan = [];
   var sprayDate = '';
@@ -1815,7 +1822,7 @@
     renderAll();
     return Promise.resolve();
   }
-  function addUser(email, password, role, permissions, displayName){
+  function addUser(email, password, role, permissions, displayName, phone){
     email = String(email||'').trim().toLowerCase();
     if(!email || !password) return Promise.resolve(false);
     if(findUser(email)){ toast('الإيميل ده موجود خلاص'); return Promise.resolve(false); }
@@ -1824,7 +1831,7 @@
       .then(function(){ return sec.auth().signOut(); })
       .catch(function(e){ if(e && e.code==='auth/email-already-in-use') return null; throw e; })
       .then(function(){
-        var user = {id:genId(), username:email, displayName:displayName||'', role:role||'employee', permissions:permissions||emptyPermissions()};
+        var user = {id:genId(), username:email, displayName:displayName||'', phone:phone||'', role:role||'employee', permissions:permissions||emptyPermissions()};
         return saveUsers(appUsers.concat([user])).then(function(){ return db.doc('roles/'+email).set({role:user.role}); });
       })
       .then(function(){ return true; })
@@ -1866,7 +1873,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, orderProducts: orderProducts, sprayPlan: sprayPlan, qualityOrders: qOrders, qualitySorting: qSorts, qualityComplaints: qComplaints
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, orderProducts: orderProducts, nurseryTiles: nurseryTiles, sprayPlan: sprayPlan, qualityOrders: qOrders, qualitySorting: qSorts, qualityComplaints: qComplaints
     };
   }
   function exportFullBackup(){
@@ -1944,6 +1951,7 @@
     if(Array.isArray(backup.pipeMaps)) writes.push(db.doc('settings/pipeMaps').set({list: backup.pipeMaps}));
     if(Array.isArray(backup.cropNames)) writes.push(db.doc('settings/cropNames').set({list: backup.cropNames}, {merge:true}));
     if(Array.isArray(backup.orderProducts)) writes.push(db.doc('settings/cropNames').set({orderProducts: backup.orderProducts}, {merge:true}));
+    if(backup.nurseryTiles && typeof backup.nurseryTiles==='object') writes.push(db.doc('settings/cropNames').set({nurseryTiles: backup.nurseryTiles}, {merge:true}));
     return Promise.all(writes);
   }
   function importFullBackup(backup){
@@ -4691,7 +4699,7 @@
       }).join(' · ');
       return '<div class="systems-list-row" style="align-items:flex-start;flex-direction:column;gap:6px;">'+
         '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;">'+
-          '<span><strong>'+escH(u.displayName||'(بدون اسم تعريفي)')+'</strong> <span class="ltr" style="direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:0.8rem;">'+escH(u.username)+'</span></span>'+
+          '<span><strong>'+escH(u.displayName||'(بدون اسم تعريفي)')+'</strong> <span class="ltr" style="direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:0.8rem;">'+escH(u.username)+'</span>'+(u.phone ? ' <span class="ltr" style="direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:0.8rem;">واتساب: '+escH(u.phone)+'</span>' : '')+'</span>'+
           '<span style="display:flex;gap:6px;">'+
             '<button class="btn-ghost btn-sm user-edit-btn" data-id="'+u.id+'" style="border-radius:8px;">تعديل</button>'+
             '<button class="del-btn user-delete-btn" data-id="'+u.id+'" title="حذف">✕</button>'+
@@ -4727,6 +4735,7 @@
         '<div class="form-grid">'+
           '<div class="field-sm"><label>الاسم التعريفي (اللي بيتكتب في المهام)</label><input type="text" id="user-display" maxlength="40" required value="'+escH(existingUser?(existingUser.displayName||''):'')+'" placeholder="مثال: أحمد"></div>'+
           '<div class="field-sm"><label>الإيميل</label><input type="email" class="ltr" id="user-username" required value="'+(existingUser?existingUser.username:'')+'"'+(existingUser?' readonly':'')+'></div>'+
+          '<div class="field-sm"><label>رقم الواتساب (لإرسال المهام)</label><input type="tel" class="ltr" id="user-phone" maxlength="20" inputmode="tel" placeholder="01012345678" value="'+escH(existingUser?(existingUser.phone||''):'')+'"></div>'+
           '<div class="field-sm"><label>كلمة مرور مؤقتة'+(existingUser?' (بتتغيّر من "نسيت كلمة المرور")':'')+'</label><input type="text" class="ltr" id="user-password"'+(existingUser?' disabled':' required minlength="6"')+'></div>'+
           '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="user-is-admin" style="width:auto;"'+(isAdminNow?' checked':'')+'> مدير (كل الصلاحيات + تبويب الإعدادات)</label></div>'+
         '</div>'+
@@ -4750,7 +4759,7 @@
       var permissions = {};
       $all('.user-perm-select', holder).forEach(function(sel){ permissions[sel.getAttribute('data-tab')] = sel.value; });
       if(existingUser){
-        var patch = {role: isAdmin?'admin':'employee', permissions: permissions, displayName: displayName};
+        var patch = {role: isAdmin?'admin':'employee', permissions: permissions, displayName: displayName, phone: $('#user-phone').value.trim()};
         updateUser(existingUser.id, patch).then(function(){
           toast('اتحفظ الحساب');
           holder.innerHTML='';
@@ -4762,7 +4771,7 @@
         });
       } else {
         if(!username || !password){ toast('اكتب الإيميل وكلمة مرور مؤقتة (6 حروف على الأقل)'); return; }
-        addUser(username, password, isAdmin?'admin':'employee', permissions, displayName).then(function(ok){
+        addUser(username, password, isAdmin?'admin':'employee', permissions, displayName, $('#user-phone').value.trim()).then(function(ok){
           if(ok===false) return;
           toast('اتضاف الحساب');
           holder.innerHTML='';
@@ -5500,6 +5509,47 @@
 
 
   /* ---------- Tasks & SOPs panel ---------- */
+  /* ---------- إرسال المهام على واتساب (رسالة جاهزة بتتفتح على واتساب الموظف) ---------- */
+  var waDay = null, waOpen = false, waSent = {};
+  function waPhone(p){
+    var d = String(p||'').replace(/[٠-٩]/g, function(c){ return String(c.charCodeAt(0)-1632); }).replace(/[^\d]/g,'');
+    if(!d) return '';
+    if(d.indexOf('00')===0) d = d.slice(2);
+    else if(d.charAt(0)==='0') d = '20' + d.slice(1);
+    return d.length>=10 ? d : '';
+  }
+  function waMessage(name, tasks, day){
+    var label = new Date(day+'T12:00:00').toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'numeric'});
+    var lines = tasks.map(function(t, i){
+      var s = (i+1)+') '+t.title+(t.greenhouse ? ' — '+t.greenhouse : '');
+      if(t.note) s += '\n   ملاحظة: '+String(t.note).slice(0,100);
+      return s;
+    });
+    return 'صباح الخير يا '+name+' 🌱\nمهامك ليوم '+label+':\n\n'+lines.join('\n')+'\n\nربنا يوفقك — O\'Roots';
+  }
+  function waSectionHtml(allTasks, defaultDay, isAdminView){
+    if(!isAdminView) return '';
+    var day = waDay || defaultDay, groups = {}, order = [];
+    allTasks.forEach(function(t){
+      if(t.status!=='pending' || t.ts.slice(0,10)!==day) return;
+      var k = String(t.assignedTo||'').trim() || '—';
+      if(!groups[k]){ groups[k] = []; order.push(k); }
+      groups[k].push(t);
+    });
+    var rows = order.map(function(name){
+      var list = groups[name], u = userByName(name), phone = u ? waPhone(u.phone) : '', key = day+'|'+name;
+      var action;
+      if(name==='—') action = '<span class="hint" style="margin:0;">مهام من غير شخص مكلّف</span>';
+      else if(!phone) action = '<span class="hint" style="margin:0;">مفيش رقم واتساب — سجّله من الإعدادات ← حسابات الموظفين</span>';
+      else action = '<a class="btn btn-primary btn-sm wa-send" data-key="'+escH(key)+'" href="https://wa.me/'+phone+'?text='+encodeURIComponent(waMessage(name, list, day))+'" target="_blank" rel="noopener">'+(waSent[key] ? 'اتبعت ✓ — ابعت تاني' : 'ابعت على واتساب')+'</a>';
+      return '<div class="wa-row" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--border);">'+
+        '<div><strong>'+escH(name)+'</strong><div class="hint" style="margin:0;">'+list.length+' مهمة</div></div>'+action+'</div>';
+    }).join('');
+    return '<details class="chart-card" id="wa-det"'+(waOpen?' open':'')+' style="margin:14px 0;"><summary style="cursor:pointer;font-weight:700;">ابعت المهام على واتساب</summary>'+
+      '<div class="field-sm" style="max-width:220px;margin-top:10px;"><label>مهام يوم</label><input type="date" class="ltr" id="wa-date" value="'+escH(day)+'"></div>'+
+      (rows || '<p class="empty-note">مفيش مهام معلّقة في اليوم ده.</p>')+
+      '<p class="hint" style="margin-top:10px;">الزرار بيفتح واتساب على محادثة الموظف برسالة جاهزة بمهامه، وانت بس تدوس إرسال. أرقام الموظفين بتتسجّل في الإعدادات ← حسابات الموظفين.</p></details>';
+  }
   function renderTasksPanel(){
     var body = $('#tasks-body');
     if(!body) return;
@@ -5594,12 +5644,20 @@
       '<div class="tasks-list">'+myTasksHtml+'</div>'+
 
       assignSectionHtml+
+      waSectionHtml(allTasks, tomorrowStr, isAdminView)+
       allTasksSectionHtml+
 
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">الإجراءات القياسية (SOPs)</h2><button class="btn btn-primary btn-sm" id="btn-new-sop">+ إجراء جديد</button></div>'+
       '<div id="sop-form-holder"></div>'+
       '<div id="sop-list">'+sopListHtml+'</div>';
     lfWire('tasks');
+    var waDate = $('#wa-date', body);
+    if(waDate) waDate.addEventListener('change', function(){ waDay = this.value || null; waOpen = true; renderTasksPanel(); });
+    var waDet = $('#wa-det', body);
+    if(waDet) waDet.addEventListener('toggle', function(){ waOpen = waDet.open; });
+    $all('.wa-send', body).forEach(function(a){
+      a.addEventListener('click', function(){ waSent[a.getAttribute('data-key')] = true; a.textContent = 'اتبعت ✓ — ابعت تاني'; });
+    });
 
     $all('.task-card', body).forEach(function(card){
       var btn = card.querySelector('.task-done-btn');
@@ -6900,41 +6958,40 @@
     lfWire('planlog');
   }
 
-  /* ---------- خطة المشتل: مربع لكل نظام (الصنف المزروع، المواسير، النباتات، الصواني المطلوبة/الموجودة/الناقصة) ---------- */
+  /* ---------- خطة المشتل: مربع لكل نظام، بتدخل فيه (الصنف، عدد المواسير، نباتات الماسورة) والبرنامج يحسب الصواني ---------- */
+  function saveNurseryTiles(){
+    if(db) return db.doc('settings/cropNames').set({nurseryTiles:nurseryTiles}, {merge:true});
+    renderAll(); return Promise.resolve();
+  }
+  function tileRows(sysId){ return Array.isArray(nurseryTiles[sysId]) ? nurseryTiles[sysId] : []; }
   function nurseryTilesData(){
     var pending = nurseryLog.filter(function(n){ return !n.transplantDate; });
     var tiles = systems.map(function(sy){
-      var map = getPipeMap(sy.id), ppp = parseFloat(map.plantsPerPipe) || 30, byCrop = {}, order = [], used = 0;
-      (map.groups||[]).forEach(function(g){
-        var k = cropKey(g.crop), p = parseFloat(g.pipes) || 0; if(!k) return;
-        var e = byCrop[k]; if(!e){ e = byCrop[k] = {key:k, name:g.crop, pipes:0}; order.push(k); }
-        e.pipes += p; used += p;
+      var assigned = {}, keysInPlan = {};
+      pending.forEach(function(n){ var k = cropKey(n.cropName); if(n.systemId===sy.id && k) assigned[k] = (assigned[k]||0) + batchTrays(n); });
+      var rows = tileRows(sy.id).map(function(r){
+        var pipes = parseFloat(r.pipes) || 0, ppp = parseFloat(r.ppp) || 0, k = cropKey(r.crop);
+        var plants = pipes * ppp, need = plants>0 ? Math.ceil(plants / TRAY_SIZE) : 0;
+        var have = 0;
+        if(k){ keysInPlan[k] = 1; have = Math.min(assigned[k]||0, need); assigned[k] = (assigned[k]||0) - have; }
+        return {id:r.id, crop:r.crop||'', key:k, pipes:r.pipes, ppp:r.ppp, plants:plants, need:need, have:have, pool:0};
       });
-      var rows = order.map(function(k){
-        var e = byCrop[k];
-        e.plants = e.pipes * ppp;
-        e.need = Math.ceil(e.plants / TRAY_SIZE);
-        e.have = sumTrays(pending.filter(function(n){ return n.systemId===sy.id && cropKey(n.cropName)===k; }));
-        e.pool = 0; e.extra = false;
-        return e;
+      // أي صواني متخصصة زيادة لنفس الصنف بتتضاف على آخر صف له
+      rows.slice().reverse().forEach(function(r, i, arr){
+        if(r.key && assigned[r.key] > 0){ r.have += assigned[r.key]; assigned[r.key] = 0; }
       });
-      // صواني متخصصة للسيستم لصنف مالوش مواسير لسه
-      var seen = {}; rows.forEach(function(r){ seen[r.key] = 1; });
-      pending.forEach(function(n){
-        var k = cropKey(n.cropName);
-        if(n.systemId!==sy.id || !k || seen[k]) return;
-        seen[k] = 1;
-        rows.push({key:k, name:n.cropName, pipes:0, plants:0, need:0, pool:0, extra:true,
-          have:sumTrays(pending.filter(function(m){ return m.systemId===sy.id && cropKey(m.cropName)===k; }))});
+      var other = Object.keys(assigned).filter(function(k){ return assigned[k] > 0 && !keysInPlan[k]; }).map(function(k){
+        var nm = (pending.filter(function(n){ return cropKey(n.cropName)===k; })[0] || {}).cropName || k;
+        return {name:nm, trays:assigned[k]};
       });
-      return {sys:sy, ppp:ppp, total:parseFloat(map.totalPipes) || 0, used:used, rows:rows};
+      return {sys:sy, rows:rows, other:other};
     });
-    // الصواني اللي من غير سيستم محدد بتتوزّع على الأنظمة الناقصة بالترتيب
+    // الصواني اللي من غير سيستم محدد بتتوزّع على الصفوف الناقصة بالترتيب
     var pool = {};
     pending.forEach(function(n){ if(!n.systemId){ var k = cropKey(n.cropName); if(k) pool[k] = (pool[k]||0) + batchTrays(n); } });
     tiles.forEach(function(t){
       t.rows.forEach(function(r){
-        var miss = Math.max(0, r.need - r.have), take = Math.min(miss, pool[r.key] || 0);
+        var miss = Math.max(0, r.need - r.have), take = r.key ? Math.min(miss, pool[r.key] || 0) : 0;
         if(take > 0){ r.pool = take; r.have += take; pool[r.key] -= take; }
       });
     });
@@ -6947,34 +7004,97 @@
   function nurseryTilesHtml(){
     var head = '<h2 class="section-title" style="margin-top:0;">🌱 خطة المشتل — احتياج كل نظام من الصواني</h2>';
     if(!systems.length) return head + '<p class="empty-note">ضيف نظام الأول (من "بيانات المياه" أو "الإعدادات") عشان تظهر خطة المشتل.</p>';
-    var data = nurseryTilesData(), fmt = function(n){ return Number(n).toLocaleString('en-US'); };
-    var tiles = data.tiles.map(function(t){
+    var groups = greenhouseGroups();
+    if(!nurseryTileGh || !groups.some(function(g){ return g.name===nurseryTileGh; })) nurseryTileGh = groups[0].name;
+    var grp = groups.filter(function(g){ return g.name===nurseryTileGh; })[0];
+    var data = nurseryTilesData(), editable = canEdit('nursery'), dis = editable ? '' : ' disabled';
+    var fmt = function(n){ return Number(n).toLocaleString('en-US'); };
+    var byId = {}; data.tiles.forEach(function(t){ byId[t.sys.id] = t; });
+    var crops = cropNamesList();
+    var gNeed = 0, gHave = 0, gMiss = 0;
+    var tilesHtml = grp.systems.map(function(sy){
+      var t = byId[sy.id], tMiss = 0;
       var rows = t.rows.map(function(r){
-        var miss = Math.max(0, r.need - r.have), ok = !r.extra && miss===0;
-        var st = function(label, val, cls){ return '<div class="'+(cls||'')+'"><span>'+label+'</span><b>'+val+'</b></div>'; };
-        return '<div class="nur-row">'+
-          '<div class="nur-crop">🌿 '+escH(r.name)+(r.extra ? ' <small class="hint">(صواني متخصصة من غير مواسير مسجلة)</small>' : '')+'</div>'+
-          '<div class="nur-stats">'+
-            st('مواسير', r.extra ? '—' : fmt(r.pipes))+
-            st('نباتات', r.extra ? '—' : fmt(r.plants))+
-            st('صواني مطلوبة', r.extra ? '—' : fmt(r.need))+
-            st('في المشتل', fmt(r.have))+
-            st('ناقص', r.extra ? '—' : fmt(miss), r.extra ? '' : (ok ? 'nur-ok' : 'nur-bad'))+
+        var miss = Math.max(0, r.need - r.have); tMiss += miss; gNeed += r.need; gHave += Math.min(r.have, r.need); gMiss += miss;
+        var has = r.plants > 0, ok = has && miss===0;
+        var opts = '<option value="">— الصنف —</option>' + crops.map(function(c){ return '<option value="'+escH(c)+'"'+(cropKey(c)===r.key?' selected':'')+'>'+escH(c)+'</option>'; }).join('') +
+          ((r.crop && !crops.some(function(c){ return cropKey(c)===r.key; })) ? '<option value="'+escH(r.crop)+'" selected>'+escH(r.crop)+'</option>' : '');
+        return '<div class="nur-row" data-row="'+escH(r.id)+'" data-have="'+r.have+'">'+
+          '<div class="nur-inputs">'+
+            '<div class="field-sm"><label>الصنف</label><select class="nt-crop"'+dis+'>'+opts+'</select></div>'+
+            '<div class="field-sm"><label>عدد المواسير</label><input type="number" class="ltr nt-pipes" min="0" step="1" inputmode="numeric" value="'+escH(r.pipes==null?'':r.pipes)+'"'+dis+'></div>'+
+            '<div class="field-sm"><label>نباتات الماسورة</label><input type="number" class="ltr nt-ppp" min="0" step="1" inputmode="numeric" value="'+escH(r.ppp==null?'':r.ppp)+'"'+dis+'></div>'+
+            '<button type="button" class="del-btn nt-del" title="شيل الصنف ده"'+dis+'>✕</button>'+
+          '</div>'+
+          '<div class="nur-stats" style="grid-template-columns:repeat(4,minmax(0,1fr));">'+
+            '<div><span>نباتات</span><b class="nt-plants">'+(has?fmt(r.plants):'—')+'</b></div>'+
+            '<div><span>صواني مطلوبة</span><b class="nt-need">'+(has?fmt(r.need):'—')+'</b></div>'+
+            '<div><span>في المشتل</span><b class="nt-have">'+fmt(r.have)+'</b></div>'+
+            '<div class="nt-missbox '+(has?(ok?'nur-ok':'nur-bad'):'')+'"><span>ناقص</span><b class="nt-miss">'+(has?fmt(miss):'—')+'</b></div>'+
           '</div>'+
           (r.pool>0 ? '<div class="hint" style="margin:4px 0 0;">منهم '+fmt(r.pool)+' صينية من غير سيستم محدد.</div>' : '')+
         '</div>';
       }).join('');
-      var free = Math.max(0, t.total - t.used);
-      return '<div class="stat-card nur-tile"><div class="nur-head"><strong>'+escH(systemLabel(t.sys))+'</strong>'+
-        '<span class="hint" style="margin:0;">'+fmt(t.total)+' ماسورة × '+fmt(t.ppp)+' نبتة</span></div>'+
-        (rows || '<p class="empty-note" style="margin:8px 0;">مفيش مواسير مسجلة للسيستم ده. سجّلها من تاب الحصاد (إنفوجراف المواسير).</p>')+
-        (t.rows.length && free>0 ? '<div class="hint" style="margin:8px 0 0;">'+fmt(free)+' ماسورة فاضية.</div>' : '')+
-      '</div>';
+      var other = t.other.length ? '<div class="hint" style="margin:8px 0 0;">صواني في المشتل لأصناف مش في الخطة: '+t.other.map(function(o){ return escH(o.name)+' ('+fmt(o.trays)+')'; }).join('، ')+'</div>' : '';
+      return '<div class="stat-card nur-tile" data-sys="'+escH(sy.id)+'"><div class="nur-head"><strong>'+escH(systemLabel(sy))+'</strong>'+
+        (t.rows.length ? '<span class="hint" style="margin:0;">'+(tMiss>0 ? 'ناقص '+fmt(tMiss)+' صينية' : 'مكتمل ✅')+'</span>' : '')+'</div>'+
+        (rows || '<p class="empty-note" style="margin:8px 0;">لسه ما سجلتش صنف للسيستم ده. دوس "ضيف صنف" واكتب عدد المواسير ونباتات كل ماسورة.</p>')+
+        other+
+        '<button type="button" class="btn btn-ghost btn-sm nt-add" style="margin-top:10px;"'+dis+'>＋ ضيف صنف</button></div>';
     }).join('');
-    var spare = data.spare.length ? '<div class="hint" style="margin:10px 0;">صواني في المشتل زيادة عن احتياج الأنظمة (من غير سيستم محدد): '+data.spare.map(function(s){ return escH(s.name)+' ('+fmt(s.trays)+')'; }).join('، ')+'</div>' : '';
-    return head +
-      '<p class="hint">الصواني المطلوبة = (عدد المواسير × نباتات الماسورة) ÷ '+TRAY_SIZE+' نبتة في الصينية، مقرّبة لفوق. "في المشتل" = صواني الصنف اللي لسه ما اتنقلتش للسيستم ده، والصواني اللي من غير سيستم محدد بتتوزّع على الأنظمة الناقصة.</p>'+
-      '<div class="nur-grid">'+tiles+'</div>'+spare;
+    var pills = groups.length>1 ? '<div class="system-pills" style="margin:6px 0 12px;">'+groups.map(function(g){
+      return '<button type="button" class="system-pill nur-gh-pill'+(g.name===nurseryTileGh?' active':'')+'" data-gh="'+escH(g.name)+'">'+escH(g.name)+'</button>';
+    }).join('')+'</div>' : '';
+    var sum = '<div class="hint" style="margin:0 0 10px;">'+escH(nurseryTileGh)+': مطلوب '+fmt(gNeed)+' صينية، الموجود في المشتل '+fmt(gHave)+'، الناقص '+fmt(gMiss)+'.</div>';
+    var spare = data.spare.length ? '<div class="hint" style="margin:10px 0;">صواني في المشتل زيادة عن احتياج الخطة (من غير سيستم محدد): '+data.spare.map(function(s){ return escH(s.name)+' ('+fmt(s.trays)+')'; }).join('، ')+'</div>' : '';
+    return head + pills +
+      '<p class="hint">اكتب لكل نظام الصنف وعدد المواسير وعدد نباتات الماسورة، والبرنامج يحسب الصواني المطلوبة = (المواسير × النباتات) ÷ '+TRAY_SIZE+' مقرّبة لفوق. "في المشتل" = صواني الصنف اللي لسه ما اتنقلتش للسيستم ده، والصواني اللي من غير سيستم محدد بتتوزّع على الصفوف الناقصة.</p>'+
+      sum + '<div class="nur-grid">'+tilesHtml+'</div>'+spare;
+  }
+  function wireNurseryTiles(root){
+    if(!root) return;
+    $all('.nur-gh-pill', root).forEach(function(b){ b.addEventListener('click', function(){ nurseryTileGh = b.getAttribute('data-gh'); renderNurseryPanel(); }); });
+    function rowCtx(el){
+      var tile = el.closest('.nur-tile'), row = el.closest('.nur-row');
+      return {tile:tile, row:row, sysId:tile.getAttribute('data-sys'), rid:row ? row.getAttribute('data-row') : null};
+    }
+    function readRow(row){
+      return {crop:row.querySelector('.nt-crop').value, pipes:row.querySelector('.nt-pipes').value, ppp:row.querySelector('.nt-ppp').value};
+    }
+    $all('.nt-pipes, .nt-ppp', root).forEach(function(inp){
+      inp.addEventListener('input', function(){
+        var row = inp.closest('.nur-row'), v = readRow(row), have = parseFloat(row.getAttribute('data-have')) || 0;
+        var plants = (parseFloat(v.pipes)||0) * (parseFloat(v.ppp)||0), need = plants>0 ? Math.ceil(plants/TRAY_SIZE) : 0, miss = Math.max(0, need-have), f = function(n){ return Number(n).toLocaleString('en-US'); };
+        row.querySelector('.nt-plants').textContent = plants>0 ? f(plants) : '—';
+        row.querySelector('.nt-need').textContent = plants>0 ? f(need) : '—';
+        row.querySelector('.nt-miss').textContent = plants>0 ? f(miss) : '—';
+        var mb = row.querySelector('.nt-missbox'); mb.classList.toggle('nur-ok', plants>0 && miss===0); mb.classList.toggle('nur-bad', plants>0 && miss>0);
+      });
+    });
+    $all('.nt-crop, .nt-pipes, .nt-ppp', root).forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var c = rowCtx(inp), v = readRow(c.row);
+        nurseryTiles[c.sysId] = tileRows(c.sysId).map(function(r){ return r.id===c.rid ? {id:r.id, crop:v.crop, pipes:v.pipes, ppp:v.ppp} : r; });
+        saveNurseryTiles();
+      });
+    });
+    $all('.nt-add', root).forEach(function(b){
+      b.addEventListener('click', function(){
+        var c = rowCtx(b), rows = tileRows(c.sysId), last = rows[rows.length-1];
+        var map = getPipeMap(c.sysId), ppp = last ? last.ppp : (map && map.plantsPerPipe ? map.plantsPerPipe : 30);
+        nurseryTiles[c.sysId] = rows.concat([{id:genId(), crop:'', pipes:'', ppp:ppp}]);
+        saveNurseryTiles();
+      });
+    });
+    $all('.nt-del', root).forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!requireAdminForDelete()) return;
+        var c = rowCtx(b);
+        if(!confirm('تشيل الصنف ده من خطة السيستم؟')) return;
+        nurseryTiles[c.sysId] = tileRows(c.sysId).filter(function(r){ return r.id!==c.rid; });
+        saveNurseryTiles();
+      });
+    });
   }
   function renderNurseryPanel(){
     var body = $('#nursery-body');
@@ -7041,6 +7161,7 @@
       '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
 
+    wireNurseryTiles(body);
     lfWire('nursery');
     $all('.nursery-crop-pill', body).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -8946,8 +9067,18 @@
   renderCropRefs = fsWrap(renderCropRefs);
 
   /* ---------- init ---------- */
-  function subscribeDb(){
-    db.collection('readings').orderBy('date','desc').limit(270).onSnapshot(function(snap){
+  /* القراءات بتتحمّل حسب المدى المختار (بدل حد ثابت 270 مستند كان بيقطع البيانات عند آخر كام يوم بس) */
+  var readingsLoadDays = 30, readingsUnsub = null;
+  function readingsCutoff(days){
+    var d = new Date(Date.now() - (days+1)*86400000);
+    return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  }
+  function subscribeReadings(days){
+    if(!db) return;
+    if(readingsUnsub){ try{ readingsUnsub(); }catch(e){} readingsUnsub = null; }
+    var q = db.collection('readings');
+    q = (days===null) ? q.orderBy('date','desc').limit(20000) : q.where('date','>=', readingsCutoff(days)).orderBy('date','desc');
+    readingsUnsub = q.onSnapshot(function(snap){
       readingsDocs = snap.docs.filter(function(d){return d.exists;}).map(function(d){
         return Object.assign({id:d.id}, d.data());
       });
@@ -8955,6 +9086,23 @@
     }, function(err){
       console.error('readings snapshot error', err);
     });
+  }
+  function ensureReadingsRange(days){
+    var need = (days===null) ? Infinity : days, cur = (readingsLoadDays===null) ? Infinity : readingsLoadDays;
+    if(!(need > cur)) return;
+    readingsLoadDays = days;
+    toast('بيحمّل بيانات أقدم…');
+    subscribeReadings(days);
+  }
+  document.addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('.range-pill[data-days]') : null;
+    if(!b) return;
+    var d = b.getAttribute('data-days');
+    ensureReadingsRange(d ? parseInt(d,10) : null);
+  });
+
+  function subscribeDb(){
+    subscribeReadings(readingsLoadDays);
 
     db.doc('settings/config').onSnapshot(function(snap){
       if(snap.exists){
@@ -9127,6 +9275,7 @@
     db.doc('settings/cropNames').onSnapshot(function(snap){
       cropNames = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
       orderProducts = (snap.exists && Array.isArray(snap.data().orderProducts)) ? snap.data().orderProducts : [];
+      nurseryTiles = (snap.exists && snap.data().nurseryTiles && typeof snap.data().nurseryTiles==='object') ? snap.data().nurseryTiles : {};
       renderAll();
     }, function(err){ console.error('cropNames snapshot error', err); });
 
