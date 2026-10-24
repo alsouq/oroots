@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ptUMN70XsZ8jOf0XVV+GJ89R1pxKMV5WrOImI7InoNs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tPDWSO/3ha6PTWDg5jiwygvu+ntyEt8eW7nnA6ZPGVQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>O'Roots — مراقبة جودة المياه</title>
@@ -584,6 +584,15 @@
   .nur-inputs .field-sm label{font-size:.68rem;}
   .nur-inputs .field-sm input,.nur-inputs .field-sm select{width:100%;min-width:0;}
   .nur-row .nur-crop{display:none;}
+
+  /* ---- مستطيل التنبيهات (بيتفتح من الجرس) ---- */
+  .notif-bar{display:none !important;}
+  .notif-pop{position:fixed;z-index:1200;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-raised, 0 12px 32px rgba(0,0,0,.25));}
+  .notif-pop.hidden{display:none;}
+  .np-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:.9rem;}
+  .np-close{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
+  .np-body{overflow-y:auto;padding:4px 10px;flex:1;min-height:0;}
+  .notif-pop .notif-foot{padding:8px 12px 10px;border-top:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -7012,6 +7021,23 @@
     var byId = {}; data.tiles.forEach(function(t){ byId[t.sys.id] = t; });
     var crops = cropNamesList();
     var gNeed = 0, gHave = 0, gMiss = 0;
+    var tot = {}, totOrder = [];
+    data.tiles.forEach(function(t){ t.rows.forEach(function(r){
+      if(!r.key || !(r.need>0)) return;
+      var e = tot[r.key]; if(!e){ e = tot[r.key] = {name:r.crop, need:0, have:0, miss:0}; totOrder.push(r.key); }
+      e.need += r.need; e.have += Math.min(r.have, r.need); e.miss += Math.max(0, r.need - r.have);
+    }); });
+    totOrder.sort(function(a,b){ return (tot[b].miss - tot[a].miss) || tot[a].name.localeCompare(tot[b].name, 'ar'); });
+    var tN = 0, tH = 0, tM = 0;
+    var missColor = function(n){ return 'font-weight:700;color:var(--'+(n>0 ? 'alert' : 'good')+');'; };
+    var totRows = totOrder.map(function(k){
+      var e = tot[k]; tN += e.need; tH += e.have; tM += e.miss;
+      return '<tr><td><strong>'+escH(e.name)+'</strong></td><td class="num">'+fmt(e.need)+'</td><td class="num">'+fmt(e.have)+'</td><td class="num" style="'+missColor(e.miss)+'">'+fmt(e.miss)+'</td></tr>';
+    }).join('');
+    var totalsHtml = '<div class="chart-card" style="margin:0 0 14px;"><h3>إجمالي النواقص من الصواني لكل صنف (كل الصوب)</h3>'+
+      (totRows ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>الصنف</th><th>مطلوب</th><th>في المشتل</th><th>ناقص</th></tr></thead><tbody>'+totRows+'</tbody>'+
+        '<tfoot><tr><td><strong>الإجمالي</strong></td><td class="num"><strong>'+fmt(tN)+'</strong></td><td class="num"><strong>'+fmt(tH)+'</strong></td><td class="num" style="'+missColor(tM)+'">'+fmt(tM)+'</td></tr></tfoot></table></div>'
+        : '<p class="empty-note">لما تكتب بيانات الأنظمة (الصنف والمواسير والنباتات) هيظهر هنا إجمالي النواقص.</p>')+'</div>';
     var tilesHtml = grp.systems.map(function(sy){
       var t = byId[sy.id], tMiss = 0;
       var rows = t.rows.map(function(r){
@@ -7047,7 +7073,7 @@
     }).join('')+'</div>' : '';
     var sum = '<div class="hint" style="margin:0 0 10px;">'+escH(nurseryTileGh)+': مطلوب '+fmt(gNeed)+' صينية، الموجود في المشتل '+fmt(gHave)+'، الناقص '+fmt(gMiss)+'.</div>';
     var spare = data.spare.length ? '<div class="hint" style="margin:10px 0;">صواني في المشتل زيادة عن احتياج الخطة (من غير سيستم محدد): '+data.spare.map(function(s){ return escH(s.name)+' ('+fmt(s.trays)+')'; }).join('، ')+'</div>' : '';
-    return head + pills +
+    return head + totalsHtml + pills +
       '<p class="hint">اكتب لكل نظام الصنف وعدد المواسير وعدد نباتات الماسورة، والبرنامج يحسب الصواني المطلوبة = (المواسير × النباتات) ÷ '+TRAY_SIZE+' مقرّبة لفوق. "في المشتل" = صواني الصنف اللي لسه ما اتنقلتش للسيستم ده، والصواني اللي من غير سيستم محدد بتتوزّع على الصفوف الناقصة.</p>'+
       sum + '<div class="nur-grid">'+tilesHtml+'</div>'+spare;
   }
@@ -7842,10 +7868,11 @@
     if(badge){ badge.textContent = n>99 ? '99+' : n; badge.classList.toggle('hidden', !n); }
     document.title = (n ? '('+n+') ' : '') + BASE_TITLE;
     try{ if(navigator.setAppBadge){ n ? navigator.setAppBadge(n) : navigator.clearAppBadge(); } }catch(e){}
-    if(!n){ bar.classList.add('hidden'); bar.innerHTML = ''; return; }
-    var worst = items.some(function(i){ return i.level==='danger'; }) ? 'danger' : (items.some(function(i){ return i.level==='warn'; }) ? 'warn' : 'info');
+    bar.classList.add('hidden'); bar.innerHTML = '';
+    var pop = ensureNotifPop();
+    if(!notifOpen){ pop.classList.add('hidden'); return; }
     var mineN = items.filter(function(i){ return i.mine; }).length, unread = items.filter(function(i){ return i.fresh; }).length;
-    var summary = 'عندك '+n+(n===1?' تنبيه':' تنبيهات')+(mineN?(' — '+mineN+' ليك'):'')+(unread?(' • '+unread+' جديد'):'');
+    var summary = n ? ('عندك '+n+(n===1?' تنبيه':' تنبيهات')+(mineN?(' — '+mineN+' ليك'):'')+(unread?(' • '+unread+' جديد'):'')) : 'التنبيهات';
     var canTab = function(tab){ var b = tab ? document.querySelector('.tab-btn[data-tab="'+tab+'"]') : null; return !!(b && b.offsetParent!==null); };
     var rows = items.map(function(i){
       return '<div class="notif-item lv-'+i.level+(i.fresh?' fresh':'')+'" data-key="'+escH(i.key)+'"'+(i.tab?(' data-tab="'+i.tab+'"'):'')+'>'+
@@ -7859,21 +7886,51 @@
       ? '<span class="hint" style="margin:0;">إشعارات الجهاز شغالة ✓</span> <button type="button" class="btn btn-ghost btn-sm" id="notif-test">جرّب إشعار</button>'
       : (perm==='denied' ? '<span class="hint" style="margin:0;">إشعارات الجهاز مقفولة من إعدادات المتصفح</span>'
         : (perm==='unsupported' ? '' : '<button type="button" class="btn btn-ghost btn-sm" id="notif-enable">🔔 فعّل إشعارات الجهاز</button>'));
-    bar.className = 'notif-bar lv-'+worst;
-    bar.innerHTML =
-      '<button type="button" class="notif-head" id="notif-toggle" aria-expanded="'+(notifOpen?'true':'false')+'"><span class="notif-ico">🔔</span><span class="notif-sum">'+escH(summary)+'</span><span class="notif-caret">'+(notifOpen?'▴':'▾')+'</span></button>'+
-      (notifOpen ? '<div class="notif-list">'+rows+'<div class="notif-foot">'+deviceRow+(unread?' <button type="button" class="btn btn-ghost btn-sm" id="notif-readall">اعتبر الكل مقروء</button>':'')+'</div></div>' : '');
+    var prevBody = pop.querySelector('.np-body'), prevScroll = prevBody ? prevBody.scrollTop : 0;
+    pop.innerHTML =
+      '<div class="np-head"><strong>'+escH(summary)+'</strong><button type="button" class="np-close" id="notif-close" aria-label="إغلاق">✕</button></div>'+
+      '<div class="np-body">'+(n ? rows : '<p class="empty-note" style="margin:12px 4px;">مفيش تنبيهات دلوقتي ✓</p>')+'</div>'+
+      '<div class="notif-foot">'+deviceRow+(unread?' <button type="button" class="btn btn-ghost btn-sm" id="notif-readall">اعتبر الكل مقروء</button>':'')+'</div>';
+    pop.classList.remove('hidden');
+    positionNotifPop();
+    var nb = pop.querySelector('.np-body'); if(nb) nb.scrollTop = prevScroll;
 
-    $('#notif-toggle').addEventListener('click', function(){ notifOpen = !notifOpen; renderNotifBar(); });
-    $all('.notif-go', bar).forEach(function(b){ b.addEventListener('click', function(){
+    $('#notif-close').addEventListener('click', function(){ notifOpen = false; renderNotifBar(); });
+    $all('.notif-go', pop).forEach(function(b){ b.addEventListener('click', function(){
       var tab = b.closest('.notif-item').getAttribute('data-tab'), btn = tab ? document.querySelector('.tab-btn[data-tab="'+tab+'"]') : null;
+      notifOpen = false; renderNotifBar();
       if(btn){ btn.click(); window.scrollTo({top:0, behavior:'smooth'}); }
     }); });
-    $all('.notif-read', bar).forEach(function(b){ b.addEventListener('click', function(){ notifMarkRead(b.getAttribute('data-nid')).then(function(){ renderNotifBar(); }); renderNotifBar(); }); });
+    $all('.notif-read', pop).forEach(function(b){ b.addEventListener('click', function(){ notifMarkRead(b.getAttribute('data-nid')).then(function(){ renderNotifBar(); }); renderNotifBar(); }); });
     var ra = $('#notif-readall'); if(ra) ra.addEventListener('click', function(){ notifMarkRead(myNotifs.filter(function(x){ return !x.read; }).map(function(x){ return x.id; })).then(function(){ renderNotifBar(); }); renderNotifBar(); });
     var en = $('#notif-enable'); if(en) en.addEventListener('click', notifEnableDevice);
     var te = $('#notif-test'); if(te) te.addEventListener('click', function(){ deviceNotify('O\'Roots', 'ده إشعار تجريبي ✅', 'test'); toast('اتبعت إشعار تجريبي'); });
   }
+  /* مستطيل التنبيهات: بيتفتح تحت الجرس ومحصور جوه الشاشة */
+  function ensureNotifPop(){
+    var p = document.getElementById('notif-pop');
+    if(!p){ p = document.createElement('div'); p.id = 'notif-pop'; p.className = 'notif-pop hidden'; p.setAttribute('role','dialog'); p.setAttribute('aria-label','التنبيهات'); document.body.appendChild(p); }
+    return p;
+  }
+  function positionNotifPop(){
+    var pop = document.getElementById('notif-pop'), bell = document.getElementById('btn-notif');
+    if(!pop || !bell || pop.classList.contains('hidden')) return;
+    var r = bell.getBoundingClientRect(), vw = document.documentElement.clientWidth, w = Math.min(360, vw - 16);
+    pop.style.width = w + 'px';
+    pop.style.left = Math.max(8, Math.min(r.left, vw - w - 8)) + 'px';
+    pop.style.right = 'auto';
+    pop.style.top = Math.round(r.bottom + 8) + 'px';
+    pop.style.maxHeight = Math.max(180, window.innerHeight - r.bottom - 20) + 'px';
+  }
+  document.addEventListener('click', function(ev){
+    if(!notifOpen) return;
+    var path = ev.composedPath ? ev.composedPath() : [];
+    if(path.some(function(n){ return n && (n.id==='notif-pop' || n.id==='btn-notif'); })) return;
+    notifOpen = false; renderNotifBar();
+  });
+  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && notifOpen){ notifOpen = false; renderNotifBar(); } });
+  window.addEventListener('resize', positionNotifPop);
+  window.addEventListener('scroll', positionNotifPop, {passive:true});
   /* ملخص يومي مرة واحدة: مهامي النهارده والمتأخرة */
   function notifDailySummary(){
     try{
@@ -8211,7 +8268,7 @@
   function qPct(a, b){ return b>0 ? (a/b*100) : 0; }
   function qPctHtml(p){ var cls = p>=Q_BAD ? 'alert' : (p>=Q_WARN ? 'warn' : 'good'); return '<span class="status-pill '+cls+'">'+qFmt(p)+'%</span>'; }
   function qUid(){ return genId(); }
-  function qOrderLabel(o){ return '#'+(o.orderNo||'—')+' — '+(o.customer||'—'); }
+  function qOrderLabel(o){ return (o.orderNo||o.customer) ? ('#'+(o.orderNo||'—')+' — '+(o.customer||'—')) : String(o.date||''); }
 
   /* ----- صور (في collection منفصل وبتتحمّل عند الطلب) ----- */
   function qFileToDataUrl(file){
@@ -8418,7 +8475,7 @@
   function qSortCardHtml(o){
     var agg = qAggregate([o]), photoCount = (o.items||[]).reduce(function(n,it){ return n + (it.photoIds||[]).length; }, 0);
     return '<div class="q-order q-sort" data-id="'+escH(o.id)+'"'+lfAttr('qsort', o.date)+'>'+
-      '<div class="q-order-head"><strong>🧺 '+escH(qSortLabel(o))+'</strong><span class="hint" style="margin:0;">'+(o.orderNo?('أوردر #'+escH(o.orderNo)+' — '+escH(o.customer||'')):'من غير أوردر')+'</span></div>'+
+      '<div class="q-order-head"><strong>🧺 '+escH(qSortLabel(o))+'</strong><span class="hint" style="margin:0;">'+(o.orderNo?('أوردر #'+escH(o.orderNo)+' — '+escH(o.customer||'')):'')+'</span></div>'+
       qUnitSummaryHtml(agg.byUnit)+qOrderItemsTable(o, true)+
       (o.notes?('<div class="hint">📝 '+escH(o.notes)+'</div>'):'')+
       '<div class="q-photos" id="q-oph-'+escH(o.id)+'"></div>'+
@@ -8446,9 +8503,7 @@
         '<div class="field-sm"><label>الوحدة</label><select class="q-draft" data-i="'+i+'" data-f="unit">'+Object.keys(Q_UNITS).map(function(u){ return '<option value="'+u+'"'+(it.unit===u?' selected':'')+'>'+Q_UNITS[u]+'</option>'; }).join('')+'</select></div></div></div>';
     }).join('');
     return '<form class="entry-form" id="q-order-form"><div class="form-grid">'+
-      '<div class="field-sm"><label>رقم الأوردر</label><input type="text" class="q-draft" data-f="orderNo" maxlength="40" required value="'+escH(d.orderNo)+'"></div>'+
-      '<div class="field-sm"><label>تاريخ الأوردر</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div>'+
-      '<div class="field-sm full"><label>العميل</label><input type="text" class="q-draft" data-f="customer" maxlength="80" required value="'+escH(d.customer)+'"></div></div>'+
+      '<div class="field-sm"><label>تاريخ الأوردر</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div></div>'+
       rows+'<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm q-add-item-btn">＋ ضيف صنف للأوردر</button></div>'+
       '<div class="field-sm full"><label>ملاحظات الأوردر</label><input type="text" class="q-draft" data-f="notes" maxlength="250" value="'+escH(d.notes||'')+'"></div>'+
       '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="q-save-btn">'+(d.id?'حفظ التعديل':'حفظ الأوردر')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="q-cancel-btn">إلغاء</button></div></form>';
@@ -8473,14 +8528,13 @@
     $('#q-cancel-btn', form).addEventListener('click', function(){ qoDraft = null; rerender(); });
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
-      if(!d.orderNo.trim() || !d.customer.trim()){ toast('اكتب رقم الأوردر والعميل'); return; }
       var items = d.items.filter(function(it){ return String(it.product||'').trim(); });
       if(!items.length){ toast('اختار صنف واحد على الأقل'); return; }
       for(var k=0;k<items.length;k++){ if(!(qNum(items[k].required)>0)){ toast('اكتب الكمية المطلوبة لـ '+items[k].product); return; } }
       if(!db){ toast('محتاج اتصال'); return; }
       var btn = $('#q-save-btn'); btn.disabled = true, now = Date.now();
       var now = Date.now(), id = d.id || genId();
-      var rec = Object.assign({}, d.id ? (qOrderById(d.id)||{}) : {}, {id:id, orderNo:d.orderNo.trim(), customer:d.customer.trim(), date:d.date, notes:d.notes||'',
+      var rec = Object.assign({}, d.id ? (qOrderById(d.id)||{}) : {}, {id:id, orderNo:String(d.orderNo||'').trim(), customer:String(d.customer||'').trim(), date:d.date, notes:d.notes||'',
         items:items.map(function(it){ return {uid:it.uid, product:cropNameClean(it.product), unit:it.unit||'kg', required:qNum(it.required)}; }),
         createdBy:d.createdBy||currentUser||'', createdAt:d.createdAt||now, updatedAt:now});
       db.collection('qualityOrders').doc(id).set(rec).then(function(){
@@ -8496,7 +8550,7 @@
     var batch = db.batch(), now = Date.now();
     list.forEach(function(o){
       var sid = genId();
-      batch.set(db.collection('qualitySorting').doc(sid), {id:sid, date:o.date, ref:'من أوردر '+o.orderNo, orderId:o.id, orderNo:o.orderNo, customer:o.customer, notes:o.notes||'', photoRefId:o.id,
+      batch.set(db.collection('qualitySorting').doc(sid), {id:sid, date:o.date, ref:(o.orderNo ? ('من أوردر '+o.orderNo) : ''), orderId:o.id, orderNo:o.orderNo, customer:o.customer, notes:o.notes||'', photoRefId:o.id,
         items:(o.items||[]).map(function(it){ return {uid:it.uid, product:it.product, unit:it.unit||'kg', required:qNum(it.required), received:qNum(it.received), sorted:qNum(it.sorted), reasons:it.reasons||[], note:it.note||'', photoIds:it.photoIds||[]}; }),
         createdBy:o.createdBy||'', createdAt:now, updatedAt:now});
       batch.set(db.collection('qualityOrders').doc(o.id), Object.assign({}, o, {legacyMoved:true, items:(o.items||[]).map(function(it){ return {uid:it.uid, product:it.product, unit:it.unit||'kg', required:qNum(it.required)}; })}));
@@ -8511,7 +8565,7 @@
     }).join('');
     var nSort = qSortsForOrder(o).length;
     return '<div class="q-order" data-id="'+escH(o.id)+'"'+lfAttr('qord', o.date)+'>'+
-      '<div class="q-order-head"><strong>'+escH(qOrderLabel(o))+'</strong><span class="hint" style="margin:0;">'+escH(o.date)+'</span></div>'+
+      '<div class="q-order-head"><strong>'+escH(qOrderLabel(o))+'</strong><span class="hint" style="margin:0;">'+((o.orderNo||o.customer) ? escH(o.date) : '')+'</span></div>'+
       '<div class="table-wrap cropref-wrap"><table><thead><tr><th>الصنف</th><th>المطلوب</th><th>اتفرز</th><th>التنفيذ</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
       orderCalcHtml(o.items||[], '🧮 المكونات المطلوبة للأوردر')+'<div class="hint" style="margin:4px 0;">'+(nSort?('🧺 مرتبط بـ '+nSort+' جلسة فرز'):'لسه ما اتفرزش لأوردر ده')+'</div>'+
       (o.notes?('<div class="hint">📝 '+escH(o.notes)+'</div>'):'')+
@@ -8635,7 +8689,7 @@
   function qNewComplaint(){ return {id:'', date:todayStr(), customer:'', orderRef:'', product:'', type:Q_CTYPES[0], severity:'med', qty:'', unit:'kg', description:'', status:'new', assignedTo:'', assignedEmail:'', due:'', rootCause:'', action:'', resolution:'', newPhotos:[], photoIds:[], taskId:'', taskDate:''}; }
   function qComplaintFormHtml(c){
     var users = appUsers.filter(function(u){ return u.displayName; });
-    var ordOpts = '<option value="">— مش مرتبطة بأوردر —</option>'+qOrders.slice(0,100).map(function(o){ return '<option value="'+escH(o.orderNo)+'"'+(c.orderRef===o.orderNo?' selected':'')+'>#'+escH(o.orderNo)+' — '+escH(o.customer)+'</option>'; }).join('');
+    var ordOpts = '<option value="">— مش مرتبطة بأوردر —</option>'+qOrders.slice(0,100).filter(function(o){ return o.orderNo; }).map(function(o){ return '<option value="'+escH(o.orderNo)+'"'+(c.orderRef===o.orderNo?' selected':'')+'>#'+escH(o.orderNo)+' — '+escH(o.customer)+'</option>'; }).join('');
     var newp = (c.newPhotos||[]).map(function(src,k){ return '<span class="q-newph"><img class="pest-photo q-thumb" src="'+src+'" alt=""><button type="button" class="del-btn qc-rm-ph" data-k="'+k+'">✕</button></span>'; }).join('');
     var sel = function(f, map, cur){ return '<select class="q-draft" data-cf="'+f+'">'+Object.keys(map).map(function(k){ return '<option value="'+k+'"'+(cur===k?' selected':'')+'>'+map[k]+'</option>'; }).join('')+'</select>'; };
     var prodField = cropNamesList().length
@@ -9039,7 +9093,7 @@
     if(printBtn) printBtn.addEventListener('click', buildAndPrintWeeklyReport);
 
     var bellBtn = $('#btn-notif');
-    if(bellBtn) bellBtn.addEventListener('click', function(){ notifOpen = !notifOpen; renderNotifBar(); window.scrollTo({top:0, behavior:'smooth'}); });
+    if(bellBtn) bellBtn.addEventListener('click', function(){ notifOpen = !notifOpen; renderNotifBar(); });
     $('#btn-logout').addEventListener('click', function(){
       Promise.resolve(logAudit('logout', 'auth', 'تسجيل خروج')).then(function(){
         return fbAuth ? fbAuth.signOut() : null;
@@ -9243,9 +9297,7 @@
       var wasFirst = notifFirstLoad;
       notifFirstLoad = false;
       myNotifs = list;
-      if(wasFirst){ if(fresh.length) notifOpen = true; }
-      else if(fresh.length){
-        notifOpen = true;
+      if(!wasFirst && fresh.length){
         fresh.forEach(function(n){ deviceNotify(n.title, n.body, n.id); });
         toast('🔔 '+fresh[0].title+(fresh.length>1?(' (+'+(fresh.length-1)+')'):''));
         try{ if(navigator.vibrate) navigator.vibrate([180,90,180]); }catch(e){}
