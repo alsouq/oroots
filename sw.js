@@ -1,5 +1,5 @@
 /* O'Roots service worker: يفتح التطبيق حتى لو النت ضعيف + إشعارات الجهاز */
-var VERSION = 'oroots-v1';
+var VERSION = 'oroots-v2';
 var SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', function(e){
@@ -16,11 +16,21 @@ self.addEventListener('fetch', function(e){
   var url = new URL(req.url);
   if(url.origin===location.origin){
     if(req.mode==='navigate'){
-      /* الصفحة: من النت الأول (عشان أي تحديث يوصل)، ولو مفيش نت من النسخة المحفوظة */
-      e.respondWith(fetch(req).then(function(r){
-        var copy = r.clone(); caches.open(VERSION).then(function(c){ c.put('index.html', copy); });
-        return r;
-      }).catch(function(){ return caches.match('index.html'); }));
+      /* الصفحة: من النت لو رد في ٢٫٥ ثانية، وإلا من النسخة المحفوظة (والنسخة الجديدة بتتحفظ في الخلفية) */
+      e.respondWith(new Promise(function(resolve){
+        var done = false;
+        var t = setTimeout(function(){
+          caches.match('index.html').then(function(c){ if(c && !done){ done = true; resolve(c); } });
+        }, 2500);
+        fetch(req).then(function(r){
+          clearTimeout(t);
+          var copy = r.clone(); caches.open(VERSION).then(function(c){ c.put('index.html', copy); });
+          if(!done){ done = true; resolve(r); }
+        }).catch(function(){
+          clearTimeout(t);
+          caches.match('index.html').then(function(c){ if(!done){ done = true; resolve(c || Response.error()); } });
+        });
+      }));
       return;
     }
     e.respondWith(caches.match(req).then(function(hit){
