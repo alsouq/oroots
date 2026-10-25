@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1rBXJwBY4wfbRLWEC/OXhwe/VD+hRTZesGr1wjxap98=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JVN4UAXJ2TdB5C4IWSx85ly8zAdFkEHuaTAPp6dHmhY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -648,6 +648,16 @@
     #print-report h2{break-after:avoid;page-break-after:avoid;}
     #print-report tr{break-inside:avoid;page-break-inside:avoid;}
   }
+
+  /* ---- استيراد الأوردرات ---- */
+  .imp-order{border:1px solid var(--border);border-radius:10px;padding:10px;margin:10px 0;background:var(--surface-2);}
+  .imp-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .imp-head select{flex:1;min-width:160px;}
+  .imp-keep{display:flex;align-items:center;padding:0 2px;}
+  .imp-item{display:grid;grid-template-columns:auto minmax(0,1fr) 64px 84px;gap:6px;align-items:end;padding:6px 0;border-top:1px dashed var(--border);}
+  .imp-item select,.imp-item input[type=number]{width:100%;min-width:0;}
+  .imp-raw{margin:0 0 2px;font-size:.7rem;color:var(--muted);direction:ltr;text-align:start;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .imp-item.warn select.imp-prod{border-color:var(--alert);}
 </style>
 </head>
 <body>
@@ -815,6 +825,12 @@
         <h3>أسماء الأصناف في الأوردرات (المكسات)</h3>
         <p class="hint">قايمة منفصلة عن "الأصناف / المحاصيل". اللي تسجّله هنا (مثلاً أسماء المكسات) هو اللي هيظهر في خانة "الصنف المطلوب" جوه الأوردرات في تاب الجودة. الأوردرات القديمة بتفضل بأسمائها.</p>
         <div id="orderprod-box"></div>
+      </div>
+
+      <div class="settings-card">
+        <h3>العملاء</h3>
+        <p class="hint">قايمة العملاء اللي بتظهر كاقتراحات في الأوردرات وبيتطابق معاها الاستيراد من الملفات.</p>
+        <div id="customers-box"></div>
       </div>
 
       <div class="settings-card">
@@ -1023,6 +1039,7 @@
   var pipeMaps = [];
   var cropNames = [];
   var orderProducts = [];
+  var customers = [];
   var nurseryTiles = {}, nurseryTilesLegacy = {}, nurseryTilesNew = null;
   function syncNurseryTiles(){ nurseryTiles = nurseryTilesNew || nurseryTilesLegacy || {}; }
   var nurseryTileGh = null;
@@ -1945,7 +1962,7 @@
       bioReleases: bioReleases, stickyTraps: stickyTraps, pheromoneTraps: pheromoneTraps,
       nurseryLog: nurseryLog, harvestLog: harvestLog, inventoryItems: inventoryItems,
       irrigCalib: irrigCalib, auditLog: auditLog, appUsers: appUsers, nurseryPlans: nurseryPlans,
-      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, orderProducts: orderProducts, nurseryTiles: nurseryTiles, sprayPlan: sprayPlan, qualityOrders: qOrders, qualitySorting: qSorts, qualityComplaints: qComplaints
+      instrumentCalibrations: instrumentCalibrations, cropRefs: cropRefs, nurseryPlanLog: nurseryPlanLog, pipeMaps: pipeMaps, cropNames: cropNames, orderProducts: orderProducts, customers: customers, nurseryTiles: nurseryTiles, sprayPlan: sprayPlan, qualityOrders: qOrders, qualitySorting: qSorts, qualityComplaints: qComplaints
     };
   }
   function exportFullBackup(){
@@ -2025,6 +2042,7 @@
     if(Array.isArray(backup.cropNames)) writes.push(db.doc('settings/cropNames').set({list: backup.cropNames}, {merge:true}));
     if(Array.isArray(backup.orderProducts)) writes.push(db.doc('settings/cropNames').set({orderProducts: backup.orderProducts}, {merge:true}));
     if(backup.nurseryTiles && typeof backup.nurseryTiles==='object') writes.push(db.doc('settings/nurseryTiles').set({tiles: backup.nurseryTiles}));
+    if(Array.isArray(backup.customers)) writes.push(db.doc('settings/customers').set({list: backup.customers}));
     return Promise.all(writes);
   }
   function importFullBackup(backup){
@@ -7681,7 +7699,8 @@
   function opFmt(g){ return (Math.round(g*10)/10).toLocaleString('en'); }
   function orderProductByName(name){
     var k = cropKey(name);
-    return orderProducts.filter(function(x){ return cropKey(x.name)===k; })[0] || null;
+    return orderProducts.filter(function(x){ return cropKey(x.name)===k; })[0] ||
+      orderProducts.filter(function(x){ return (x.aka||[]).some(function(a){ return cropKey(a)===k; }); })[0] || null;
   }
   function orderProductNames(){
     return orderProducts.map(function(x){ return x.name; }).sort(function(a,b){ return a.localeCompare(b, 'ar'); });
@@ -7753,6 +7772,7 @@
     if(!box) return;
     var list = orderProducts.slice().sort(function(a,b){ return a.name.localeCompare(b.name, 'ar'); });
     var missing = ORDER_SEED.filter(function(s){ return !orderProductByName(s.name); });
+    var itemsPlan = opItemsSeedPlan();
     function editorHtml(x){
       var ks = Object.keys(opEdit.recipe).sort(function(a,b){ return MIX_VARIETIES.indexOf(a) - MIX_VARIETIES.indexOf(b); });
       var pool = MIX_VARIETIES.filter(function(v){ return !(v in opEdit.recipe); });
@@ -7774,6 +7794,7 @@
         '<button type="button" class="del-btn op-del" title="حذف">✕</button></div>'+(open ? editorHtml(x) : '')+'</div>';
     }).join('');
     box.innerHTML =
+      (itemsPlan.n ? '<div class="hint" style="margin-bottom:10px;">ملف الأصناف الجديد: '+itemsPlan.add.length+' صنف جديد'+(itemsPlan.rename.length?('، '+itemsPlan.rename.length+' ميكس هيتغيّر اسمه للاسم الإنجليزي (والاسم القديم بيفضل شغال)'):'')+(itemsPlan.barcode.length?('، '+itemsPlan.barcode.length+' باركود'):'')+'. <button type="button" class="btn btn-primary btn-sm" id="op-items-seed">⬇️ حدّث الأصناف ('+itemsPlan.n+')</button></div>' : '')+
       (missing.length ? '<div class="hint" style="margin-bottom:10px;">جاهز عندك '+missing.length+' صنف من حاسبة الأكياس (9 مكسات بوصفاتها وباقي الأصناف المنفردة). <button type="button" class="btn btn-primary btn-sm" id="op-import">⬇️ استيرادهم ('+missing.length+')</button></div>' : '')+
       (list.length ? rows : '<p class="empty-note">لسه ما سجلتش أسماء. لحد ما تسجّل، خانة الصنف في الأوردر بتفضل كتابة حرة.</p>')+
       '<form class="entry-form" id="orderprod-form" style="margin-top:12px;"><div class="form-grid"><div class="field-sm full"><label>أسماء جديدة (كل اسم في سطر)</label><textarea id="op-new" rows="3" maxlength="800" placeholder="مثال: ميكس سلطة&#10;ميكس ورقيات"></textarea></div></div>'+
@@ -7792,6 +7813,7 @@
     sumLine();
     $all('.op-g, .op-w', box).forEach(function(inp){ inp.addEventListener('input', function(){ capture(); sumLine(); }); });
 
+    var seedBtn = $('#op-items-seed'); if(seedBtn) seedBtn.addEventListener('click', opApplyItemsSeed);
     var imp = $('#op-import');
     if(imp) imp.addEventListener('click', function(){
       var add = missing.map(function(s){ return Object.assign({id:genId()}, JSON.parse(JSON.stringify(s))); });
@@ -8483,7 +8505,7 @@
   function qPct(a, b){ return b>0 ? (a/b*100) : 0; }
   function qPctHtml(p){ var cls = p>=Q_BAD ? 'alert' : (p>=Q_WARN ? 'warn' : 'good'); return '<span class="status-pill '+cls+'">'+qFmt(p)+'%</span>'; }
   function qUid(){ return genId(); }
-  function qOrderLabel(o){ return (o.orderNo||o.customer) ? ('#'+(o.orderNo||'—')+' — '+(o.customer||'—')) : String(o.date||''); }
+  function qOrderLabel(o){ return o.customer ? ((o.orderNo ? ('#'+o.orderNo+' — ') : '')+o.customer) : (o.orderNo ? ('#'+o.orderNo) : String(o.date||'')); }
 
   /* ----- صور (في collection منفصل وبتتحمّل عند الطلب) ----- */
   function qFileToDataUrl(file){
@@ -8705,6 +8727,366 @@
   }
 
   /* ----- الأوردرات: بيانات الأوردر والكميات المطلوبة بس ----- */
+  /* ================= استيراد الأوردرات من ملف + قايمة العملاء ================= */
+  /* ===== استيراد الأوردرات: قراءة النص + مطابقة العملاء والأصناف (كود مشترك بين التطبيق والاختبار) ===== */
+  function impClean(l){ return String(l||'').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069\u061c]/g,'').replace(/\s+/g,' ').trim(); }
+  function impNum(s){ var t = String(s||'').replace(/[,\s]/g,'').replace(/[٠-٩]/g,function(c){ return String(c.charCodeAt(0)-1632); }); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; }
+  function impIso(d, m, y){ return y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2); }
+  function impCustomerName(line){
+    var s = impClean(line);
+    s = s.replace(/[)(]*\s*(?:كاش|أجل|اجل)\s*[)(]*/g,' ')
+         .replace(/(?:None|[\d+\-]{5,})\s*[:：]\s*(?:ض\s*\.?\s*ر|ر\s*\.?\s*ض|ت)(?![\u0600-\u06FF])/g,' ')
+         .replace(/(?:ض\s*\.?\s*ر|ر\s*\.?\s*ض|ت)\s*[:：]\s*(?:None|[\d+\-]{5,})/g,' ')
+         .replace(/(^|\s)None(?=\s|$)/g,' ');
+    s = s.replace(/^[\s)(:\-–]+|[\s)(:\-–]+$/g,'').replace(/\s+/g,' ').trim();
+    var open = (s.match(/\(/g)||[]).length, close = (s.match(/\)/g)||[]).length;
+    if(close>open) s = s.replace(/\)/g,'').trim();
+    return s;
+  }
+  function impParse(text){
+    var lines = String(text||'').replace(/(\S)(طلبية عميل)/g,'$1\n$2').split(/\r?\n/).map(impClean).filter(function(l){ return l; });
+    var dateRe = /(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/, orders = [], cur = null, nameBuf = [], state = 'idle', rev = null;
+    var headWord = /^(الصنف|الباركود|الكمية|الوحدة|سعر|سعر الوحدة|الإجمالي|الاجمالي)(\s+(الصنف|الباركود|الكمية|الوحدة|سعر|سعر الوحدة|الإجمالي|الاجمالي))*$/;
+    var bcRe = /(?:^|[^\d])(\d{12,14})(?=[^\d]|$)/, bcOnly = /^[*_\s]*(\d{12,14})[*_\s]*$/;
+    function pushItem(bc, q, p, t, name){
+      var ok = false, Q = q, P = p;
+      [[q,p],[p,q]].forEach(function(pm){ if(!ok && Math.abs(pm[0]*pm[1]-t) < 0.51){ Q = pm[0]; P = pm[1]; ok = true; } });
+      var it = {raw:impClean(name||''), barcode:bc, qty:Q, price:P, total:t, calcOk:ok};
+      cur.items.push(it); return it;
+    }
+    for(var i=0;i<lines.length;i++){
+      var l = lines[i];
+      var dm = l.match(dateRe);
+      if(dm && /(طلبي|عميل|order)/i.test(l) && !bcRe.test(l)){
+        cur = {date:impIso(dm[1],dm[2],dm[3]), customerRaw:'', items:[], grand:null, sum:0};
+        orders.push(cur); nameBuf = []; rev = null; state = 'cust'; continue;
+      }
+      if(!cur) continue;
+      if(state==='cust'){
+        if(headWord.test(l)){ state = 'items'; continue; }
+        cur.customerRaw = impCustomerName(l); state = 'items'; continue;
+      }
+      if((l==='الإجمالي'||l==='الاجمالي') && i+1<lines.length && impNum(lines[i+1])!==null && cur.items.length){ cur.grand = impNum(lines[i+1]); i++; nameBuf = []; rev = null; continue; }
+      if(headWord.test(l)) continue;
+      var tot = l.match(/^(الإجمالي|الاجمالي)\s*[:：]?\s*(-?[\d,.]+)?$/);
+      if(tot){
+        var v = tot[2] ? impNum(tot[2]) : null;
+        if(v===null && i+1<lines.length && impNum(lines[i+1])!==null){ v = impNum(lines[i+1]); i++; }
+        cur.grand = v; nameBuf = []; rev = null; continue;
+      }
+      var bm = l.match(bcRe);
+      if(bm){
+        var bc = bm[1], rest = l.replace(bm[1],' ').replace(/[*_]/g,' '), nums = [], words = [];
+        rest.split(/\s+/).forEach(function(tk){ if(!tk) return; var n = impNum(tk); if(n!==null) nums.push(n); else words.push(tk); });
+        if(nums.length>=3){                                  // كله في سطر واحد
+          var firstNumPos = l.search(/\d/), before = l.indexOf(bm[1]), q, p, t;
+          if(before <= firstNumPos){ q = nums[0]; p = nums[1]; t = nums[2]; } else { t = nums[0]; p = nums[1]; q = nums[2]; }
+          pushItem(bc, q, p, t, nameBuf.join(' ')+' '+words.join(' ')); nameBuf = []; rev = null; continue;
+        }
+        var fwd = [], j = i+1;
+        while(fwd.length<3 && j<lines.length && bcOnly.test(l)){ var n2 = impNum(lines[j]); if(n2===null) break; fwd.push(n2); j++; }
+        if(fwd.length===3){                                  // الاسم قبل الباركود، والأرقام بعده: كمية، سعر، إجمالي
+          pushItem(bc, fwd[0], fwd[1], fwd[2], nameBuf.join(' ')+' '+words.join(' ')); nameBuf = []; rev = null; i = j-1; continue;
+        }
+        var k = nameBuf.length;                              // جدول بالترتيب المعكوس: إجمالي، سعر، كمية، باركود، ثم الاسم
+        if(k>=3 && impNum(nameBuf[k-1])!==null && impNum(nameBuf[k-2])!==null && impNum(nameBuf[k-3])!==null){
+          var t2 = impNum(nameBuf[k-3]), p2 = impNum(nameBuf[k-2]), q2 = impNum(nameBuf[k-1]);
+          nameBuf = nameBuf.slice(0, k-3);
+          rev = pushItem(bc, q2, p2, t2, words.join(' ')); continue;
+        }
+        nameBuf.push(l); continue;
+      }
+      if(rev && impNum(l)===null){ rev.raw = impClean(rev.raw+' '+l); continue; }
+      if(impNum(l)!==null) rev = null;
+      nameBuf.push(l);
+    }
+    orders.forEach(function(o){ o.sum = o.items.reduce(function(s,it){ return s+it.total; }, 0); });
+    return orders.filter(function(o){ return o.items.length; });
+  }
+  /* ----- مطابقة الأسماء ----- */
+  function impTokens(s){
+    var t = String(s||'').toLowerCase().replace(/[\u0600-\u06FF]/g,' ').replace(/[\u064B-\u065F]/g,'')
+      .replace(/(\d)([a-z])/g,'$1 $2').replace(/([a-z])(\d)/g,'$1 $2').replace(/&/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+    var seen = {}, out = [];
+    t.split(/\s+/).forEach(function(w){
+      if(!w) return;
+      if(w==='gm'||w==='gms'||w==='gram'||w==='gr'||w==='g'||w==='grams') w = 'grams';
+      if(w==='kilo'||w==='kg') w = 'kg';
+      if(!seen[w]){ seen[w] = 1; out.push(w); }
+    });
+    return out;
+  }
+  function impLev(a, b){
+    if(a===b) return 0; var m = a.length, n = b.length; if(!m) return n; if(!n) return m;
+    var prev = [], cur2 = [], i, j; for(j=0;j<=n;j++) prev[j] = j;
+    for(i=1;i<=m;i++){ cur2[0] = i; for(j=1;j<=n;j++){ cur2[j] = Math.min(prev[j]+1, cur2[j-1]+1, prev[j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1)); } prev = cur2.slice(); }
+    return prev[n];
+  }
+  function impTokSim(x, y){ if(x===y) return 1; if(/^\d+$/.test(x)||/^\d+$/.test(y)) return 0; var d = impLev(x,y), L = Math.max(x.length,y.length); var r = 1-d/L; return r>=0.75 ? r : 0; }
+  function impScore(a, b, skip){
+    var A = a.filter(function(w){ return !skip || skip.indexOf(w)<0; }), B = b.filter(function(w){ return !skip || skip.indexOf(w)<0; });
+    if(!A.length || !B.length) return 0;
+    var used = {}, sum = 0;
+    A.forEach(function(x){ var best = 0, bi = -1; B.forEach(function(y,k){ if(used[k]) return; var s = impTokSim(x,y); if(s>best){ best = s; bi = k; } }); if(bi>=0){ used[bi] = 1; sum += best; } });
+    return sum / ((A.length + B.length)/2);
+  }
+  function impRank(raw, names, skip){
+    var a = impTokens(raw);
+    return names.map(function(n){ return {name:n, score:impScore(a, impTokens(n), skip)}; }).filter(function(x){ return x.score>0; }).sort(function(x,y){ return y.score-x.score; });
+  }
+
+  function impDecodeXml(s){ return String(s).replace(/&#x([0-9a-f]+);/gi,function(_,h){ return String.fromCodePoint(parseInt(h,16)); }).replace(/&#(\d+);/g,function(_,d){ return String.fromCodePoint(parseInt(d,10)); }).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&'); }
+  function impDocxXmlToText(xml){
+    var paras = String(xml).match(/<w:p[ >][\s\S]*?<\/w:p>/g) || [], out = [];
+    paras.forEach(function(p){
+      var s = p.replace(/<w:tab\/>/g,'<w:t> </w:t>').replace(/<w:br[^>]*\/>/g,'<w:t> </w:t>');
+      var txt = (s.match(/<w:t(?: [^>]*)?>[\s\S]*?<\/w:t>/g)||[]).map(function(t){ return t.replace(/<[^>]+>/g,''); }).join('');
+      txt = impDecodeXml(txt).replace(/\s+/g,' ').trim();
+      if(txt) out.push(txt);
+    });
+    return out.join('\n');
+  }
+  function impReadZipEntry(buf, wanted){
+    var u8 = new Uint8Array(buf), dv = new DataView(buf), eocd = -1, i;
+    for(i=u8.length-22; i>=Math.max(0,u8.length-65557); i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd = i; break; } }
+    if(eocd<0) return Promise.reject(new Error('مش ملف Word صالح'));
+    var count = dv.getUint16(eocd+10,true), p = dv.getUint32(eocd+16,true), found = null, n;
+    for(n=0;n<count;n++){
+      if(dv.getUint32(p,true)!==0x02014b50) break;
+      var method = dv.getUint16(p+10,true), csize = dv.getUint32(p+20,true), nl = dv.getUint16(p+28,true), el = dv.getUint16(p+30,true), cl = dv.getUint16(p+32,true), lho = dv.getUint32(p+42,true);
+      var name = new TextDecoder().decode(u8.subarray(p+46, p+46+nl));
+      if(name===wanted){ found = {method:method, csize:csize, lho:lho}; break; }
+      p += 46 + nl + el + cl;
+    }
+    if(!found) return Promise.reject(new Error('الملف مفيهوش '+wanted));
+    var start = found.lho + 30 + dv.getUint16(found.lho+26,true) + dv.getUint16(found.lho+28,true);
+    var raw = u8.subarray(start, start+found.csize);
+    if(found.method===0) return Promise.resolve(new TextDecoder().decode(raw));
+    if(found.method!==8) return Promise.reject(new Error('طريقة ضغط مش مدعومة'));
+    if(typeof DecompressionStream==='undefined') return Promise.reject(new Error('المتصفح مش بيدعم فك الضغط — حدّث كروم'));
+    return new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+  }
+  function impReadDocx(buf){ return impReadZipEntry(buf, 'word/document.xml').then(impDocxXmlToText); }
+
+
+  var CUSTOMER_SEED = ["Abu Ashra", "Aguri Bar", "Andina Restaurant", "Aurora Restaurant", "B TONTO", "Bar Ten", "BOHO (YLCA)", "Bon Joyo", "Botanica Restaurant", "Camino Restaurant", "Char Restaurant", "Chicha", "Daily Dose", "GNK", "Gouna Sailing Club", "Granata Restaurant", "Hally Gally", "Hotel Anceint Sands", "Hotel Arena Inn (Cooks Club)", "Hotel Caribean", "Hotel Casa Cook", "Hotel Chedi", "Hotel Club Paradise", "Hotel Fort Arabisque", "Hotel G Hotel", "Hotel Hilton Gouna", "Hotel Hilton Heliopolise", "Hotel Kaisol Romance", "Hotel La Maison Bleu", "Hotel Palm Royal", "Hotel Sentido", "Hotel Serenity", "Hotel Sheraton Miramar", "Hotel Siva Grand Beach", "Hotel Steigenberger Golf", "Hotel Sultan Bay", "Individual (Cairo)", "Individual (El-Gouna)", "Individual (Hurghda)", "individual Soma Bay", "Italian Restaurant", "Karibu", "Kay's Egypt", "La 7", "La Fiamma", "La Garage", "Lablaya Restaurant", "Lartigiano", "Luma", "Mafia Restaurant", "Pacha Mama", "pasta Basta", "Pier 88 (Cairo)", "Pier 88 El Gouna", "Port Ghaleb Resort", "Price Choice", "Ratios (Cairo)", "Riah Restaurant", "Sachi", "Selena Restaurant", "Seven Stars Restaurant", "Signor Sassi", "Smokery (Gouna)", "Snack Shack", "Soma Bay Hospitality", "Sotto Sopra", "Tawila Island", "Trattoria", "Zaytona Restaurant", "Zia Melia (Gouna)", "Zouni (Cairo)", "Zouni (Gouna)", "Zouni (Soma Bay)"];
+  var ITEMS_SEED = [{"name": "5 Star Mix 150 Grams"}, {"name": "5 Star Mix 250 Grams"}, {"name": "5 Star Mix 450 Grams", "barcode": "6224001251078"}, {"name": "GNK Mix"}, {"name": "88 Leafy Mix"}, {"name": "7 Star Mix 450 Grams", "barcode": "6224001251092"}, {"name": "Mix curly (Batavia & Lolo Rosso)", "barcode": "6224001251597"}, {"name": "Mix (Romaine350Grams)"}, {"name": "Ceasar mix 450 Grams"}, {"name": "Basil -Classic- 100 Grams"}, {"name": "Basil -Italian- 500 Grams", "barcode": "6224001251757"}, {"name": "Basil -Italian- 100 Grams", "barcode": "6224001251108"}, {"name": "Basil -Lemon- 100 Grams"}, {"name": "Basil -Red- 100 Grams"}, {"name": "Basil -Cinnamon- 100 Grams"}, {"name": "Celery 200 Grams"}, {"name": "OROOTS Exotic Baby Mix 200 Grams"}, {"name": "Cucumber(kg)"}, {"name": "Chives 50 Grams", "barcode": "6224001251207"}, {"name": "Dill 50 Grams"}, {"name": "Edible Flower (Anise)"}, {"name": "Edible Flower (Borage)", "barcode": "6224001251252"}, {"name": "Edible Flower (MUSTARD)"}, {"name": "Edible Flower (Mari Gold)", "barcode": "6224001251245"}, {"name": "Edible Flower (Queen)"}, {"name": "Edible Flower (Mix)", "barcode": "6224001251610"}, {"name": "Flower Leafs(Mari Gold)"}, {"name": "Flower Leafs"}, {"name": "Habaq 100 Grams"}, {"name": "Kale Mix 200 Grams", "barcode": "6224001251481"}, {"name": "Lettuce Batavia", "barcode": "6224001251016"}, {"name": "Lettuce Red Batavia"}, {"name": "Lettuce Cherooki"}, {"name": "Lettuce Lolo Rosso", "barcode": "6224001251047"}, {"name": "Lettuce Romaine"}, {"name": "Lettuce Saturday"}, {"name": "Lettuce Green Oakleaf"}, {"name": "Lettuce Red Oakleaf", "barcode": "6224001251870"}, {"name": "Lettuce Butterhead", "barcode": "6224001251641"}, {"name": "Microgreen Rocca"}, {"name": "Microgreen Red Radish"}, {"name": "Microgreen Green Radish", "barcode": "6224001251818"}, {"name": "Microgreen Beetroot"}, {"name": "Microgreen Spicy Mix"}, {"name": "Microgreen MUSTARD", "barcode": "6224001251856"}, {"name": "Microgreen Mix", "barcode": "6224001251269"}, {"name": "Mint 100 Grams", "barcode": "6224001251221"}, {"name": "Maramia 100 Grams"}, {"name": "Mustard 200 Grams", "barcode": "6224001251177"}, {"name": "Parsley 100 Grams"}, {"name": "Lettuce Mini Romaine"}, {"name": "Pepper Mix Spicy 1 KG"}, {"name": "Pack Choi 200 Grams", "barcode": "6224001251658"}, {"name": "Pepper Mix sweet 50 Grams"}, {"name": "Pepper Mix Spicy 50 Grams", "barcode": "6224001251382"}, {"name": "Pepper Spicy Black 100 Grams"}, {"name": "Pepper Oroots Spicy Mix"}, {"name": "Yellow Habanero 100 Grams"}, {"name": "Pepper Mix sweet 250 Grams"}, {"name": "Pepper Mix Spicy 250 Grams"}, {"name": "Pepper Spicy Black 250 Grams"}, {"name": "Rocca 500 GRAMS", "barcode": "6224001251764"}, {"name": "Rocca 100 GRAMS", "barcode": "6224001251238"}, {"name": "Baby Rocca 500 GRAMS"}, {"name": "Baby Rocca 100 GRAMS", "barcode": "6224001251788"}, {"name": "Sorrel 100 Grams", "barcode": "6224001251528"}, {"name": "Italian Dandelion 100 Grams"}, {"name": "Baby Sorrel", "barcode": "6224001251771"}, {"name": "Cherry Cherry Bomb300 Grams"}, {"name": "Cherry Bronze Pear 300 Grams"}, {"name": "Swiss Chard 200 Grams", "barcode": "6224001251535"}, {"name": "Tomato Cherry KG (on VINE)"}, {"name": "Tomato Beef (KG)"}, {"name": "Tomato San Marzano (KG)"}, {"name": "Tomato San Marzano 500 Grams"}, {"name": "Tomato Cherry Indego (KG)"}, {"name": "Tomato Cherry Mix (KG)", "barcode": "6224001251559"}, {"name": "Mix Cherry 300 Grams", "barcode": "6224001251276"}, {"name": "Black Cherry 300 Grams"}, {"name": "Cherry Yellow Tiger 300 Grams"}, {"name": "Sweet Nova 300Grams", "barcode": "6224001251313"}, {"name": "cherry SuperSweet 300 GM"}, {"name": "Cherry Kumquat 300 Grams"}, {"name": "Cherry Chocomato 300 Grams"}, {"name": "Cherry Indigo rose 300 Grams"}, {"name": "Cherry Orange Blosom 300 Grams"}, {"name": "Cherry Supersweet KG"}, {"name": "Cherry Violet 300 Grams"}, {"name": "Tomato Cherry Yellow (KG)"}, {"name": "Tomato Cherry Black (KG)"}, {"name": "Holland Pepper"}, {"name": "Green Hornet Pepper"}, {"name": "Spanish Padron Pepper"}, {"name": "Holland Pepper 250g"}, {"name": "Spicy Halepeno"}, {"name": "Spinash Padron Pepper 250"}, {"name": "Spinach 200 Grams"}];
+  var MIX_ALIAS = {'فايف ستار ميكس':'5 Star Mix 450 Grams','فايف ستار ميكس 250':'5 Star Mix 250 Grams','سفن ستار ميكس':'7 Star Mix 450 Grams','ليف 88':'88 Leafy Mix','كيرلي':'Mix curly (Batavia & Lolo Rosso)','سيزر':'Ceasar mix 450 Grams','جي إن ك':'GNK Mix','ميكس رومين':'Mix (Romaine350Grams)','إيجزوتيك':'OROOTS Exotic Baby Mix 200 Grams'};
+  var IMP_SKIP = ['gouna','hotel','restaurant','el'];
+
+  /* ----- العملاء (إعدادات) ----- */
+  function customerNames(){ return customers.map(function(c){ return c.name; }).sort(function(a,b){ return a.localeCompare(b, 'ar'); }); }
+  function saveCustomers(list){
+    customers = list;
+    if(db) return db.doc('settings/customers').set({list:list}).catch(function(e){ console.error('customers save failed', e); toast('ما اتحفظش — محتاج صلاحية المدير'); });
+    renderAll(); return Promise.resolve();
+  }
+  function renderCustomersSettings(){
+    var box = $('#customers-box'); if(!box) return;
+    var missing = CUSTOMER_SEED.filter(function(n){ return !customers.some(function(c){ return cropKey(c.name)===cropKey(n); }); });
+    var list = customers.slice().sort(function(a,b){ return a.name.localeCompare(b.name, 'ar'); });
+    box.innerHTML =
+      (missing.length ? '<div class="hint" style="margin-bottom:10px;">جاهز عندك '+missing.length+' عميل من ملف العملاء. <button type="button" class="btn btn-primary btn-sm" id="cu-import">⬇️ استيرادهم ('+missing.length+')</button></div>' : '')+
+      (list.length ? '<div class="table-wrap cropref-wrap scroll-8">'+list.map(function(c){
+        return '<div class="cu-row" data-id="'+escH(c.id)+'" style="display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--border);"><span style="flex:1;">'+escH(c.name)+'</span><button type="button" class="del-btn cu-del" title="حذف">✕</button></div>';
+      }).join('')+'</div>' : '<p class="empty-note">لسه ما سجلتش عملاء.</p>')+
+      '<form class="entry-form" id="cu-form" style="margin-top:12px;"><div class="form-grid"><div class="field-sm full"><label>عملاء جدد (كل اسم في سطر)</label><textarea id="cu-new" rows="3" maxlength="1500"></textarea></div></div><div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="cu-add">＋ إضافة للقايمة</button></div></form>';
+    var imp = $('#cu-import');
+    if(imp) imp.addEventListener('click', function(){
+      var add = missing.map(function(n){ return {id:genId(), name:n}; });
+      saveCustomers(customers.concat(add)).then(function(){ logAudit('add','settings','استيراد '+add.length+' عميل من ملف العملاء'); toast('اتضافوا '+add.length+' عميل'); });
+    });
+    $('#cu-add').addEventListener('click', function(){
+      var have = {}; customers.forEach(function(c){ have[cropKey(c.name)] = 1; });
+      var add = [];
+      $('#cu-new').value.split('\n').forEach(function(line){ var nm = cropNameClean(line); if(!nm) return; var k = cropKey(nm); if(have[k]) return; have[k] = 1; add.push({id:genId(), name:nm}); });
+      if(!add.length){ toast('اكتب اسم جديد (أو الاسم موجود فعلاً)'); return; }
+      saveCustomers(customers.concat(add)).then(function(){ logAudit('add','settings','إضافة '+add.length+' عميل'); toast('اتضاف'); });
+    });
+    $all('.cu-del', box).forEach(function(b){ b.addEventListener('click', function(){
+      if(!requireAdminForDelete()) return;
+      var id = b.closest('.cu-row').getAttribute('data-id'), c = customers.filter(function(x){ return x.id===id; })[0];
+      if(!c || !confirm('تحذف "'+c.name+'" من قايمة العملاء؟ (الأوردرات القديمة هتفضل بالاسم ده)')) return;
+      saveCustomers(customers.filter(function(x){ return x.id!==id; })).then(function(){ logAudit('delete','settings','حذف عميل: '+c.name); toast('اتحذف'); });
+    }); });
+  }
+
+  /* ----- تحديث قايمة الأصناف من ملف الأصناف (الأسماء + الباركود) ----- */
+  function opItemsSeedPlan(){
+    var plan = {add:[], rename:[], barcode:[], n:0}, names = orderProductNames();
+    ITEMS_SEED.forEach(function(s){
+      var ex = (s.barcode && orderProducts.filter(function(x){ return x.barcode===s.barcode; })[0]) || orderProductByName(s.name);
+      if(!ex){ var r = impRank(s.name, names)[0]; if(r && r.score>=0.9) ex = orderProductByName(r.name); }
+      if(ex){ if(s.barcode && !ex.barcode) plan.barcode.push({id:ex.id, barcode:s.barcode}); return; }
+      var alias = Object.keys(MIX_ALIAS).filter(function(k){ return MIX_ALIAS[k]===s.name; })[0], old = alias ? orderProductByName(alias) : null;
+      if(old) plan.rename.push({id:old.id, name:s.name, barcode:s.barcode||old.barcode||''});
+      else plan.add.push({name:s.name, barcode:s.barcode||''});
+    });
+    plan.n = plan.add.length + plan.rename.length + plan.barcode.length;
+    return plan;
+  }
+  function opApplyItemsSeed(){
+    var plan = opItemsSeedPlan(), ren = {}, bcs = {};
+    plan.rename.forEach(function(r){ ren[r.id] = r; }); plan.barcode.forEach(function(b){ bcs[b.id] = b.barcode; });
+    var next = orderProducts.map(function(x){
+      if(ren[x.id]) return Object.assign({}, x, {name:ren[x.id].name, barcode:ren[x.id].barcode||x.barcode||'', aka:(x.aka||[]).concat([x.name])});
+      if(bcs[x.id]) return Object.assign({}, x, {barcode:bcs[x.id]});
+      return x;
+    });
+    plan.add.forEach(function(a){ var o = {id:genId(), name:a.name}; if(a.barcode) o.barcode = a.barcode; next.push(o); });
+    return saveOrderProducts(next).then(function(){ logAudit('add','settings','تحديث أصناف الأوردرات من ملف الأصناف: '+plan.add.length+' جديد، '+plan.rename.length+' اسم اتغير، '+plan.barcode.length+' باركود'); toast('اتحدّثت الأصناف'); });
+  }
+
+  /* ----- واجهة الاستيراد في تاب الجودة ← الأوردرات ----- */
+  var impState = {open:false, text:'', orders:[], date:'', info:'', diag:''};
+  function impEnglish(raw){ return impClean(String(raw||'').replace(/[\u0600-\u06FF]+/g,' ').replace(/\s*\/\s*/g,' ')).replace(/\(\s*\)/g,'').trim(); }
+  function impUnitFor(name){
+    var p = orderProductByName(name);
+    if(p && p.kind==='mix') return 'bag';
+    if(/(^|[^a-z])kg([^a-z]|$)/i.test(String(name))) return 'kg';
+    return 'pcs';
+  }
+  function impDup(o){ return qOrders.some(function(x){ return x.date===o.date && cropKey(x.customer||'')===cropKey(o.customer); }); }
+  function impBuild(parsed){
+    var cNames = customerNames(), pNames = orderProductNames();
+    return parsed.map(function(o){
+      var cm = cNames.length ? impRank(o.customerRaw, cNames, IMP_SKIP) : [], best = cm[0];
+      var pick = (best && best.score>=0.6) ? best.name : o.customerRaw;
+      var items = o.items.map(function(it){
+        var byBc = it.barcode ? orderProducts.filter(function(x){ return x.barcode===it.barcode; })[0] : null, p = null, score = 0;
+        if(byBc){ p = byBc.name; score = 1; }
+        else { var r = impRank(it.raw, pNames)[0]; if(r && r.score>=0.6){ p = r.name; score = r.score; } }
+        var eng = impEnglish(it.raw);
+        return {raw:it.raw, eng:eng, barcode:it.barcode, product:p || '__raw__', score:score, qty:it.qty, unit:impUnitFor(p || eng), inc:true, calcOk:it.calcOk};
+      });
+      return {include:true, date:o.date, customerRaw:o.customerRaw, customer:pick, custScore:best ? best.score : 0, custSuggest:cm.slice(0,4).map(function(x){ return x.name; }), items:items, grand:o.grand, sum:o.sum};
+    });
+  }
+  function impCustBadge(o){
+    if(o.customer===o.customerRaw && !customers.some(function(c){ return c.name===o.customer; })) return '<span class="status-pill warn">عميل مش في القايمة</span>';
+    return o.custScore<0.9 && o.customer!==o.customerRaw ? '<span class="status-pill warn">تأكد من العميل</span>' : '<span class="status-pill good">عميل مطابق</span>';
+  }
+  function qImportHtml(){
+    if(!canEdit('quality')) return '';
+    var os = impState.orders, pNames = orderProductNames(), cNames = customerNames();
+    var prodOpts = pNames.map(function(n){ return '<option value="'+escH(n)+'">'+escH(n)+'</option>'; }).join('');
+    var unitOpts = Object.keys(Q_UNITS).map(function(u){ return '<option value="'+u+'">'+Q_UNITS[u]+'</option>'; }).join('');
+    var selOpt = function(html, val){ var needle = 'value="'+escH(val)+'"'; var i = html.indexOf(needle); return i<0 ? html : html.slice(0,i)+needle+' selected'+html.slice(i+needle.length); };
+    var nItems = 0, nNew = 0, nDup = 0, nCheck = 0;
+    var cards = os.map(function(o, oi){
+      var dup = impDup(o); if(dup) nDup++;
+      var seen = {}, opts = '<option value="__raw__"'+(o.customer===o.customerRaw?' selected':'')+'>كما في الملف: '+escH(o.customerRaw)+'</option>';
+      o.custSuggest.concat(cNames).forEach(function(n){ var k = cropKey(n); if(seen[k]) return; seen[k] = 1; opts += '<option value="'+escH(n)+'"'+(n===o.customer && o.customer!==o.customerRaw?' selected':'')+'>'+escH(n)+'</option>'; });
+      var rows = o.items.map(function(it, ii){
+        nItems++; if(it.product==='__raw__') nNew++; else if(it.score<0.85) nCheck++;
+        var raw = '<option value="__raw__"'+(it.product==='__raw__'?' selected':'')+'>— اسم جديد: '+escH(it.eng||it.raw)+' —</option>';
+        var warn = (it.product==='__raw__' || it.score<0.85 || !it.calcOk) ? ' warn' : '';
+        return '<div class="imp-item'+warn+'" data-i="'+ii+'"><label class="imp-keep"><input type="checkbox" class="imp-iinc"'+(it.inc?' checked':'')+'></label>'+
+          '<div class="imp-main"><div class="imp-raw" title="'+escH(it.raw)+'">'+escH(it.eng||it.raw)+'</div><select class="imp-prod">'+raw+selOpt(prodOpts, it.product)+'</select></div>'+
+          '<input type="number" class="ltr imp-qty" min="0" step="any" inputmode="decimal" value="'+escH(it.qty)+'"><select class="imp-unit">'+selOpt(unitOpts, it.unit)+'</select></div>';
+      }).join('');
+      var sumNote = (o.grand!=null && Math.abs(o.sum-o.grand)>0.51) ? '<span class="status-pill alert">مجموع الأصناف '+qFmt(o.sum)+' مش زي إجمالي الملف '+qFmt(o.grand)+'</span>' : (o.grand!=null ? '<span class="hint" style="margin:0;">إجمالي الملف '+qFmt(o.grand)+' ✓</span>' : '');
+      return '<div class="imp-order" data-o="'+oi+'"><div class="imp-head"><label class="imp-keep"><input type="checkbox" class="imp-include"'+(o.include?' checked':'')+'></label>'+
+        '<select class="imp-cust">'+opts+'</select><span class="imp-cbadge">'+impCustBadge(o)+'</span></div>'+
+        '<div class="imp-meta hint" style="margin:4px 0;">'+escH(o.date)+' — '+o.items.length+' صنف '+(dup ? '<span class="status-pill alert imp-dup">موجود قبل كده — هيتخطّى</span>' : '<span class="imp-dup"></span>')+' '+sumNote+'</div>'+rows+'</div>';
+    }).join('');
+    var inc = os.filter(function(o){ return o.include && !impDup(o); }).length;
+    var preview = os.length ?
+      '<div class="hint" style="margin:10px 0;"><strong>لقيت '+os.length+' أوردر و'+nItems+' صنف.</strong>'+(nNew?' '+nNew+' صنف اسمه جديد (مش في القايمة).':'')+(nCheck?' '+nCheck+' صنف محتاج تأكيد.':'')+(nDup?' '+nDup+' أوردر موجود قبل كده.':'')+'</div>'+
+      '<div class="field-sm" style="max-width:220px;"><label>تاريخ الأوردرات (بيتطبّق على الكل)</label><input type="date" class="ltr" id="q-imp-date" value="'+escH(impState.date)+'"></div>'+
+      cards+'<div class="form-actions" style="margin-top:10px;"><button type="button" class="btn btn-primary" id="q-imp-save">احفظ '+inc+' أوردر</button> <button type="button" class="btn btn-ghost" id="q-imp-clear">مسح</button></div>' : '';
+    var note = impState.info ? '<div class="hint" style="margin:8px 0;color:var(--alert);">'+escH(impState.info)+'</div>' : '';
+    var diag = impState.diag ? '<pre class="hint" dir="ltr" style="white-space:pre-wrap;max-height:160px;overflow:auto;">'+escH(impState.diag)+'</pre>' : '';
+    return '<details class="chart-card" id="q-imp-det"'+(impState.open||os.length?' open':'')+' style="margin:0 0 14px;"><summary style="cursor:pointer;font-weight:700;">📥 استيراد أوردرات من ملف</summary>'+
+      '<p class="hint" style="margin-top:8px;">اختار ملف Word (.docx) أو ملف نصي، أو الصق النص تحت. البرنامج بيقرا العملاء والأصناف والكميات وبيطابقهم مع القوايم، وانت بتراجع قبل الحفظ.</p>'+
+      '<input type="file" id="q-imp-file" accept=".docx,.txt,.csv,.text" style="margin:6px 0;">'+
+      '<textarea id="q-imp-text" rows="3" placeholder="أو الصق نص الأوردرات هنا" style="width:100%;margin:6px 0;">'+escH(impState.text)+'</textarea>'+
+      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="q-imp-read">قراءة النص</button></div>'+note+diag+preview+'</details>';
+  }
+  function impLoadText(text, fileName){
+    var parsed = impParse(text);
+    impState.open = true; impState.text = fileName ? '' : text; impState.diag = '';
+    if(!parsed.length){
+      impState.orders = []; impState.info = 'ما لقيتش أوردرات في '+(fileName ? 'الملف' : 'النص')+'. المفروض كل أوردر يبدأ بسطر فيه "طلبية عميل" والتاريخ، وفي الأصناف باركود. لو الملف مختلف ابعتهولي.';
+      impState.diag = String(text).split(/\r?\n/).slice(0,12).join('\n');
+    } else {
+      impState.info = ''; impState.orders = impBuild(parsed); impState.date = impState.orders[0].date;
+    }
+    renderQualityPanel();
+  }
+  function impReadFile(f){
+    var n = String(f.name||'').toLowerCase();
+    if(/\.pdf$/.test(n)){ impState.open = true; impState.info = 'ملف PDF مش مدعوم مباشرة. افتحه في Word واحفظه .docx، أو انسخ النص والصقه في الخانة.'; renderQualityPanel(); return; }
+    if(/\.doc$/.test(n)){ impState.open = true; impState.info = 'ده Word قديم (.doc). افتحه واحفظه بصيغة .docx وارفعه تاني.'; renderQualityPanel(); return; }
+    var go = /\.docx$/.test(n) ? f.arrayBuffer().then(impReadDocx) : f.text();
+    go.then(function(t){ impLoadText(t, f.name); }).catch(function(e){ impState.open = true; impState.info = 'تعذّر قراءة الملف: '+(e && e.message ? e.message : ''); renderQualityPanel(); });
+  }
+  function impSave(){
+    if(!db){ toast('محتاج اتصال'); return; }
+    var recs = [], learn = [], skipped = 0, bad = '';
+    impState.orders.forEach(function(o){
+      if(!o.include || bad) return;
+      if(impDup(o)){ skipped++; return; }
+      var cust = String(o.customer||'').trim();
+      var its = o.items.filter(function(it){ return it.inc && qNum(it.qty)>0; }).map(function(it){
+        var name = it.product==='__raw__' ? cropNameClean(it.eng || it.raw) : it.product;
+        if(it.barcode) learn.push({barcode:it.barcode, name:name, isNew:it.product==='__raw__'});
+        return {uid:qUid(), product:name, unit:it.unit||'pcs', required:qNum(it.qty)};
+      });
+      if(!its.length) return;
+      if(!cust){ bad = 'في أوردر من غير اسم عميل'; return; }
+      var id = genId(), now = Date.now();
+      recs.push({id:id, orderNo:'', customer:cust, date:o.date, notes:'اتسجّل من ملف', items:its, createdBy:currentUser||'', createdAt:now, updatedAt:now});
+    });
+    if(bad){ toast(bad); return; }
+    if(!recs.length){ toast(skipped ? 'كل الأوردرات موجودة قبل كده' : 'مفيش أوردرات للحفظ'); return; }
+    var batch = db.batch();
+    recs.forEach(function(r){ batch.set(db.collection('qualityOrders').doc(r.id), r); });
+    var btn = $('#q-imp-save'); if(btn) btn.disabled = true;
+    batch.commit().then(function(){
+      logAudit('add','quality','استيراد '+recs.length+' أوردر من ملف ('+recs.reduce(function(s,r){ return s+r.items.length; },0)+' صنف)');
+      toast('اتسجّل '+recs.length+' أوردر'+(skipped ? ' — وتخطّيت '+skipped+' موجودين' : ''));
+      if(currentUserRole==='admin' && learn.length){
+        var changed = false, next = orderProducts.map(function(p){ return p; }), seen = {};
+        learn.forEach(function(l){
+          if(seen[l.barcode]) return; seen[l.barcode] = 1;
+          var p = next.filter(function(x){ return cropKey(x.name)===cropKey(l.name); })[0];
+          if(p){ if(!p.barcode){ next[next.indexOf(p)] = Object.assign({}, p, {barcode:l.barcode}); changed = true; } }
+          else if(l.isNew){ next.push({id:genId(), name:l.name, barcode:l.barcode}); changed = true; }
+        });
+        if(changed) saveOrderProducts(next);
+      }
+      impState.orders = []; impState.text = ''; impState.info = ''; impState.open = false;
+      renderQualityPanel();
+    }).catch(function(e){ console.error(e); toast('تعذر الحفظ'); if(btn) btn.disabled = false; });
+  }
+  function qImportWire(root){
+    var det = $('#q-imp-det', root); if(!det) return;
+    det.addEventListener('toggle', function(){ impState.open = det.open; });
+    var ta = $('#q-imp-text', det); ta.addEventListener('input', function(){ impState.text = ta.value; });
+    $('#q-imp-read', det).addEventListener('click', function(){ if(!ta.value.trim()){ toast('الصق النص الأول'); return; } impLoadText(ta.value, ''); });
+    $('#q-imp-file', det).addEventListener('change', function(){ var f = this.files && this.files[0]; if(f) impReadFile(f); });
+    var sv = $('#q-imp-save', det); if(sv) sv.addEventListener('click', impSave);
+    var cl = $('#q-imp-clear', det); if(cl) cl.addEventListener('click', function(){ impState.orders = []; impState.info = ''; impState.diag = ''; renderQualityPanel(); });
+    var dt = $('#q-imp-date', det); if(dt) dt.addEventListener('change', function(){ if(!dt.value) return; impState.date = dt.value; impState.orders.forEach(function(o){ o.date = dt.value; }); renderQualityPanel(); });
+    det.addEventListener('change', function(ev){
+      var el = ev.target, oc = el.closest('.imp-order'); if(!oc) return;
+      var o = impState.orders[parseInt(oc.getAttribute('data-o'),10)]; if(!o) return;
+      var row = el.closest('.imp-item'), it = row ? o.items[parseInt(row.getAttribute('data-i'),10)] : null;
+      if(el.classList.contains('imp-include')) o.include = el.checked;
+      else if(el.classList.contains('imp-cust')){
+        o.customer = el.value==='__raw__' ? o.customerRaw : el.value;
+        o.custScore = el.value==='__raw__' ? 0 : (impRank(o.customerRaw, [o.customer], IMP_SKIP)[0] || {score:0}).score;
+        oc.querySelector('.imp-cbadge').innerHTML = impCustBadge(o);
+        var d = oc.querySelector('.imp-dup'); if(d){ var dp = impDup(o); d.className = 'imp-dup'+(dp?' status-pill alert':''); d.textContent = dp ? 'موجود قبل كده — هيتخطّى' : ''; }
+        var s = $('#q-imp-save', det); if(s) s.textContent = 'احفظ '+impState.orders.filter(function(x){ return x.include && !impDup(x); }).length+' أوردر';
+      }
+      else if(it && el.classList.contains('imp-iinc')) it.inc = el.checked;
+      else if(it && el.classList.contains('imp-prod')){ it.product = el.value; it.score = el.value==='__raw__' ? 0 : 1; it.unit = impUnitFor(el.value==='__raw__' ? it.eng : el.value); var us = row.querySelector('.imp-unit'); if(us) us.value = it.unit; row.classList.toggle('warn', el.value==='__raw__'); }
+      else if(it && el.classList.contains('imp-qty')) it.qty = qNum(el.value);
+      else if(it && el.classList.contains('imp-unit')) it.unit = el.value;
+    });
+  }
   function qoNew(){ return {id:'', orderNo:'', customer:'', date:todayStr(), notes:'', items:[{uid:qUid(), product:'', unit:'kg', required:''}]}; }
   function qoFormHtml(d){
     var products = orderProductNames();
@@ -8718,7 +9100,8 @@
         '<div class="field-sm"><label>الوحدة</label><select class="q-draft" data-i="'+i+'" data-f="unit">'+Object.keys(Q_UNITS).map(function(u){ return '<option value="'+u+'"'+(it.unit===u?' selected':'')+'>'+Q_UNITS[u]+'</option>'; }).join('')+'</select></div></div></div>';
     }).join('');
     return '<form class="entry-form" id="q-order-form"><div class="form-grid">'+
-      '<div class="field-sm"><label>تاريخ الأوردر</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div></div>'+
+      '<div class="field-sm"><label>تاريخ الأوردر</label><input type="date" class="ltr q-draft" data-f="date" required value="'+escH(d.date)+'"></div>'+
+      '<div class="field-sm full"><label>اسم العميل</label><input type="text" class="q-draft" data-f="customer" list="q-customers-dl" maxlength="80" required autocomplete="off" value="'+escH(d.customer||'')+'"><datalist id="q-customers-dl">'+customerNames().map(function(n){ return '<option value="'+escH(n)+'"></option>'; }).join('')+'</datalist></div></div>'+
       rows+'<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm q-add-item-btn">＋ ضيف صنف للأوردر</button></div>'+
       '<div class="field-sm full"><label>ملاحظات الأوردر</label><input type="text" class="q-draft" data-f="notes" maxlength="250" value="'+escH(d.notes||'')+'"></div>'+
       '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="q-save-btn">'+(d.id?'حفظ التعديل':'حفظ الأوردر')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="q-cancel-btn">إلغاء</button></div></form>';
@@ -8743,6 +9126,7 @@
     $('#q-cancel-btn', form).addEventListener('click', function(){ qoDraft = null; rerender(); });
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
+      if(!String(d.customer||'').trim()){ toast('اكتب اسم العميل'); return; }
       var items = d.items.filter(function(it){ return String(it.product||'').trim(); });
       if(!items.length){ toast('اختار صنف واحد على الأقل'); return; }
       for(var k=0;k<items.length;k++){ if(!(qNum(items[k].required)>0)){ toast('اكتب الكمية المطلوبة لـ '+items[k].product); return; } }
@@ -8791,6 +9175,7 @@
     var legacy = qLegacyOrders();
     return (legacy.length && currentUserRole==='admin' ? '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">فيه '+legacy.length+' أوردر فيه بيانات فرز قديمة (جه / بعد الفرز / فاقد / صور) كانت متسجلة جوه الأوردر. <button type="button" class="btn btn-primary btn-sm" id="q-migrate">🔄 انقلها لقسم الفرز</button></div>' : '')+
       '<details class="chart-card" id="q-form-details"'+(qoDraft?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(qoDraft && qoDraft.id ? '✏️ تعديل أوردر' : '＋ أوردر جديد')+'</summary><div id="q-form-holder" style="margin-top:10px;">'+(qoDraft ? qoFormHtml(qoDraft) : '<button type="button" class="btn btn-primary btn-sm" id="q-new-btn">＋ ابدأ أوردر جديد</button>')+'</div></details>'+
+      qImportHtml()+
       qIngredientsDayHtml()+
       '<h3 class="section-title">📦 الأوردرات ('+list.length+')</h3>'+lfBarHtml('qord')+
       (list.length ? list.map(qOrderCardHtml).join('') : '<p class="empty-note">لسه ما سجلتش أوردرات. سجّل الأوردر بالأصناف والكميات المطلوبة.</p>');
@@ -8987,6 +9372,7 @@
       qoWire();
       var idt = $('#q-ing-date'); if(idt) idt.addEventListener('change', function(){ qIngDay = this.value || todayStr(); qIngOpen = true; renderQualityPanel(); });
       var idd = $('#q-ing-det'); if(idd) idd.addEventListener('toggle', function(){ qIngOpen = idd.open; });
+      qImportWire(body);
       $all('.q-order', body).forEach(function(card){
         var id = card.getAttribute('data-id'), o = qOrderById(id); if(!o) return;
         card.querySelector('.q-edit').addEventListener('click', function(){
@@ -9126,7 +9512,7 @@
       db.collection('trash').doc(id).delete().then(function(){ toast('اتمسح'); }).catch(function(){ toast('تعذر المسح'); });
     }); });
   }
-  function renderSettingsPanels(){ safe(renderUsersSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
+  function renderSettingsPanels(){ safe(renderUsersSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
   function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
   /* بيرسم التاب المفتوح بس — باقي التابات بتترسم أول ما تفتحها (setupTabs) */
   function renderAll(){
@@ -9632,6 +10018,11 @@
       syncNurseryTiles();
       renderAllSoon();
     }, function(err){ console.error('cropNames snapshot error', err); });
+
+    db.doc('settings/customers').onSnapshot(function(snap){
+      customers = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
+      renderAllSoon();
+    }, function(err){ console.error('customers snapshot error', err); });
 
     db.doc('settings/nurseryTiles').onSnapshot(function(snap){
       nurseryTilesNew = (snap.exists && snap.data().tiles && typeof snap.data().tiles==='object') ? snap.data().tiles : null;
