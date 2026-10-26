@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TEtCbxq6FxB8aU6ZOXfXnbBVQLNujRGJB3FNBLBZxno=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Ss4yZ0oE0fujeT42UOkN74cmex5JAwcNYlSGxaUjh0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -959,6 +965,19 @@
 <script>
 (function(){
   "use strict";
+  var DBG = /[?&]debug(=|&|$)/.test(location.search), dbgMarks = [], bootLogged = {};
+  function dbg(label){ try{ dbgMarks.push({t:Math.round(performance.now()), l:label}); }catch(e){} }
+  function showDbg(){
+    var d = document.getElementById('dbg-panel');
+    if(!d){
+      d = document.createElement('div'); d.id = 'dbg-panel';
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;max-height:75vh;overflow:auto;z-index:6000;background:rgba(0,0,0,.9);color:#9ff0b5;font:11px/1.55 monospace;padding:8px 10px;direction:ltr;text-align:left;white-space:pre;';
+      d.addEventListener('click', function(){ d.remove(); });
+      document.body.appendChild(d);
+    }
+    d.textContent = '(tap to close)  ms since page start\n'+dbgMarks.map(function(m){ return String(m.t).padStart(6)+'  '+m.l; }).join('\n');
+  }
+  dbg('script start (page+scripts loaded)');
 
   /* ---------- رسالة تأكيد قبل أي حفظ بيانات ----------
      بتتسجّل أول حاجة (capture) عشان تسبق كل معالجات الحفظ؛ لو المستخدم رفض، الحفظ بيتوقف خالص. */
@@ -10227,6 +10246,7 @@
   }
   function enterApp(fbUser){
     if(appEntered) return;
+    dbg('enterApp start');
     ensureSplash();   // غطّي الصفحة بشاشة التحميل لحد ما البيانات توصل (بدل صفحة فاضية)
     var email = String(fbUser.email||'').toLowerCase();
     var usersRef = db.doc('settings/users');
@@ -10255,6 +10275,7 @@
       $('#hello-user').textContent = 'أهلاً، '+(r.me.displayName||currentUser);
       $('#login-screen').classList.add('hidden');
       $('#app').classList.remove('hidden');
+      dbg('user profile loaded -> subscribing');
       subscribeDb();
       startPipeDayWatcher();
       startLiveClock();
@@ -10285,6 +10306,7 @@
       var email = nameInput.value.trim().toLowerCase();
       var password = $('#login-code').value;
       $('#login-error').textContent = '';
+      dbg('login submitted');
       fbAuth.signInWithEmailAndPassword(email, password).then(function(){
         try{ localStorage.setItem('oroots_last_name', email); }catch(e){}
       }).catch(function(e){ $('#login-error').textContent = friendlyAuthError(e); });
@@ -10336,7 +10358,9 @@
   /* تحميل أول مرة: شريط تحميل + دمج الرسم + القراءات على مرحلتين (٧ أيام الأول ثم ٣٠ يوم في الخلفية) */
   var bootActive = false, bootIdleTimer = null, bootMaxTimer = null, renderSoonTimer = null;
   var bootSeen = {}, BOOT_EXPECTED = 28;
-  function bootTick(key){
+  var BOOT_NAMES = {"k1": "readings", "k2": "settings/config", "k3": "settings/systems", "k4": "settings/users", "k5": "sops", "k6": "fertilizers", "k7": "targetProfiles", "k8": "nutrientRecipes", "k9": "pestlog", "k10": "bioReleases", "k11": "stickyTraps", "k12": "pheromoneTraps", "k13": "nursery", "k14": "irrigCalib", "k15": "inventory", "k16": "harvest", "k17": "settings/nurseryPlans", "k18": "instrumentCalibrations", "k19": "notifications", "k20": "qualityOrders", "k21": "qualitySorting", "k22": "qualityComplaints", "k23": "sprayPlan", "k24": "settings/cropNames", "k25": "settings/customers", "k26": "settings/nurseryTiles", "k27": "settings/pipeMaps", "k28": "nurseryPlanLog"};
+  function bootTick(key, snap){
+    if(DBG && !bootLogged[key]){ bootLogged[key] = 1; dbg('data: '+(BOOT_NAMES[key]||key)+(snap && snap.metadata ? (snap.metadata.fromCache ? '  <- cache' : '  <- server') : '')+(snap && snap.size!=null ? ('  ('+snap.size+' docs)') : '')); }
     if(!bootActive) return;
     bootSeen[key] = 1;
     if(Object.keys(bootSeen).length >= BOOT_EXPECTED){ clearTimeout(bootIdleTimer); bootIdleTimer = setTimeout(finishBoot, 40); }
@@ -10364,7 +10388,7 @@
     return e;
   }
   function showBootBar(){
-    bootActive = true; bootSeen = {};
+    bootActive = true; bootSeen = {}; bootLogged = {};
     clearTimeout(bootIdleTimer); clearTimeout(bootMaxTimer);
     bootIdleTimer = setTimeout(finishBoot, 6000);
     bootMaxTimer = setTimeout(finishBoot, 10000);
@@ -10373,8 +10397,11 @@
     if(!bootActive) return;
     bootActive = false;
     clearTimeout(bootIdleTimer); clearTimeout(bootMaxTimer);
+    dbg('finishBoot: rendering');
     safe(renderAll);
+    dbg('render done');
     hideSplash();
+    if(DBG) showDbg();
     if(!readingsPhase2Done){ readingsPhase2Done = true; ensureReadingsRange(30, true); }
   }
   function renderAllSoon(){
@@ -10395,7 +10422,7 @@
       readingsDocs = snap.docs.filter(function(d){return d.exists;}).map(function(d){
         return Object.assign({id:d.id}, d.data());
       });
-      bootTick('k1'); renderAllSoon();
+      bootTick('k1', snap); renderAllSoon();
     }, function(err){
       console.error('readings snapshot error', err);
     });
@@ -10427,14 +10454,14 @@
       }
       settingsLoaded = true;
       fillSettingsForm();
-      bootTick('k2'); renderAllSoon();
+      bootTick('k2', snap); renderAllSoon();
     }, function(err){
       console.error('settings snapshot error', err);
     });
 
     db.doc('settings/systems').onSnapshot(function(snap){
       systems = (snap.exists && snap.data().list) ? snap.data().list : [];
-      bootTick('k3'); renderAllSoon();
+      bootTick('k3', snap); renderAllSoon();
     }, function(err){
       console.error('systems snapshot error', err);
     });
@@ -10448,92 +10475,92 @@
         if(me){ currentUserRole = me.role; currentUserPermissions = me.permissions||{}; }
       }
       applyTabVisibility();
-      bootTick('k4'); renderAllSoon();
+      bootTick('k4', snap); renderAllSoon();
     }, function(err){
       console.error('users snapshot error', err);
     });
 
     db.collection('sops').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       sops = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k5'); renderAllSoon();
+      bootTick('k5', snap); renderAllSoon();
     }, function(err){
       console.error('sops snapshot error', err);
     });
 
     db.collection('fertilizers').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       customFertilizers = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k6'); renderAllSoon();
+      bootTick('k6', snap); renderAllSoon();
     }, function(err){
       console.error('fertilizers snapshot error', err);
     });
 
     db.collection('targetProfiles').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       targetProfiles = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k7'); renderAllSoon();
+      bootTick('k7', snap); renderAllSoon();
     }, function(err){
       console.error('targetProfiles snapshot error', err);
     });
 
     db.collection('nutrientRecipes').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       nutrientRecipes = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k8'); renderAllSoon();
+      bootTick('k8', snap); renderAllSoon();
     }, function(err){
       console.error('nutrientRecipes snapshot error', err);
     });
 
     db.collection('pestlog').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k9'); renderAllSoon();
+      bootTick('k9', snap); renderAllSoon();
     }, function(err){
       console.error('pestlog snapshot error', err);
     });
 
     db.collection('bioReleases').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       bioReleases = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k10'); renderAllSoon();
+      bootTick('k10', snap); renderAllSoon();
     }, function(err){ console.error('bioReleases snapshot error', err); });
 
     db.collection('stickyTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       stickyTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k11'); renderAllSoon();
+      bootTick('k11', snap); renderAllSoon();
     }, function(err){ console.error('stickyTraps snapshot error', err); });
 
     db.collection('pheromoneTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pheromoneTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k12'); renderAllSoon();
+      bootTick('k12', snap); renderAllSoon();
     }, function(err){ console.error('pheromoneTraps snapshot error', err); });
 
     db.collection('nursery').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       nurseryLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k13'); renderAllSoon();
+      bootTick('k13', snap); renderAllSoon();
     }, function(err){
       console.error('nursery snapshot error', err);
     });
 
     db.collection('irrigCalib').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       irrigCalib = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k14'); renderAllSoon();
+      bootTick('k14', snap); renderAllSoon();
     }, function(err){
       console.error('irrigCalib snapshot error', err);
     });
 
     db.collection('inventory').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       inventoryItems = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k15'); renderAllSoon();
+      bootTick('k15', snap); renderAllSoon();
     }, function(err){
       console.error('inventory snapshot error', err);
     });
 
     db.collection('harvest').orderBy('createdAt','desc').limit(5000).onSnapshot(function(snap){
       harvestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k16'); renderAllSoon();
+      bootTick('k16', snap); renderAllSoon();
     }, function(err){
       console.error('harvest snapshot error', err);
     });
 
     db.doc('settings/nurseryPlans').onSnapshot(function(snap){
       nurseryPlans = (snap.exists && snap.data().list) ? snap.data().list : [];
-      bootTick('k17'); renderAllSoon();
+      bootTick('k17', snap); renderAllSoon();
     }, function(err){
       console.error('nurseryPlans snapshot error', err);
     });
@@ -10547,7 +10574,7 @@
 
     db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k18'); renderAllSoon();
+      bootTick('k18', snap); renderAllSoon();
     }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
 
     db.collection('notifications').where('to','==',String(currentUser).toLowerCase()).onSnapshot(function(snap){
@@ -10563,25 +10590,25 @@
         try{ if(navigator.vibrate) navigator.vibrate([180,90,180]); }catch(e){}
       }
       notifCleanup();
-      bootTick('k19'); renderAllSoon();
+      bootTick('k19', snap); renderAllSoon();
     }, function(err){ console.error('notifications snapshot error', err); });
 
     db.collection('qualityOrders').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qOrders = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k20'); renderAllSoon();
+      bootTick('k20', snap); renderAllSoon();
     }, function(err){ console.error('qualityOrders snapshot error', err); });
     db.collection('qualitySorting').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qSorts = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k21'); renderAllSoon();
+      bootTick('k21', snap); renderAllSoon();
     }, function(err){ console.error('qualitySorting snapshot error', err); });
     db.collection('qualityComplaints').orderBy('date','desc').limit(2000).onSnapshot(function(snap){
       qComplaints = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k22'); renderAllSoon();
+      bootTick('k22', snap); renderAllSoon();
     }, function(err){ console.error('qualityComplaints snapshot error', err); });
 
     db.collection('sprayPlan').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       sprayPlan = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k23'); renderAllSoon();
+      bootTick('k23', snap); renderAllSoon();
     }, function(err){ console.error('sprayPlan snapshot error', err); });
 
     db.doc('settings/cropNames').onSnapshot(function(snap){
@@ -10589,28 +10616,28 @@
       orderProducts = (snap.exists && Array.isArray(snap.data().orderProducts)) ? snap.data().orderProducts : [];
       nurseryTilesLegacy = (snap.exists && snap.data().nurseryTiles && typeof snap.data().nurseryTiles==='object') ? snap.data().nurseryTiles : {};
       syncNurseryTiles();
-      bootTick('k24'); renderAllSoon();
+      bootTick('k24', snap); renderAllSoon();
     }, function(err){ console.error('cropNames snapshot error', err); });
 
     db.doc('settings/customers').onSnapshot(function(snap){
       customers = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
-      bootTick('k25'); renderAllSoon();
+      bootTick('k25', snap); renderAllSoon();
     }, function(err){ console.error('customers snapshot error', err); });
 
     db.doc('settings/nurseryTiles').onSnapshot(function(snap){
       nurseryTilesNew = (snap.exists && snap.data().tiles && typeof snap.data().tiles==='object') ? snap.data().tiles : null;
       syncNurseryTiles();
-      bootTick('k26'); renderAllSoon();
+      bootTick('k26', snap); renderAllSoon();
     }, function(err){ console.error('nurseryTiles snapshot error', err); });
 
     db.doc('settings/pipeMaps').onSnapshot(function(snap){
       pipeMaps = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
-      bootTick('k27'); renderAllSoon();
+      bootTick('k27', snap); renderAllSoon();
     }, function(err){ console.error('pipeMaps snapshot error', err); });
 
     db.collection('nurseryPlanLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       nurseryPlanLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      bootTick('k28'); renderAllSoon();
+      bootTick('k28', snap); renderAllSoon();
     }, function(err){ console.error('nurseryPlanLog snapshot error', err); });
   }
 
@@ -10641,6 +10668,7 @@
       return;
     }
     firebase.initializeApp(FIREBASE_CONFIG);
+    dbg('firebase initialized');
     fbAuth = firebase.auth();
     var fs = firebase.firestore();
     fs.settings({ignoreUndefinedProperties:true});
@@ -10667,7 +10695,7 @@
       });
     } };
 
-    fbAuth.onAuthStateChanged(function(u){ if(u) enterApp(u); else showLoginForm(); });
+    fbAuth.onAuthStateChanged(function(u){ dbg('auth state: '+(u?'signed-in':'signed-out')); if(u) enterApp(u); else showLoginForm(); });
     setTimeout(function(){ if(!appEntered) showLoginForm(); }, 9000);
   }
 
