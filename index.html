@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JVN4UAXJ2TdB5C4IWSx85ly8zAdFkEHuaTAPp6dHmhY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jiRop/TT0igQnpA3Y3YxpVlGMwD86UAANsT0AGY7iFA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -8729,6 +8729,7 @@
   /* ----- الأوردرات: بيانات الأوردر والكميات المطلوبة بس ----- */
   /* ================= استيراد الأوردرات من ملف + قايمة العملاء ================= */
   /* ===== استيراد الأوردرات: قراءة النص + مطابقة العملاء والأصناف (كود مشترك بين التطبيق والاختبار) ===== */
+  /* ===== استيراد الأوردرات: قراءة النص + مطابقة العملاء والأصناف (كود مشترك بين التطبيق والاختبار) ===== */
   function impClean(l){ return String(l||'').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069\u061c]/g,'').replace(/\s+/g,' ').trim(); }
   function impNum(s){ var t = String(s||'').replace(/[,\s]/g,'').replace(/[٠-٩]/g,function(c){ return String(c.charCodeAt(0)-1632); }); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; }
   function impIso(d, m, y){ return y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2); }
@@ -8743,7 +8744,7 @@
     if(close>open) s = s.replace(/\)/g,'').trim();
     return s;
   }
-  function impParse(text){
+  function impParseInvoice(text){
     var lines = String(text||'').replace(/(\S)(طلبية عميل)/g,'$1\n$2').split(/\r?\n/).map(impClean).filter(function(l){ return l; });
     var dateRe = /(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/, orders = [], cur = null, nameBuf = [], state = 'idle', rev = null;
     var headWord = /^(الصنف|الباركود|الكمية|الوحدة|سعر|سعر الوحدة|الإجمالي|الاجمالي)(\s+(الصنف|الباركود|الكمية|الوحدة|سعر|سعر الوحدة|الإجمالي|الاجمالي))*$/;
@@ -8803,6 +8804,39 @@
     orders.forEach(function(o){ o.sum = o.items.reduce(function(s,it){ return s+it.total; }, 0); });
     return orders.filter(function(o){ return o.items.length; });
   }
+
+  /* رسايل بسيطة: اسم العميل في سطر (واختياري فرع/شخص في السطر اللي بعده) وتحته الأصناف: كمية ثم الصنف */
+  function impParseChat(text){
+    var lines = String(text||'').split(/\r?\n/).map(impClean).filter(function(l){ return l; });
+    var itemRe = /^(\d+(?:[.,]\d+)?)\s*(kg|kgs|كجم|كيلو)?\s+(\S.*)$/i, dateRe = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/;
+    var orders = [], hdr = [], cur = null, date = '';
+    function flushHdr(){
+      if(!hdr.length) return;
+      var c1 = hdr[0], c2 = hdr.slice(1).join(' ');
+      cur = {date:date, customerRaw:c2 ? (c1+' - '+c2) : c1, cust1:c1, cust2:c2, items:[], grand:null, sum:0};
+      orders.push(cur); hdr = [];
+    }
+    lines.forEach(function(l){
+      var dm = l.match(dateRe);
+      if(dm){ date = impIso(dm[1],dm[2],dm[3]); hdr = []; cur = null; return; }
+      var m = l.match(itemRe);
+      if(m){
+        flushHdr();
+        if(!cur) return;
+        var kg = !!m[2], name = impClean(m[3]);
+        cur.items.push({raw:name+(kg?' (KG)':''), barcode:'', qty:parseFloat(m[1].replace(',','.')), price:0, total:0, calcOk:true, forceUnit:kg?'kg':''});
+        return;
+      }
+      if(cur && cur.items.length){ cur = null; hdr = []; }   // أول سطر غير صنف بعد أصناف = عميل جديد
+      hdr.push(l);
+    });
+    return orders.filter(function(o){ return o.items.length; });
+  }
+  function impParse(text){
+    var o = impParseInvoice(text);
+    return o.length ? o : impParseChat(text);
+  }
+
   /* ----- مطابقة الأسماء ----- */
   function impTokens(s){
     var t = String(s||'').toLowerCase().replace(/[\u0600-\u06FF]/g,' ').replace(/[\u064B-\u065F]/g,'')
@@ -8812,15 +8846,24 @@
       if(!w) return;
       if(w==='gm'||w==='gms'||w==='gram'||w==='gr'||w==='g'||w==='grams') w = 'grams';
       if(w==='kilo'||w==='kg') w = 'kg';
+      if(w==='five') w = '5';
+      if(w==='seven') w = '7';
       if(!seen[w]){ seen[w] = 1; out.push(w); }
     });
     return out;
   }
   function impLev(a, b){
-    if(a===b) return 0; var m = a.length, n = b.length; if(!m) return n; if(!n) return m;
-    var prev = [], cur2 = [], i, j; for(j=0;j<=n;j++) prev[j] = j;
-    for(i=1;i<=m;i++){ cur2[0] = i; for(j=1;j<=n;j++){ cur2[j] = Math.min(prev[j]+1, cur2[j-1]+1, prev[j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1)); } prev = cur2.slice(); }
-    return prev[n];
+    var m = a.length, n = b.length, d = [], i, j;
+    if(!m) return n; if(!n) return m;
+    for(i=0;i<=m;i++){ d[i] = [i]; }
+    for(j=1;j<=n;j++){ d[0][j] = j; }
+    for(i=1;i<=m;i++){
+      for(j=1;j<=n;j++){
+        d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1));
+        if(i>1 && j>1 && a.charAt(i-1)===b.charAt(j-2) && a.charAt(i-2)===b.charAt(j-1)) d[i][j] = Math.min(d[i][j], d[i-2][j-2]+1);
+      }
+    }
+    return d[m][n];
   }
   function impTokSim(x, y){ if(x===y) return 1; if(/^\d+$/.test(x)||/^\d+$/.test(y)) return 0; var d = impLev(x,y), L = Math.max(x.length,y.length); var r = 1-d/L; return r>=0.75 ? r : 0; }
   function impScore(a, b, skip){
@@ -8834,7 +8877,6 @@
     var a = impTokens(raw);
     return names.map(function(n){ return {name:n, score:impScore(a, impTokens(n), skip)}; }).filter(function(x){ return x.score>0; }).sort(function(x,y){ return y.score-x.score; });
   }
-
   function impDecodeXml(s){ return String(s).replace(/&#x([0-9a-f]+);/gi,function(_,h){ return String.fromCodePoint(parseInt(h,16)); }).replace(/&#(\d+);/g,function(_,d){ return String.fromCodePoint(parseInt(d,10)); }).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&'); }
   function impDocxXmlToText(xml){
     var paras = String(xml).match(/<w:p[ >][\s\S]*?<\/w:p>/g) || [], out = [];
@@ -8950,16 +8992,20 @@
   function impBuild(parsed){
     var cNames = customerNames(), pNames = orderProductNames();
     return parsed.map(function(o){
-      var cm = cNames.length ? impRank(o.customerRaw, cNames, IMP_SKIP) : [], best = cm[0];
-      var pick = (best && best.score>=0.6) ? best.name : o.customerRaw;
+      var q = o.cust1 ? (o.cust1+' '+(o.cust2||'')).trim() : o.customerRaw;
+      var cm = cNames.length ? impRank(q, cNames, IMP_SKIP) : [], best = cm[0], pick = o.customerRaw;
+      if(best && best.score>=0.6){
+        pick = best.name;
+        if(o.cust2){ var bt = impTokens(best.name); if(impTokens(o.cust2).some(function(t){ return bt.indexOf(t)<0; })) pick = best.name+' - '+o.cust2; }
+      }
       var items = o.items.map(function(it){
         var byBc = it.barcode ? orderProducts.filter(function(x){ return x.barcode===it.barcode; })[0] : null, p = null, score = 0;
         if(byBc){ p = byBc.name; score = 1; }
-        else { var r = impRank(it.raw, pNames)[0]; if(r && r.score>=0.6){ p = r.name; score = r.score; } }
+        else { var r = impRank(it.raw, pNames)[0]; if(r && r.score>=0.5){ p = r.name; score = r.score; } }
         var eng = impEnglish(it.raw);
-        return {raw:it.raw, eng:eng, barcode:it.barcode, product:p || '__raw__', score:score, qty:it.qty, unit:impUnitFor(p || eng), inc:true, calcOk:it.calcOk};
+        return {raw:it.raw, eng:eng, barcode:it.barcode, product:p || '__raw__', score:score, qty:it.qty, unit:it.forceUnit || impUnitFor(p || eng), inc:true, calcOk:it.calcOk};
       });
-      return {include:true, date:o.date, customerRaw:o.customerRaw, customer:pick, custScore:best ? best.score : 0, custSuggest:cm.slice(0,4).map(function(x){ return x.name; }), items:items, grand:o.grand, sum:o.sum};
+      return {include:true, date:o.date || todayStr(), customerRaw:o.customerRaw, customer:pick, custScore:best ? best.score : 0, custSuggest:cm.slice(0,4).map(function(x){ return x.name; }), items:items, grand:o.grand, sum:o.sum};
     });
   }
   function impCustBadge(o){
@@ -8975,7 +9021,8 @@
     var nItems = 0, nNew = 0, nDup = 0, nCheck = 0;
     var cards = os.map(function(o, oi){
       var dup = impDup(o); if(dup) nDup++;
-      var seen = {}, opts = '<option value="__raw__"'+(o.customer===o.customerRaw?' selected':'')+'>كما في الملف: '+escH(o.customerRaw)+'</option>';
+      var curOpt = (o.customer!==o.customerRaw && cNames.indexOf(o.customer)<0) ? '<option value="'+escH(o.customer)+'" selected>'+escH(o.customer)+'</option>' : '';
+      var seen = {}, opts = curOpt+'<option value="__raw__"'+(o.customer===o.customerRaw?' selected':'')+'>كما في الملف: '+escH(o.customerRaw)+'</option>';
       o.custSuggest.concat(cNames).forEach(function(n){ var k = cropKey(n); if(seen[k]) return; seen[k] = 1; opts += '<option value="'+escH(n)+'"'+(n===o.customer && o.customer!==o.customerRaw?' selected':'')+'>'+escH(n)+'</option>'; });
       var rows = o.items.map(function(it, ii){
         nItems++; if(it.product==='__raw__') nNew++; else if(it.score<0.85) nCheck++;
@@ -8998,7 +9045,7 @@
     var note = impState.info ? '<div class="hint" style="margin:8px 0;color:var(--alert);">'+escH(impState.info)+'</div>' : '';
     var diag = impState.diag ? '<pre class="hint" dir="ltr" style="white-space:pre-wrap;max-height:160px;overflow:auto;">'+escH(impState.diag)+'</pre>' : '';
     return '<details class="chart-card" id="q-imp-det"'+(impState.open||os.length?' open':'')+' style="margin:0 0 14px;"><summary style="cursor:pointer;font-weight:700;">📥 استيراد أوردرات من ملف</summary>'+
-      '<p class="hint" style="margin-top:8px;">اختار ملف Word (.docx) أو ملف نصي، أو الصق النص تحت. البرنامج بيقرا العملاء والأصناف والكميات وبيطابقهم مع القوايم، وانت بتراجع قبل الحفظ.</p>'+
+      '<p class="hint" style="margin-top:8px;">اختار ملف Word (.docx) أو ملف نصي، أو الصق النص تحت. بيقرا شكلين: فاتورة المبيعات (طلبية عميل)، أو رسايل بسيطة زي: اسم العميل في سطر، وتحته الفرع أو الشخص (اختياري)، وبعدها الأصناف كل صنف في سطر (الكمية الأول ثم الصنف، مثلاً "10 italian basil 100g" أو "5 kg cherry mix"). بيطابق العملاء والأصناف مع القوايم وانت بتراجع قبل الحفظ. لو مفيش تاريخ في النص بيتحط تاريخ النهارده وتقدر تغيّره.</p>'+
       '<input type="file" id="q-imp-file" accept=".docx,.txt,.csv,.text" style="margin:6px 0;">'+
       '<textarea id="q-imp-text" rows="3" placeholder="أو الصق نص الأوردرات هنا" style="width:100%;margin:6px 0;">'+escH(impState.text)+'</textarea>'+
       '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="q-imp-read">قراءة النص</button></div>'+note+diag+preview+'</details>';
@@ -9007,7 +9054,7 @@
     var parsed = impParse(text);
     impState.open = true; impState.text = fileName ? '' : text; impState.diag = '';
     if(!parsed.length){
-      impState.orders = []; impState.info = 'ما لقيتش أوردرات في '+(fileName ? 'الملف' : 'النص')+'. المفروض كل أوردر يبدأ بسطر فيه "طلبية عميل" والتاريخ، وفي الأصناف باركود. لو الملف مختلف ابعتهولي.';
+      impState.orders = []; impState.info = 'ما لقيتش أوردرات في '+(fileName ? 'الملف' : 'النص')+'. المفروض كل أوردر يكون إما فاتورة (سطر فيه "طلبية عميل" والتاريخ والأصناف بباركود)، أو اسم العميل في سطر وتحته أصنافه (كمية ثم صنف). لو الملف مختلف ابعتهولي.';
       impState.diag = String(text).split(/\r?\n/).slice(0,12).join('\n');
     } else {
       impState.info = ''; impState.orders = impBuild(parsed); impState.date = impState.orders[0].date;
