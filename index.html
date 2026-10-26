@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jiRop/TT0igQnpA3Y3YxpVlGMwD86UAANsT0AGY7iFA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xP+4iK32ER2Xrza14hdVhc+as5WEV2jDBAE+D8N/tzY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -658,6 +658,16 @@
   .imp-item select,.imp-item input[type=number]{width:100%;min-width:0;}
   .imp-raw{margin:0 0 2px;font-size:.7rem;color:var(--muted);direction:ltr;text-align:start;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .imp-item.warn select.imp-prod{border-color:var(--alert);}
+
+  /* ---- تسجيل المهمة بالصوت ---- */
+  .voice-box{background:var(--surface-2);border:1px dashed var(--border);border-radius:10px;padding:10px;margin:0 0 12px;}
+  .voice-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .voice-auto{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:400;}
+  .btn.voice-live{background:var(--alert) !important;animation:voicepulse 1s ease-in-out infinite;}
+  @keyframes voicepulse{0%,100%{box-shadow:0 0 0 0 rgba(214,69,61,.5);}50%{box-shadow:0 0 0 8px rgba(214,69,61,0);}}
+  .voice-card{margin-top:8px;padding:8px;border-radius:8px;background:var(--surface);}
+  .voice-chip{display:inline-block;background:var(--surface-2);border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:.8rem;}
+  .voice-chip.bad{background:var(--alert-soft);color:var(--alert);}
 </style>
 </head>
 <body>
@@ -5790,6 +5800,194 @@
       (rows || '<p class="empty-note">مفيش مهام معلّقة في اليوم ده.</p>')+
       '<p class="hint" style="margin-top:10px;">الزرار بيفتح واتساب على محادثة الموظف برسالة جاهزة بمهامه، وانت بس تدوس إرسال. أرقام الموظفين بتتسجّل في الإعدادات ← حسابات الموظفين.</p></details>';
   }
+  /* ===== تحليل جملة صوتية لمهمة: العنوان + الصوبة + التاريخ + المكلّف ===== */
+  function vDigits(s){ return String(s||'').replace(/[٠-٩]/g,function(c){ return String(c.charCodeAt(0)-1632); }).replace(/[۰-۹]/g,function(c){ return String(c.charCodeAt(0)-1776); }); }
+  function vAr(s){
+    return vDigits(String(s||'')).toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[إأآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/[^a-z0-9\u0600-\u06FF]/g,'');
+  }
+  var V_NUMS = {'واحد':'1','واحده':'1','اتنين':'2','اثنين':'2','تنين':'2','اثنان':'2','تلاته':'3','ثلاثه':'3','تلات':'3','ثلاث':'3','اربعه':'4','اربع':'4','فور':'4','خمسه':'5','خمس':'5','ستا':'6','سته':'6','ست':'6','سبعه':'7','سبع':'7','تمانيه':'8','ثمانيه':'8','تمن':'8','تسعه':'9','تسع':'9','عشره':'10','عشر':'10','one':'1','two':'2','three':'3','four':'4','five':'5','six':'6'};
+  var V_LETTERS = {'ال':'l','ايل':'l','الي':'l','جي':'g','اتش':'h','سي':'c','اي':'a','بي':'b','دي':'d'};
+  var V_CMD = ['ضيف','اضف','اضافه','سجل','اعمل','عين','كلف','انشئ','عاوز','عايز','اريد','ممكن','لو','سمحت','من','فضلك'];
+  var V_PREP = ['علي','الي','للموظف','للعامل','للاستاذ','للمهندس','عند'];
+  var V_DAYS = {'السبت':6,'الاحد':0,'الحد':0,'الاثنين':1,'الاتنين':1,'الثلاثاء':2,'التلات':2,'التلاتاء':2,'الاربعاء':3,'الاربع':3,'الخميس':4,'الجمعه':5};
+  var V_MONTHS = {'يناير':1,'فبراير':2,'مارس':3,'ابريل':4,'مايو':5,'يونيو':6,'يوليو':7,'اغسطس':8,'سبتمبر':9,'اكتوبر':10,'نوفمبر':11,'ديسمبر':12};
+  function vIso(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function vAdd(todayIso, n){ var p = todayIso.split('-'), d = new Date(+p[0], +p[1]-1, +p[2]+n, 12); return vIso(d); }
+  function vLev(a, b){
+    var m = a.length, n = b.length, d = [], i, j; if(!m) return n; if(!n) return m;
+    for(i=0;i<=m;i++) d[i] = [i]; for(j=1;j<=n;j++) d[0][j] = j;
+    for(i=1;i<=m;i++) for(j=1;j<=n;j++){ d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1)); if(i>1&&j>1&&a.charAt(i-1)===b.charAt(j-2)&&a.charAt(i-2)===b.charAt(j-1)) d[i][j] = Math.min(d[i][j], d[i-2][j-2]+1); }
+    return d[m][n];
+  }
+  function vSim(a, b){ if(!a||!b) return 0; if(a===b) return 1; return 1 - vLev(a,b)/Math.max(a.length,b.length); }
+  function voiceParseTask(text, ctx){
+    var today = ctx.today, toks = vDigits(String(text||'')).replace(/[،,.؟?!]/g,' ').split(/\s+/).filter(function(x){ return x; });
+    var keys = toks.map(vAr), used = toks.map(function(){ return false; }), out = {title:'', date:'', greenhouse:'', assignee:'', heard:String(text||'').trim()};
+    function mark(a, b){ for(var i=a;i<b;i++) used[i] = true; }
+    // --- التاريخ ---
+    for(var i=0;i<toks.length && !out.date;i++){
+      var k = keys[i], nx = keys[i+1]||'';
+      if(k==='بعد' && (nx==='بكره'||nx==='بكرا'||nx==='غد')){ out.date = vAdd(today,2); mark(i,i+2); break; }
+      if(k==='بعد' && /^\d+$/.test(nx) && /^(ايام|يوم|ايام)$/.test(keys[i+2]||'')){ out.date = vAdd(today,parseInt(nx,10)); mark(i,i+3); break; }
+      if(k==='بكره'||k==='بكرا'||k==='غدا'||k==='غد'){ out.date = vAdd(today,1); mark(i,i+1); break; }
+      if(k==='النهارده'||k==='انهارده'||k==='النهرده'||k==='اليوم'){ out.date = today; mark(i,i+1); break; }
+      if(V_DAYS[k]!==undefined){
+        var dow = new Date(today+'T12:00:00').getDay(), diff = (V_DAYS[k]-dow+7)%7; if(diff===0) diff = 7;
+        out.date = vAdd(today,diff); var s = (keys[i-1]==='يوم') ? i-1 : i, e = (/^(الجاي|الجاى|القادم|اللي)$/.test(nx) ? i+2 : i+1); mark(s,e); break;
+      }
+      if(/^\d{1,2}$/.test(k) && V_MONTHS[nx]){ var y = parseInt(today.slice(0,4),10), mo = V_MONTHS[nx], dd = parseInt(k,10), iso = y+'-'+('0'+mo).slice(-2)+'-'+('0'+dd).slice(-2); if(iso<today) iso = (y+1)+iso.slice(4); out.date = iso; mark(i,i+2); break; }
+      var dm = toks[i].match(/^(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?$/);
+      if(dm){ var yy = dm[3] ? (dm[3].length===2 ? 2000+parseInt(dm[3],10) : parseInt(dm[3],10)) : parseInt(today.slice(0,4),10); out.date = yy+'-'+('0'+dm[2]).slice(-2)+'-'+('0'+dm[1]).slice(-2); mark(i,i+1); break; }
+    }
+    // --- الصوبة (اسمها ممكن يتنطق "إل جي ٤" أو "LG4" أو "صوبة ٢") ---
+    var ghs = (ctx.greenhouses||[]).map(function(n){ var f = vAr(n); return {name:n, full:f, short:f.replace(/^(صوبه|صاله)/,'')}; });
+    function wkey(a, b){ var s = ''; for(var j=a;j<b;j++){ var kk = keys[j]; s += V_NUMS[kk] || V_LETTERS[kk] || kk; } return s; }
+    gh: for(var a=0;a<toks.length;a++){
+      if(used[a]) continue;
+      var hasWord = /^(صوبه|الصوبه|صاله|الصاله|صوبة)$/.test(keys[a]);
+      for(var len=4; len>=1; len--){
+        var from = hasWord ? a+1 : a, to = from+len; if(to>toks.length) continue;
+        var w = wkey(from,to);
+        for(var g=0;g<ghs.length;g++){
+          var hit = (w===ghs[g].full) || (hasWord && w===ghs[g].short) || (w===ghs[g].full.replace(/^(صوبه|صاله)/,'') && hasWord);
+          if(hit && !used.slice(from,to).some(Boolean)){ out.greenhouse = ghs[g].name; mark(hasWord ? a : from, to); break gh; }
+        }
+      }
+    }
+    // --- المكلّف ---
+    var names = (ctx.names||[]).map(function(n){ return {name:n, key:vAr(n)}; });
+    function bestName(from, to){
+      var wk = ''; for(var j=from;j<to;j++) wk += keys[j];
+      if(wk.length<3) return null; var best = null;
+      names.forEach(function(n){
+        var sc = 0;
+        if(wk===n.key) sc = 1; else if(n.key.indexOf(wk)===0 && wk.length>=4) sc = 0.92; else sc = vSim(wk, n.key);
+        if(sc>=0.8 && (!best || sc>best.sc || (sc===best.sc && to-from>best.len))) best = {name:n.name, sc:sc, len:to-from};
+      });
+      return best;
+    }
+    var pick = null, pickAt = -1, pickLen = 0;
+    for(var p=0;p<toks.length;p++){
+      if(used[p]) continue;
+      var isPrep = V_PREP.indexOf(keys[p])>=0 || V_CMD.indexOf(keys[p])===5 /* عين */ || keys[p]==='كلف';
+      var attached = keys[p].length>3 && keys[p].charAt(0)==='ل' && !isPrep;
+      for(var L=3; L>=1; L--){
+        var st = (isPrep ? p+1 : p), en = st+L;
+        if(!isPrep && !attached) continue;
+        if(en>toks.length) continue;
+        if(attached){ var sv = keys[p]; keys[p] = sv.slice(1); var r1 = bestName(p, p+L); keys[p] = sv; if(r1 && (!pick || r1.sc>pick.sc)){ pick = r1; pickAt = p; pickLen = L; } continue; }
+        if(used.slice(st,en).some(Boolean)) continue;
+        var r = bestName(st, en); if(r && (!pick || r.sc>pick.sc || (r.sc===pick.sc && L>pickLen))){ pick = r; pickAt = st; pickLen = L; }
+      }
+    }
+    if(pick){ out.assignee = pick.name; var startMark = pickAt; if(pickAt>0 && V_PREP.indexOf(keys[pickAt-1])>=0) startMark = pickAt-1; if(pickAt>0 && (keys[pickAt-1]==='كلف' || keys[pickAt-1]==='عين')) startMark = pickAt-1; mark(startMark, pickAt+pickLen); }
+    // --- العنوان: اللي فاضل بعد شيل الأوامر والأدوات ---
+    var rest = [];
+    toks.forEach(function(t, idx){
+      if(used[idx]) return;
+      var k = keys[idx];
+      if(idx<5 && (V_CMD.indexOf(k)>=0 || /^(مهمه|تاسك|task|مهمة)$/.test(k) || k==='لي' || k==='ال')) return;
+      rest.push(t);
+    });
+    while(rest.length && /^(في|ب|علي|على|ل|الي|عند)$/.test(vAr(rest[0])||rest[0])) rest.shift();
+    while(rest.length && /^(في|ب|علي|على|ل|الي|عند|يوم)$/.test(vAr(rest[rest.length-1])||rest[rest.length-1])) rest.pop();
+    out.title = rest.join(' ').trim();
+    return out;
+  }
+
+
+  /* ---------- تسجيل المهمة بالصوت (مدير): الكلام ← نص ← مهمة بالصوبة والتاريخ والشخص ---------- */
+  var voiceState = {listening:false, interim:'', parsed:null, err:''};
+  var voiceRec = null;
+  function voiceSupported(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+  function voiceAutoOn(){ try{ return localStorage.getItem('oroots-voice-auto')==='1'; }catch(e){ return false; } }
+  function voiceCtx(){
+    var dn = appUsers.filter(function(u){ return u.displayName; }).map(function(u){ return u.displayName; });
+    var names = dn.concat(knownNames().filter(function(n){ return dn.indexOf(n)<0 && n.indexOf('@')<0; }));
+    return {today:todayStr(), greenhouses:greenhouseGroups().map(function(g){ return g.name; }), names:names};
+  }
+  function voiceBoxHtml(){
+    if(!voiceSupported()) return '<p class="hint">التسجيل الصوتي محتاج متصفح كروم (أندرويد أو كمبيوتر)، ومش مدعوم في المتصفح ده.</p>';
+    return '<div class="voice-box" id="voice-box"><div class="voice-row"><button type="button" class="btn btn-primary btn-sm" id="voice-btn">🎤 سجّل المهمة بالصوت</button>'+
+      '<label class="voice-auto"><input type="checkbox" id="voice-auto" style="width:auto;"> حفظ تلقائي بعد التعرّف</label></div>'+
+      '<div class="hint" style="margin:6px 0 0;">قول مثلاً: «ضيف مهمة غسيل سقف صوبة LG4 بكرة على عبدالرحمن»</div>'+
+      '<div class="hint" id="voice-status" style="margin:4px 0;"></div><div id="voice-result"></div></div>';
+  }
+  function voiceScore(p){ return (p.title?1:0)+(p.assignee?2:0)+(p.greenhouse?1:0)+(p.date?1:0); }
+  function voiceFill(p, onlyEmpty){
+    var set = function(sel, v){ var e = $(sel); if(e && v && (!onlyEmpty || !e.value)) e.value = v; };
+    set('#task-title', p.title); set('#task-assignee', p.assignee); set('#task-date', p.date);
+    var g = $('#task-gh');
+    if(g && p.greenhouse && (!onlyEmpty || !g.value)){ for(var i=0;i<g.options.length;i++){ if(g.options[i].value===p.greenhouse){ g.value = p.greenhouse; break; } } }
+  }
+  function voiceRender(){
+    var btn = $('#voice-btn'), st = $('#voice-status'), res = $('#voice-result');
+    if(!btn || !st || !res) return;
+    btn.textContent = voiceState.listening ? '⏹ بسمعك… دوس عشان توقف' : '🎤 سجّل المهمة بالصوت';
+    btn.classList.toggle('voice-live', voiceState.listening);
+    st.textContent = voiceState.listening ? (voiceState.interim ? '«'+voiceState.interim+'»' : 'اتكلم دلوقتي…') : (voiceState.err || '');
+    var p = voiceState.parsed;
+    if(!p){ res.innerHTML = ''; return; }
+    var chip = function(label, v, optional){ return v ? '<span class="voice-chip">'+label+': <b>'+escH(v)+'</b></span>' : '<span class="voice-chip'+(optional?'':' bad')+'">'+label+': '+(optional?'مفيش':'مش واضح')+'</span>'; };
+    var dt = p.date || ($('#task-date') ? $('#task-date').value : '');
+    res.innerHTML = '<div class="voice-card"><div class="hint" style="margin:0 0 6px;">سمعت: «'+escH(p.heard)+'»</div>'+
+      chip('المهمة', p.title)+chip('الشخص', p.assignee)+chip('الصوبة', p.greenhouse, true)+chip('التاريخ', dt)+(p.date?'':'<span class="hint" style="margin:0;">(التاريخ الافتراضي)</span>')+
+      '<div class="form-actions" style="margin-top:8px;"><button type="button" class="btn btn-primary btn-sm" id="voice-ok">✓ سجّل المهمة</button> <button type="button" class="btn btn-ghost btn-sm" id="voice-redo">🎤 من تاني</button> <button type="button" class="btn btn-ghost btn-sm" id="voice-clear">مسح</button></div></div>';
+  }
+  function voiceSubmit(){
+    var f = $('#task-assign-form');
+    if(!f){ toast('افتح تاب المهام'); return; }
+    if(!$('#task-title').value.trim() || !$('#task-assignee').value.trim()){ toast('كمّل المهمة والشخص الأول'); return; }
+    voiceState.parsed = null; voiceState.err = '';
+    if(f.requestSubmit) f.requestSubmit(); else f.dispatchEvent(new Event('submit', {cancelable:true, bubbles:true}));
+  }
+  function voiceHandle(alts){
+    var ctx = voiceCtx(), best = null;
+    alts.forEach(function(t){ var p = voiceParseTask(t, ctx); if(!best || voiceScore(p)>voiceScore(best)) best = p; });
+    if(!best || !best.title){ voiceState.parsed = null; voiceState.err = 'ما فهمتش المهمة — جرّب تاني. سمعت: «'+(alts[0]||'')+'»'; return; }
+    voiceState.parsed = best; voiceState.err = '';
+    voiceFill(best, false);
+    if(voiceAutoOn() && best.title && best.assignee) setTimeout(voiceSubmit, 50);
+  }
+  function voiceToggle(){
+    if(voiceState.listening && voiceRec){ try{ voiceRec.stop(); }catch(e){} return; }
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    voiceRec = new SR(); voiceRec.lang = 'ar-EG'; voiceRec.interimResults = true; voiceRec.maxAlternatives = 3; voiceRec.continuous = false;
+    voiceState.err = ''; voiceState.interim = ''; voiceState.parsed = null; voiceState.listening = true;
+    voiceRec.onresult = function(ev){
+      var interim = '', finalAlts = null;
+      for(var i=ev.resultIndex;i<ev.results.length;i++){
+        var r = ev.results[i];
+        if(r.isFinal){ finalAlts = []; for(var a=0;a<r.length;a++) finalAlts.push(r[a].transcript); } else interim += r[0].transcript;
+      }
+      voiceState.interim = interim || (finalAlts ? finalAlts[0] : voiceState.interim);
+      if(finalAlts) voiceHandle(finalAlts);
+      voiceRender();
+    };
+    voiceRec.onerror = function(ev){
+      var m = {'not-allowed':'مفيش صلاحية للميكروفون — فعّلها من إعدادات المتصفح للموقع ده', 'service-not-allowed':'مفيش صلاحية للميكروفون', 'no-speech':'ما سمعتش حاجة — جرّب تاني', 'audio-capture':'مفيش ميكروفون متوصل', 'network':'التعرّف على الصوت محتاج إنترنت', 'aborted':''};
+      voiceState.err = (m[ev.error]!==undefined ? m[ev.error] : 'حصلت مشكلة في التسجيل ('+ev.error+')');
+      voiceState.listening = false; voiceRender();
+    };
+    voiceRec.onend = function(){ voiceState.listening = false; voiceRender(); };
+    try{ voiceRec.start(); }catch(e){ voiceState.listening = false; voiceState.err = 'تعذّر تشغيل الميكروفون'; }
+    voiceRender();
+  }
+  function wireVoice(root){
+    var b = $('#voice-btn', root); if(!b) return;
+    b.addEventListener('click', voiceToggle);
+    var au = $('#voice-auto', root);
+    if(au){ au.checked = voiceAutoOn(); au.addEventListener('change', function(){ try{ localStorage.setItem('oroots-voice-auto', au.checked?'1':'0'); }catch(e){} }); }
+    if(voiceState.parsed) voiceFill(voiceState.parsed, true);
+    voiceRender();
+    var res = $('#voice-result', root);
+    res.addEventListener('click', function(ev){
+      var t = ev.target; if(!t || !t.id) return;
+      if(t.id==='voice-ok') voiceSubmit();
+      else if(t.id==='voice-redo') voiceToggle();
+      else if(t.id==='voice-clear'){ voiceState.parsed = null; voiceState.err = ''; voiceRender(); }
+    });
+  }
   function renderTasksPanel(){
     var body = $('#tasks-body');
     if(!body) return;
@@ -5846,7 +6044,7 @@
           '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">تعيين المهمة</button></div>'+
         '</form>'+
         '<datalist id="known-names-list">'+namesDatalist+'</datalist>';
-      assignSectionHtml = '<h2 class="section-title">تعيين مهمة جديدة</h2>'+assignFormHtml;
+      assignSectionHtml = '<h2 class="section-title">تعيين مهمة جديدة</h2>'+voiceBoxHtml()+assignFormHtml;
 
       var sortedAll = allTasks.slice().sort(function(a,b){ return b.ts.localeCompare(a.ts); });
       var tableRowsHtml = sortedAll.map(function(t){
@@ -5898,6 +6096,7 @@
     if(waDet) waDet.addEventListener('toggle', function(){ waOpen = waDet.open; });
     var tsDet = $('#ts-det', body);
     if(tsDet) tsDet.addEventListener('toggle', function(){ tsOpen = tsDet.open; });
+    wireVoice(body);
     $all('.wa-send', body).forEach(function(a){
       a.addEventListener('click', function(){ waSent[a.getAttribute('data-key')] = true; a.textContent = 'اتبعت ✓ — ابعت تاني'; });
     });
