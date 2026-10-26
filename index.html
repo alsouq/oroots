@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xP+4iK32ER2Xrza14hdVhc+as5WEV2jDBAE+D8N/tzY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TEtCbxq6FxB8aU6ZOXfXnbBVQLNujRGJB3FNBLBZxno=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -217,7 +217,7 @@
   .sp-matrix td,.sp-matrix th{text-align:center;} .sp-matrix td:first-child,.sp-matrix th:first-child{text-align:start;white-space:normal;min-width:70px;}
   .sp-dayh{cursor:pointer;line-height:1.2;} .sp-dayh.sel{background:rgba(47,158,99,.2);} .sp-dayh.today{color:var(--brand);} .sp-cell{cursor:pointer;}
   .sp-dot{display:inline-block;min-width:22px;height:22px;line-height:22px;border-radius:11px;color:#fff;font-weight:700;font-size:.75rem;}
-  .sp-dot.st-done{background:#2f9e63;} .sp-dot.st-late{background:var(--alert);} .sp-dot.st-today{background:#e0a82e;} .sp-dot.st-planned{background:#8a97a3;}
+  .sp-dot.st-done{background:#2f9e63;} .sp-dot.st-skipped{background:#6b7280;} .sp-item.st-skipped{border-inline-start-color:#6b7280;opacity:.9;} .sp-skipinfo{margin:6px 0;padding:6px 10px;border-radius:8px;background:rgba(107,114,128,.12);font-size:.82rem;} .sp-skipform{margin-top:8px;padding:8px;border:1px dashed var(--border);border-radius:10px;} .sp-skipform textarea{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;font-size:.9rem;} .sp-dot.st-late{background:var(--alert);} .sp-dot.st-today{background:#e0a82e;} .sp-dot.st-planned{background:#8a97a3;}
   .sp-item{border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--surface);border-inline-start:5px solid #8a97a3;}
   .sp-item.st-done{border-inline-start-color:#2f9e63;opacity:.85;} .sp-item.st-late{border-inline-start-color:var(--alert);} .sp-item.st-today{border-inline-start-color:#e0a82e;}
   .sp-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;} .sp-kind{font-weight:700;} .sp-prod{margin:4px 0;}
@@ -231,6 +231,10 @@
     #print-report .pr-small{font-size:0.72rem;color:#555;font-weight:400;}
     #print-report .pr-box{text-align:center;font-size:1.25rem;width:34px;} #print-report .pr-note{min-width:90px;}
     #print-report tr.pr-done td{color:#444;background:#efefef !important;}
+    #print-report tr.pr-skipped td{color:#7a2a1e;background:#fbeeea !important;}
+    #print-report table{table-layout:auto;max-width:100%;} #print-report td,#print-report th{word-break:break-word;overflow-wrap:anywhere;vertical-align:top;}
+    #print-report .table-wrap,#print-report .cropref-wrap{overflow:visible !important;border:none !important;} #print-report img{max-width:100%;}
+    #print-report .hint{font-size:.72rem;color:#555;margin:0;} #print-report .status-pill{background:none !important;color:#111 !important;padding:0 !important;border:none !important;}
     #print-report .pr-sign{display:flex;gap:40px;margin-top:22px;} #print-report .pr-sign > div{flex:1;display:flex;align-items:flex-end;gap:8px;font-weight:700;}
     #print-report .pr-line{flex:1;border-bottom:1px solid #333;height:18px;}
   }
@@ -364,6 +368,17 @@
   .task-sop-link{font-size:0.75rem;color:var(--muted);margin-bottom:8px;}
   .pest-card{background:var(--surface);border:1px solid var(--border);border-inline-start:4px solid var(--alert);border-radius:14px;padding:12px 14px;}
   .pest-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+  .pest-card.eradicated{border-inline-start:4px solid #2f9e63;} .pest-erad-info{margin:6px 0;padding:6px 10px;border-radius:8px;background:rgba(47,158,99,.12);font-size:.82rem;}
+  .pt-ctl{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;} .pt-row{padding:8px 0;border-top:1px solid var(--border);} .pt-row:first-of-type{border-top:none;}
+  .pt-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;} .pt-name{font-weight:700;font-size:.88rem;}
+  .pt-trend{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);}
+  .pt-trend.up{color:var(--alert);background:rgba(220,60,50,.12);} .pt-trend.down{color:#2f9e63;background:rgba(47,158,99,.14);} .pt-trend.new{color:#9a6b00;background:rgba(224,168,46,.2);}
+  .pt-body{display:flex;align-items:center;gap:10px;} .pt-lines{flex:1;min-width:0;} .pt-line{display:flex;align-items:center;gap:6px;margin:2px 0;}
+  .pt-lbl{font-size:.68rem;color:var(--muted);min-width:44px;} .pt-track{flex:1;height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden;} .pt-n{min-width:22px;font-size:.75rem;font-weight:700;text-align:end;}
+  .pt-bar{height:100%;border-radius:5px;background:#6b7f95;} .pt-bar.up,.pt-bar.new{background:var(--alert);} .pt-bar.down{background:#2f9e63;} .pt-bar.prev{background:#c3cad2;}
+  .pt-spark{flex:none;direction:ltr;color:#6b7f95;} .pt-spark.up,.pt-spark.new{color:var(--alert);} .pt-spark.down{color:#2f9e63;}
+  .pt-legend{font-size:.72rem;color:var(--muted);margin-top:6px;} .pt-sum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 6px;font-size:.8rem;font-weight:700;}
+  .pt-mx td,.pt-mx th{text-align:center;} .pt-mx td:first-child,.pt-mx th:first-child{text-align:start;} .pt-mx td.up{color:var(--alert);font-weight:700;} .pt-mx td.down{color:#2f9e63;font-weight:700;} .pt-mx td.new{color:#9a6b00;font-weight:700;}
   .pest-photo{max-width:100%;max-height:220px;border-radius:10px;margin:8px 0;display:block;object-fit:cover;cursor:zoom-in;}
   .pest-treat-row{padding:4px 0;border-top:1px dashed rgba(0,0,0,.12);font-size:0.82rem;} .pest-treat-row:first-of-type{border-top:none;}
   #photo-viewer{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.94);display:flex;flex-direction:column;touch-action:none;}
@@ -944,6 +959,26 @@
 <script>
 (function(){
   "use strict";
+
+  /* ---------- رسالة تأكيد قبل أي حفظ بيانات ----------
+     بتتسجّل أول حاجة (capture) عشان تسبق كل معالجات الحفظ؛ لو المستخدم رفض، الحفظ بيتوقف خالص. */
+  (function(){
+    var SAVE_BTN_SEL = '#btn-save-ranges, #qe-save, #btn-save-target-profile, #btn-save-recipe, #btn-calc-plan, .op-save, #q-imp-save';
+    function clean(t){ return String(t||'').replace(/\s+/g,' ').trim(); }
+    function ask(label){ return window.confirm('تأكيد الحفظ\n\n'+(label ? ('«'+label+'»\n\n') : '')+'تحفظ البيانات دي؟'); }
+    function stopIt(ev){ ev.preventDefault(); ev.stopImmediatePropagation(); }
+    document.addEventListener('submit', function(ev){
+      var f = ev.target;
+      if(!f || f.id==='login-form' || (f.hasAttribute && f.hasAttribute('data-noconfirm'))) return;
+      var b = ev.submitter || (f.querySelector ? f.querySelector('button[type=submit], button:not([type])') : null);
+      if(!ask(b ? clean(b.textContent) : '')) stopIt(ev);
+    }, true);
+    document.addEventListener('click', function(ev){
+      var b = ev.target && ev.target.closest ? ev.target.closest(SAVE_BTN_SEL) : null;
+      if(!b || b.disabled) return;
+      if(!ask(clean(b.textContent))) stopIt(ev);
+    }, true);
+  })();
 
   var SOURCES = [
     {key:'irrigation', label:'الري', title:'مياه الري', color:'var(--brand)', colorHex:'#2DBE6C'},
@@ -2083,7 +2118,7 @@
   }
   var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
-    '#btn-plan-snapshot, .q-edit, .q-del, .q-add-item, .q-status-btn, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
+    '#btn-plan-snapshot, .q-edit, .q-del, .q-add-item, .q-status-btn, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-erad-btn, .pest-uneradicate-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
   var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
@@ -2221,9 +2256,9 @@
     renderAll();
     return Promise.resolve();
   }
-  function addSop(title, category, steps){
+  function addSop(title, category, steps, images){
     if(!title) return Promise.resolve();
-    var sop = {id:genId(), title:title, category:category||'', steps:steps||'', createdBy:currentUser||'', createdAt:Date.now(), updatedAt:Date.now()};
+    var sop = {id:genId(), title:title, category:category||'', steps:steps||'', images:images||[], createdBy:currentUser||'', createdAt:Date.now(), updatedAt:Date.now()};
     return saveSop(sop);
   }
   function updateSop(id, patch){
@@ -4232,7 +4267,7 @@
       '<h2>الإصابات المسجلة هذا الأسبوع ('+weekPests.length+')</h2>'+
       (weekPests.length ?
         '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المرض/الآفة</th><th>الحالة</th></tr></thead><tbody>'+
-          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+x.problemName+'</td><td>'+(x.treated?'اتعالجت':'لسه')+'</td></tr>'; }).join('')+
+          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+x.problemName+'</td><td>'+(x.eradicated?'اتقضي عليها':(x.treated?'اتعالجت':'لسه'))+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد إصابات مسجلة هذا الأسبوع.</p>')+
 
       '<h2>حالة الصوب</h2>'+
@@ -4537,7 +4572,7 @@
     var recentPests = pestLog.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.ts.localeCompare(a.ts); }).slice(0,5);
     var pestsHtml = '<div class="chart-card"><h3>آخر إصابات الصوبة</h3>'+
       (recentPests.length ? '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الآفة/المرض</th><th>الشدة</th><th>الحالة</th></tr></thead><tbody>'+
-        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+x.problemName+'</td><td>'+(x.severity||'—')+'</td><td>'+(x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
+        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+x.problemName+'</td><td>'+(x.severity||'—')+'</td><td>'+(x.eradicated?'<span class=\'status-pill good\'>اتقضي عليها ✅</span>':x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
       '</tbody></table></div>' : '<p class="empty-note">لا توجد إصابات مسجلة.</p>')+
     '</div>';
     var relForGh = bioReleases.filter(function(x){ return x.greenhouse===gh; });
@@ -6073,7 +6108,7 @@
           '<div><span class="sop-title">'+s.title+'</span>'+(s.category?(' <span class="sop-category">'+s.category+'</span>'):'')+'</div>'+
           '<div><button class="btn-ghost btn-sm sop-edit-btn" style="border-radius:8px;">تعديل</button> <button class="btn-danger-ghost btn-sm sop-delete-btn" style="border-radius:8px;">حذف</button></div>'+
         '</div>'+
-        '<ol class="sop-steps">'+stepLines.map(function(l){ return '<li>'+l+'</li>'; }).join('')+'</ol>'+
+        '<ol class="sop-steps">'+stepLines.map(function(l){ return '<li>'+l+'</li>'; }).join('')+'</ol>'+sopImagesHtml(s)+
       '</div>';
     }).join('') : '<p class="empty-note">لسه مفيش إجراءات قياسية مضافة.</p>';
 
@@ -6187,18 +6222,51 @@
     applyPermissionLock($('#tasks-body'), 'tasks');
   }
 
+  /* ---------- صور الإجراءات (SOP) ---------- */
+  var SOP_MAX_IMAGES = 8, SOP_MAX_CHARS = 850000;   // حد أمان: مستند Firestore أقصاه 1MB
+  function sopImgsSize(arr){ return arr.reduce(function(n, x){ return n + String(x).length; }, 0); }
+  function sopFileToDataUrl(file){
+    return compressImageToBlob(file, 800, 0.55).then(function(blob){
+      return new Promise(function(resolve, reject){ var r = new FileReader(); r.onload = function(){ resolve(r.result); }; r.onerror = function(){ reject(r.error); }; r.readAsDataURL(blob); });
+    });
+  }
+  function sopImagesHtml(sop){
+    var im = (sop.images||[]).filter(function(x){ return typeof x==='string' && x.indexOf('data:image/')===0; });
+    return im.length ? '<div class="q-photos sop-photos">'+im.map(function(src){ return '<img class="pest-photo q-thumb" src="'+src+'" alt="صورة الإجراء">'; }).join('')+'</div>' : '';
+  }
   function showSopForm(existingSop){
     var holder = $('#sop-form-holder');
     if(!holder) return;
+    var imgs = (existingSop && Array.isArray(existingSop.images)) ? existingSop.images.slice() : [];
     holder.innerHTML =
       '<form class="entry-form" id="sop-form">'+
         '<div class="form-grid">'+
-          '<div class="field-sm"><label>العنوان</label><input type="text" id="sop-title" maxlength="120" required value="'+(existingSop?existingSop.title:'')+'"></div>'+
-          '<div class="field-sm"><label>الفئة (اختياري)</label><input type="text" id="sop-category" maxlength="60" value="'+(existingSop?(existingSop.category||''):'')+'"></div>'+
-          '<div class="field-sm full"><label>الخطوات (سطر لكل خطوة)</label><textarea id="sop-steps" rows="5" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:0.9rem;font-family:inherit;">'+(existingSop?existingSop.steps:'')+'</textarea></div>'+
+          '<div class="field-sm"><label>العنوان</label><input type="text" id="sop-title" maxlength="120" required value="'+(existingSop?escH(existingSop.title):'')+'"></div>'+
+          '<div class="field-sm"><label>الفئة (اختياري)</label><input type="text" id="sop-category" maxlength="60" value="'+(existingSop?escH(existingSop.category||''):'')+'"></div>'+
+          '<div class="field-sm full"><label>الخطوات (سطر لكل خطوة)</label><textarea id="sop-steps" rows="5" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:0.9rem;font-family:inherit;">'+(existingSop?escH(existingSop.steps||''):'')+'</textarea></div>'+
+          '<div class="field-sm full"><label>📷 صور الإجراء (اختياري — لحد '+SOP_MAX_IMAGES+' صور)</label><input type="file" id="sop-files" accept="image/*" multiple><div class="q-newphs" id="sop-imgs"></div></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الإجراء</button> <button type="button" class="btn btn-ghost btn-sm" id="sop-cancel-btn">إلغاء</button></div>'+
       '</form>';
+    function drawImgs(){
+      var box = $('#sop-imgs');
+      box.innerHTML = imgs.map(function(src, k){ return '<span class="q-newph"><img class="pest-photo q-thumb" src="'+src+'" alt=""><button type="button" class="del-btn sop-rm-img" data-k="'+k+'" title="شيل الصورة">✕</button></span>'; }).join('');
+      $all('.sop-rm-img', box).forEach(function(bt){ bt.addEventListener('click', function(){ imgs.splice(parseInt(bt.getAttribute('data-k'),10), 1); drawImgs(); }); });
+    }
+    drawImgs();
+    $('#sop-files').addEventListener('change', function(){
+      var files = [].slice.call(this.files||[]); this.value = '';
+      if(!files.length) return;
+      var room = SOP_MAX_IMAGES - imgs.length;
+      if(room<=0){ toast('أقصى عدد صور '+SOP_MAX_IMAGES); return; }
+      if(files.length>room){ files = files.slice(0, room); toast('هنضيف أول '+room+' صور بس'); }
+      toast('بيجهّز الصور...');
+      Promise.all(files.map(sopFileToDataUrl)).then(function(urls){
+        var next = imgs.concat(urls);
+        if(sopImgsSize(next) > SOP_MAX_CHARS){ toast('حجم الصور كبير — قلّل العدد'); return; }
+        imgs = next; drawImgs();
+      }).catch(function(){ toast('تعذر تجهيز الصور'); });
+    });
     $('#sop-cancel-btn').addEventListener('click', function(){ holder.innerHTML=''; });
     $('#sop-form').addEventListener('submit', function(ev){
       ev.preventDefault();
@@ -6206,11 +6274,11 @@
       var category = $('#sop-category').value.trim();
       var steps = $('#sop-steps').value;
       if(!title){ toast('اكتب عنوان'); return; }
-      var p = existingSop ? updateSop(existingSop.id, {title:title, category:category, steps:steps}) : addSop(title, category, steps);
+      var p = existingSop ? updateSop(existingSop.id, {title:title, category:category, steps:steps, images:imgs}) : addSop(title, category, steps, imgs);
       p.then(function(){
         toast('اتحفظ الإجراء');
         renderTasksPanel();
-      });
+      }).catch(function(){ toast('ما اتحفظش — راجع حجم الصور'); });
     });
   }
 
@@ -6610,7 +6678,7 @@
 
   /* ---------- Pest & Disease Control panel ---------- */
   var pestCategoryLabel = {fungal:'فطري 🍄', insect:'حشري 🐛', other:'أخرى'};
-  var pestFilterCategory = null;
+  var pestFilterCategory = null, pestFilterStatus = '';
 
   /* ---------- عارض الصور: تكبير/تصغير/تحريك ---------- */
   function closePhotoViewer(){
@@ -6705,6 +6773,107 @@
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعاملة</button> <button type="button" class="btn btn-ghost btn-sm" id="pt-cancel">إلغاء</button></div></form>';
   }
 
+  /* ---------- تأكيد القضاء على الإصابة بعد المعاملة ---------- */
+  function pestWho(){
+    var u = findUser(currentUser||'');
+    return (u && u.displayName) || currentUser || '';
+  }
+  function pestSetEradicated(id, on){
+    var inc = pestLog.filter(function(x){ return x.id===id; })[0];
+    if(!inc) return Promise.resolve();
+    var patch = on ? {eradicated:true, eradicatedAt:Date.now(), eradicatedBy:pestWho(), eradicatedByEmail:currentUser||'', updatedAt:Date.now()}
+                   : {eradicated:false, eradicatedAt:null, eradicatedBy:'', eradicatedByEmail:'', updatedAt:Date.now()};
+    return savePestIncident(Object.assign({}, inc, patch)).then(function(r){
+      logAudit('edit','pests',(on ? 'تأكيد القضاء على: ' : 'إرجاع للنشطة: ')+(inc.problemName||'—')+(inc.greenhouse?(' — '+inc.greenhouse):''));
+      return r;
+    });
+  }
+  /* ---------- اتجاه الإصابات: كل مرض/حشرة — بيزيد ولا بيقل؟ ---------- */
+  var pestTrendDays = 30, pestTrendScope = 'gh';
+  var PT_ICON = {fungal:'🍄', insect:'🐛', other:'⚠️'};
+  function pestTrendCompute(ghName, days){
+    var now = Date.now(), span = days*86400000, wk = 7*86400000, map = {};
+    pestLog.forEach(function(p){
+      if(ghName && p.greenhouse!==ghName) return;
+      var t = new Date(p.ts).getTime(); if(isNaN(t)) return;
+      var age = Math.max(0, now - t), nm = String(p.problemName||'').trim() || 'بدون اسم';
+      var k = nm.replace(/\s+/g,' ').toLowerCase();
+      var x = map[k] || (map[k] = {name:nm, category:p.category||'other', cur:0, prev:0, weeks:[0,0,0,0,0,0,0,0]});
+      if(age < span) x.cur++; else if(age < 2*span) x.prev++;
+      var w = Math.floor(age/wk); if(w<8) x.weeks[7-w]++;
+    });
+    return map;
+  }
+  function pestTrendInfo(cur, prev){
+    if(!cur && !prev) return {cls:'flat', arrow:'—', text:'مفيش'};
+    if(!prev) return {cls:'new', arrow:'🆕', text:'جديدة'};
+    if(cur>prev) return {cls:'up', arrow:'↑', text:'بتزيد +'+(cur-prev)+' (+'+Math.round((cur-prev)/prev*100)+'%)'};
+    if(cur<prev) return {cls:'down', arrow:'↓', text:(cur ? 'بتقل ' : 'اختفت ')+'-'+(prev-cur)+' (-'+Math.round((prev-cur)/prev*100)+'%)'};
+    return {cls:'flat', arrow:'＝', text:'ثابتة'};
+  }
+  function pestSpark(weeks, cls){
+    var mx = Math.max.apply(null, weeks.concat([1])), W = 84, H = 26, step = W/(weeks.length-1);
+    var pts = weeks.map(function(v, i){ return (i*step).toFixed(1)+','+(H-3-(v/mx)*(H-6)).toFixed(1); });
+    var last = pts[pts.length-1].split(',');
+    return '<svg class="pt-spark '+cls+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="آخر 8 أسابيع"><polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.join(' ')+'"/><circle cx="'+last[0]+'" cy="'+last[1]+'" r="2.6" fill="currentColor"/></svg>';
+  }
+  function pestTrendRowsHtml(map){
+    var rows = Object.keys(map).map(function(k){ return map[k]; }).filter(function(x){ return x.cur || x.prev; })
+      .sort(function(a,b){ return (b.cur-a.cur) || (b.prev-a.prev) || a.name.localeCompare(b.name); });
+    if(!rows.length) return '<p class="empty-note">مفيش إصابات متسجلة في الفترة دي.</p>';
+    var mx = Math.max.apply(null, rows.map(function(x){ return Math.max(x.cur, x.prev); }).concat([1]));
+    var up = 0, down = 0;
+    var html = rows.map(function(x){
+      var tr = pestTrendInfo(x.cur, x.prev);
+      if(tr.cls==='up' || tr.cls==='new') up++; else if(tr.cls==='down') down++;
+      var w = function(n){ return n ? Math.max(4, Math.round(n/mx*100)) : 0; };
+      return '<div class="pt-row"><div class="pt-head"><span class="pt-name">'+(PT_ICON[x.category]||'')+' '+escH(x.name)+'</span><span class="pt-trend '+tr.cls+'">'+tr.arrow+' '+tr.text+'</span></div>'+
+        '<div class="pt-body"><div class="pt-lines">'+
+          '<div class="pt-line"><span class="pt-lbl">الحالية</span><span class="pt-track"><span class="pt-bar '+tr.cls+'" style="display:block;width:'+w(x.cur)+'%"></span></span><span class="pt-n">'+x.cur+'</span></div>'+
+          '<div class="pt-line"><span class="pt-lbl">السابقة</span><span class="pt-track"><span class="pt-bar prev" style="display:block;width:'+w(x.prev)+'%"></span></span><span class="pt-n">'+x.prev+'</span></div>'+
+        '</div>'+pestSpark(x.weeks, tr.cls)+'</div></div>';
+    }).join('');
+    return '<div class="pt-sum"><span style="color:var(--alert);">⬆ بتزيد/جديدة: '+up+'</span><span style="color:#2f9e63;">⬇ بتقل: '+down+'</span></div>'+html;
+  }
+  function pestTrendMatrixHtml(days){
+    var ghs = greenhouseGroups().map(function(g){ return g.name; }), per = {};
+    ghs.forEach(function(g){ per[g] = pestTrendCompute(g, days); });
+    var all = pestTrendCompute('', days);
+    var keys = Object.keys(all).filter(function(k){ return all[k].cur || all[k].prev; }).sort(function(a,b){ return (all[b].cur-all[a].cur) || (all[b].prev-all[a].prev); });
+    if(!keys.length) return '<p class="empty-note">مفيش إصابات متسجلة في الفترة دي.</p>';
+    var cell = function(x){
+      if(!x || (!x.cur && !x.prev)) return '<td>·</td>';
+      var tr = pestTrendInfo(x.cur, x.prev);
+      return '<td class="'+tr.cls+'" title="الفترة السابقة: '+x.prev+'">'+x.cur+' <small>'+tr.arrow+'</small></td>';
+    };
+    var head = '<tr><th>المرض/الآفة</th>'+ghs.map(function(g){ return '<th>'+escH(g)+'</th>'; }).join('')+'<th>الإجمالي</th></tr>';
+    var rows = keys.map(function(k){
+      return '<tr><td>'+(PT_ICON[all[k].category]||'')+' <strong>'+escH(all[k].name)+'</strong></td>'+ghs.map(function(g){ return cell(per[g][k]); }).join('')+cell(all[k])+'</tr>';
+    }).join('');
+    return '<div class="table-wrap cropref-wrap"><table class="pt-mx"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'+
+      '<div class="pt-legend">الرقم = عدد الإصابات في آخر '+days+' يوم — ↑ زيادة عن الفترة اللي قبلها، ↓ نقص، ＝ ثابتة، 🆕 ظهرت جديدة.</div>';
+  }
+  function pestTrendInner(gh){
+    var d = pestTrendDays;
+    var pills = [30, 60, 90].map(function(n){ return '<button type="button" class="range-pill pt-days'+(d===n?' active':'')+'" data-d="'+n+'">'+n+' يوم</button>'; }).join('')+
+      '<span style="flex:1"></span>'+
+      '<button type="button" class="range-pill pt-scope'+(pestTrendScope==='gh'?' active':'')+'" data-s="gh">الصوبة دي</button>'+
+      '<button type="button" class="range-pill pt-scope'+(pestTrendScope==='all'?' active':'')+'" data-s="all">كل الصوب</button>';
+    var body = pestTrendScope==='all' ? pestTrendMatrixHtml(d) : (
+      '<div class="hint" style="margin:0 0 4px;">🏭 '+escH(gh)+' — آخر '+d+' يوم مقارنةً بالـ '+d+' يوم اللي قبلها</div>'+pestTrendRowsHtml(pestTrendCompute(gh, d))+
+      '<div class="pt-legend">الخط الصغير = عدد الإصابات في آخر 8 أسابيع (من الأقدم لليمين للأحدث).</div>');
+    return '<div class="pt-ctl">'+pills+'</div>'+body;
+  }
+  function pestTrendHtml(gh){
+    return '<div class="chart-card pt-card" style="margin:14px 0;"><h3 style="margin:0 0 8px;">📈 اتجاه الإصابات — بيزيد ولا بيقل؟</h3><div id="pest-trend">'+pestTrendInner(gh)+'</div></div>';
+  }
+  function pestTrendWire(gh){
+    var box = $('#pest-trend'); if(!box) return;
+    function redraw(){ box.innerHTML = pestTrendInner(gh); pestTrendWire(gh); }
+    $all('.pt-days', box).forEach(function(b){ b.addEventListener('click', function(){ pestTrendDays = parseInt(b.getAttribute('data-d'),10) || 30; redraw(); }); });
+    $all('.pt-scope', box).forEach(function(b){ b.addEventListener('click', function(){ pestTrendScope = b.getAttribute('data-s'); redraw(); }); });
+  }
+
   function renderPestsPanel(){
     var ghPicker = $('#pests-greenhouse-picker');
     var body = $('#pests-body');
@@ -6724,6 +6893,11 @@
 
     var incidents = flattenPestlog(gh);
     if(pestFilterCategory) incidents = incidents.filter(function(p){ return p.category===pestFilterCategory; });
+    if(pestFilterStatus==='active') incidents = incidents.filter(function(p){ return !p.eradicated; });
+    else if(pestFilterStatus==='done') incidents = incidents.filter(function(p){ return !!p.eradicated; });
+    var statusPillsHtml = [['','الكل'],['active','🔴 نشطة'],['done','✅ اتقضي عليها']].map(function(x){
+      return '<button type="button" class="range-pill pest-status-pill'+(pestFilterStatus===x[0]?' active':'')+'" data-st="'+x[0]+'">'+x[1]+'</button>';
+    }).join('');
 
     var filterPillsHtml = ['fungal','insect','other'].map(function(cat){
       return '<button type="button" class="range-pill pest-filter-pill'+(pestFilterCategory===cat?' active':'')+'" data-cat="'+cat+'">'+pestCategoryLabel[cat]+'</button>';
@@ -6733,18 +6907,20 @@
       var sevBadge = p.severity ? '<span class="status-pill '+(p.severity==='high'?'alert':(p.severity==='medium'?'':'good'))+'" style="'+(p.severity==='medium'?'background:var(--tank-soft);color:var(--tank);':'')+'">'+(p.severity==='high'?'شديدة':(p.severity==='medium'?'متوسطة':'خفيفة'))+'</span>' : '';
       var photoHtml = p.photoAssetId ? ('<img class="pest-photo" src="'+pestPhotoUrl(p.photoAssetId)+'" alt="صورة الإصابة">') : '';
       var treatHtml = pestTreatmentsHtml(p);
-      return '<div class="pest-card" data-id="'+p.id+'"'+lfAttr('pests', p.ts)+'>'+
-        '<div class="pest-card-head"><span class="task-date-badge">'+fmtTs(p.ts)+'</span>'+pestCategoryLabel[p.category]+' '+sevBadge+'</div>'+
+      var eradBadge = p.eradicated ? '<span class="status-pill good">✅ اتقضي عليها</span>' : '';
+      var eradInfo = p.eradicated ? '<div class="pest-erad-info">✅ تم القضاء على الإصابة'+(p.eradicatedAt?(' — '+escH(fmtTs(new Date(p.eradicatedAt).toISOString().slice(0,16)))):'')+'<br>👤 '+escH(p.eradicatedBy||p.eradicatedByEmail||'—')+'</div>' : '';
+      return '<div class="pest-card'+(p.eradicated?' eradicated':'')+'" data-id="'+p.id+'"'+lfAttr('pests', p.ts)+'>'+
+        '<div class="pest-card-head"><span class="task-date-badge">'+fmtTs(p.ts)+'</span>'+pestCategoryLabel[p.category]+' '+sevBadge+' '+eradBadge+'</div>'+
         '<div class="task-title">'+(p.problemName||'—')+'</div>'+
         (p.location?('<div class="task-note">📍 '+p.location+'</div>'):'')+
         photoHtml+
-        treatHtml+
+        treatHtml+eradInfo+
         (p.note?('<div class="task-note">'+p.note+'</div>'):'')+
         (pestTreatId===p.id ? pestTreatFormHtml(p) : '')+
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;">'+
           '<span style="color:var(--muted);font-size:0.72rem;">بواسطة '+(p.by||'—')+(p.updatedAt?' · اتعدّلت':'')+'</span>'+
           '<span style="display:flex;gap:6px;align-items:center;">'+
-            '<button type="button" class="btn btn-primary btn-sm pest-treat-btn">➕ معاملة</button>'+
+            (p.eradicated ? '<button type="button" class="btn btn-ghost btn-sm pest-uneradicate-btn">↩ رجّعها نشطة</button>' : ('<button type="button" class="btn btn-primary btn-sm pest-treat-btn">➕ معاملة</button>'+((p.treated || pestTreatmentsOf(p).length) ? '<button type="button" class="btn btn-primary btn-sm pest-erad-btn" style="background:#2f9e63;border-color:#2f9e63;">✅ تأكيد القضاء</button>' : '')))+
             '<button type="button" class="btn btn-ghost btn-sm pest-edit-btn">✏️ تعديل</button>'+
             '<button class="del-btn pest-delete-btn" title="حذف">✕</button>'+
           '</span>'+
@@ -6776,13 +6952,16 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">'+(pestEditing?'حفظ التعديل':'حفظ')+'</button>'+(pestEditing?' <button type="button" class="btn btn-ghost btn-sm" id="pest-edit-cancel">إلغاء</button>':'')+'</div>'+
       '</form>'+
 
+      pestTrendHtml(gh)+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
+      '<div class="range-filter">'+statusPillsHtml+'</div>'+
       lfBarHtml('pests')+
       '<div class="tasks-list">'+listHtml+'</div>'+
       renderBioControlSectionHtml(gh);
 
     $('#pest-ts').value = nowLocalInputValue();
+    pestTrendWire(gh);
     ['pests','bio','sticky','pher'].forEach(function(k){ lfWire(k); });
     $('#pest-treated').addEventListener('change', function(){
       var show = this.checked ? 'block' : 'none';
@@ -6933,6 +7112,24 @@
         renderPestsPanel();
         var f = $('#pt-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'center'});
       });
+    });
+    $all('.pest-erad-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.pest-card').getAttribute('data-id');
+        if(!confirm('تأكد إن الإصابة دي اتقضي عليها بعد المعاملة؟')) return;
+        btn.disabled = true;
+        pestSetEradicated(id, true).then(function(){ toast('اتسجّل القضاء على الإصابة ✅'); });
+      });
+    });
+    $all('.pest-uneradicate-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.pest-card').getAttribute('data-id');
+        btn.disabled = true;
+        pestSetEradicated(id, false).then(function(){ toast('اترجّعت نشطة'); });
+      });
+    });
+    $all('.pest-status-pill', body).forEach(function(btn){
+      btn.addEventListener('click', function(){ pestFilterStatus = btn.getAttribute('data-st') || ''; renderPestsPanel(); });
     });
     $all('.pest-treat-del', body).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -7135,7 +7332,7 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var incidents = flattenPestlog(greenhouseName).filter(function(x){ return lfInRange('pests', x.ts); });
     if(!incidents.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['الوقت','النوع','اسم المرض/الآفة','الشدة','الموقع','تمت المعاملة','المبيد','الكمية','عدد المعاملات','تفاصيل المعاملات','ملاحظة','بواسطة'];
+    var header = ['الوقت','النوع','اسم المرض/الآفة','الشدة','الموقع','تمت المعاملة','المبيد','الكمية','عدد المعاملات','تفاصيل المعاملات','ملاحظة','بواسطة','تم القضاء عليها','وقت القضاء','اتقضي عليها بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
     incidents.forEach(function(p){
       lines.push([
@@ -7143,7 +7340,7 @@
         (p.treated?'نعم':'لا'), p.pesticideName, p.dose,
         (p.treated?1:0)+pestTreatmentsOf(p).length,
         pestTreatmentsOf(p).map(function(t){ return String(t.ts).replace('T',' ')+': '+(t.pesticideName||'')+(t.dose?(' ('+t.dose+')'):'')+(t.note?(' — '+t.note):''); }).join(' | '),
-        p.note, p.by
+        p.note, p.by, (p.eradicated?'نعم':'لا'), (p.eradicatedAt ? new Date(p.eradicatedAt).toISOString().slice(0,16).replace('T',' ') : ''), p.eradicatedBy||''
       ].map(csvEscape).join(','));
     });
     var csv = '\uFEFF' + lines.join('\r\n');
@@ -8242,7 +8439,7 @@
       if(teamLate.length) items.push({key:'team', level:'danger', icon:'👥', title:teamLate.length+' مهمة متأخرة على الفريق', detail:'راجع المهام والإجراءات', tab:'tasks', rank:1});
     }
     if(isAdminU){
-      var spOpen = sprayPlan.filter(function(e){ return sprayState(e)!=='done' && !e.taskId; });
+      var spOpen = sprayPlan.filter(function(e){ return sprayState(e)!=='done' && sprayState(e)!=='skipped' && !e.taskId; });
       var spToday = spOpen.filter(function(e){ return e.date===today; }).length, spLate = spOpen.filter(function(e){ return e.date<today; }).length;
       if(spLate) items.push({key:'sp-late', level:'danger', icon:'🍃', title:spLate+' رش/تسميد متأخر وملهوش حد', detail:'افتح الرش والتسميد وعيّن حد أو سجّل إنه اتنفّذ', tab:'spray', rank:1});
       if(spToday) items.push({key:'sp-today', level:'warn', icon:'🍃', title:spToday+' رش/تسميد النهارده ومش معيّن لحد', detail:'عيّنه على حد من الفريق', tab:'spray', rank:2});
@@ -8422,6 +8619,7 @@
     return flattenTasks().filter(function(t){ return t.id===e.taskId; })[0] || null;
   }
   function sprayState(e){
+    if(e.skipped) return 'skipped';
     var t = sprayTaskOf(e), done = t ? t.status==='done' : !!e.done, today = todayStr();
     if(done) return 'done';
     if(e.date < today) return 'late';
@@ -8479,6 +8677,51 @@
     return saveSprayEntry(Object.assign({}, e, {done:done, doneAt:done?Date.now():null, doneBy:done?(currentUser||''):''}));
   }
 
+  /* ---------- إلغاء رش/تسميد مجدول (مع السبب واسم اللي عمل كده) ---------- */
+  function sprayWho(){
+    var u = findUser(currentUser||'');
+    return (u && u.displayName) || currentUser || '';
+  }
+  function sprayAskSkip(card, e){
+    var old = card.querySelector('.sp-skipform');
+    if(old){ old.remove(); return; }
+    var f = document.createElement('div'); f.className = 'sp-skipform';
+    f.innerHTML = '<label class="hint" style="margin:0 0 4px;display:block;">سبب عدم الرش/التسميد (مطلوب)</label><textarea class="sp-skipreason" rows="2" maxlength="200" placeholder="مثال: ريح شديدة / فترة أمان / المنتج مش متوفر"></textarea><div class="form-actions" style="margin-top:6px;"><button type="button" class="btn btn-primary btn-sm sp-skipok">تأكيد الإلغاء</button> <button type="button" class="btn btn-ghost btn-sm sp-skipno">رجوع</button></div>';
+    card.appendChild(f);
+    var ta = f.querySelector('textarea'); ta.focus();
+    f.querySelector('.sp-skipno').addEventListener('click', function(){ f.remove(); });
+    f.querySelector('.sp-skipok').addEventListener('click', function(){
+      var reason = ta.value.trim();
+      if(!reason){ toast('اكتب سبب عدم الرش'); ta.focus(); return; }
+      this.disabled = true;
+      spraySkip(e, reason).then(function(){ toast('اتسجّل إنه مش هيترش'); });
+    });
+  }
+  function spraySkip(e, reason){
+    var upd = Object.assign({}, e, {skipped:true, skipReason:reason, skippedBy:sprayWho(), skippedByEmail:currentUser||'', skippedAt:Date.now(), done:false, doneAt:null, doneBy:''});
+    return removeLinkedTask(e).then(function(){
+      upd.taskId = ''; upd.taskDate = '';   // المكلّف يفضل متسجّل عشان الرجوع والتقرير
+      return saveSprayEntry(upd);
+    }).then(function(){
+      logAudit('edit','spray','إلغاء رش/تسميد: '+sprayTitle(e)+' ('+e.date+') — السبب: '+reason);
+      if(e.assignedEmail && String(e.assignedEmail).toLowerCase()!==String(currentUser||'').toLowerCase()){
+        notifyUser(e.assignedEmail, 'task', 'اتلغى رش/تسميد', sprayTitle(e)+' — '+e.date+' — السبب: '+reason+' — بواسطة '+sprayWho(), {});
+      }
+    });
+  }
+  function sprayUnskip(e){
+    var upd = Object.assign({}, e, {skipped:false, skipReason:'', skippedBy:'', skippedByEmail:'', skippedAt:null, done:false});
+    var p = Promise.resolve();
+    if(e.assignedEmail){
+      var tp = addTask(e.date, {title:sprayTitle(upd), greenhouse:(upd.halls||[]).join(' + '), assignedTo:e.assignedTo, assignedEmail:e.assignedEmail, note:sprayTaskNote(upd), sopTitle:'رش وتسميد'});
+      upd.taskId = tp.taskId; upd.taskDate = e.date; p = tp;
+    }
+    return p.then(function(){ return saveSprayEntry(upd); }).then(function(){
+      logAudit('edit','spray','رجّع رش/تسميد للجدول: '+sprayTitle(e)+' ('+e.date+')');
+      toast('اترجّع للجدول');
+    });
+  }
+
   function sprayProductOptions(current){
     var inv = function(type){ return inventoryItems.filter(function(x){ return x.type===type; }); };
     var opt = function(name, extra){ return '<option value="'+escH(name)+'"'+(current && cropKey(current)===cropKey(name)?' selected':'')+'>'+escH(name)+(extra||'')+'</option>'; };
@@ -8492,16 +8735,17 @@
   }
   function sprayItemHtml(e, hall){
     var st = sprayState(e), t = sprayTaskOf(e), k = SPRAY_KINDS[e.kind]||SPRAY_KINDS.foliar;
-    var chip = {done:'<span class="status-pill good">تم ✓</span>', late:'<span class="status-pill alert">متأخر</span>', today:'<span class="status-pill" style="background:rgba(224,168,46,.2);color:#9a6b00;">النهارده</span>', planned:'<span class="status-pill">مجدول</span>'}[st];
+    var chip = {done:'<span class="status-pill good">تم ✓</span>', late:'<span class="status-pill alert">متأخر</span>', today:'<span class="status-pill" style="background:rgba(224,168,46,.2);color:#9a6b00;">النهارده</span>', planned:'<span class="status-pill">مجدول</span>', skipped:'<span class="status-pill alert">⛔ اتلغى</span>'}[st];
     var others = (e.halls||[]).filter(function(h){ return h!==hall; });
     return '<div class="sp-item st-'+st+'" data-id="'+escH(e.id)+'">'+
       '<div class="sp-head"><span class="sp-kind">'+k.icon+' '+k.label+'</span>'+chip+(e.slot?('<span class="hint" style="margin:0;">'+SPRAY_SLOTS[e.slot]+'</span>'):'')+'</div>'+
       '<div class="sp-prod"><strong>'+escH(e.product)+'</strong>'+(e.dose?(' — '+escH(e.dose)):'')+'</div>'+
       (others.length?('<div class="hint" style="margin:2px 0;">معاها: '+escH(others.join('، '))+'</div>'):'')+
       (e.note?('<div class="hint" style="margin:2px 0;">'+escH(e.note)+'</div>'):'')+
+      (st==='skipped' ? '<div class="sp-skipinfo"><b>⛔ مش هيترش</b><br>السبب: '+escH(e.skipReason||'—')+'<br>👤 '+escH(e.skippedBy||e.skippedByEmail||'—')+(e.skippedAt?(' — '+escH(fmtTs(new Date(e.skippedAt).toISOString().slice(0,16)))):'')+'</div>' : '')+
       '<div class="hint" style="margin:4px 0;">'+(e.assignedTo?('👤 '+escH(e.assignedTo)+(t?' (على مهامه)':'')):'👤 لسه ما اتعيّنش لحد')+(st==='done'&&(e.doneAt||(t&&t.completedAt))?(' — اتنفّذ '+escH(fmtTs(new Date(e.doneAt||t.completedAt).toISOString().slice(0,16)))):'')+'</div>'+
       '<div class="form-actions" style="margin-top:6px;">'+
-        (st==='done' ? '<button type="button" class="btn btn-ghost btn-sm sp-undo">↩ رجّعه</button>' : '<button type="button" class="btn btn-primary btn-sm sp-done">✓ تم</button> <button type="button" class="btn btn-ghost btn-sm sp-edit">✏️ تعديل</button>')+
+        (st==='skipped' ? '<button type="button" class="btn btn-ghost btn-sm sp-unskip">↩ رجّعه للجدول</button>' : (st==='done' ? '<button type="button" class="btn btn-ghost btn-sm sp-undo">↩ رجّعه</button>' : '<button type="button" class="btn btn-primary btn-sm sp-done">✓ تم</button> <button type="button" class="btn btn-ghost btn-sm sp-edit">✏️ تعديل</button> <button type="button" class="btn btn-ghost btn-sm sp-skip">⛔ مش هيترش</button>'))+
         ' <button type="button" class="del-btn sp-del" title="حذف">✕</button></div></div>';
   }
   /* ---------- طباعة جدول الرش والتسميد كتقرير ---------- */
@@ -8529,14 +8773,14 @@
         var st = sprayState(e), done = st==='done', k = SPRAY_KINDS[e.kind] || SPRAY_KINDS.foliar;
         if(done) doneN++;
         var others = (e.halls||[]).filter(function(x){ return x!==h; });
-        return '<tr class="'+(done?'pr-done':'')+'"><td>'+SPRAY_DAYS[new Date(e.date+'T00:00:00').getDay()]+'<br>'+escH(e.date)+'</td>'+
+        return '<tr class="'+(done?'pr-done':(st==='skipped'?'pr-skipped':''))+'"><td>'+SPRAY_DAYS[new Date(e.date+'T00:00:00').getDay()]+'<br>'+escH(e.date)+'</td>'+
           '<td>'+(e.slot?SPRAY_SLOTS[e.slot]:'—')+'</td><td>'+k.label+'</td>'+
           '<td><strong>'+escH(e.product)+'</strong>'+(others.length?('<div class="pr-small">مع: '+escH(others.join('، '))+'</div>'):'')+'</td>'+
           '<td>'+escH(e.dose||'—')+'</td><td>'+escH(e.assignedTo||'—')+'</td>'+
-          '<td class="pr-box">'+(done?'✓':'☐')+'</td><td class="pr-note">'+escH(e.note||'')+'</td></tr>';
+          '<td class="pr-box">'+(done?'✓':(st==='skipped'?'✕':'☐'))+'</td><td class="pr-note">'+escH(e.note||'')+(st==='skipped' ? ('<div><b>لم يُرش</b> — السبب: '+escH(e.skipReason||'—')+'<div class="pr-small">بواسطة: '+escH(e.skippedBy||e.skippedByEmail||'—')+(e.skippedAt?(' — '+escH(fmtTs(new Date(e.skippedAt).toISOString().slice(0,16)))):'')+'</div></div>') : '')+'</td></tr>';
       }).join('');
       return '<div class="pr-hall'+(scope==='month' && idx>0 ? ' pr-newpage' : '')+'"><h2>🏭 '+escH(h)+' <span class="pr-small">('+es.length+' رشة/تسميد)</span></h2>'+
-        (es.length ? '<table><thead><tr><th>اليوم</th><th>الوقت</th><th>النوع</th><th>المنتج</th><th>الجرعة</th><th>المسؤول</th><th>تم</th><th>ملاحظات</th></tr></thead><tbody>'+rows+'</tbody></table>' : '<p class="pr-empty">مفيش رش أو تسميد مجدول.</p>')+'</div>';
+        (es.length ? '<table><thead><tr><th>اليوم</th><th>الوقت</th><th>النوع</th><th>المنتج</th><th>الجرعة</th><th>المسؤول</th><th>الحالة</th><th>ملاحظات</th></tr></thead><tbody>'+rows+'</tbody></table>' : '<p class="pr-empty">مفيش رش أو تسميد مجدول.</p>')+'</div>';
     }).join('');
     if(!sections){ toast('مفيش رش أو تسميد في الفترة دي عشان تتطبع'); return; }
     logAudit('export','spray','طباعة جدول الرش والتسميد: '+r.label+(hallName?(' — '+hallName):'')+' ('+total+' عنصر)');
@@ -8555,7 +8799,7 @@
     if(isMonth) days = sprayMonthDays(sprayDate); else for(var i=0;i<7;i++) days.push(sprayAdd(ws,i));
     var periodLabel = isMonth ? 'الشهر ده' : 'الأسبوع ده';
     var dayEntries = sprayPlan.filter(function(e){ return e.date===sprayDate; });
-    var cnt = {done:0, late:0, today:0, planned:0};
+    var cnt = {done:0, late:0, today:0, planned:0, skipped:0};
     sprayPlan.filter(function(e){ return e.date>=days[0] && e.date<=days[days.length-1]; }).forEach(function(e){ cnt[sprayState(e)]++; });
 
     // مصفوفة الأسبوع
@@ -8566,7 +8810,8 @@
       return '<tr><td><strong>'+escH(h)+'</strong></td>'+days.map(function(dd){
         var es = sprayPlan.filter(function(e){ return e.date===dd && (e.halls||[]).indexOf(h)>=0; });
         if(!es.length) return '<td class="sp-cell" data-d="'+dd+'"></td>';
-        var worst = es.some(function(e){ return sprayState(e)==='late'; }) ? 'late' : (es.every(function(e){ return sprayState(e)==='done'; }) ? 'done' : (es.some(function(e){ return sprayState(e)==='today'; }) ? 'today' : 'planned'));
+        var act = es.filter(function(e){ return sprayState(e)!=='skipped'; });
+        var worst = !act.length ? 'skipped' : (act.some(function(e){ return sprayState(e)==='late'; }) ? 'late' : (act.every(function(e){ return sprayState(e)==='done'; }) ? 'done' : (act.some(function(e){ return sprayState(e)==='today'; }) ? 'today' : 'planned')));
         return '<td class="sp-cell has" data-d="'+dd+'"><span class="sp-dot st-'+worst+'">'+es.length+'</span></td>';
       }).join('')+'</tr>';
     }).join('')+'</tbody></table></div>';
@@ -8600,7 +8845,7 @@
     body.innerHTML =
       '<div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div>'+
       '<h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
-      '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, periodLabel)+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, periodLabel)+climateStatChip('جاي', cnt.planned, 'مجدول')+'</div>'+
+      '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, periodLabel)+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, periodLabel)+climateStatChip('جاي', cnt.planned, 'مجدول')+(cnt.skipped ? climateStatChip('اتلغى', cnt.skipped, periodLabel) : '')+'</div>'+
       '<details class="chart-card" id="sp-print-box" style="margin-top:12px;"><summary style="cursor:pointer;font-weight:700;">🖨️ طباعة الجدول كتقرير</summary>'+
         '<div class="form-grid" style="margin-top:10px;">'+
           '<div class="field-sm"><label>الفترة</label><select id="sp-pr-scope"><option value="day">اليوم المفتوح ('+sprayDate+')</option><option value="week"'+(isMonth?'':' selected')+'>الأسبوع</option><option value="month"'+(isMonth?' selected':'')+'>الشهر كامل</option></select></div>'+
@@ -8628,6 +8873,8 @@
       if(!e) return;
       var d = card.querySelector('.sp-done'); if(d) d.addEventListener('click', function(){ sprayMarkDone(e, true).then(function(){ toast('اتسجّل إنه اتنفّذ'); }); });
       var u = card.querySelector('.sp-undo'); if(u) u.addEventListener('click', function(){ sprayMarkDone(e, false).then(function(){ toast('اترجّع'); }); });
+      var sk = card.querySelector('.sp-skip'); if(sk) sk.addEventListener('click', function(){ sprayAskSkip(card, e); });
+      var us = card.querySelector('.sp-unskip'); if(us) us.addEventListener('click', function(){ sprayUnskip(e); });
       var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
       var dl = card.querySelector('.sp-del'); if(dl) dl.addEventListener('click', function(){
         if(!requireAdminForDelete()) return;
@@ -9423,6 +9670,7 @@
       '<details class="chart-card" id="q-form-details"'+(qoDraft?' open':'')+'><summary style="cursor:pointer;font-weight:700;">'+(qoDraft && qoDraft.id ? '✏️ تعديل أوردر' : '＋ أوردر جديد')+'</summary><div id="q-form-holder" style="margin-top:10px;">'+(qoDraft ? qoFormHtml(qoDraft) : '<button type="button" class="btn btn-primary btn-sm" id="q-new-btn">＋ ابدأ أوردر جديد</button>')+'</div></details>'+
       qImportHtml()+
       qIngredientsDayHtml()+
+      '<div class="chart-card" style="margin:10px 0;"><div style="font-weight:700;margin-bottom:6px;">🖨️ طباعة الأوردرات كتقرير</div><div class="form-grid"><div class="field-sm"><label>من تاريخ</label><input type="date" class="ltr" id="qo-pfrom" value="'+escH(qoPrint.from)+'"></div><div class="field-sm"><label>إلى تاريخ (اختياري)</label><input type="date" class="ltr" id="qo-pto" value="'+escH(qoPrint.to)+'"></div></div><div class="hint">لو اخترت "من" بس هيطبع أوردرات اليوم ده، ولو اخترت الاتنين هيطبع كل اللي بينهم.</div><div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="qo-print-btn">🖨️ اطبع الأوردرات</button></div></div>'+
       '<h3 class="section-title">📦 الأوردرات ('+list.length+')</h3>'+lfBarHtml('qord')+
       (list.length ? list.map(qOrderCardHtml).join('') : '<p class="empty-note">لسه ما سجلتش أوردرات. سجّل الأوردر بالأصناف والكميات المطلوبة.</p>');
   }
@@ -9498,6 +9746,68 @@
     }); });
     qSaveCsv(lines, 'oroots-orders');
   }
+  /* ----- طباعة التقارير: كلها جداول A4 portrait ----- */
+  function qUnitSummaryTable(byUnit){
+    var rows = Object.keys(byUnit).map(function(u){ var x = byUnit[u];
+      return '<tr><td>'+Q_UNITS[u]+'</td><td class="num">'+qFmt(x.req)+'</td><td class="num">'+qFmt(x.rec)+'</td><td class="num">'+qFmt(x.srt)+'</td><td class="num">'+qFmt(qPct(x.srt, x.req))+'%</td><td class="num">'+qFmt(x.waste)+'</td><td class="num">'+qFmt(qPct(x.waste, x.rec))+'%</td></tr>'; }).join('');
+    return rows ? '<table><thead><tr><th>الوحدة</th><th>مطلوب</th><th>جه</th><th>بعد الفرز</th><th>تنفيذ %</th><th>الفاقد</th><th>فاقد %</th></tr></thead><tbody>'+rows+'</tbody></table>' : '';
+  }
+  function qReportPrintHtml(){
+    var ss = qRepSorts(), agg = qAggregate(ss, qRep.product), ords = qRepOrdersList();
+    var prodRows = Object.keys(agg.byProduct).map(function(k){ return agg.byProduct[k]; }).sort(function(a,b){ return qPct(b.waste,b.rec)-qPct(a.waste,a.rec); }).map(function(x){
+      return '<tr><td><strong>'+escH(x.product)+'</strong> <span class="pr-small">('+Q_UNITS[x.unit]+' — '+x.orders+' مرة)</span></td><td class="num">'+qFmt(x.req)+'</td><td class="num">'+qFmt(x.rec)+'</td><td class="num">'+qFmt(x.srt)+'</td><td class="num">'+qFmt(x.waste)+'</td><td class="num">'+qFmt(qPct(x.waste, x.rec))+'%</td></tr>'; }).join('');
+    var reasonRows = '';
+    Object.keys(agg.byReason).forEach(function(u){
+      var bu = agg.byReason[u], tot = Object.keys(bu).reduce(function(n,k){ return n + bu[k]; }, 0);
+      Object.keys(bu).sort(function(a,b){ return bu[b]-bu[a]; }).forEach(function(k){
+        reasonRows += '<tr><td>'+escH(k)+'</td><td>'+Q_UNITS[u]+'</td><td class="num">'+qFmt(bu[k])+'</td><td class="num">'+qFmt(qPct(bu[k], tot))+'%</td></tr>'; });
+    });
+    var sortRows = agg.orders.map(function(r){
+      var u = Object.keys(r.byUnit).map(function(k){ var x = r.byUnit[k]; return qFmt(x.srt)+'/'+qFmt(x.rec)+' '+Q_UNITS[k]+' — فاقد '+qFmt(x.waste)+' ('+qFmt(qPct(x.waste, x.rec))+'%)'; }).join('<br>');
+      return '<tr><td>'+escH(qSortLabel(r.o))+(r.o.orderNo?(' <span class="pr-small">أوردر #'+escH(r.o.orderNo)+'</span>'):'')+'</td><td>'+u+'</td></tr>'; }).join('');
+    var ordRows = ords.map(function(o){
+      var lines = (o.items||[]).filter(function(it){ return !qRep.product || cropKey(it.product)===cropKey(qRep.product); }).map(function(it){
+        var req = qNum(it.required), got = qSortedForOrder(o, it.product, it.unit);
+        return escH(it.product)+': مطلوب '+qFmt(req)+' '+Q_UNITS[it.unit||'kg']+' — اتفرز '+qFmt(got)+' ('+qFmt(qPct(got, req))+'%)'; }).join('<br>');
+      return lines ? '<tr><td>'+escH(qOrderLabel(o))+'<div class="pr-small">'+escH(o.date)+'</div></td><td>'+lines+'</td></tr>' : ''; }).join('');
+    var cs = qComplaints.filter(function(c){ return qInRange(c.date); }), byType = {};
+    cs.forEach(function(c){ var t = c.type||'أخرى'; byType[t] = (byType[t]||0) + 1; });
+    var open = cs.filter(function(c){ return c.status==='new' || c.status==='review'; }).length;
+    var csRows = Object.keys(byType).map(function(k){ return '<tr><td>'+escH(k)+'</td><td class="num">'+byType[k]+'</td></tr>'; }).join('');
+    var tbl = function(head, rows){ return '<table><thead><tr>'+head.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table>'; };
+    return '<h2>الفرز — المادة الخام والفاقد</h2>'+(agg.items ? qUnitSummaryTable(agg.byUnit) : '<p class="pr-empty">مفيش فرز في الفترة دي.</p>')+
+      (prodRows ? '<h2>حسب المادة الخام</h2>'+tbl(['المادة الخام','مطلوب','جه','بعد الفرز','فاقد','فاقد %'], prodRows) : '')+
+      (reasonRows ? '<h2>أسباب الفاقد</h2>'+tbl(['السبب','الوحدة','الكمية','النسبة'], reasonRows) : '')+
+      (sortRows ? '<h2>حسب جلسة الفرز</h2>'+tbl(['الجلسة','بعد الفرز / اللي جه والفاقد'], sortRows) : '')+
+      '<h2>الأوردرات في الفترة ('+ords.length+')</h2>'+(ordRows ? tbl(['الأوردر','المطلوب واللي اتفرز'], ordRows) : '<p class="pr-empty">مفيش أوردرات في الفترة دي.</p>')+
+      '<h2>الشكاوى في الفترة ('+cs.length+' — مفتوحة: '+open+')</h2>'+(csRows ? tbl(['النوع','العدد'], csRows) : '<p class="pr-empty">مفيش شكاوى في الفترة دي.</p>');
+  }
+  /* طباعة كل الأوردرات في يوم معيّن أو بين تاريخين */
+  var qoPrint = {from:'', to:''};
+  function qPrintOrdersRange(){
+    var from = qoPrint.from, to = qoPrint.to || qoPrint.from;
+    if(!from){ toast('اختار التاريخ (من)'); return; }
+    if(to < from){ var tmp = from; from = to; to = tmp; }
+    var list = qOrders.filter(function(o){ return o.date>=from && o.date<=to; }).sort(function(a,b){ return (a.date||'').localeCompare(b.date||'') || (a.createdAt||0)-(b.createdAt||0); });
+    if(!list.length){ toast('مفيش أوردرات في الفترة دي'); return; }
+    var rows = '', tot = {};
+    list.forEach(function(o, idx){
+      var items = o.items||[], n = Math.max(items.length, 1);
+      var lead = '<td rowspan="'+n+'" class="num">'+(idx+1)+'</td><td rowspan="'+n+'">'+escH(o.date||'')+'</td><td rowspan="'+n+'">'+escH(o.orderNo ? ('#'+o.orderNo) : '—')+'</td><td rowspan="'+n+'">'+escH(o.customer||'—')+(o.notes?('<div class="pr-small">'+escH(o.notes)+'</div>'):'')+'</td>';
+      if(!items.length){ rows += '<tr>'+lead+'<td colspan="4" class="pr-empty">بدون أصناف</td></tr>'; return; }
+      items.forEach(function(it, k){
+        var u = it.unit||'kg', req = qNum(it.required), got = qSortedForOrder(o, it.product, u);
+        var t = tot[u] || (tot[u] = {req:0, got:0}); t.req += req; t.got += got;
+        rows += '<tr>'+(k===0 ? lead : '')+'<td>'+escH(it.product)+' <span class="pr-small">('+Q_UNITS[u]+')</span></td><td class="num">'+qFmt(req)+'</td><td class="num">'+qFmt(got)+'</td><td class="num">'+qFmt(qPct(got, req))+'%</td></tr>';
+      });
+    });
+    var totRows = Object.keys(tot).map(function(u){ return '<tr><td>'+Q_UNITS[u]+'</td><td class="num">'+qFmt(tot[u].req)+'</td><td class="num">'+qFmt(tot[u].got)+'</td><td class="num">'+qFmt(qPct(tot[u].got, tot[u].req))+'%</td></tr>'; }).join('');
+    var label = (from===to) ? ('يوم '+from) : ('من '+from+' إلى '+to);
+    var body = '<table><thead><tr><th>#</th><th>التاريخ</th><th>رقم الأوردر</th><th>العميل</th><th>الصنف</th><th>المطلوب</th><th>اتفرز</th><th>التنفيذ</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<h2>الإجمالي حسب الوحدة</h2><table><thead><tr><th>الوحدة</th><th>المطلوب</th><th>اتفرز</th><th>التنفيذ</th></tr></thead><tbody>'+totRows+'</tbody></table>';
+    logAudit('export','quality','طباعة تقرير الأوردرات — '+label+' ('+list.length+' أوردر)');
+    qPrintHtml('تقرير الأوردرات', escH(label)+' — '+list.length+' أوردر', body);
+  }
   function qPrintHtml(title, meta, bodyHtml){
     printReportDoc({title:title, meta:meta, body:bodyHtml, extraSigner:'مسؤول الجودة', delay:120});
   }
@@ -9505,11 +9815,11 @@
     var meta = (qRep.from||qRep.to) ? ('الفترة: '+(qRep.from||'البداية')+' إلى '+(qRep.to||'النهاية')) : 'كل الفترات';
     meta += qRep.product ? (' — '+escH(qRep.product)) : '';
     logAudit('export','quality','طباعة تقرير الجودة — '+meta);
-    qPrintHtml('تقرير الجودة والفرز والفاقد', meta, qReportHtml());
+    qPrintHtml('تقرير الجودة والفرز والفاقد', meta, qReportPrintHtml());
   }
   function qPrintSort(o){
     qLoadPhotos(o.photoRefId || o.id).then(function(list){
-      var body = qUnitSummaryHtml(qAggregate([o]).byUnit)+qOrderItemsTable(o, true);
+      var body = qUnitSummaryTable(qAggregate([o]).byUnit)+qOrderItemsTable(o, true);
       var ph = (o.items||[]).map(function(it){
         var mine = list.filter(function(x){ return x.itemUid===it.uid; });
         return mine.length ? '<div class="pr-hall"><h2>📷 صور أسباب الفاقد — '+escH(it.product)+'</h2><div class="pr-photos">'+mine.map(function(x){ return '<img src="'+x.data+'" alt="">'; }).join('')+'</div></div>' : '';
@@ -9614,6 +9924,10 @@
     $all('#q-nav .range-pill', body).forEach(function(b){ b.addEventListener('click', function(){ qView = b.getAttribute('data-v'); renderQualityPanel(); }); });
     if(qView==='orders'){
       var nb = $('#q-new-btn'); if(nb) nb.addEventListener('click', function(){ qoDraft = qoNew(); renderQualityPanel(); });
+      var opf = $('#qo-pfrom'), opt = $('#qo-pto'), opb = $('#qo-print-btn');
+      if(opf) opf.addEventListener('change', function(){ qoPrint.from = this.value; });
+      if(opt) opt.addEventListener('change', function(){ qoPrint.to = this.value; });
+      if(opb) opb.addEventListener('click', qPrintOrdersRange);
       var mg = $('#q-migrate'); if(mg) mg.addEventListener('click', function(){ mg.disabled = true; qMigrateLegacy().then(function(n){ toast('اتنقلت بيانات '+n+' أوردر لقسم الفرز'); }).catch(function(e){ console.error(e); toast('تعذر النقل'); mg.disabled = false; }); });
       qoWire();
       var idt = $('#q-ing-date'); if(idt) idt.addEventListener('change', function(){ qIngDay = this.value || todayStr(); qIngOpen = true; renderQualityPanel(); });
@@ -9913,6 +10227,7 @@
   }
   function enterApp(fbUser){
     if(appEntered) return;
+    ensureSplash();   // غطّي الصفحة بشاشة التحميل لحد ما البيانات توصل (بدل صفحة فاضية)
     var email = String(fbUser.email||'').toLowerCase();
     var usersRef = db.doc('settings/users');
     usersRef.get({source:'cache'}).then(function(c){ return c.exists ? c : usersRef.get(); }, function(){ return usersRef.get(); }).then(function(snap){
@@ -10020,6 +10335,18 @@
   var readingsLoadDays = 7, readingsUnsub = null, readingsPhase2Done = false;
   /* تحميل أول مرة: شريط تحميل + دمج الرسم + القراءات على مرحلتين (٧ أيام الأول ثم ٣٠ يوم في الخلفية) */
   var bootActive = false, bootIdleTimer = null, bootMaxTimer = null, renderSoonTimer = null;
+  var bootSeen = {}, BOOT_EXPECTED = 28;
+  function bootTick(key){
+    if(!bootActive) return;
+    bootSeen[key] = 1;
+    if(Object.keys(bootSeen).length >= BOOT_EXPECTED){ clearTimeout(bootIdleTimer); bootIdleTimer = setTimeout(finishBoot, 40); }
+  }
+  function ensureSplash(){
+    if(document.getElementById('splash')) return;
+    var sp = document.createElement('div'); sp.id = 'splash';
+    sp.innerHTML = '<img src="icon-192.png" alt="O\'Roots" width="132" height="132"><div class="splash-spin"></div><div style="font-size:.9rem;color:#6b7a63;font-weight:700;">بنجهّز بياناتك…</div>';
+    document.body.appendChild(sp);
+  }
   function hideSplash(){
     var s = document.getElementById('splash');
     if(!s) return;
@@ -10037,7 +10364,7 @@
     return e;
   }
   function showBootBar(){
-    bootActive = true;
+    bootActive = true; bootSeen = {};
     clearTimeout(bootIdleTimer); clearTimeout(bootMaxTimer);
     bootIdleTimer = setTimeout(finishBoot, 6000);
     bootMaxTimer = setTimeout(finishBoot, 10000);
@@ -10068,7 +10395,7 @@
       readingsDocs = snap.docs.filter(function(d){return d.exists;}).map(function(d){
         return Object.assign({id:d.id}, d.data());
       });
-      renderAllSoon();
+      bootTick('k1'); renderAllSoon();
     }, function(err){
       console.error('readings snapshot error', err);
     });
@@ -10100,14 +10427,14 @@
       }
       settingsLoaded = true;
       fillSettingsForm();
-      renderAllSoon();
+      bootTick('k2'); renderAllSoon();
     }, function(err){
       console.error('settings snapshot error', err);
     });
 
     db.doc('settings/systems').onSnapshot(function(snap){
       systems = (snap.exists && snap.data().list) ? snap.data().list : [];
-      renderAllSoon();
+      bootTick('k3'); renderAllSoon();
     }, function(err){
       console.error('systems snapshot error', err);
     });
@@ -10121,92 +10448,92 @@
         if(me){ currentUserRole = me.role; currentUserPermissions = me.permissions||{}; }
       }
       applyTabVisibility();
-      renderAllSoon();
+      bootTick('k4'); renderAllSoon();
     }, function(err){
       console.error('users snapshot error', err);
     });
 
     db.collection('sops').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       sops = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k5'); renderAllSoon();
     }, function(err){
       console.error('sops snapshot error', err);
     });
 
     db.collection('fertilizers').orderBy('createdAt','desc').limit(1000).onSnapshot(function(snap){
       customFertilizers = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k6'); renderAllSoon();
     }, function(err){
       console.error('fertilizers snapshot error', err);
     });
 
     db.collection('targetProfiles').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       targetProfiles = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k7'); renderAllSoon();
     }, function(err){
       console.error('targetProfiles snapshot error', err);
     });
 
     db.collection('nutrientRecipes').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
       nutrientRecipes = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k8'); renderAllSoon();
     }, function(err){
       console.error('nutrientRecipes snapshot error', err);
     });
 
     db.collection('pestlog').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k9'); renderAllSoon();
     }, function(err){
       console.error('pestlog snapshot error', err);
     });
 
     db.collection('bioReleases').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       bioReleases = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k10'); renderAllSoon();
     }, function(err){ console.error('bioReleases snapshot error', err); });
 
     db.collection('stickyTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       stickyTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k11'); renderAllSoon();
     }, function(err){ console.error('stickyTraps snapshot error', err); });
 
     db.collection('pheromoneTraps').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       pheromoneTraps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k12'); renderAllSoon();
     }, function(err){ console.error('pheromoneTraps snapshot error', err); });
 
     db.collection('nursery').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       nurseryLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k13'); renderAllSoon();
     }, function(err){
       console.error('nursery snapshot error', err);
     });
 
     db.collection('irrigCalib').orderBy('createdAt','desc').limit(3000).onSnapshot(function(snap){
       irrigCalib = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k14'); renderAllSoon();
     }, function(err){
       console.error('irrigCalib snapshot error', err);
     });
 
     db.collection('inventory').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       inventoryItems = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k15'); renderAllSoon();
     }, function(err){
       console.error('inventory snapshot error', err);
     });
 
     db.collection('harvest').orderBy('createdAt','desc').limit(5000).onSnapshot(function(snap){
       harvestLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k16'); renderAllSoon();
     }, function(err){
       console.error('harvest snapshot error', err);
     });
 
     db.doc('settings/nurseryPlans').onSnapshot(function(snap){
       nurseryPlans = (snap.exists && snap.data().list) ? snap.data().list : [];
-      renderAllSoon();
+      bootTick('k17'); renderAllSoon();
     }, function(err){
       console.error('nurseryPlans snapshot error', err);
     });
@@ -10220,7 +10547,7 @@
 
     db.collection('instrumentCalibrations').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       instrumentCalibrations = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k18'); renderAllSoon();
     }, function(err){ console.error('instrumentCalibrations snapshot error', err); });
 
     db.collection('notifications').where('to','==',String(currentUser).toLowerCase()).onSnapshot(function(snap){
@@ -10236,25 +10563,25 @@
         try{ if(navigator.vibrate) navigator.vibrate([180,90,180]); }catch(e){}
       }
       notifCleanup();
-      renderAllSoon();
+      bootTick('k19'); renderAllSoon();
     }, function(err){ console.error('notifications snapshot error', err); });
 
     db.collection('qualityOrders').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qOrders = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k20'); renderAllSoon();
     }, function(err){ console.error('qualityOrders snapshot error', err); });
     db.collection('qualitySorting').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       qSorts = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k21'); renderAllSoon();
     }, function(err){ console.error('qualitySorting snapshot error', err); });
     db.collection('qualityComplaints').orderBy('date','desc').limit(2000).onSnapshot(function(snap){
       qComplaints = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k22'); renderAllSoon();
     }, function(err){ console.error('qualityComplaints snapshot error', err); });
 
     db.collection('sprayPlan').orderBy('date','desc').limit(3000).onSnapshot(function(snap){
       sprayPlan = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k23'); renderAllSoon();
     }, function(err){ console.error('sprayPlan snapshot error', err); });
 
     db.doc('settings/cropNames').onSnapshot(function(snap){
@@ -10262,28 +10589,28 @@
       orderProducts = (snap.exists && Array.isArray(snap.data().orderProducts)) ? snap.data().orderProducts : [];
       nurseryTilesLegacy = (snap.exists && snap.data().nurseryTiles && typeof snap.data().nurseryTiles==='object') ? snap.data().nurseryTiles : {};
       syncNurseryTiles();
-      renderAllSoon();
+      bootTick('k24'); renderAllSoon();
     }, function(err){ console.error('cropNames snapshot error', err); });
 
     db.doc('settings/customers').onSnapshot(function(snap){
       customers = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
-      renderAllSoon();
+      bootTick('k25'); renderAllSoon();
     }, function(err){ console.error('customers snapshot error', err); });
 
     db.doc('settings/nurseryTiles').onSnapshot(function(snap){
       nurseryTilesNew = (snap.exists && snap.data().tiles && typeof snap.data().tiles==='object') ? snap.data().tiles : null;
       syncNurseryTiles();
-      renderAllSoon();
+      bootTick('k26'); renderAllSoon();
     }, function(err){ console.error('nurseryTiles snapshot error', err); });
 
     db.doc('settings/pipeMaps').onSnapshot(function(snap){
       pipeMaps = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
-      renderAllSoon();
+      bootTick('k27'); renderAllSoon();
     }, function(err){ console.error('pipeMaps snapshot error', err); });
 
     db.collection('nurseryPlanLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
       nurseryPlanLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
-      renderAllSoon();
+      bootTick('k28'); renderAllSoon();
     }, function(err){ console.error('nurseryPlanLog snapshot error', err); });
   }
 
@@ -10317,7 +10644,7 @@
     fbAuth = firebase.auth();
     var fs = firebase.firestore();
     fs.settings({ignoreUndefinedProperties:true});
-    try{ fs.enablePersistence({synchronizeTabs:true}).catch(function(){}); }catch(e){}
+    try{ fs.enablePersistence({synchronizeTabs:true}).catch(function(e){ console.warn('التخزين المؤقت مش شغال على الصفحة دي (غالباً بتتفتح كملف محلي):', e && e.code); }); }catch(e){}
     db = fs;
     updateSyncBadge();
 
