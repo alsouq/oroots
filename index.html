@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Ss4yZ0oE0fujeT42UOkN74cmex5JAwcNYlSGxaUjh0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FXvLSluVshv/Vg+7mkUhyliQJvKJJ5YDytkT2RilE+Q=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -906,6 +906,21 @@
       </div>
 
       <div class="settings-card">
+        <h3>⏰ تنبيه المهام كل ساعة</h3>
+        <p class="hint">الموظف اللي بيفعّل التنبيه على موبايله بيوصله تنبيه كل ساعة بمهامه اللي لسه ما خلصتهاش، وبس جوه الساعات دي (بتوقيت القاهرة). التغيير بيتطبق من التنبيه الجاي.</p>
+        <div class="range-row">
+          <span class="metric-name">من الساعة</span>
+          <select id="remind-from" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;"></select>
+        </div>
+        <div class="range-row">
+          <span class="metric-name">لحد الساعة</span>
+          <select id="remind-to" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;"></select>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-save-remind">حفظ ساعات التنبيه</button>
+        <span class="save-msg hidden" id="msg-remind">تم الحفظ</span>
+      </div>
+
+      <div class="settings-card">
         <h3>نسخة احتياطية كاملة</h3>
         <p class="hint">ملف واحد فيه كل بيانات النظام (الأنظمة والقراءات والمهام والمخزون والحسابات وكل حاجة تانية) — للنقل بين الأجهزة أو كأمان إضافي. الاستعادة بتكتب البيانات بس ومش بتغيّر حسابات الدخول، وخليه في مكان آمن لأنه فيه كل بيانات المزرعة.</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -962,6 +977,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script>
 (function(){
   "use strict";
@@ -979,10 +995,27 @@
   }
   dbg('script start (page+scripts loaded)');
 
+  /* ---------- Service worker: فتح فوري + تحديث في الخلفية ---------- */
+  function showUpdateBar(){
+    if(document.getElementById('upd-bar')) return;
+    var b = document.createElement('div'); b.id = 'upd-bar';
+    b.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5500;background:#1f4d36;color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font:600 .9rem system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25);direction:rtl;';
+    b.innerHTML = '<span>🔄 في نسخة جديدة من النظام</span><button type="button" style="background:#fff;color:#1f4d36;border:0;border-radius:8px;padding:6px 12px;font-weight:700;font-family:inherit;">حدّث دلوقتي</button>';
+    b.querySelector('button').addEventListener('click', function(){ location.reload(); });
+    document.body.appendChild(b);
+  }
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+    navigator.serviceWorker.addEventListener('message', function(ev){ if(ev.data && ev.data.type==='update-ready') showUpdateBar(); });
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(e){ console.warn('service worker مش شغال:', e && e.message); });
+      try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function(){}); }catch(e){}
+    });
+  }
+
   /* ---------- رسالة تأكيد قبل أي حفظ بيانات ----------
      بتتسجّل أول حاجة (capture) عشان تسبق كل معالجات الحفظ؛ لو المستخدم رفض، الحفظ بيتوقف خالص. */
   (function(){
-    var SAVE_BTN_SEL = '#btn-save-ranges, #qe-save, #btn-save-target-profile, #btn-save-recipe, #btn-calc-plan, .op-save, #q-imp-save';
+    var SAVE_BTN_SEL = '#btn-save-ranges, #btn-save-remind, #qe-save, #btn-save-target-profile, #btn-save-recipe, #btn-calc-plan, .op-save, #q-imp-save';
     function clean(t){ return String(t||'').replace(/\s+/g,' ').trim(); }
     function ask(label){ return window.confirm('تأكيد الحفظ\n\n'+(label ? ('«'+label+'»\n\n') : '')+'تحفظ البيانات دي؟'); }
     function stopIt(ev){ ev.preventDefault(); ev.stopImmediatePropagation(); }
@@ -1061,7 +1094,7 @@
   };
   var BOOTSTRAP_ADMIN = 'dragoncool3330@gmail.com';
   var fbAuth = null, fbStorage = null, appEntered = false;
-  var settings = { accessCode:'', ph:[5.5,6.5], ec:[1.2,3.0], temp:[18,26] };
+  var settings = { accessCode:'', ph:[5.5,6.5], ec:[1.2,3.0], temp:[18,26], remindFrom:7, remindTo:19 };
   var settingsLoaded = false;
   var readingsDocs = [];
   var systems = [];
@@ -1490,7 +1523,7 @@
     var old = Object.assign({}, settings);
     return saveSettingsRaw(patch).then(function(r){
       try{
-        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة'};
+        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)'};
         Object.keys(patch||{}).forEach(function(k){
           if(k==='accessCode'){ if(old.accessCode!==patch.accessCode) logAudit('edit', 'admin', 'غيّر كود الدخول'); return; }
           if(JSON.stringify(old[k])!==JSON.stringify(patch[k])){
@@ -6133,6 +6166,7 @@
 
     body.innerHTML =
       '<h2 class="section-title" style="margin-top:0;">مهامّك</h2>'+
+      remindRowHtml()+
       '<div class="tasks-list">'+myTasksHtml+'</div>'+
 
       assignSectionHtml+
@@ -8405,6 +8439,132 @@
       if(db) db.collection('notifications').doc(n.id).delete().catch(function(){});
     });
   }
+  /* ---------- تنبيه المهام كل ساعة (صوت + اهتزاز) لحد ما المهمة تتعلّم "تم" ---------- */
+  var PUSH_VAPID_KEY = 'BDT1iGjtxN8blq3KlBaY4lE4llMyhfr1YlZQ4zjqDBHMxHJRPI9EEDiDcpdae1EDMKcde4mS3v9AdSbJc6ZnDWw';   // ← الصق هنا المفتاح العام (Web Push key) من Firebase Console عشان التنبيه يشتغل والتطبيق مقفول
+  var REMIND_MS = 3600000;
+  function remindFrom(){ var v = parseInt(settings.remindFrom, 10); return (v>=0 && v<=23) ? v : 7; }
+  function remindTo(){ var v = parseInt(settings.remindTo, 10), f = remindFrom(); return (v>=1 && v<=24 && v>f) ? v : Math.max(19, f+1); }
+  function hourLabel(h){ h = Number(h); if(h===0 || h===24) return '12 منتصف الليل'; if(h===12) return '12 ظهراً'; return (h%12)+(h<12 ? ' ص' : ' م'); }
+  var remindTimer = null, lastRemindAt = 0, pushToken = null;
+  function remindPref(){ try{ return localStorage.getItem('oroots_remind')==='on'; }catch(e){ return false; } }
+  function setRemindPref(on){ try{ localStorage.setItem('oroots_remind', on ? 'on' : 'off'); }catch(e){} }
+  function remindOn(){ return remindPref() && deviceNotifSupported() && Notification.permission==='granted'; }
+  function myPendingDue(){
+    var today = todayStr();
+    return flattenTasks().filter(function(t){ return t.status==='pending' && isMyTask(t) && t.ts.slice(0,10) <= today; });
+  }
+  function remindMsg(list){
+    var today = todayStr();
+    var title = list.length===1 ? '⏰ عندك مهمة لسه ما خلصتهاش' : '⏰ عندك '+list.length+' مهام لسه ما خلصتهاش';
+    var lines = list.slice(0,3).map(function(t){ return '• '+t.title+(t.ts.slice(0,10) < today ? ' (متأخرة)' : ''); });
+    return {title:title, body: lines.join('\n')+(list.length>3 ? ('\n+'+(list.length-3)+' تانية') : '')+'\nافتح التطبيق واضغط "تم ✓" عشان التنبيه يقف.'};
+  }
+  function beep(){
+    try{
+      var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+      var c = new AC();
+      [0, .35, .7].forEach(function(off){
+        var o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine'; o.frequency.value = 880; o.connect(g); g.connect(c.destination);
+        var t0 = c.currentTime + off;
+        g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.35, t0+.03); g.gain.exponentialRampToValueAtTime(.0001, t0+.28);
+        o.start(t0); o.stop(t0+.3);
+      });
+      setTimeout(function(){ try{ c.close(); }catch(e){} }, 1500);
+    }catch(e){}
+  }
+  function vib(){ try{ if(navigator.vibrate) navigator.vibrate([300,150,300,150,500]); }catch(e){} }
+  function remindNow(force){
+    var h = new Date().getHours();
+    if(!force && (h < remindFrom() || h >= remindTo())) return;
+    lastRemindAt = Date.now();
+    var list = myPendingDue(); if(!list.length) return;
+    var m = remindMsg(list);
+    if(document.visibilityState==='visible'){ toast(m.title); beep(); vib(); return; }
+    if(!pushToken){ deviceNotify(m.title, m.body, 'oroots-tasks'); beep(); vib(); }   // لو الـ push شغال السيرفر هو اللي بيبعت
+  }
+  function startRemindLoop(){
+    clearInterval(remindTimer); remindTimer = null;
+    if(!remindOn()) return;
+    remindTimer = setInterval(function(){ if(Date.now() - lastRemindAt >= REMIND_MS - 20000) remindNow(false); }, 30000);
+  }
+  function remindClearShown(){
+    try{
+      if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+        navigator.serviceWorker.getRegistration().then(function(r){ if(r && r.getNotifications) r.getNotifications({tag:'oroots-tasks'}).then(function(l){ l.forEach(function(n){ n.close(); }); }); });
+      }
+    }catch(e){}
+  }
+  function pushSupported(){
+    try{ if(!(window.firebase && firebase.messaging && firebase.messaging.isSupported)) return Promise.resolve(false); return Promise.resolve(firebase.messaging.isSupported()); }
+    catch(e){ return Promise.resolve(false); }
+  }
+  function pushRegister(){
+    if(!PUSH_VAPID_KEY || !db || !('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return Promise.resolve(false);
+    return pushSupported().then(function(ok){
+      if(!ok) return false;
+      var ready = Promise.race([navigator.serviceWorker.ready, new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('sw not ready')); }, 8000); })]);
+      return ready.then(function(reg){
+        return firebase.messaging().getToken({vapidKey:PUSH_VAPID_KEY, serviceWorkerRegistration:reg});
+      }).then(function(token){
+        if(!token) return false;
+        pushToken = token;
+        return db.collection('pushTokens').doc(token).set({token:token, email:String(currentUser||'').toLowerCase(), ua:String(navigator.userAgent||'').slice(0,140), updatedAt:Date.now()}).then(function(){ return true; });
+      });
+    }).catch(function(e){ console.warn('push register failed:', e && (e.code || e.message)); return false; });
+  }
+  function pushUnregister(){
+    var tok = pushToken; pushToken = null;
+    var jobs = [];
+    if(tok && db) jobs.push(db.collection('pushTokens').doc(tok).delete().catch(function(){}));
+    try{ if(window.firebase && firebase.messaging && PUSH_VAPID_KEY) jobs.push(Promise.resolve(firebase.messaging().deleteToken()).catch(function(){})); }catch(e){}
+    return Promise.all(jobs);
+  }
+  function remindEnable(){
+    if(!deviceNotifSupported()){ toast('المتصفح ده مش بيدعم الإشعارات (على الآيفون ثبّت التطبيق على الشاشة الرئيسية الأول)'); return; }
+    var go = function(){
+      setRemindPref(true); initDeviceNotif(); lastRemindAt = Date.now();
+      beep();   // بيجهّز الصوت بعد لمسة المستخدم وبيعرّفه شكل التنبيه
+      pushRegister().then(function(ok){
+        toast(ok ? 'اتفعّل التنبيه كل ساعة ✅ (حتى لو التطبيق مقفول)' : 'اتفعّل التنبيه كل ساعة ✅ (بيشتغل والتطبيق مفتوح)');
+        startRemindLoop(); renderAllSoon();
+      });
+    };
+    if(Notification.permission==='granted'){ go(); return; }
+    Notification.requestPermission().then(function(perm){
+      if(perm==='granted') go(); else toast('الإشعارات مقفولة، فعّلها من إعدادات المتصفح');
+      renderAllSoon();
+    });
+  }
+  function remindDisable(){
+    setRemindPref(false); clearInterval(remindTimer); remindTimer = null;
+    pushUnregister().then(function(){ toast('اتقفل التنبيه كل ساعة'); renderAllSoon(); });
+  }
+  function remindInit(){
+    lastRemindAt = Date.now();
+    remindClearShown();
+    if(remindOn()){ initDeviceNotif(); pushRegister(); startRemindLoop(); }
+  }
+  function remindBtnHtml(){
+    if(!deviceNotifSupported()) return '';
+    var on = remindOn();
+    return '<button type="button" class="btn '+(on?'btn-primary':'btn-ghost')+' btn-sm remind-toggle">⏰ تنبيه المهام كل ساعة: '+(on?'شغّال':'مقفول')+'</button>';
+  }
+  function remindRowHtml(){
+    var b = remindBtnHtml(); if(!b) return '';
+    return '<div style="margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">'+b+'<span class="hint" style="margin:0;">بيفكّرك بمهامك اللي لسه ما خلصتهاش كل ساعة (من '+hourLabel(remindFrom())+' لـ '+hourLabel(remindTo())+') لحد ما تدوس "تم ✓".</span></div>';
+  }
+  document.addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('.remind-toggle') : null;
+    if(!b) return;
+    if(remindOn()) remindDisable(); else remindEnable();
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState!=='visible') return;
+    remindClearShown();
+    if(remindTimer && Date.now() - lastRemindAt >= REMIND_MS) remindNow(false);
+  });
+
   /* إشعارات الجهاز: بتشتغل والتطبيق مفتوح (حتى لو في الخلفية) */
   function deviceNotifSupported(){ return typeof window.Notification !== 'undefined'; }
   function initDeviceNotif(){
@@ -8541,7 +8701,7 @@
     }).join('');
     var perm = deviceNotifSupported() ? Notification.permission : 'unsupported';
     var deviceRow = perm==='granted'
-      ? '<span class="hint" style="margin:0;">إشعارات الجهاز شغالة ✓</span> <button type="button" class="btn btn-ghost btn-sm" id="notif-test">جرّب إشعار</button>'
+      ? '<span class="hint" style="margin:0;">إشعارات الجهاز شغالة ✓</span> <button type="button" class="btn btn-ghost btn-sm" id="notif-test">جرّب إشعار</button> '+remindBtnHtml()
       : (perm==='denied' ? '<span class="hint" style="margin:0;">إشعارات الجهاز مقفولة من إعدادات المتصفح</span>'
         : (perm==='unsupported' ? '' : '<button type="button" class="btn btn-ghost btn-sm" id="notif-enable">🔔 فعّل إشعارات الجهاز</button>'));
     var prevBody = pop.querySelector('.np-body'), prevScroll = prevBody ? prevBody.scrollTop : 0;
@@ -10151,6 +10311,15 @@
     $('#range-ph-min').value = settings.ph[0]; $('#range-ph-max').value = settings.ph[1];
     $('#range-ec-min').value = settings.ec[0]; $('#range-ec-max').value = settings.ec[1];
     $('#range-temp-min').value = settings.temp[0]; $('#range-temp-max').value = settings.temp[1];
+    fillRemindForm();
+  }
+  function fillRemindForm(){
+    var f = $('#remind-from'), t = $('#remind-to'); if(!f || !t) return;
+    if(!f.options.length){
+      for(var h=0; h<=23; h++) f.add(new Option(hourLabel(h), h));
+      for(var k=1; k<=24; k++) t.add(new Option(hourLabel(k), k));
+    }
+    f.value = remindFrom(); t.value = remindTo();
   }
   function setupSettings(){
     $('#btn-new-user').addEventListener('click', function(){ showUserForm(null); });
@@ -10173,6 +10342,15 @@
       }).then(function(){
         $('#msg-ranges').classList.remove('hidden');
         setTimeout(function(){ $('#msg-ranges').classList.add('hidden'); }, 1800);
+      });
+    });
+    $('#btn-save-remind').addEventListener('click', function(){
+      var f = parseInt($('#remind-from').value, 10), t = parseInt($('#remind-to').value, 10);
+      if(!(t > f)){ toast('ساعة النهاية لازم تبقى بعد ساعة البداية'); return; }
+      saveSettings({remindFrom:f, remindTo:t}).then(function(){
+        $('#msg-remind').classList.remove('hidden');
+        setTimeout(function(){ $('#msg-remind').classList.add('hidden'); }, 1800);
+        renderAllSoon();
       });
     });
     $('#btn-export-all').addEventListener('click', function(){ exportCSV(null); });
@@ -10354,7 +10532,7 @@
 
   /* ---------- init ---------- */
   /* القراءات بتتحمّل حسب المدى المختار (بدل حد ثابت 270 مستند كان بيقطع البيانات عند آخر كام يوم بس) */
-  var readingsLoadDays = 7, readingsUnsub = null, readingsPhase2Done = false;
+  var readingsLoadDays = (function(){ try{ return localStorage.getItem('oroots_rd30')==='1' ? 30 : 7; }catch(e){ return 7; } })(), readingsUnsub = null, readingsPhase2Done = false;
   /* تحميل أول مرة: شريط تحميل + دمج الرسم + القراءات على مرحلتين (٧ أيام الأول ثم ٣٠ يوم في الخلفية) */
   var bootActive = false, bootIdleTimer = null, bootMaxTimer = null, renderSoonTimer = null;
   var bootSeen = {}, BOOT_EXPECTED = 28;
@@ -10390,8 +10568,8 @@
   function showBootBar(){
     bootActive = true; bootSeen = {}; bootLogged = {};
     clearTimeout(bootIdleTimer); clearTimeout(bootMaxTimer);
-    bootIdleTimer = setTimeout(finishBoot, 6000);
-    bootMaxTimer = setTimeout(finishBoot, 10000);
+    bootIdleTimer = setTimeout(finishBoot, 3000);
+    bootMaxTimer = setTimeout(finishBoot, 6000);
   }
   function finishBoot(){
     if(!bootActive) return;
@@ -10402,7 +10580,8 @@
     dbg('render done');
     hideSplash();
     if(DBG) showDbg();
-    if(!readingsPhase2Done){ readingsPhase2Done = true; ensureReadingsRange(30, true); }
+    safe(remindInit);
+    if(!readingsPhase2Done){ readingsPhase2Done = true; ensureReadingsRange(30, true); try{ localStorage.setItem('oroots_rd30','1'); }catch(e){} }
   }
   function renderAllSoon(){
     if(bootActive){ clearTimeout(bootIdleTimer); bootIdleTimer = setTimeout(finishBoot, 900); return; }
