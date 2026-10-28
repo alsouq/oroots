@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FXvLSluVshv/Vg+7mkUhyliQJvKJJ5YDytkT2RilE+Q=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mMsrBRSyVni0TLAI7DdIUSjnn4yvmPFohqSnHcEx1sU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1155,6 +1155,7 @@
   var qCStatus = '';
   var qRep = {from:'', to:'', product:''};
   var qPhotoCache = {};
+  var bioNewPhotos = [], bioPhotoOpen = {}, BIO_MAX_PHOTOS = 8, BIO_MAX_NEW = 4, BIO_MAX_CHARS = 700000;
   var sprayView = 'week';
   var notifSeen = {};
   var notifFirstLoad = true;
@@ -1793,6 +1794,8 @@
     }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد أصناف بعد. ضيف سماد أو مبيد من الفورم فوق.</td></tr>';
 
     body.innerHTML =
+      '<div class="form-actions" style="margin:10px 0;"><button type="button" class="btn btn-primary btn-sm" id="btn-new-inventory">+ إضافة صنف جديد</button></div>'+
+      '<div id="inventory-form-holder"></div>'+
       '<p class="hint">سجّل هنا كل الأسمدة والمبيدات المتاحة عندك بالمخزن، مع المادة الفعالة وإيه اللي بتعالجه والجرعة الموصى بها. المبيدات هنا بتظهر تلقائي كدروب داون في تاب المكافحة لما تسجل معاملة.</p>'+
       '<div class="climate-stats">'+climateStatChip('أسمدة', fertCount, '')+climateStatChip('مبيدات', pestCount, '')+'</div>'+
       '<div class="range-filter" id="inventory-filter-pills">'+
@@ -1800,8 +1803,6 @@
         '<button type="button" class="range-pill inv-filter-pill'+(inventoryFilterType==='fertilizer'?' active':'')+'" data-type="fertilizer">أسمدة</button>'+
         '<button type="button" class="range-pill inv-filter-pill'+(inventoryFilterType==='pesticide'?' active':'')+'" data-type="pesticide">مبيدات</button>'+
       '</div>'+
-      '<div class="form-actions" style="margin:10px 0;"><button type="button" class="btn btn-primary btn-sm" id="btn-new-inventory">+ إضافة صنف جديد</button></div>'+
-      '<div id="inventory-form-holder"></div>'+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">قائمة المخزن</h2><button class="btn btn-ghost btn-sm" id="inventory-export">تصدير CSV</button></div>'+
       '<div class="table-wrap inv-wrap"><table><thead><tr><th>الاسم / النوع</th><th>المادة الفعالة / يستهدف</th><th>الجرعة / الطور</th><th>الكمية</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 
@@ -2168,7 +2169,7 @@
     if(currentUserRole!=='admin'){ toast('الحذف متاح للمدير بس'); return false; }
     return true;
   }
-  var MUTATION_SELECTOR = '.del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
+  var MUTATION_SELECTOR = '.bio-add-files, #bio-files, .del-btn, .task-done-btn, .task-toggle-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
     '#btn-plan-snapshot, .q-edit, .q-del, .q-add-item, .q-status-btn, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-erad-btn, .pest-uneradicate-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
@@ -2550,12 +2551,19 @@
     var rec = {id:genId(), greenhouse:data.greenhouse||'', beneficialName:data.beneficialName||'', targetPest:data.targetPest||'',
       releaseDate:data.releaseDate||todayStr(), nextReleaseDate:data.nextReleaseDate||'', perM2:data.perM2||'',
       note:data.note||'', by:currentUser||'', createdAt:Date.now()};
-    if(db) return db.collection('bioReleases').doc(rec.id).set(rec);
+    var photos = (data.photos || []).slice(0, BIO_MAX_NEW);
+    rec.photoCount = db ? photos.length : 0;
+    if(db){
+      var batch = db.batch(), now = Date.now();
+      batch.set(db.collection('bioReleases').doc(rec.id), rec);
+      photos.forEach(function(src){ var pid = genId(); batch.set(db.collection('qualityPhotos').doc(pid), {id:pid, refId:'bio:'+rec.id, data:src, createdAt:now, by:currentUser||''}); });
+      return batch.commit();
+    }
     bioReleases.push(rec); persistLocalBio(); renderAll(); return Promise.resolve();
   }
   function addBioRelease(data){
     return addBioReleaseRaw(data).then(function(r){
-      logAudit('add', 'pests', 'إطلاق حيوي: '+data.beneficialName+' ضد '+(data.targetPest||'—')+' — '+(data.greenhouse||'')+(data.perM2?(' — '+data.perM2+'/م²'):''));
+      logAudit('add', 'pests', 'إطلاق حيوي: '+data.beneficialName+' ضد '+(data.targetPest||'—')+' — '+(data.greenhouse||'')+(data.perM2?(' — '+data.perM2+'/م²'):'')+((data.photos && data.photos.length) ? (' — '+data.photos.length+' صور') : ''));
       return r;
     });
   }
@@ -5331,8 +5339,6 @@
 
     inner.innerHTML =
       '<div class="system-header"><h2>'+systemLabel(sys)+' — سجل الحصاد</h2></div>'+
-      '<details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 إنفوجراف المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details>'+
-      statsHtml+
       '<h2 class="section-title">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
@@ -5347,6 +5353,8 @@
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الحصاد</button></div>'+
       '</form>'+
+      '<details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 إنفوجراف المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details>'+
+      statsHtml+
       (crops.length ?
         '<h2 class="section-title">شارت المحصول</h2>'+
         '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>'+
@@ -5692,18 +5700,7 @@
 
     body.innerHTML =
       '<div class="system-header"><h2>'+gh+'</h2></div>'+
-      '<h2 class="section-title" style="margin-top:0;">آخر قراءة</h2>'+
-      latestStatsHtml+
-      '<h2 class="section-title">ملخص يوم محدد</h2>'+
-      '<div class="day-picker-row"><label for="climate-day-picker">اختر اليوم:</label><input type="date" id="climate-day-picker" class="ltr"></div>'+
-      dailyHtml+
-      '<h2 class="section-title">اتجاه DLI والإشعاع التراكمي عبر الأيام</h2>'+
-      '<div class="range-filter">'+dailyRangeHtml+'</div>'+
-      '<div class="mini-charts">'+
-        '<div class="chart-card"><h3>DLI اليومي (mol/m²/يوم)</h3><div class="chart-wrap"><div id="cl-chart-dli" class="svg-chart-holder"></div></div></div>'+
-        '<div class="chart-card"><h3>الإشعاع التراكمي اليومي (J/cm²)</h3><div class="chart-wrap"><div id="cl-chart-radsum" class="svg-chart-holder"></div></div></div>'+
-      '</div>'+
-      '<h2 class="section-title">تسجيل قراءة مناخ جديدة</h2>'+
+      '<h2 class="section-title" style="margin-top:0;">تسجيل قراءة مناخ جديدة</h2>'+
       '<form class="entry-form" id="climate-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('climate-ts')+'</div>'+
@@ -5714,7 +5711,18 @@
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ القراءة</button></div>'+
       '</form>'+
-      '<h2 class="section-title">الاتجاه خلال آخر القراءات</h2>'+
+      '<h2 class="section-title">آخر قراءة</h2>'+
+      latestStatsHtml+
+      '<h2 class="section-title">ملخص يوم محدد</h2>'+
+      '<div class="day-picker-row"><label for="climate-day-picker">اختر اليوم:</label><input type="date" id="climate-day-picker" class="ltr"></div>'+
+      dailyHtml+
+      '<h2 class="section-title">اتجاه DLI والإشعاع التراكمي عبر الأيام</h2>'+
+      '<div class="range-filter">'+dailyRangeHtml+'</div>'+
+      '<div class="mini-charts">'+
+        '<div class="chart-card"><h3>DLI اليومي (mol/m²/يوم)</h3><div class="chart-wrap"><div id="cl-chart-dli" class="svg-chart-holder"></div></div></div>'+
+        '<div class="chart-card"><h3>الإشعاع التراكمي اليومي (J/cm²)</h3><div class="chart-wrap"><div id="cl-chart-radsum" class="svg-chart-holder"></div></div></div>'+
+      '</div>'+
+            '<h2 class="section-title">الاتجاه خلال آخر القراءات</h2>'+
       '<div class="range-filter" id="climate-range-filter"></div>'+
       '<div class="mini-charts">'+
         '<div class="chart-card"><h3>الحرارة (°C)</h3><div class="chart-wrap"><div id="cl-chart-temp" class="svg-chart-holder"></div></div></div>'+
@@ -6165,18 +6173,18 @@
     }).join('') : '<p class="empty-note">لسه مفيش إجراءات قياسية مضافة.</p>';
 
     body.innerHTML =
-      '<h2 class="section-title" style="margin-top:0;">مهامّك</h2>'+
+      assignSectionHtml+
+      '<h2 class="section-title"'+(assignSectionHtml ? '' : ' style="margin-top:0;"')+'>مهامّك</h2>'+
       remindRowHtml()+
       '<div class="tasks-list">'+myTasksHtml+'</div>'+
 
-      assignSectionHtml+
-      taskStatsHtml(allTasks, isAdminView)+
-      waSectionHtml(allTasks, tomorrowStr, isAdminView)+
-      allTasksSectionHtml+
-
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">الإجراءات القياسية (SOPs)</h2><button class="btn btn-primary btn-sm" id="btn-new-sop">+ إجراء جديد</button></div>'+
       '<div id="sop-form-holder"></div>'+
-      '<div id="sop-list">'+sopListHtml+'</div>';
+      '<div id="sop-list">'+sopListHtml+'</div>'+
+
+      taskStatsHtml(allTasks, isAdminView)+
+      waSectionHtml(allTasks, tomorrowStr, isAdminView)+
+      allTasksSectionHtml;
     lfWire('tasks');
     var waDate = $('#wa-date', body);
     if(waDate) waDate.addEventListener('change', function(){ waDay = this.value || null; waOpen = true; renderTasksPanel(); });
@@ -6841,6 +6849,91 @@
       return r;
     });
   }
+  /* ---------- صور إطلاقات المكافحة الحيوية (بتتخزّن في qualityPhotos بـ refId = bio:<id>) ---------- */
+  function bioSize(arr){ return arr.reduce(function(n, x){ return n + String(x).length; }, 0); }
+  function bioDrawNew(){
+    var box = $('#bio-newphs'); if(!box) return;
+    box.innerHTML = bioNewPhotos.map(function(src, k){ return '<span class="q-newph"><img class="pest-photo q-thumb" src="'+src+'" alt=""><button type="button" class="del-btn bio-new-rm" data-k="'+k+'" title="شيل الصورة">✕</button></span>'; }).join('');
+    $all('.bio-new-rm', box).forEach(function(b){ b.addEventListener('click', function(){ bioNewPhotos.splice(parseInt(b.getAttribute('data-k'),10), 1); bioDrawNew(); }); });
+  }
+  function bioLoadStrip(row, id){
+    var strip = row.querySelector('.bio-strip'); if(!strip) return;
+    strip.innerHTML = '<span class="hint">بيحمّل الصور...</span>';
+    qLoadPhotos('bio:'+id).then(function(list){
+      strip.innerHTML = list.length ? list.map(function(x){
+        var mine = currentUserRole==='admin' || String(x.by||'').toLowerCase()===String(currentUser||'').toLowerCase();
+        return '<span class="q-newph"><img class="pest-photo q-thumb" src="'+x.data+'" alt="صورة الإطلاق">'+(mine ? '<button type="button" class="del-btn bio-ph-del" data-pid="'+x.id+'" title="امسح الصورة">✕</button>' : '')+'</span>';
+      }).join('') : '<span class="hint">مفيش صور لسه.</span>';
+      $all('.bio-ph-del', strip).forEach(function(b){ b.addEventListener('click', function(){ bioDeletePhoto(id, b.getAttribute('data-pid'), row); }); });
+    }).catch(function(){ strip.innerHTML = '<span class="hint">تعذر تحميل الصور.</span>'; });
+  }
+  function bioDeletePhoto(id, pid, row){
+    if(!confirm('تمسح الصورة دي؟')) return;
+    var batch = db.batch();
+    batch.delete(db.collection('qualityPhotos').doc(pid));
+    batch.update(db.collection('bioReleases').doc(id), {photoCount: firebase.firestore.FieldValue.increment(-1)});
+    batch.commit().then(function(){
+      delete qPhotoCache['bio:'+id]; bioLoadStrip(row, id);
+      logAudit('delete', 'pests', 'مسح صورة من إطلاق حيوي');
+      toast('اتمسحت الصورة');
+    }).catch(function(){ toast('ما اتمسحتش'); });
+  }
+  function bioAddPhotos(id, files, row){
+    if(!db || !files.length) return;
+    var r = bioReleases.filter(function(x){ return x.id===id; })[0];
+    var room = BIO_MAX_PHOTOS - ((r && r.photoCount) || 0);
+    if(room<=0){ toast('أقصى عدد صور للإطلاق '+BIO_MAX_PHOTOS); return; }
+    if(files.length>room){ files = files.slice(0, room); toast('هنضيف أول '+room+' صور بس'); }
+    toast('بيجهّز الصور...');
+    Promise.all(files.map(qFileToDataUrl)).then(function(urls){
+      if(bioSize(urls) > BIO_MAX_CHARS){ toast('حجم الصور كبير — قلّل العدد'); return; }
+      var batch = db.batch(), now = Date.now();
+      urls.forEach(function(src){ var pid = genId(); batch.set(db.collection('qualityPhotos').doc(pid), {id:pid, refId:'bio:'+id, data:src, createdAt:now, by:currentUser||''}); });
+      batch.update(db.collection('bioReleases').doc(id), {photoCount: firebase.firestore.FieldValue.increment(urls.length)});
+      return batch.commit().then(function(){
+        delete qPhotoCache['bio:'+id]; bioLoadStrip(row, id);
+        logAudit('edit', 'pests', 'أضاف '+urls.length+' صور لإطلاق حيوي'+(r ? (': '+r.beneficialName) : ''));
+        toast('اتضافت الصور ✅');
+      });
+    }).catch(function(){ toast('ما اتحفظتش الصور'); });
+  }
+  function bioOpenPhotoRow(tr, id){
+    if(tr.nextElementSibling && tr.nextElementSibling.classList.contains('bio-photo-row')) return;
+    var row = document.createElement('tr'); row.className = 'bio-photo-row';
+    row.innerHTML = '<td colspan="8"><div class="q-photos bio-strip"></div><div class="form-actions" style="margin-top:4px;"><label class="btn btn-ghost btn-sm" style="cursor:pointer;">➕ أضف صور<input type="file" accept="image/*" multiple class="bio-add-files" style="display:none;"></label></div></td>';
+    tr.parentNode.insertBefore(row, tr.nextSibling);
+    bioLoadStrip(row, id);
+    row.querySelector('.bio-add-files').addEventListener('change', function(){ var fl = [].slice.call(this.files||[]); this.value = ''; bioAddPhotos(id, fl, row); });
+  }
+  function bioWirePhotos(){
+    bioDrawNew();
+    var fi = $('#bio-files');
+    if(fi) fi.addEventListener('change', function(){
+      var files = [].slice.call(this.files||[]); this.value = '';
+      if(!files.length) return;
+      var room = BIO_MAX_NEW - bioNewPhotos.length;
+      if(room<=0){ toast('أقصى عدد '+BIO_MAX_NEW+' صور هنا (تقدر تضيف غيرها بعد الحفظ)'); return; }
+      if(files.length>room){ files = files.slice(0, room); toast('هنضيف أول '+room+' صور بس'); }
+      toast('بيجهّز الصور...');
+      Promise.all(files.map(qFileToDataUrl)).then(function(urls){
+        var next = bioNewPhotos.concat(urls);
+        if(bioSize(next) > BIO_MAX_CHARS){ toast('حجم الصور كبير — قلّل العدد'); return; }
+        bioNewPhotos = next; bioDrawNew();
+      }).catch(function(){ toast('تعذر تجهيز الصور'); });
+    });
+    $all('.bio-photos-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var tr = btn.closest('tr'), id = tr.getAttribute('data-id'), nx = tr.nextElementSibling;
+        if(nx && nx.classList.contains('bio-photo-row')){ nx.remove(); delete bioPhotoOpen[id]; return; }
+        bioPhotoOpen[id] = 1; bioOpenPhotoRow(tr, id);
+      });
+    });
+    Object.keys(bioPhotoOpen).forEach(function(id){
+      var b = document.querySelector('tr[data-id="'+id+'"] .bio-photos-btn');
+      if(b) bioOpenPhotoRow(b.closest('tr'), id);
+    });
+  }
+
   /* ---------- اتجاه الإصابات: كل مرض/حشرة — بيزيد ولا بيقل؟ ---------- */
   var pestTrendDays = 30, pestTrendScope = 'gh';
   var PT_ICON = {fungal:'🍄', insect:'🐛', other:'⚠️'};
@@ -7005,13 +7098,13 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">'+(pestEditing?'حفظ التعديل':'حفظ')+'</button>'+(pestEditing?' <button type="button" class="btn btn-ghost btn-sm" id="pest-edit-cancel">إلغاء</button>':'')+'</div>'+
       '</form>'+
 
+      renderBioControlSectionHtml(gh)+
       pestTrendHtml(gh)+
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
       '<div class="range-filter">'+statusPillsHtml+'</div>'+
       lfBarHtml('pests')+
-      '<div class="tasks-list">'+listHtml+'</div>'+
-      renderBioControlSectionHtml(gh);
+      '<div class="tasks-list">'+listHtml+'</div>';
 
     $('#pest-ts').value = nowLocalInputValue();
     pestTrendWire(gh);
@@ -7261,8 +7354,8 @@
     var relRows = relList.length ? relList.map(function(x){
       return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+x.beneficialName+'</td><td>'+(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.perM2||'—')+'</td><td>'+(x.nextReleaseDate?nextReleaseBadge(x.nextReleaseDate):'—')+'</td>'+
-        '<td>'+(x.note||'—')+'</td><td><button class="del-btn bio-release-del" title="حذف">✕</button></td></tr>';
-    }).join('') : '<tr><td colspan="7" class="empty-note">لا توجد إطلاقات مسجلة لهذه الصوبة.</td></tr>';
+        '<td>'+(x.note||'—')+'</td><td><button type="button" class="btn btn-ghost btn-sm bio-photos-btn">📷 '+(x.photoCount||'+')+'</button></td><td><button class="del-btn bio-release-del" title="حذف">✕</button></td></tr>';
+    }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد إطلاقات مسجلة لهذه الصوبة.</td></tr>';
 
     var stRows = stList.length ? stList.map(function(x){
       return '<tr data-id="'+x.id+'"'+lfAttr('sticky', x.placedDate)+'><td class="ltr num">'+x.placedDate+'</td><td>'+stickyColorLabel(x.color)+'</td>'+
@@ -7292,12 +7385,13 @@
             '<div class="field-sm"><label>موعد الإطلاق القادم (اختياري)</label><input type="date" class="ltr" id="bio-next-date"></div>'+
             '<div class="field-sm"><label>العدد لكل م² (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="bio-per-m2" placeholder="مثال: 6"></div>'+
             '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="bio-note"></div>'+
+            '<div class="field-sm full"><label>📷 صور الإطلاق (اختياري — لحد '+BIO_MAX_NEW+' صور، وتقدر تضيف غيرها بعد الحفظ)</label><input type="file" id="bio-files" accept="image/*" multiple><div class="q-newphs" id="bio-newphs"></div></div>'+
           '</div>'+
           '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الإطلاق</button></div>'+
         '</form>'+
         '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="bio-release-export">تصدير CSV</button></div>'+
         lfBarHtml('bio')+
-        '<div class="table-wrap"><table><thead><tr><th>تاريخ الإطلاق</th><th>العدو الحيوي</th><th>يستهدف</th><th>العدد/م²</th><th>الإطلاق القادم</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+relRows+'</tbody></table></div>'+
+        '<div class="table-wrap"><table><thead><tr><th>تاريخ الإطلاق</th><th>العدو الحيوي</th><th>يستهدف</th><th>العدد/م²</th><th>الإطلاق القادم</th><th>ملاحظة</th><th>صور</th><th></th></tr></thead><tbody>'+relRows+'</tbody></table></div>'+
       '</details>'+
 
       '<details class="nut-details"><summary>🟡 لاصقات ملونة (Sticky Traps)</summary>'+
@@ -7343,13 +7437,14 @@
         addBioRelease({
           greenhouse: gh, beneficialName: name, targetPest: $('#bio-target').value.trim(),
           releaseDate: $('#bio-release-date').value || todayStr(), nextReleaseDate: $('#bio-next-date').value,
-          perM2: $('#bio-per-m2').value, note: $('#bio-note').value.trim()
-        }).then(function(){ toast('اتسجّل الإطلاق'); renderPestsPanel(); });
+          perM2: $('#bio-per-m2').value, note: $('#bio-note').value.trim(), photos: bioNewPhotos.slice()
+        }).then(function(){ bioNewPhotos = []; toast('اتسجّل الإطلاق'); renderPestsPanel(); });
       });
       $all('.bio-release-del').forEach(function(btn){
         btn.addEventListener('click', function(){ deleteBioRelease(btn.closest('tr').getAttribute('data-id')); });
       });
       $('#bio-release-export').addEventListener('click', function(){ exportBioCSV('release', gh); });
+      bioWirePhotos();
     }
     var stForm = $('#sticky-form');
     if(stForm){
@@ -7857,11 +7952,11 @@
     var planSectionHtml = nurseryTilesHtml();
 
     body.innerHTML =
-      planSectionHtml +
       '<h2 class="section-title">'+(tBatch?'نقل صواني للسيستم':(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة'))+'</h2>'+
       '<div id="nursery-form-holder"></div>'+
 
       (nurseryLastMsg ? '<div class="stat-card" style="margin:12px 0;border-inline-start:4px solid var(--brand);">✅ '+escH(nurseryLastMsg)+'</div>' : '') +
+      planSectionHtml +
       nurserySummaryHtml(all) +
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
@@ -9023,6 +9118,7 @@
 
     body.innerHTML =
       '<div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div>'+
+      '<h3 class="section-title" id="sp-form-title" style="margin-top:12px;">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml+
       '<h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
       '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, periodLabel)+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, periodLabel)+climateStatChip('جاي', cnt.planned, 'مجدول')+(cnt.skipped ? climateStatChip('اتلغى', cnt.skipped, periodLabel) : '')+'</div>'+
       '<details class="chart-card" id="sp-print-box" style="margin-top:12px;"><summary style="cursor:pointer;font-weight:700;">🖨️ طباعة الجدول كتقرير</summary>'+
@@ -9033,8 +9129,7 @@
       '<div class="range-filter" id="sp-view" style="margin-top:12px;"><button type="button" class="range-pill'+(isMonth?'':' active')+'" data-v="week">📅 الأسبوع</button><button type="button" class="range-pill'+(isMonth?' active':'')+'" data-v="month">🗓️ الشهر كامل</button></div>'+
       (isMonth ? '<div class="sp-mnav"><button type="button" class="btn btn-ghost btn-sm" id="sp-mprev">‹ الشهر السابق</button><strong class="sp-mtitle">'+SPRAY_MONTHS[new Date(sprayDate+'T00:00:00').getMonth()]+' '+new Date(sprayDate+'T00:00:00').getFullYear()+'</strong><button type="button" class="btn btn-ghost btn-sm" id="sp-mnext">الشهر التالي ›</button></div>' : '')+
       '<h3 class="section-title">'+(isMonth ? '🗓️ جدول الشهر كامل (اضغط على يوم)' : '📅 جدول الأسبوع (اضغط على يوم)')+'</h3>'+matrix+
-      '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div>'+
-      '<h3 class="section-title" id="sp-form-title">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml;
+      '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div>';
 
     // ربط الأحداث
     $('#sp-prev').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,-1); renderSprayPanel(); });
