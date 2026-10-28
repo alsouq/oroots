@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mMsrBRSyVni0TLAI7DdIUSjnn4yvmPFohqSnHcEx1sU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lJzgs5fvDX2adH8Yp4xgy7pZnQAOLam6wq5iWu/3agA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -375,6 +375,18 @@
   .pest-card{background:var(--surface);border:1px solid var(--border);border-inline-start:4px solid var(--alert);border-radius:14px;padding:12px 14px;}
   .pest-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
   .pest-card.eradicated{border-inline-start:4px solid #2f9e63;} .pest-erad-info{margin:6px 0;padding:6px 10px;border-radius:8px;background:rgba(47,158,99,.12);font-size:.82rem;}
+  .io-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin:0 0 16px;}
+  .io-card.io-full{position:fixed;inset:0;z-index:4000;margin:0;border-radius:0;overflow:auto;background:var(--paper);padding-top:calc(12px + env(safe-area-inset-top,0px));}
+  .io-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;} .io-title{font-weight:800;font-size:.88rem;letter-spacing:.3px;}
+  .io-tools{display:flex;gap:6px;} .io-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 10px;font-size:.8rem;cursor:pointer;font-family:inherit;} .io-btn:disabled{opacity:.35;cursor:default;}
+  .io-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0;} .io-pills{display:flex;gap:6px;flex-wrap:wrap;}
+  .io-range{display:flex;align-items:center;gap:6px;margin-inline-start:auto;direction:ltr;} .io-range input[type=date]{width:auto;padding:4px 6px;font-size:.78rem;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink);} .io-lbl{font-size:.74rem;color:var(--muted);white-space:nowrap;}
+  .io-svgwrap{width:100%;direction:ltr;} .io-svgwrap svg{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none;} .io-grid{stroke:var(--border);} .io-tick{fill:var(--muted);}
+  .io-link{color:#1b6fa8;font-size:.76rem;font-weight:700;cursor:pointer;background:none;border:none;padding:6px 0;font-family:inherit;}
+  .io-tbl-wrap{overflow-x:auto;direction:ltr;} table.io-table{width:100%;border-collapse:collapse;font-size:.72rem;min-width:560px;} .io-table th{color:var(--muted);font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;} .io-table td{padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:left;}
+  .io-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px;} .io-row-off td{opacity:.45;} .io-cur-v,.io-cur-h{font-weight:700;color:var(--ink);}
+  .io-sw{position:relative;display:inline-block;width:34px;height:18px;} .io-sw input{opacity:0;width:0;height:0;position:absolute;} .io-sw span{position:absolute;inset:0;background:#c3c9d0;border-radius:18px;transition:.2s;cursor:pointer;} .io-sw span:before{content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;} .io-sw input:checked+span{background:#1b6fa8;} .io-sw input:checked+span:before{transform:translateX(16px);}
+  .io-builder{margin-bottom:16px;} .io-srow{border:1px solid var(--border);border-radius:10px;padding:8px;margin:8px 0;} .io-srow select{width:100%;} .io-srow2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;} .io-color{width:44px;height:36px;padding:0;border:1px solid var(--border);border-radius:8px;background:none;} .io-mul{display:flex;align-items:center;gap:4px;margin:0;} .io-mul input{width:72px;}
   .pt-ctl{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;} .pt-row{padding:8px 0;border-top:1px solid var(--border);} .pt-row:first-of-type{border-top:none;}
   .pt-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;} .pt-name{font-weight:700;font-size:.88rem;}
   .pt-trend{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);}
@@ -732,6 +744,7 @@
 
   <nav class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="overview" style="--tab-color:var(--ink)">نظرة عامة</button>
+<button class="tab-btn" data-tab="charts" style="--tab-color:var(--water)">📈 الشارتات</button>
     <button class="tab-btn" data-tab="water" style="--tab-color:var(--brand)">بيانات المياه</button>
     <button class="tab-btn" data-tab="climate" style="--tab-color:var(--tank)">بيانات المناخ</button>
     <button class="tab-btn" data-tab="tasks" style="--tab-color:var(--water)">المهام والإجراءات</button>
@@ -785,7 +798,12 @@
       <div id="overview-nutrients"></div>
     </section>
 
-    <section class="panel" id="panel-water">
+    <section class="panel" id="panel-charts">
+<h1 class="page-title">📈 الشارتات</h1>
+<div id="charts-body"></div>
+</section>
+
+<section class="panel" id="panel-water">
       <h1 class="page-title">بيانات المياه</h1>
       <div class="system-picker" id="greenhouse-picker"></div>
       <div class="system-picker" id="system-picker"></div>
@@ -2200,7 +2218,7 @@
   function applyTabVisibility(){
     $all('.tab-btn').forEach(function(btn){
       var tab = btn.getAttribute('data-tab');
-      if(tab==='overview'){ btn.classList.remove('hidden'); return; }
+      if(tab==='overview' || tab==='charts'){ btn.classList.remove('hidden'); return; }
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
@@ -7956,14 +7974,14 @@
       '<div id="nursery-form-holder"></div>'+
 
       (nurseryLastMsg ? '<div class="stat-card" style="margin:12px 0;border-inline-start:4px solid var(--brand);">✅ '+escH(nurseryLastMsg)+'</div>' : '') +
-      planSectionHtml +
-      nurserySummaryHtml(all) +
       '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
       cropPillsHtml+
       lfBarHtml('nursery')+
       '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
-      (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>');
+      (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>') +
+      nurserySummaryHtml(all) +
+      planSectionHtml;
 
     wireNurseryTiles(body);
     lfWire('nursery');
@@ -10349,10 +10367,365 @@
   function renderSettingsPanels(){ safe(renderUsersSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
   function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
   /* بيرسم التاب المفتوح بس — باقي التابات بتترسم أول ما تفتحها (setupTabs) */
+  /* ====================== الشارتات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + شارتات مخصصة ====================== */
+  var customCharts = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_customcharts') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
+  var ioState = {}, ioBuilder = null, IO_MAX_SERIES = 12;
+  var IO_COLORS = ['#2C8C6F','#D8543A','#2C7A8C','#C9932F','#8C6FA2','#3B82F6','#6FA22E','#E0457B','#7A5C2E','#0F766E'];
+  var CL_METRICS = [
+    {k:'temp', n:'الحرارة', u:'°C', f:function(e){ return parseFloat(e.temp); }},
+    {k:'rh', n:'الرطوبة النسبية', u:'%', f:function(e){ return parseFloat(e.rh); }},
+    {k:'vpd', n:'VPD', u:'kPa', f:function(e){ return climateVPD(parseFloat(e.temp), parseFloat(e.rh)); }},
+    {k:'ah', n:'الرطوبة المطلقة AH', u:'g/m³', f:function(e){ return climateAH(parseFloat(e.temp), parseFloat(e.rh)); }},
+    {k:'hd', n:'عجز الرطوبة HD', u:'g/m³', f:function(e){ return climateHD(parseFloat(e.temp), parseFloat(e.rh)); }},
+    {k:'lux', n:'شدة الإضاءة', u:'Lux', f:function(e){ return parseFloat(e.lux); }},
+    {k:'wm2', n:'الإشعاع', u:'W/m²', f:function(e){ return climateRadiationWm2(parseFloat(e.lux)); }},
+    {k:'ppfd', n:'PPFD', u:'µmol/m²/s', f:function(e){ return climatePPFD(parseFloat(e.lux)); }}
+  ];
+  var WT_METRICS = [{k:'ph', n:'pH', u:''}, {k:'ec', n:'EC', u:'mS/cm'}, {k:'temp', n:'الحرارة', u:'°C'}];
+
+  function ioPad(n){ return (n<10 ? '0' : '')+n; }
+  function ioFmtT(t, withTime){ var d = new Date(t); return ioPad(d.getDate())+'/'+ioPad(d.getMonth()+1)+(withTime ? (' '+ioPad(d.getHours())+':'+ioPad(d.getMinutes())) : ''); }
+  function ioFmt(v){ if(v===null || v===undefined || !isFinite(v)) return '-'; var a = Math.abs(v); return String(parseFloat(a>=1000 ? v.toFixed(0) : (a>=100 ? v.toFixed(1) : v.toFixed(2)))); }
+  function ioDayStr(t){ var d = new Date(t); return d.getFullYear()+'-'+ioPad(d.getMonth()+1)+'-'+ioPad(d.getDate()); }
+
+  /* حالة كل شارت (نافذة الوقت / الخطوط المقفولة / الجدول) بتتحفظ على الجهاز */
+  function ioSt(chart){
+    var id = chart.id;
+    if(!ioState[id]){
+      var saved = {}; try{ saved = (JSON.parse(localStorage.getItem('oroots_iostate') || '{}') || {})[id] || {}; }catch(e){}
+      ioState[id] = {days: saved.days || chart.days || 7, end: null, hidden: saved.hidden || {}, table: saved.table !== false, cursorT: null, full: false};
+    }
+    return ioState[id];
+  }
+  function ioSaveSt(id){
+    try{ var all = JSON.parse(localStorage.getItem('oroots_iostate') || '{}') || {}, st = ioState[id]; all[id] = {days: st.days, hidden: st.hidden, table: st.table}; localStorage.setItem('oroots_iostate', JSON.stringify(all)); }catch(e){}
+  }
+
+  /* كل المقاييس اللي ينفع تتربط ببعض: مناخ + مياه + حصاد + مكافحة + مصايد */
+  function ioCatalog(){
+    var out = [];
+    greenhouseGroups().forEach(function(g){
+      CL_METRICS.forEach(function(m){ out.push({ref:'c|'+g.name+'|'+m.k, group:'🌡️ مناخ — '+g.name, name:m.n, unit:m.u}); });
+    });
+    systems.forEach(function(sys){
+      SOURCES.forEach(function(src){
+        WT_METRICS.forEach(function(m){ out.push({ref:'w|'+sys.id+'|'+src.key+'|'+m.k, group:'💧 مياه — '+systemLabel(sys)+' — '+src.label, name:m.n, unit:m.u}); });
+      });
+    });
+    var crops = {}; harvestLog.forEach(function(h){ if(h.cropName) crops[h.cropName] = 1; });
+    Object.keys(crops).sort().forEach(function(c){ out.push({ref:'h|'+c, group:'🥬 حصاد (كجم/يوم)', name:c, unit:'كجم'}); });
+    var ghs = {}; greenhouseGroups().forEach(function(g){ ghs[g.name] = 1; }); pestLog.forEach(function(p){ if(p.greenhouse) ghs[p.greenhouse] = 1; });
+    Object.keys(ghs).forEach(function(gh){
+      var grp = '🐛 مكافحة — '+gh;
+      out.push({ref:'p|'+gh+'|*', group:grp, name:'كل الإصابات (عدد/يوم)', unit:'عدد'});
+      var names = {}; pestLog.forEach(function(p){ if(p.greenhouse===gh && p.problemName) names[String(p.problemName).trim().replace(/\|/g,'/')] = 1; });
+      Object.keys(names).sort().forEach(function(n){ out.push({ref:'p|'+gh+'|'+n, group:grp, name:n+' (عدد/يوم)', unit:'عدد'}); });
+      out.push({ref:'s|'+gh, group:grp, name:'مصايد لاصقة (عدد)', unit:'عدد'});
+      out.push({ref:'f|'+gh, group:grp, name:'مصايد فيرمونية (عدد)', unit:'عدد'});
+    });
+    return out;
+  }
+  function ioCatMap(cat){ var m = {}; cat.forEach(function(c){ m[c.ref] = c; }); return m; }
+
+  /* بيحوّل أي مرجع (ref) لنقاط {x:وقت, y:قيمة} */
+  function ioData(ref){
+    var p = String(ref).split('|'), t = p[0], pts = [];
+    if(t==='c'){
+      var m = CL_METRICS.filter(function(x){ return x.k===p[2]; })[0]; if(!m) return [];
+      flattenEntries('climate', p[1]).forEach(function(e){ var v = m.f(e), x = new Date(e.ts).getTime(); if(isFinite(v) && isFinite(x)) pts.push({x:x, y:v}); });
+    } else if(t==='w'){
+      flattenEntries(p[2], p[1]).forEach(function(e){ var v = parseFloat(e[p[3]]), x = new Date(e.ts).getTime(); if(isFinite(v) && isFinite(x)) pts.push({x:x, y:v}); });
+    } else if(t==='h'){
+      var day = {};
+      harvestLog.forEach(function(h){
+        if(h.cropName!==p[1]) return;
+        var q = parseFloat(h.quantity), kg = h.unit==='kg' ? q : (h.unit==='g' ? q/1000 : NaN), d = String(h.ts||'').slice(0,10);
+        if(isFinite(kg) && d) day[d] = (day[d]||0) + kg;
+      });
+      Object.keys(day).forEach(function(d){ pts.push({x:new Date(d+'T12:00:00').getTime(), y:Math.round(day[d]*1000)/1000}); });
+    } else if(t==='p'){
+      var cnt = {};
+      pestLog.forEach(function(x){
+        if(x.greenhouse!==p[1]) return;
+        if(p[2]!=='*' && String(x.problemName||'').trim().replace(/\|/g,'/')!==p[2]) return;
+        var d = String(x.ts||'').slice(0,10); if(d) cnt[d] = (cnt[d]||0) + 1;
+      });
+      Object.keys(cnt).forEach(function(d){ pts.push({x:new Date(d+'T12:00:00').getTime(), y:cnt[d]}); });
+    } else if(t==='s' || t==='f'){
+      (t==='s' ? stickyTraps : pheromoneTraps).forEach(function(x){
+        if(x.greenhouse!==p[1]) return;
+        var v = parseFloat(x.count), d = x.placedDate;
+        if(isFinite(v) && d) pts.push({x:new Date(d+'T12:00:00').getTime(), y:v});
+      });
+    }
+    pts.sort(function(a,b){ return a.x - b.x; });
+    return pts.filter(function(q){ return isFinite(q.x); });
+  }
+
+  function ioNice(mn, mx, n){
+    if(!isFinite(mn) || !isFinite(mx)) { mn = 0; mx = 1; }
+    if(mn===mx){ var pad = Math.abs(mn)*0.1 || 1; mn -= pad; mx += pad; }
+    var raw = (mx-mn)/n, mag = Math.pow(10, Math.floor(Math.log(raw)/Math.LN10)), res = raw/mag;
+    var step = (res<1.5 ? 1 : (res<3 ? 2 : (res<7 ? 5 : 10))) * mag;
+    var lo = Math.floor(mn/step + 1e-9)*step, hi = Math.ceil(mx/step - 1e-9)*step, ticks = [];
+    for(var v = lo, i = 0; v <= hi + step*1e-6 && i < 14; v += step, i++) ticks.push(Math.round(v/step)*step);
+    return {min:lo, max:hi, ticks:ticks};
+  }
+  function ioDecimate(pts, maxN){
+    if(pts.length <= maxN) return pts;
+    var size = Math.ceil(pts.length/maxN), out = [];
+    for(var i=0; i<pts.length; i+=size){
+      var sx = 0, sy = 0, c = 0;
+      for(var j=i; j<Math.min(i+size, pts.length); j++){ sx += pts[j].x; sy += pts[j].y; c++; }
+      out.push({x:sx/c, y:sy/c});
+    }
+    return out;
+  }
+  function ioGap(win){ return win.length > 1 ? (win[win.length-1].x - win[0].x)/(win.length-1) : 0; }
+
+  function ioBuildSeries(chart, st, catMap){
+    var end = st.end || Date.now(), from = end - st.days*86400000;
+    return (chart.series || []).map(function(d){
+      var meta = catMap[d.ref] || {name:String(d.ref), group:'(غير متاح)', unit:''};
+      var scale = parseFloat(d.scale); if(!isFinite(scale) || scale===0) scale = 1;
+      var win = ioData(d.ref).filter(function(p){ return p.x >= from && p.x <= end; });
+      var mn = null, mx = null, sum = 0;
+      win.forEach(function(p){ if(mn===null || p.y<mn) mn = p.y; if(mx===null || p.y>mx) mx = p.y; sum += p.y; });
+      return {def:d, meta:meta, scale:scale, axis:(d.axis==='R' ? 'R' : 'L'), color:d.color || '#2C8C6F', visible:!st.hidden[d.id], win:win, min:mn, max:mx, avg:win.length ? sum/win.length : null, gap:ioGap(win)};
+    });
+  }
+
+  /* رسم الـ SVG (دالة نقية: بتاخد البيانات وبترجّع نص الـ SVG والأبعاد) */
+  function ioBuildSvg(series, from, to, W, H){
+    var vis = series.filter(function(s){ return s.visible && s.win.length; });
+    var hasL = vis.some(function(s){ return s.axis==='L'; }), hasR = vis.some(function(s){ return s.axis==='R'; });
+    var m = {l:(hasL || !hasR) ? 42 : 10, r:hasR ? 42 : 10, t:10, b:22};
+    var pw = W - m.l - m.r, ph = H - m.t - m.b, span = Math.max(1, to - from);
+    function ext(axis){
+      var lo = null, hi = null;
+      vis.forEach(function(s){ if(s.axis!==axis) return; for(var i=0; i<s.win.length; i++){ var v = s.win[i].y*s.scale; if(lo===null || v<lo) lo = v; if(hi===null || v>hi) hi = v; } });
+      return lo===null ? null : ioNice(lo, hi, 5);
+    }
+    var A = {L:ext('L'), R:ext('R')};
+    function X(t){ return m.l + (t - from)/span*pw; }
+    function Y(axis, v){ var a = A[axis]; return m.t + ph - (v - a.min)/(a.max - a.min)*ph; }
+    var g = '', gridAx = A.L ? 'L' : (A.R ? 'R' : null);
+    if(gridAx) A[gridAx].ticks.forEach(function(v){ var y = Y(gridAx, v).toFixed(1); g += '<line class="io-grid" x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y+'" y2="'+y+'" stroke-width="1"/>'; });
+    if(A.L) A.L.ticks.forEach(function(v){ g += '<text x="'+(m.l-5)+'" y="'+(Y('L', v)+3.5).toFixed(1)+'" text-anchor="end" font-size="10" class="io-tick">'+ioFmt(v)+'</text>'; });
+    if(A.R) A.R.ticks.forEach(function(v){ g += '<text x="'+(W-m.r+5)+'" y="'+(Y('R', v)+3.5).toFixed(1)+'" text-anchor="start" font-size="10" class="io-tick">'+ioFmt(v)+'</text>'; });
+    var nx = Math.max(3, Math.min(8, Math.floor(pw/78))), short = span <= 2.2*86400000;
+    for(var i=0; i<=nx; i++){
+      var t = from + span*i/nx, d = new Date(t), lbl = short ? (ioPad(d.getHours())+':'+ioPad(d.getMinutes())) : ioFmtT(t, false);
+      g += '<text x="'+X(t).toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+(i===0 ? 'start' : (i===nx ? 'end' : 'middle'))+'" font-size="10" class="io-tick">'+lbl+'</text>';
+    }
+    vis.forEach(function(s){
+      var pts = ioDecimate(s.win, Math.max(60, Math.floor(pw)));
+      if(pts.length===1){ g += '<circle cx="'+X(pts[0].x).toFixed(1)+'" cy="'+Y(s.axis, pts[0].y*s.scale).toFixed(1)+'" r="3" fill="'+s.color+'"/>'; return; }
+      g += '<polyline fill="none" stroke="'+s.color+'" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(function(p){ return X(p.x).toFixed(1)+','+Y(s.axis, p.y*s.scale).toFixed(1); }).join(' ')+'"/>';
+    });
+    if(!vis.length) g += '<text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" font-size="12" class="io-tick">مفيش بيانات في الفترة دي (أو كل الخطوط مقفولة)</text>';
+    var svg = '<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="شارت">'+g+'<g class="io-cur"></g><rect class="io-hit" x="'+m.l+'" y="'+m.t+'" width="'+pw+'" height="'+ph+'" fill="transparent"/></svg>';
+    return {svg:svg, geo:{m:m, pw:pw, ph:ph, from:from, to:to, X:X, Y:Y, A:A}};
+  }
+
+  function ioNearest(s, t, tol){
+    var a = s.win, lo = 0, hi = a.length-1;
+    if(!a.length) return null;
+    while(hi - lo > 1){ var mid = (lo+hi) >> 1; if(a[mid].x < t) lo = mid; else hi = mid; }
+    var p = Math.abs(a[lo].x - t) <= Math.abs(a[hi].x - t) ? a[lo] : a[hi];
+    return Math.abs(p.x - t) <= tol ? p : null;
+  }
+  function ioCursor(host, ctx){
+    var g = host.querySelector('.io-cur'), hdr = host.querySelector('.io-cur-h'), t = ctx.st.cursorT;
+    var cells = $all('.io-cur-v', host);
+    cells.forEach(function(c){ c.textContent = '-'; });
+    if(hdr) hdr.textContent = '';
+    if(!g) return;
+    if(t===null){ g.innerHTML = ''; return; }
+    var geo = ctx.geo, x = geo.X(t), html = '<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+geo.m.t+'" y2="'+(geo.m.t+geo.ph)+'" stroke="#8a97a3" stroke-width="1" stroke-dasharray="3 3"/>';
+    ctx.series.forEach(function(s){
+      if(!s.visible) return;
+      var p = ioNearest(s, t, Math.max((geo.to-geo.from)*0.03, s.gap*0.6));
+      var cell = host.querySelector('.io-cur-v[data-sid="'+s.def.id+'"]');
+      if(cell) cell.textContent = p ? ioFmt(p.y) : '-';
+      if(p) html += '<circle cx="'+geo.X(p.x).toFixed(1)+'" cy="'+geo.Y(s.axis, p.y*s.scale).toFixed(1)+'" r="3.5" fill="'+s.color+'" stroke="#fff" stroke-width="1"/>';
+    });
+    g.innerHTML = html;
+    if(hdr) hdr.textContent = ioFmtT(t, true);
+  }
+
+  function ioDraw(host, ctx){
+    var wrap = host.querySelector('.io-svgwrap'); if(!wrap) return;
+    var W = Math.max(280, Math.floor(wrap.clientWidth || 340)), H = ctx.st.full ? Math.max(300, Math.floor((window.innerHeight||700)*0.55)) : 250;
+    var r = ioBuildSvg(ctx.series, ctx.from, ctx.to, W, H);
+    ctx.geo = r.geo; wrap.innerHTML = r.svg;
+    var svg = wrap.querySelector('svg');
+    function move(ev){
+      var rect = svg.getBoundingClientRect(); if(!rect.width) return;
+      var px = (ev.clientX - rect.left) * (W/rect.width);
+      var t = ctx.geo.from + (px - ctx.geo.m.l)/ctx.geo.pw*(ctx.geo.to - ctx.geo.from);
+      ctx.st.cursorT = Math.max(ctx.geo.from, Math.min(ctx.geo.to, t));
+      ioCursor(host, ctx);
+    }
+    svg.style.touchAction = 'pan-y';
+    svg.addEventListener('pointerdown', move); svg.addEventListener('pointermove', move);
+    ioCursor(host, ctx);
+  }
+
+  /* بيطلب من السيرفر قراءات أقدم لو النافذة المختارة (7/30/90 يوم أو رجوع لورا) أقدم من اللي متحمّل */
+  function ioNeedData(st){
+    var end = st.end || Date.now(), need = Math.ceil((Date.now() - (end - st.days*86400000))/86400000) + 1, steps = [30, 90, 180, 365], d = null;
+    for(var i=0; i<steps.length; i++){ if(need <= steps[i]){ d = steps[i]; break; } }
+    ensureReadingsRange(d);
+  }
+  function ioRenderCard(chart, host, canEditCharts, isDefault){
+    var st = ioSt(chart); ioNeedData(st);
+    var catMap = ioCatMap(ioCatalog());
+    var end = st.end || Date.now(), from = end - st.days*86400000;
+    var series = ioBuildSeries(chart, st, catMap);
+    var ctx = {chart:chart, st:st, series:series, from:from, to:end, geo:null};
+    var pills = [[1,'24 ساعة'],[7,'7 أيام'],[30,'30 يوم'],[90,'90 يوم']].map(function(p){ return '<button type="button" class="range-pill io-days'+(st.days===p[0]?' active':'')+'" data-d="'+p[0]+'">'+p[1]+'</button>'; }).join('');
+    var rows = series.map(function(s){
+      var tag = (s.scale!==1 ? ' <span class="hint" style="margin:0;">(×'+ioFmt(s.scale)+')</span>' : '')+(s.axis==='R' ? ' <span class="hint" style="margin:0;">[R]</span>' : '');
+      return '<tr class="'+(s.visible?'':'io-row-off')+'"><td><label class="io-sw"><input type="checkbox" class="io-tog" data-sid="'+escH(s.def.id)+'"'+(s.visible?' checked':'')+'><span></span></label></td>'+
+        '<td dir="auto"><span class="io-dot" style="background:'+s.color+';"></span>'+escH(s.meta.name)+tag+'</td><td dir="auto">'+escH(s.meta.group)+'</td><td>'+escH(s.meta.unit||'')+'</td>'+
+        '<td>'+ioFmt(s.min)+'</td><td>'+ioFmt(s.max)+'</td><td>'+ioFmt(s.avg)+'</td><td class="io-cur-v" data-sid="'+escH(s.def.id)+'">-</td></tr>';
+    }).join('');
+    host.className = 'io-card'+(st.full ? ' io-full' : '');
+    host.setAttribute('data-cid', chart.id);
+    host.innerHTML =
+      '<div class="io-head"><div class="io-title" dir="auto">'+escH(chart.title||'شارت')+'</div><div class="io-tools">'+
+        (canEditCharts ? '<button type="button" class="io-btn io-edit" title="تعديل">✏️</button>'+(isDefault ? '' : '<button type="button" class="io-btn io-del" title="حذف">🗑</button>') : '')+
+        '<button type="button" class="io-btn io-full-btn" title="ملء الشاشة">'+(st.full ? '✕' : '⛶')+'</button></div></div>'+
+      '<div class="io-ctl"><span class="io-pills">'+pills+'</span><span class="io-range"><button type="button" class="io-btn io-prev">‹</button>'+
+        '<input type="date" class="io-date" value="'+ioDayStr(end)+'"><span class="io-lbl">'+ioFmtT(from, false)+' – '+ioFmtT(end, false)+'</span><button type="button" class="io-btn io-next"'+(st.end ? '' : ' disabled')+'>›</button></span></div>'+
+      '<div class="io-svgwrap"></div>'+
+      '<button type="button" class="io-link io-tbl-toggle">'+(st.table ? 'إخفاء الجدول' : 'إظهار الجدول')+'</button>'+
+      (st.table ? '<div class="io-tbl-wrap"><table class="io-table"><thead><tr><th></th><th>Item</th><th>Group</th><th>Unit</th><th>Min</th><th>Max</th><th>Avg</th><th class="io-cur-h"></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '');
+    ioDraw(host, ctx);
+    var rerender = function(){ ioNeedData(st); ioSaveSt(chart.id); renderChartsPanel(); };
+    $all('.io-days', host).forEach(function(b){ b.addEventListener('click', function(){ st.days = parseInt(b.getAttribute('data-d'),10) || 7; rerender(); }); });
+    host.querySelector('.io-prev').addEventListener('click', function(){ var span = st.days*86400000; st.end = (st.end || Date.now()) - span; st.cursorT = null; rerender(); });
+    host.querySelector('.io-next').addEventListener('click', function(){ var span = st.days*86400000, e = (st.end || Date.now()) + span; st.end = e >= Date.now() ? null : e; st.cursorT = null; rerender(); });
+    host.querySelector('.io-date').addEventListener('change', function(){
+      if(!this.value){ return; }
+      var e = new Date(this.value+'T23:59:59').getTime(); st.end = e >= Date.now() ? null : e; st.cursorT = null; rerender();
+    });
+    host.querySelector('.io-tbl-toggle').addEventListener('click', function(){ st.table = !st.table; rerender(); });
+    host.querySelector('.io-full-btn').addEventListener('click', function(){ st.full = !st.full; renderChartsPanel(); });
+    $all('.io-tog', host).forEach(function(c){ c.addEventListener('change', function(){ var sid = c.getAttribute('data-sid'); if(c.checked) delete st.hidden[sid]; else st.hidden[sid] = true; rerender(); }); });
+    var eb = host.querySelector('.io-edit'); if(eb) eb.addEventListener('click', function(){
+      ioBuilder = JSON.parse(JSON.stringify(chart)); ioBuilder.isNew = !!isDefault;
+      if(isDefault) ioBuilder.id = genId();
+      renderChartsPanel();
+    });
+    var db2 = host.querySelector('.io-del'); if(db2) db2.addEventListener('click', function(){
+      if(!requireAdminForDelete()) return;
+      if(!confirm('تمسح الشارت "'+(chart.title||'')+'"؟')) return;
+      ioSaveCharts(customCharts.filter(function(c){ return c.id!==chart.id; })).then(function(){ logAudit('delete','charts','مسح شارت: '+(chart.title||'')); toast('اتمسح الشارت'); });
+    });
+  }
+
+  function ioSaveCharts(list){
+    customCharts = list;
+    if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(list)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
+    return db.doc('settings/customCharts').set({charts:list, updatedAt:Date.now(), updatedBy:currentUser||''});
+  }
+  function ioDefaults(){
+    var out = [], g = greenhouseGroups()[0];
+    if(g) out.push({id:'default-clim', title:'مناخ '+g.name, days:7, series:[
+      {id:'a', ref:'c|'+g.name+'|temp', color:'#D8543A', axis:'L', scale:1}, {id:'b', ref:'c|'+g.name+'|rh', color:'#2C7A8C', axis:'R', scale:1},
+      {id:'c', ref:'c|'+g.name+'|vpd', color:'#C9932F', axis:'L', scale:1}, {id:'d', ref:'c|'+g.name+'|ppfd', color:'#8C6FA2', axis:'R', scale:0.1}]});
+    if(systems[0]) out.push({id:'default-water', title:'مياه '+systemLabel(systems[0]), days:7, series:[
+      {id:'a', ref:'w|'+systems[0].id+'|irrigation|ph', color:'#2DBE6C', axis:'L', scale:1}, {id:'b', ref:'w|'+systems[0].id+'|irrigation|ec', color:'#3B82F6', axis:'L', scale:1},
+      {id:'c', ref:'w|'+systems[0].id+'|irrigation|temp', color:'#F5A623', axis:'R', scale:1}]});
+    return out;
+  }
+
+  /* منشئ الشارتات: اختار أي مقاييس وارسمها مع بعض (المدير بس) */
+  function ioOptionsHtml(cat, sel){
+    var groups = [], map = {};
+    cat.forEach(function(c){ if(!map[c.group]){ map[c.group] = []; groups.push(c.group); } map[c.group].push(c); });
+    var html = groups.map(function(g){ return '<optgroup label="'+escH(g)+'">'+map[g].map(function(c){ return '<option value="'+escH(c.ref)+'"'+(c.ref===sel?' selected':'')+'>'+escH(c.name)+(c.unit?(' ('+escH(c.unit)+')'):'')+'</option>'; }).join('')+'</optgroup>'; }).join('');
+    if(sel && !cat.some(function(c){ return c.ref===sel; })) html = '<option value="'+escH(sel)+'" selected>(غير متاح) '+escH(sel)+'</option>'+html;
+    return html;
+  }
+  function ioBuilderHtml(){
+    var b = ioBuilder, cat = ioCatalog();
+    var rows = b.series.map(function(s, i){
+      return '<div class="io-srow" data-i="'+i+'"><select class="io-f" data-f="ref">'+ioOptionsHtml(cat, s.ref)+'</select><div class="io-srow2">'+
+        '<input type="color" class="io-f io-color" data-f="color" value="'+escH(s.color||'#2C8C6F')+'">'+
+        '<select class="io-f" data-f="axis"><option value="L"'+(s.axis!=='R'?' selected':'')+'>محور يسار</option><option value="R"'+(s.axis==='R'?' selected':'')+'>محور يمين</option></select>'+
+        '<label class="io-mul">×<input type="number" step="any" class="io-f ltr" data-f="scale" value="'+escH(String(s.scale===undefined?1:s.scale))+'"></label>'+
+        '<button type="button" class="del-btn io-rm" data-i="'+i+'" title="شيل الخط">✕</button></div></div>';
+    }).join('');
+    return '<form class="entry-form io-builder" id="io-form"><h2 class="section-title" style="margin-top:0;">'+(b.isNew ? '➕ شارت جديد' : '✏️ تعديل شارت')+'</h2>'+
+      '<div class="form-grid"><div class="field-sm full"><label>اسم الشارت</label><input type="text" id="io-title" maxlength="80" required value="'+escH(b.title||'')+'"></div></div>'+
+      '<p class="hint">كل خط = أي مقياس من أي مكان (مناخ/مياه/حصاد/مكافحة...). المحور اليمين مفيد لو القيم مختلفة في الحجم، والمعامل × بيصغّر أو يكبّر الخط على الرسم بس (زي ×0.1) من غير ما يغيّر الأرقام في الجدول.</p>'+
+      '<div id="io-rows">'+rows+'</div>'+
+      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="io-add">➕ أضف خط</button></div>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الشارت</button> <button type="button" class="btn btn-ghost btn-sm" id="io-cancel">إلغاء</button></div></form>';
+  }
+  function ioWireBuilder(body){
+    var form = $('#io-form', body); if(!form) return;
+    var b = ioBuilder;
+    $('#io-title', form).addEventListener('input', function(){ b.title = this.value; });
+    $all('.io-srow', form).forEach(function(row){
+      var i = parseInt(row.getAttribute('data-i'), 10);
+      $all('.io-f', row).forEach(function(el){ el.addEventListener('change', function(){ var f = el.getAttribute('data-f'); b.series[i][f] = (f==='scale') ? el.value : el.value; }); el.addEventListener('input', function(){ if(el.getAttribute('data-f')==='scale') b.series[i].scale = el.value; }); });
+    });
+    $all('.io-rm', form).forEach(function(btn){ btn.addEventListener('click', function(){ if(b.series.length<=1){ toast('لازم يبقى فيه خط واحد على الأقل'); return; } b.series.splice(parseInt(btn.getAttribute('data-i'),10), 1); renderChartsPanel(); }); });
+    $('#io-add', form).addEventListener('click', function(){
+      if(b.series.length >= IO_MAX_SERIES){ toast('أقصى عدد خطوط '+IO_MAX_SERIES); return; }
+      var cat = ioCatalog();
+      b.series.push({id:genId(), ref:cat.length ? cat[0].ref : '', color:IO_COLORS[b.series.length % IO_COLORS.length], axis:'L', scale:1});
+      renderChartsPanel();
+    });
+    $('#io-cancel', form).addEventListener('click', function(){ ioBuilder = null; renderChartsPanel(); });
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      if(currentUserRole!=='admin'){ toast('إنشاء الشارتات للمدير بس'); return; }
+      var title = (b.title||'').trim();
+      if(!title){ toast('اكتب اسم الشارت'); return; }
+      if(!b.series.length || b.series.some(function(s){ return !s.ref; })){ toast('اختار المقياس لكل خط'); return; }
+      var chart = {id:b.id, title:title, days:b.days||7, series:b.series.map(function(s){ var sc = parseFloat(s.scale); return {id:s.id, ref:s.ref, color:s.color||'#2C8C6F', axis:s.axis==='R'?'R':'L', scale:(isFinite(sc) && sc!==0) ? sc : 1}; })};
+      var exists = customCharts.some(function(c){ return c.id===chart.id; });
+      var next = exists ? customCharts.map(function(c){ return c.id===chart.id ? chart : c; }) : customCharts.concat([chart]);
+      delete ioState[chart.id];
+      ioSaveCharts(next).then(function(){ logAudit(exists?'edit':'add','charts','شارت: '+title+' ('+chart.series.length+' خط)'); toast('اتحفظ الشارت ✅'); ioBuilder = null; renderChartsPanel(); }).catch(function(){ toast('ما اتحفظش — تأكد إنك مدير'); });
+    });
+  }
+
+  function renderChartsPanel(){
+    var body = $('#charts-body'); if(!body) return;
+    var isAdmin = currentUserRole==='admin';
+    var saved = customCharts.length > 0, charts = saved ? customCharts : ioDefaults();
+    body.innerHTML =
+      '<div class="form-actions" style="margin:0 0 10px;">'+(isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="io-new">➕ شارت جديد</button>' : '')+
+      '<span class="hint" style="margin:0;">شغّل/اقفل أي خط من المفتاح في الجدول، واسحب صباعك على الشارت تشوف القيم في الوقت ده.'+(isAdmin ? '' : ' (إنشاء الشارتات للمدير)')+'</span></div>'+
+      (ioBuilder ? ioBuilderHtml() : '')+
+      '<div id="io-list"></div>'+
+      (charts.length ? '' : '<p class="empty-note">لسه مفيش بيانات كفاية. سجّل قراءات مناخ أو مياه وهتظهر هنا شارتات جاهزة.</p>');
+    var nb = $('#io-new', body);
+    if(nb) nb.addEventListener('click', function(){
+      var cat = ioCatalog();
+      ioBuilder = {id:genId(), title:'', days:7, isNew:true, series:[{id:genId(), ref:cat.length ? cat[0].ref : '', color:IO_COLORS[0], axis:'L', scale:1}]};
+      renderChartsPanel();
+    });
+    ioWireBuilder(body);
+    var list = $('#io-list', body);
+    charts.forEach(function(c){
+      var host = document.createElement('div'); list.appendChild(host);
+      try{ ioRenderCard(c, host, isAdmin, !saved); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم الشارت.</p>'; }
+    });
+  }
+  (function(){ var tm = null; window.addEventListener('resize', function(){ clearTimeout(tm); tm = setTimeout(function(){ if(panelOn('panel-charts')) renderChartsPanel(); }, 250); }); })();
+
   function renderAll(){
     safe(applyTabVisibility);
     if(panelOn('panel-settings')) renderSettingsPanels();
     if(panelOn('panel-overview')) safe(renderSystemsOverview);
+  if(panelOn('panel-charts')) safe(renderChartsPanel);
     if(panelOn('panel-water')) renderWaterTab();
     if(panelOn('panel-climate')) safe(renderClimatePanel);
     if(panelOn('panel-tasks')) safe(renderTasksPanel);
@@ -10381,11 +10754,11 @@
   /* ---------- tabs ---------- */
   function setupTabs(){
     var panelMap = {
-      overview:'#panel-overview', water:'#panel-water', climate:'#panel-climate',
+      overview:'#panel-overview', charts:'#panel-charts', water:'#panel-water', climate:'#panel-climate',
       tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', inventory:'#panel-inventory', settings:'#panel-settings'
     };
     var renderMap = {
-      overview: renderSystemsOverview, water: renderWaterTab, climate: renderClimatePanel,
+      overview: renderSystemsOverview, charts: renderChartsPanel, water: renderWaterTab, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
       harvest: renderHarvestPanel, inventory: renderInventoryPanel, settings: renderSettingsPanels
     };
@@ -10839,6 +11212,12 @@
       console.error('nurseryPlans snapshot error', err);
     });
 
+    db.doc('settings/customCharts').onSnapshot(function(snap){
+      customCharts = (snap.exists && Array.isArray(snap.data().charts)) ? snap.data().charts : [];
+      renderAllSoon();
+    }, function(err){
+      console.error('customCharts snapshot error', err);
+    });
     db.doc('settings/cropRefs').onSnapshot(function(snap){
       cropRefs = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : null;
       renderCropRefs();
