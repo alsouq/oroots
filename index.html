@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lJzgs5fvDX2adH8Yp4xgy7pZnQAOLam6wq5iWu/3agA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WiiO27yoCMKk7Qf4t1eaCAs0dEGSOHuLkqIjZv+aeDk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -375,13 +375,25 @@
   .pest-card{background:var(--surface);border:1px solid var(--border);border-inline-start:4px solid var(--alert);border-radius:14px;padding:12px 14px;}
   .pest-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
   .pest-card.eradicated{border-inline-start:4px solid #2f9e63;} .pest-erad-info{margin:6px 0;padding:6px 10px;border-radius:8px;background:rgba(47,158,99,.12);font-size:.82rem;}
+  .wx-strip{display:flex;align-items:center;gap:16px;overflow-x:auto;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;} .wx-strip::-webkit-scrollbar{display:none;} .wx-strip:empty{display:none;}
+  .wx-clock{display:flex;flex-direction:column;align-items:center;line-height:1.25;padding-inline-end:14px;border-inline-end:1px solid var(--border);flex:none;} .wx-time{font-size:1.05rem;font-weight:800;direction:ltr;font-variant-numeric:tabular-nums;} .wx-date{font-size:.7rem;font-weight:600;color:var(--muted);}
+  .wx-toggle{flex:none;border:1px solid var(--border);background:var(--paper);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:inherit;margin-inline-start:auto;}
+  .wx-detail{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px 14px;} .wx-detail:empty{display:none;} .wx-sec{margin:10px 0 6px;font-size:.78rem;font-weight:800;color:var(--muted);}
+  .wx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;} .wx-card{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;line-height:1.3;} .wx-card small{font-size:.66rem;color:var(--muted);} .wx-card b{font-size:.92rem;font-weight:800;direction:ltr;text-align:start;} .wx-card em{font-style:normal;font-size:.64rem;color:var(--muted);}
+  .wx-hours{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;} .wx-hr{flex:none;text-align:center;font-size:.74rem;background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:6px 9px;min-width:58px;direction:ltr;line-height:1.5;}
+  .wx-days{display:grid;gap:6px;} .wx-day{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:.76rem;} .wx-day b{min-width:60px;}
+  .wx-loc{font-size:.74rem;color:var(--muted);flex:none;} .wx-chip{display:flex;flex-direction:column;align-items:center;line-height:1.25;flex:none;} .wx-chip b{font-size:.9rem;font-weight:800;direction:ltr;} .wx-chip small{font-size:.66rem;color:var(--muted);} .wx-stale{opacity:.55;}
+  .ov-h3{display:flex;align-items:center;justify-content:space-between;gap:8px;} .ov-title{flex:1;min-width:0;}
+  .ov-menu-btn,.io-menu-btn{border:none;background:transparent;color:var(--ink);font-size:1.3rem;line-height:1;padding:2px 9px;border-radius:8px;cursor:pointer;font-weight:900;font-family:inherit;} .ov-menu-btn:hover,.io-menu-btn:hover{background:var(--surface-2);}
+  .ov-menu{position:fixed;z-index:4600;min-width:190px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;} .ov-menu button{display:block;width:100%;text-align:start;background:none;border:none;color:var(--ink);padding:10px 12px;border-radius:8px;font-family:inherit;font-size:.86rem;cursor:pointer;} .ov-menu button:hover{background:var(--surface-2);} .ov-menu .ov-danger{color:var(--alert);}
   .io-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin:0 0 16px;}
   .io-card.io-full{position:fixed;inset:0;z-index:4000;margin:0;border-radius:0;overflow:auto;background:var(--paper);padding-top:calc(12px + env(safe-area-inset-top,0px));}
   .io-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;} .io-title{font-weight:800;font-size:.88rem;letter-spacing:.3px;}
   .io-tools{display:flex;gap:6px;} .io-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 10px;font-size:.8rem;cursor:pointer;font-family:inherit;} .io-btn:disabled{opacity:.35;cursor:default;}
   .io-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0;} .io-pills{display:flex;gap:6px;flex-wrap:wrap;}
-  .io-range{display:flex;align-items:center;gap:6px;margin-inline-start:auto;direction:ltr;} .io-range input[type=date]{width:auto;padding:4px 6px;font-size:.78rem;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink);} .io-lbl{font-size:.74rem;color:var(--muted);white-space:nowrap;}
-  .io-svgwrap{width:100%;direction:ltr;} .io-svgwrap svg{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none;} .io-grid{stroke:var(--border);} .io-tick{fill:var(--muted);}
+  .io-range{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-inline-start:auto;direction:ltr;} .io-range input[type=date]{width:auto;padding:4px 6px;font-size:.78rem;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink);} .io-lbl{font-size:.74rem;color:var(--muted);white-space:nowrap;}
+  .io-svgwrap{width:100%;direction:ltr;position:relative;}
+  .io-tip{position:absolute;display:none;pointer-events:none;z-index:5;max-width:240px;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:10px;padding:6px 9px;font-size:.72rem;box-shadow:0 4px 14px rgba(0,0,0,.2);} .io-tip-h{font-weight:800;margin-bottom:3px;} .io-tip-r{display:flex;align-items:center;gap:4px;white-space:nowrap;line-height:1.7;} .io-dl{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);margin:0;white-space:nowrap;} .io-svgwrap svg{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none;} .io-grid{stroke:var(--border);} .io-tick{fill:var(--muted);}
   .io-link{color:#1b6fa8;font-size:.76rem;font-weight:700;cursor:pointer;background:none;border:none;padding:6px 0;font-family:inherit;}
   .io-tbl-wrap{overflow-x:auto;direction:ltr;} table.io-table{width:100%;border-collapse:collapse;font-size:.72rem;min-width:560px;} .io-table th{color:var(--muted);font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;} .io-table td{padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:left;}
   .io-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px;} .io-row-off td{opacity:.45;} .io-cur-v,.io-cur-h{font-weight:700;color:var(--ink);}
@@ -741,8 +753,10 @@
       <button class="icon-btn" id="btn-logout" title="تسجيل الخروج">⎋</button>
     </div>
   </header>
+<div class="wx-strip" id="wx-strip" aria-label="التاريخ والوقت والطقس"></div>
+<div class="wx-detail" id="wx-detail"></div>
 
-  <nav class="tabs" id="tabs">
+<nav class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="overview" style="--tab-color:var(--ink)">نظرة عامة</button>
 <button class="tab-btn" data-tab="charts" style="--tab-color:var(--water)">📈 الشارتات</button>
     <button class="tab-btn" data-tab="water" style="--tab-color:var(--brand)">بيانات المياه</button>
@@ -775,6 +789,7 @@
       <p class="hint" style="margin-top:-4px;">اختار الصوبة، وبعدين اختار النظام، عشان تشوف كل بياناته في مكان واحد.</p>
       <div id="systems-overview"></div>
       <div id="overview-system-detail"></div>
+<div id="ov-custom"></div>
 
       <h2 class="section-title">ملخص سريع (كل الصوب)</h2>
       <div class="climate-stats" id="overview-quickstats"></div>
@@ -939,6 +954,32 @@
       </div>
 
       <div class="settings-card">
+        <h3>🌤️ الطقس في الشريط العلوي</h3>
+        <p class="hint">بيظهر فوق الصفحة مع التاريخ والوقت: الحرارة والرطوبة والرياح والإشعاع للمنطقة اللي تحددها هنا (المصدر Open-Meteo، بيتحدّث كل 10 دقايق). ابحث عن اسم المنطقة، أو اكتب إحداثيات المزرعة بالظبط.</p>
+        <div class="range-row">
+          <span class="metric-name">ابحث عن المنطقة</span>
+          <input type="text" id="wx-q" placeholder="مثال: القاهرة أو Cairo" style="flex:1;min-width:120px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;">
+          <button type="button" class="btn btn-ghost btn-sm" id="wx-search">بحث</button>
+        </div>
+        <div id="wx-results"></div>
+        <div class="range-row">
+          <span class="metric-name">اسم المنطقة</span>
+          <input type="text" id="wx-name" maxlength="60" style="flex:1;min-width:120px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;">
+        </div>
+        <div class="range-row">
+          <span class="metric-name">خط العرض (Lat)</span>
+          <input type="number" step="any" id="wx-lat" class="ltr" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;">
+        </div>
+        <div class="range-row">
+          <span class="metric-name">خط الطول (Lon)</span>
+          <input type="number" step="any" id="wx-lon" class="ltr" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-family:inherit;">
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-save-wx">حفظ الموقع</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-wx">إخفاء الطقس</button>
+        <span class="save-msg hidden" id="msg-wx">تم الحفظ</span>
+      </div>
+
+      <div class="settings-card">
         <h3>نسخة احتياطية كاملة</h3>
         <p class="hint">ملف واحد فيه كل بيانات النظام (الأنظمة والقراءات والمهام والمخزون والحسابات وكل حاجة تانية) — للنقل بين الأجهزة أو كأمان إضافي. الاستعادة بتكتب البيانات بس ومش بتغيّر حسابات الدخول، وخليه في مكان آمن لأنه فيه كل بيانات المزرعة.</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -1033,7 +1074,7 @@
   /* ---------- رسالة تأكيد قبل أي حفظ بيانات ----------
      بتتسجّل أول حاجة (capture) عشان تسبق كل معالجات الحفظ؛ لو المستخدم رفض، الحفظ بيتوقف خالص. */
   (function(){
-    var SAVE_BTN_SEL = '#btn-save-ranges, #btn-save-remind, #qe-save, #btn-save-target-profile, #btn-save-recipe, #btn-calc-plan, .op-save, #q-imp-save';
+    var SAVE_BTN_SEL = '#btn-save-ranges, #btn-save-remind, #btn-save-wx, #btn-clear-wx, #qe-save, #btn-save-target-profile, #btn-save-recipe, #btn-calc-plan, .op-save, #q-imp-save';
     function clean(t){ return String(t||'').replace(/\s+/g,' ').trim(); }
     function ask(label){ return window.confirm('تأكيد الحفظ\n\n'+(label ? ('«'+label+'»\n\n') : '')+'تحفظ البيانات دي؟'); }
     function stopIt(ev){ ev.preventDefault(); ev.stopImmediatePropagation(); }
@@ -1542,7 +1583,7 @@
     var old = Object.assign({}, settings);
     return saveSettingsRaw(patch).then(function(r){
       try{
-        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)'};
+        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)', weatherName:'منطقة الطقس', weatherLat:'خط عرض الطقس', weatherLon:'خط طول الطقس'};
         Object.keys(patch||{}).forEach(function(k){
           if(k==='accessCode'){ if(old.accessCode!==patch.accessCode) logAudit('edit', 'admin', 'غيّر كود الدخول'); return; }
           if(JSON.stringify(old[k])!==JSON.stringify(patch[k])){
@@ -10369,6 +10410,7 @@
   /* بيرسم التاب المفتوح بس — باقي التابات بتترسم أول ما تفتحها (setupTabs) */
   /* ====================== الشارتات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + شارتات مخصصة ====================== */
   var customCharts = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_customcharts') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
+  var ovPrefs = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_ovprefs') || 'null'); if(o && typeof o==='object') return {hidden:o.hidden || {}, titles:o.titles || {}}; }catch(e){} return {hidden:{}, titles:{}}; })();
   var ioState = {}, ioBuilder = null, IO_MAX_SERIES = 12;
   var IO_COLORS = ['#2C8C6F','#D8543A','#2C7A8C','#C9932F','#8C6FA2','#3B82F6','#6FA22E','#E0457B','#7A5C2E','#0F766E'];
   var CL_METRICS = [
@@ -10393,7 +10435,7 @@
     var id = chart.id;
     if(!ioState[id]){
       var saved = {}; try{ saved = (JSON.parse(localStorage.getItem('oroots_iostate') || '{}') || {})[id] || {}; }catch(e){}
-      ioState[id] = {days: saved.days || chart.days || 7, end: null, hidden: saved.hidden || {}, table: saved.table !== false, cursorT: null, full: false};
+      ioState[id] = {days: saved.days || chart.days || 7, end: null, hidden: saved.hidden || {}, table: saved.table !== false, cursorT: null, full: false, custom: null};
     }
     return ioState[id];
   }
@@ -10410,6 +10452,18 @@
     systems.forEach(function(sys){
       SOURCES.forEach(function(src){
         WT_METRICS.forEach(function(m){ out.push({ref:'w|'+sys.id+'|'+src.key+'|'+m.k, group:'💧 مياه — '+systemLabel(sys)+' — '+src.label, name:m.n, unit:m.u}); });
+      });
+    });
+    greenhouseGroups().forEach(function(g){
+      out.push({ref:'cd|'+g.name+'|dli', group:'🌡️ مناخ — '+g.name, name:'DLI اليومي', unit:'mol/m²/يوم'});
+      out.push({ref:'cd|'+g.name+'|rad', group:'🌡️ مناخ — '+g.name, name:'الإشعاع التراكمي اليومي', unit:'J/cm²'});
+    });
+    systems.forEach(function(sys){
+      out.push({ref:'k|'+sys.id+'|point', group:'💧 معايرة الري — '+systemLabel(sys), name:'تصرف النقطة الواحدة', unit:'مل/دقيقة'});
+      out.push({ref:'k|'+sys.id+'|sys', group:'💧 معايرة الري — '+systemLabel(sys), name:'إجمالي تصرف النظام', unit:'لتر/دقيقة'});
+      harvestCropsForSystem(sys.id).forEach(function(c){
+        var first = harvestForSystem(sys.id).filter(function(h){ return h.cropName===c; })[0];
+        out.push({ref:'hs|'+sys.id+'|'+c, group:'🥬 حصاد — '+systemLabel(sys), name:c+' (كل تسجيل)', unit:(first && HARVEST_UNIT_LABELS[first.unit]) || ''});
       });
     });
     var crops = {}; harvestLog.forEach(function(h){ if(h.cropName) crops[h.cropName] = 1; });
@@ -10457,6 +10511,15 @@
         var v = parseFloat(x.count), d = x.placedDate;
         if(isFinite(v) && d) pts.push({x:new Date(d+'T12:00:00').getTime(), y:v});
       });
+    } else if(t==='cd'){
+      dailySeriesFor(flattenEntries('climate', p[1]), p[2]==='dli' ? 'dli' : 'radiation').forEach(function(q){ pts.push({x:q.x, y:q.y}); });
+    } else if(t==='k'){
+      calibForSystem(p[1]).forEach(function(c){
+        var v = p[2]==='point' ? (c.perPointLpm*1000) : c.systemLpm, x = new Date(c.ts).getTime();
+        if(v!==null && v!==undefined && isFinite(v) && isFinite(x)) pts.push({x:x, y:v});
+      });
+    } else if(t==='hs'){
+      harvestForSystem(p[1]).forEach(function(h){ if(h.cropName!==p[2]) return; var q = parseFloat(h.quantity), x = new Date(h.ts).getTime(); if(isFinite(q) && isFinite(x)) pts.push({x:x, y:q}); });
     }
     pts.sort(function(a,b){ return a.x - b.x; });
     return pts.filter(function(q){ return isFinite(q.x); });
@@ -10483,8 +10546,14 @@
   }
   function ioGap(win){ return win.length > 1 ? (win[win.length-1].x - win[0].x)/(win.length-1) : 0; }
 
+  /* نافذة الوقت: فترة مخصصة (من تاريخ لتاريخ) أو آخر N يوم */
+  function ioWin(st){
+    if(st.custom) return {from:st.custom.from, to:st.custom.to};
+    var to = st.end || Date.now();
+    return {from:to - st.days*86400000, to:to};
+  }
   function ioBuildSeries(chart, st, catMap){
-    var end = st.end || Date.now(), from = end - st.days*86400000;
+    var w = ioWin(st), end = w.to, from = w.from;
     return (chart.series || []).map(function(d){
       var meta = catMap[d.ref] || {name:String(d.ref), group:'(غير متاح)', unit:''};
       var scale = parseFloat(d.scale); if(!isFinite(scale) || scale===0) scale = 1;
@@ -10540,25 +10609,36 @@
     var cells = $all('.io-cur-v', host);
     cells.forEach(function(c){ c.textContent = '-'; });
     if(hdr) hdr.textContent = '';
+    var tip = host.querySelector('.io-tip');
+    if(tip) tip.style.display = 'none';
     if(!g) return;
     if(t===null){ g.innerHTML = ''; return; }
     var geo = ctx.geo, x = geo.X(t), html = '<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+geo.m.t+'" y2="'+(geo.m.t+geo.ph)+'" stroke="#8a97a3" stroke-width="1" stroke-dasharray="3 3"/>';
+    var rows = [];
     ctx.series.forEach(function(s){
       if(!s.visible) return;
       var p = ioNearest(s, t, Math.max((geo.to-geo.from)*0.03, s.gap*0.6));
+      if(p) rows.push('<div class="io-tip-r" dir="auto"><span class="io-dot" style="background:'+s.color+';"></span>'+escH(s.meta.name)+': <b>'+ioFmt(p.y)+'</b> '+escH(s.meta.unit||'')+'</div>');
       var cell = host.querySelector('.io-cur-v[data-sid="'+s.def.id+'"]');
       if(cell) cell.textContent = p ? ioFmt(p.y) : '-';
       if(p) html += '<circle cx="'+geo.X(p.x).toFixed(1)+'" cy="'+geo.Y(s.axis, p.y*s.scale).toFixed(1)+'" r="3.5" fill="'+s.color+'" stroke="#fff" stroke-width="1"/>';
     });
     g.innerHTML = html;
     if(hdr) hdr.textContent = ioFmtT(t, true);
+    if(tip && rows.length){
+      tip.innerHTML = '<div class="io-tip-h">'+ioFmtT(t, true)+'</div>'+rows.join('');
+      tip.style.display = 'block';
+      var total = geo.m.l + geo.pw + geo.m.r, cw = (tip.parentNode && tip.parentNode.clientWidth) || total, px = x*(cw/total), tw = tip.offsetWidth || 170;
+      tip.style.left = ((px + 14 + tw > cw) ? Math.max(0, px - 14 - tw) : (px + 14))+'px';
+      tip.style.top = (geo.m.t + 4)+'px';
+    }
   }
 
   function ioDraw(host, ctx){
     var wrap = host.querySelector('.io-svgwrap'); if(!wrap) return;
     var W = Math.max(280, Math.floor(wrap.clientWidth || 340)), H = ctx.st.full ? Math.max(300, Math.floor((window.innerHeight||700)*0.55)) : 250;
     var r = ioBuildSvg(ctx.series, ctx.from, ctx.to, W, H);
-    ctx.geo = r.geo; wrap.innerHTML = r.svg;
+    ctx.geo = r.geo; wrap.innerHTML = r.svg+'<div class="io-tip"></div>';
     var svg = wrap.querySelector('svg');
     function move(ev){
       var rect = svg.getBoundingClientRect(); if(!rect.width) return;
@@ -10569,22 +10649,23 @@
     }
     svg.style.touchAction = 'pan-y';
     svg.addEventListener('pointerdown', move); svg.addEventListener('pointermove', move);
+    svg.addEventListener('pointerleave', function(ev){ if(ev.pointerType==='mouse'){ ctx.st.cursorT = null; ioCursor(host, ctx); } });
     ioCursor(host, ctx);
   }
 
   /* بيطلب من السيرفر قراءات أقدم لو النافذة المختارة (7/30/90 يوم أو رجوع لورا) أقدم من اللي متحمّل */
   function ioNeedData(st){
-    var end = st.end || Date.now(), need = Math.ceil((Date.now() - (end - st.days*86400000))/86400000) + 1, steps = [30, 90, 180, 365], d = null;
+    var w = ioWin(st), need = Math.ceil((Date.now() - w.from)/86400000) + 1, steps = [30, 90, 180, 365], d = null;
     for(var i=0; i<steps.length; i++){ if(need <= steps[i]){ d = steps[i]; break; } }
     ensureReadingsRange(d);
   }
   function ioRenderCard(chart, host, canEditCharts, isDefault){
     var st = ioSt(chart); ioNeedData(st);
     var catMap = ioCatMap(ioCatalog());
-    var end = st.end || Date.now(), from = end - st.days*86400000;
+    var w = ioWin(st), end = w.to, from = w.from, live = st.custom ? (st.custom.to >= Date.now() - 60000) : !st.end;
     var series = ioBuildSeries(chart, st, catMap);
     var ctx = {chart:chart, st:st, series:series, from:from, to:end, geo:null};
-    var pills = [[1,'24 ساعة'],[7,'7 أيام'],[30,'30 يوم'],[90,'90 يوم']].map(function(p){ return '<button type="button" class="range-pill io-days'+(st.days===p[0]?' active':'')+'" data-d="'+p[0]+'">'+p[1]+'</button>'; }).join('');
+    var pills = [[1,'24 ساعة'],[7,'7 أيام'],[30,'30 يوم'],[90,'90 يوم']].map(function(p){ return '<button type="button" class="range-pill io-days'+(!st.custom && st.days===p[0] ? ' active' : '')+'" data-d="'+p[0]+'">'+p[1]+'</button>'; }).join('');
     var rows = series.map(function(s){
       var tag = (s.scale!==1 ? ' <span class="hint" style="margin:0;">(×'+ioFmt(s.scale)+')</span>' : '')+(s.axis==='R' ? ' <span class="hint" style="margin:0;">[R]</span>' : '');
       return '<tr class="'+(s.visible?'':'io-row-off')+'"><td><label class="io-sw"><input type="checkbox" class="io-tog" data-sid="'+escH(s.def.id)+'"'+(s.visible?' checked':'')+'><span></span></label></td>'+
@@ -10595,42 +10676,54 @@
     host.setAttribute('data-cid', chart.id);
     host.innerHTML =
       '<div class="io-head"><div class="io-title" dir="auto">'+escH(chart.title||'شارت')+'</div><div class="io-tools">'+
-        (canEditCharts ? '<button type="button" class="io-btn io-edit" title="تعديل">✏️</button>'+(isDefault ? '' : '<button type="button" class="io-btn io-del" title="حذف">🗑</button>') : '')+
-        '<button type="button" class="io-btn io-full-btn" title="ملء الشاشة">'+(st.full ? '✕' : '⛶')+'</button></div></div>'+
+        '<button type="button" class="io-btn io-full-btn" title="ملء الشاشة">'+(st.full ? '✕' : '⛶')+'</button>'+
+        (canEditCharts ? '<button type="button" class="io-menu-btn" title="خيارات الشارت" aria-label="خيارات الشارت">⋮</button>' : '')+'</div></div>'+
       '<div class="io-ctl"><span class="io-pills">'+pills+'</span><span class="io-range"><button type="button" class="io-btn io-prev">‹</button>'+
-        '<input type="date" class="io-date" value="'+ioDayStr(end)+'"><span class="io-lbl">'+ioFmtT(from, false)+' – '+ioFmtT(end, false)+'</span><button type="button" class="io-btn io-next"'+(st.end ? '' : ' disabled')+'>›</button></span></div>'+
+        '<label class="io-dl">من <input type="date" class="io-from" value="'+ioDayStr(from)+'" max="'+ioDayStr(Date.now())+'"></label>'+
+        '<label class="io-dl">إلى <input type="date" class="io-to" value="'+ioDayStr(end)+'" max="'+ioDayStr(Date.now())+'"></label>'+
+        '<button type="button" class="io-btn io-next"'+(live ? ' disabled' : '')+'>›</button></span></div>'+
       '<div class="io-svgwrap"></div>'+
       '<button type="button" class="io-link io-tbl-toggle">'+(st.table ? 'إخفاء الجدول' : 'إظهار الجدول')+'</button>'+
       (st.table ? '<div class="io-tbl-wrap"><table class="io-table"><thead><tr><th></th><th>Item</th><th>Group</th><th>Unit</th><th>Min</th><th>Max</th><th>Avg</th><th class="io-cur-h"></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '');
     ioDraw(host, ctx);
-    var rerender = function(){ ioNeedData(st); ioSaveSt(chart.id); renderChartsPanel(); };
-    $all('.io-days', host).forEach(function(b){ b.addEventListener('click', function(){ st.days = parseInt(b.getAttribute('data-d'),10) || 7; rerender(); }); });
-    host.querySelector('.io-prev').addEventListener('click', function(){ var span = st.days*86400000; st.end = (st.end || Date.now()) - span; st.cursorT = null; rerender(); });
-    host.querySelector('.io-next').addEventListener('click', function(){ var span = st.days*86400000, e = (st.end || Date.now()) + span; st.end = e >= Date.now() ? null : e; st.cursorT = null; rerender(); });
-    host.querySelector('.io-date').addEventListener('change', function(){
-      if(!this.value){ return; }
-      var e = new Date(this.value+'T23:59:59').getTime(); st.end = e >= Date.now() ? null : e; st.cursorT = null; rerender();
+    var rerender = function(){ ioNeedData(st); ioSaveSt(chart.id); ioRefresh(); };
+    $all('.io-days', host).forEach(function(b){ b.addEventListener('click', function(){ st.days = parseInt(b.getAttribute('data-d'),10) || 7; st.custom = null; rerender(); }); });
+    host.querySelector('.io-prev').addEventListener('click', function(){
+      var w2 = ioWin(st), span = w2.to - w2.from;
+      if(st.custom) st.custom = {from:w2.from - span, to:w2.to - span}; else st.end = w2.to - span;
+      st.cursorT = null; rerender();
     });
+    host.querySelector('.io-next').addEventListener('click', function(){
+      var w2 = ioWin(st), span = w2.to - w2.from, now = Date.now();
+      if(st.custom){ var nt = Math.min(now, w2.to + span); st.custom = {from:nt - span, to:nt}; }
+      else { var e = (st.end || now) + span; st.end = e >= now ? null : e; }
+      st.cursorT = null; rerender();
+    });
+    function applyRange(){
+      var f = host.querySelector('.io-from').value, t = host.querySelector('.io-to').value;
+      if(!f || !t) return;
+      var a1 = new Date(f+'T00:00:00').getTime(), b1 = new Date(t+'T23:59:59').getTime();
+      if(b1 < a1){ a1 = new Date(t+'T00:00:00').getTime(); b1 = new Date(f+'T23:59:59').getTime(); }
+      st.custom = {from:a1, to:b1}; st.cursorT = null; rerender();
+    }
+    host.querySelector('.io-from').addEventListener('change', applyRange);
+    host.querySelector('.io-to').addEventListener('change', applyRange);
     host.querySelector('.io-tbl-toggle').addEventListener('click', function(){ st.table = !st.table; rerender(); });
-    host.querySelector('.io-full-btn').addEventListener('click', function(){ st.full = !st.full; renderChartsPanel(); });
+    host.querySelector('.io-full-btn').addEventListener('click', function(){ st.full = !st.full; ioRefresh(); });
     $all('.io-tog', host).forEach(function(c){ c.addEventListener('change', function(){ var sid = c.getAttribute('data-sid'); if(c.checked) delete st.hidden[sid]; else st.hidden[sid] = true; rerender(); }); });
-    var eb = host.querySelector('.io-edit'); if(eb) eb.addEventListener('click', function(){
-      ioBuilder = JSON.parse(JSON.stringify(chart)); ioBuilder.isNew = !!isDefault;
-      if(isDefault) ioBuilder.id = genId();
-      renderChartsPanel();
-    });
-    var db2 = host.querySelector('.io-del'); if(db2) db2.addEventListener('click', function(){
-      if(!requireAdminForDelete()) return;
-      if(!confirm('تمسح الشارت "'+(chart.title||'')+'"؟')) return;
-      ioSaveCharts(customCharts.filter(function(c){ return c.id!==chart.id; })).then(function(){ logAudit('delete','charts','مسح شارت: '+(chart.title||'')); toast('اتمسح الشارت'); });
-    });
+    var mb = host.querySelector('.io-menu-btn');
+    if(mb) mb.addEventListener('click', function(ev){ ev.stopPropagation(); ovShowMenu(mb, {kind:'custom', chart:chart, isDefault:isDefault}); });
   }
 
-  function ioSaveCharts(list){
-    customCharts = list;
-    if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(list)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
-    return db.doc('settings/customCharts').set({charts:list, updatedAt:Date.now(), updatedBy:currentUser||''});
+  function ioSaveAll(list, ov){
+    customCharts = list; if(ov) ovPrefs = ov;
+    if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(customCharts)); localStorage.setItem('oroots_ovprefs', JSON.stringify(ovPrefs)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
+    return db.doc('settings/customCharts').set({charts:customCharts, ov:ovPrefs, updatedAt:Date.now(), updatedBy:currentUser||''});
   }
+  function ioSaveCharts(list){ return ioSaveAll(list, null); }
+  /* أول مرة بنعدّل: الشارتات الجاهزة بتتحفظ كلها عشان ما تختفيش */
+  function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
+  function ioRefresh(){ if(panelOn('panel-overview')) safe(renderOvCustom); if(panelOn('panel-charts')) renderChartsPanel(); }
   function ioDefaults(){
     var out = [], g = greenhouseGroups()[0];
     if(g) out.push({id:'default-clim', title:'مناخ '+g.name, days:7, series:[
@@ -10674,25 +10767,27 @@
       var i = parseInt(row.getAttribute('data-i'), 10);
       $all('.io-f', row).forEach(function(el){ el.addEventListener('change', function(){ var f = el.getAttribute('data-f'); b.series[i][f] = (f==='scale') ? el.value : el.value; }); el.addEventListener('input', function(){ if(el.getAttribute('data-f')==='scale') b.series[i].scale = el.value; }); });
     });
-    $all('.io-rm', form).forEach(function(btn){ btn.addEventListener('click', function(){ if(b.series.length<=1){ toast('لازم يبقى فيه خط واحد على الأقل'); return; } b.series.splice(parseInt(btn.getAttribute('data-i'),10), 1); renderChartsPanel(); }); });
+    $all('.io-rm', form).forEach(function(btn){ btn.addEventListener('click', function(){ if(b.series.length<=1){ toast('لازم يبقى فيه خط واحد على الأقل'); return; } b.series.splice(parseInt(btn.getAttribute('data-i'),10), 1); ioRefresh(); }); });
     $('#io-add', form).addEventListener('click', function(){
       if(b.series.length >= IO_MAX_SERIES){ toast('أقصى عدد خطوط '+IO_MAX_SERIES); return; }
       var cat = ioCatalog();
       b.series.push({id:genId(), ref:cat.length ? cat[0].ref : '', color:IO_COLORS[b.series.length % IO_COLORS.length], axis:'L', scale:1});
-      renderChartsPanel();
+      ioRefresh();
     });
-    $('#io-cancel', form).addEventListener('click', function(){ ioBuilder = null; renderChartsPanel(); });
+    $('#io-cancel', form).addEventListener('click', function(){ ioBuilder = null; ioRefresh(); });
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
       if(currentUserRole!=='admin'){ toast('إنشاء الشارتات للمدير بس'); return; }
       var title = (b.title||'').trim();
       if(!title){ toast('اكتب اسم الشارت'); return; }
       if(!b.series.length || b.series.some(function(s){ return !s.ref; })){ toast('اختار المقياس لكل خط'); return; }
-      var chart = {id:b.id, title:title, days:b.days||7, series:b.series.map(function(s){ var sc = parseFloat(s.scale); return {id:s.id, ref:s.ref, color:s.color||'#2C8C6F', axis:s.axis==='R'?'R':'L', scale:(isFinite(sc) && sc!==0) ? sc : 1}; })};
-      var exists = customCharts.some(function(c){ return c.id===chart.id; });
-      var next = exists ? customCharts.map(function(c){ return c.id===chart.id ? chart : c; }) : customCharts.concat([chart]);
+      var chart = {id:b.id, title:title, days:b.days||7, ov:!!b.ov, series:b.series.map(function(s){ var sc = parseFloat(s.scale); return {id:s.id, ref:s.ref, color:s.color||'#2C8C6F', axis:s.axis==='R'?'R':'L', scale:(isFinite(sc) && sc!==0) ? sc : 1}; })};
+      var base = ioMaterialized(), exists = base.some(function(c){ return c.id===chart.id; });
+      var next = exists ? base.map(function(c){ return c.id===chart.id ? chart : c; }) : base.concat([chart]);
+      var ovNext = null;
+      if(b.replaces){ ovPrefs.hidden[b.replaces] = true; ovNext = ovPrefs; }
       delete ioState[chart.id];
-      ioSaveCharts(next).then(function(){ logAudit(exists?'edit':'add','charts','شارت: '+title+' ('+chart.series.length+' خط)'); toast('اتحفظ الشارت ✅'); ioBuilder = null; renderChartsPanel(); }).catch(function(){ toast('ما اتحفظش — تأكد إنك مدير'); });
+      ioSaveAll(next, ovNext).then(function(){ logAudit(exists?'edit':'add','charts','شارت: '+title+' ('+chart.series.length+' خط)'); toast('اتحفظ الشارت ✅'); ioBuilder = null; ioRefresh(); }).catch(function(){ toast('ما اتحفظش — تأكد إنك مدير'); });
     });
   }
 
@@ -10703,13 +10798,13 @@
     body.innerHTML =
       '<div class="form-actions" style="margin:0 0 10px;">'+(isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="io-new">➕ شارت جديد</button>' : '')+
       '<span class="hint" style="margin:0;">شغّل/اقفل أي خط من المفتاح في الجدول، واسحب صباعك على الشارت تشوف القيم في الوقت ده.'+(isAdmin ? '' : ' (إنشاء الشارتات للمدير)')+'</span></div>'+
-      (ioBuilder ? ioBuilderHtml() : '')+
+      ((ioBuilder && ioBuilder.ctx!=='ov') ? ioBuilderHtml() : '')+
       '<div id="io-list"></div>'+
       (charts.length ? '' : '<p class="empty-note">لسه مفيش بيانات كفاية. سجّل قراءات مناخ أو مياه وهتظهر هنا شارتات جاهزة.</p>');
     var nb = $('#io-new', body);
     if(nb) nb.addEventListener('click', function(){
       var cat = ioCatalog();
-      ioBuilder = {id:genId(), title:'', days:7, isNew:true, series:[{id:genId(), ref:cat.length ? cat[0].ref : '', color:IO_COLORS[0], axis:'L', scale:1}]};
+      ioBuilder = {id:genId(), title:'', days:7, isNew:true, ctx:'tab', series:[{id:genId(), ref:cat.length ? cat[0].ref : '', color:IO_COLORS[0], axis:'L', scale:1}]};
       renderChartsPanel();
     });
     ioWireBuilder(body);
@@ -10719,12 +10814,333 @@
       try{ ioRenderCard(c, host, isAdmin, !saved); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم الشارت.</p>'; }
     });
   }
-  (function(){ var tm = null; window.addEventListener('resize', function(){ clearTimeout(tm); tm = setTimeout(function(){ if(panelOn('panel-charts')) renderChartsPanel(); }, 250); }); })();
+  /* ====================== نظرة عامة: قايمة ⋮ لكل شارت (تعديل / تغيير الاسم / تكرار / إزالة) ====================== */
+  /* بيحوّل أي شارت جاهز في نظرة عامة لتعريف قابل للتعديل (خطوط من الكتالوج) */
+  function ovDefFor(id, title){
+    var ser = [], m, sysId = overviewSystemId, gh = overviewGreenhouse;
+    function one(ref, color){ ser.push({ref:ref, color:color}); }
+    if((m = /^ov-chart-water-(ph|ec|temp)$/.exec(id))) systems.forEach(function(sy, i){ one('w|'+sy.id+'|irrigation|'+m[1], paletteColor(i)); });
+    else if(id==='ov-chart-water-calib') systems.forEach(function(sy, i){ one('k|'+sy.id+'|point', paletteColor(i)); });
+    else if((m = /^ov-chart-climate-(temp|rh|vpd)$/.exec(id))) greenhouseGroups().forEach(function(g, i){ one('c|'+g.name+'|'+m[1], paletteColor(i)); });
+    else if((m = /^ovd-w-(ph|ec|temp)$/.exec(id))){ if(sysId) SOURCES.forEach(function(s){ one('w|'+sysId+'|'+s.key+'|'+m[1], s.colorHex); }); }
+    else if(id==='ovd-calib-point'){ if(sysId) one('k|'+sysId+'|point', '#2C7A8C'); }
+    else if(id==='ovd-calib-sys'){ if(sysId) one('k|'+sysId+'|sys', '#C9932F'); }
+    else if((m = /^ovd-cl-(temp|rh|vpd|lux|ppfd)$/.exec(id))){ var cc = {temp:'#D8543A', rh:'#2C7A8C', vpd:'#C9932F', lux:'#8C6FA2', ppfd:'#2C8C6F'}; if(gh) one('c|'+gh+'|'+m[1], cc[m[1]]); }
+    else if(id==='ovd-cl-ahhd'){ if(gh){ one('c|'+gh+'|ah', '#6FA22E'); one('c|'+gh+'|hd', '#D8543A'); } }
+    else if(id==='ovd-cl-dli'){ if(gh) one('cd|'+gh+'|dli', '#2C8C6F'); }
+    else if(id==='ovd-cl-rad'){ if(gh) one('cd|'+gh+'|rad', '#8C6FA2'); }
+    else if((m = /^ovd-hv-(\d+)$/.exec(id))){ var crop = sysId ? harvestCropsForSystem(sysId)[parseInt(m[1], 10)] : null; if(crop) one('hs|'+sysId+'|'+crop, '#C9932F'); }
+    else if(id==='ovd-pests'){ if(gh) one('p|'+gh+'|*', '#D8543A'); }
+    if(!ser.length) return null;
+    ser.forEach(function(s){ s.id = genId(); s.axis = 'L'; s.scale = 1; });
+    return {id:genId(), title:title, days:30, ov:true, series:ser};
+  }
+  function ovCloseMenu(){ var m = document.getElementById('ov-menu'); if(m && m.parentNode) m.parentNode.removeChild(m); }
+  function ovShowMenu(btn, ctx){
+    ovCloseMenu();
+    var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
+    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل الشارت</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار الشارت</button><button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة الشارت' : 'حذف الشارت')+'</button>';
+    document.body.appendChild(m);
+    var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 190;
+    m.style.top = Math.min(r.bottom + 4, (window.innerHeight || 700) - 190)+'px';
+    m.style.left = Math.max(8, Math.min((window.innerWidth || 360) - mw - 8, r.left))+'px';
+    $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var a = b.getAttribute('data-a'); ovCloseMenu(); ovAction(a, ctx); }); });
+  }
+  function ovScrollToBuilder(){ setTimeout(function(){ var f = document.getElementById('io-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 80); }
+  function ovAction(a, ctx){
+    if(currentUserRole!=='admin'){ toast('تعديل الشارتات للمدير بس'); return; }
+    if(ctx.kind==='builtin') ovBuiltinAction(a, ctx); else ovCustomAction(a, ctx);
+  }
+  function ovBuiltinAction(a, ctx){
+    var id = ctx.id, cur = ctx.title || ctx.orig || id;
+    if(a==='rename'){
+      var nt = window.prompt('اسم الشارت:', cur); if(nt===null) return; nt = nt.trim(); if(!nt) return;
+      ovPrefs.titles[id] = nt;
+      ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('edit','charts','غيّر اسم شارت: '+cur+' ← '+nt); toast('اتغيّر الاسم'); });
+      return;
+    }
+    if(a==='del'){
+      if(!confirm('تشيل الشارت "'+cur+'" من نظرة عامة؟\n(تقدر ترجّعه من زر "إظهار الشارتات المخفية")')) return;
+      ovPrefs.hidden[id] = true;
+      ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('delete','charts','شال شارت من نظرة عامة: '+cur); toast('اتشال الشارت'); });
+      return;
+    }
+    var def = ovDefFor(id, cur);
+    if(!def){ toast('الشارت ده لسه مفيهوش بيانات تتعدّل'); return; }
+    if(a==='dup'){
+      def.title = cur+' (نسخة)';
+      ioSaveAll(ioMaterialized().concat([def]), null).then(function(){ logAudit('add','charts','نسخ شارت: '+cur); toast('اتعمل نسخة في قسم "شارتاتي" تحت'); });
+      return;
+    }
+    if(a==='edit'){ def.ctx = 'ov'; def.isNew = true; def.replaces = id; ioBuilder = def; ioRefresh(); ovScrollToBuilder(); }
+  }
+  function ovCustomAction(a, ctx){
+    var chart = ctx.chart, list = ioMaterialized(), i = -1;
+    for(var k=0; k<list.length; k++){ if(list[k].id===chart.id){ i = k; break; } }
+    if(i < 0){ toast('الشارت مش موجود'); return; }
+    if(a==='rename'){
+      var nt = window.prompt('اسم الشارت:', list[i].title || ''); if(nt===null) return; nt = nt.trim(); if(!nt) return;
+      list[i] = Object.assign({}, list[i], {title:nt});
+      ioSaveAll(list, null).then(function(){ logAudit('edit','charts','غيّر اسم شارت: '+nt); toast('اتغيّر الاسم'); });
+    } else if(a==='del'){
+      if(!confirm('تمسح الشارت "'+(list[i].title || '')+'"؟')) return;
+      var removed = list.splice(i, 1)[0];
+      ioSaveAll(list, null).then(function(){ logAudit('delete','charts','مسح شارت: '+(removed.title || '')); toast('اتمسح الشارت'); });
+    } else if(a==='dup'){
+      var cp = JSON.parse(JSON.stringify(list[i])); cp.id = genId(); cp.title = (cp.title || 'شارت')+' (نسخة)';
+      cp.series.forEach(function(s){ s.id = genId(); });
+      list.splice(i+1, 0, cp);
+      ioSaveAll(list, null).then(function(){ logAudit('add','charts','نسخ شارت: '+(list[i].title || '')); toast('اتعمل نسخة من الشارت'); });
+    } else if(a==='edit'){
+      ioBuilder = JSON.parse(JSON.stringify(list[i])); ioBuilder.isNew = false; ioBuilder.ctx = panelOn('panel-overview') ? 'ov' : 'tab';
+      ioRefresh(); ovScrollToBuilder();
+    }
+  }
+  /* بيزوّد كل شارت جاهز في نظرة عامة بعنوان قابل للتغيير وزرار ⋮، وبيخفي اللي اتشال */
+  function ovDecorate(){
+    var root = document.getElementById('panel-overview'); if(!root) return;
+    var isAdmin = currentUserRole==='admin';
+    $all('.chart-card', root).forEach(function(card){
+      var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3'); if(!holder || !h3) return;
+      var id = holder.id;
+      if(ovPrefs.hidden[id]){ card.style.display = 'none'; return; }
+      card.style.display = '';
+      if(h3.querySelector('.ov-title')) return;
+      var orig = h3.textContent;
+      h3.setAttribute('data-orig', orig); h3.className = 'ov-h3';
+      h3.innerHTML = '<span class="ov-title">'+escH(ovPrefs.titles[id] || orig)+'</span>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات الشارت" aria-label="خيارات الشارت">⋮</button>' : '');
+    });
+  }
+  function renderOvCustom(){
+    var el = $('#ov-custom'); if(!el) return;
+    var isAdmin = currentUserRole==='admin', list = customCharts.filter(function(c){ return c.ov; });
+    var showBuilder = !!(ioBuilder && ioBuilder.ctx==='ov'), hid = Object.keys(ovPrefs.hidden).length;
+    if(!list.length && !showBuilder && !(isAdmin && hid)){ el.innerHTML = ''; ovDecorate(); return; }
+    el.innerHTML =
+      (isAdmin && hid ? '<div class="form-actions" style="margin:10px 0 0;"><button type="button" class="btn btn-ghost btn-sm" id="ov-restore">🔄 إظهار الشارتات المخفية ('+hid+')</button></div>' : '')+
+      ((list.length || showBuilder) ? '<h2 class="section-title">📈 شارتاتي (قابلة للتعديل)</h2>' : '')+
+      (showBuilder ? ioBuilderHtml() : '')+
+      '<div id="ov-custom-list"></div>';
+    var rb = $('#ov-restore', el);
+    if(rb) rb.addEventListener('click', function(){ ovPrefs.hidden = {}; ioSaveAll(customCharts, ovPrefs).then(function(){ toast('اتظهرت الشارتات المخفية'); }); });
+    ioWireBuilder(el);
+    var box = $('#ov-custom-list', el);
+    list.forEach(function(c){
+      var host = document.createElement('div'); box.appendChild(host);
+      try{ ioRenderCard(c, host, isAdmin, false); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم الشارت.</p>'; }
+    });
+    ovDecorate();
+  }
+  document.addEventListener('click', function(ev){
+    var t = ev.target; if(!t || !t.closest) return;
+    var b = t.closest('.ov-menu-btn');
+    if(b){
+      ev.stopPropagation();
+      var h3 = b.closest('h3'), tt = h3 ? h3.querySelector('.ov-title') : null;
+      ovShowMenu(b, {kind:'builtin', id:b.getAttribute('data-cid'), title:tt ? tt.textContent : '', orig:h3 ? (h3.getAttribute('data-orig') || '') : ''});
+      return;
+    }
+    if(!t.closest('#ov-menu')) ovCloseMenu();
+  });
+  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape') ovCloseMenu(); });
+  window.addEventListener('scroll', ovCloseMenu, true);
+  (function(){
+    var root = document.getElementById('panel-overview'), tm = null;
+    if(root && window.MutationObserver) new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(ovDecorate, 0); }).observe(root, {childList:true, subtree:true});
+  })();
+
+  (function(){ var tm = null; window.addEventListener('resize', function(){ clearTimeout(tm); tm = setTimeout(function(){ ioRefresh(); }, 250); }); })();
+
+  /* ====================== شريط التاريخ والوقت والطقس (زي IIVO) — المصدر: Open-Meteo ====================== */
+  function wxLS(k){ try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } }
+  var wxData = wxLS('oroots_wx'), wxExtra = wxLS('oroots_wx2'), wxOpen = (function(){ try{ return localStorage.getItem('oroots_wxopen')==='1'; }catch(e){ return false; } })();
+  var wxClockTimer = null, wxFetchTimer = null, wxBusy = false, wxDateFmt = null, WX_EVERY = 10*60*1000;
+  var WX_PAR = 0.45, WX_UMOL = 4.57;   // PAR ≈ 45% من الإشعاع الكلي، و4.57 µmol لكل جول
+  var WX_DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  function wxDir(deg){ return WX_DIRS[Math.round((((deg % 360) + 360) % 360)/22.5) % 16]; }
+  function wxBeaufort(ms){ var t = [0.3,1.6,3.4,5.5,8,10.8,13.9,17.2,20.8,24.5,28.5,32.7]; for(var i=0; i<t.length; i++){ if(ms < t[i]) return i; } return 12; }
+  function wxIcon(c){
+    c = Number(c);
+    if(c===0) return '☀️'; if(c===1 || c===2) return '🌤️'; if(c===3) return '☁️'; if(c===45 || c===48) return '🌫️';
+    if(c>=51 && c<=57) return '🌦️'; if((c>=61 && c<=67) || (c>=80 && c<=82)) return '🌧️'; if((c>=71 && c<=77) || c===85 || c===86) return '❄️'; if(c>=95) return '⛈️';
+    return '🌡️';
+  }
+  function wxNum(v){ v = parseFloat(v); return isFinite(v) ? v : null; }
+  function wxN(v, dp){ v = parseFloat(v); return isFinite(v) ? v.toFixed(dp) : '—'; }
+  function wxDli(jPerM2){ return jPerM2*WX_PAR*WX_UMOL/1e6; }                 // J/m² → mol/m² (DLI)
+  function wxDew(T, RH){ T = parseFloat(T); RH = parseFloat(RH); if(!isFinite(T) || !isFinite(RH) || RH<=0) return null; var g = Math.log(RH/100) + 17.62*T/(243.12+T); return 243.12*g/(17.62-g); }
+  function wxHM(sec){ sec = parseFloat(sec); if(!isFinite(sec)) return '—'; var m = Math.round(sec/60); return Math.floor(m/60)+'س '+(m%60)+'د'; }
+  function wxHHMM(iso){ return iso ? String(iso).slice(11,16) : '—'; }
+  function wxMinsTo(a, b){ return Math.round((Date.parse(a+':00Z') - Date.parse(b+':00Z'))/60000); }
+  function wxConfigured(){ return isFinite(parseFloat(settings.weatherLat)) && isFinite(parseFloat(settings.weatherLon)); }
+  function wxSame(o){ return !!o && wxConfigured() && o.lat===parseFloat(settings.weatherLat) && o.lon===parseFloat(settings.weatherLon); }
+
+  /* طلب 1 (أساسي للشريط): الحالة الحالية + إشعاع النهارده لحد دلوقتي */
+  function wxParse(j, lat, lon){
+    var c = j.current || {}, h = j.hourly || {}, now = String(c.time || ''), today = now.slice(0,10), curHour = now.slice(0,13), sum = 0;
+    (h.time || []).forEach(function(tm, i){
+      if(String(tm).slice(0,10) !== today || String(tm).slice(0,13) >= curHour) return;
+      var w = parseFloat((h.shortwave_radiation || [])[i]); if(isFinite(w)) sum += w*3600;   // W/m² × ثانية = J/m²
+    });
+    var mins = parseInt(now.slice(14,16), 10) || 0, cur = parseFloat(c.shortwave_radiation);
+    if(isFinite(cur)) sum += cur*mins*60;
+    return {t:Date.now(), lat:lat, lon:lon, temp:c.temperature_2m, rh:c.relative_humidity_2m, ws:c.wind_speed_10m, wd:c.wind_direction_10m, rad:c.shortwave_radiation, code:c.weather_code, jcm2:sum/10000, dli:wxDli(sum)};
+  }
+  /* طلب 2 (التفاصيل): باقي خواص الهواء + الشروق/الغروب + DLI + توقعات الساعات والأيام */
+  function wxParseB(j, lat, lon){
+    var c = j.current || {}, d = j.daily || {}, h = j.hourly || {}, now = String(c.time || ''), today = now.slice(0,10), dt = d.time || [];
+    var i = dt.indexOf(today); if(i < 0) i = Math.min(1, Math.max(0, dt.length-1));
+    function dv(k, ix){ var a = d[k]; return a ? wxNum(a[ix]) : null; }
+    function ds(k, ix){ var a = d[k]; return a ? a[ix] : null; }
+    function dliAt(ix){ var v = dv('shortwave_radiation_sum', ix); return v===null ? null : wxDli(v*1e6); }   // MJ/m² → J/m²
+    var days = [];
+    for(var k=i+1; k<Math.min(dt.length, i+4); k++) days.push({date:dt[k], code:dv('weather_code',k), tmax:dv('temperature_2m_max',k), tmin:dv('temperature_2m_min',k), rain:dv('precipitation_sum',k), pp:dv('precipitation_probability_max',k), dli:dliAt(k)});
+    var hours = [];
+    (h.time || []).forEach(function(tm, ix){
+      if(String(tm) > now && hours.length < 12) hours.push({h:String(tm).slice(11,16), temp:wxNum((h.temperature_2m || [])[ix]), code:(h.weather_code || [])[ix], pp:wxNum((h.precipitation_probability || [])[ix])});
+    });
+    return {t:Date.now(), lat:lat, lon:lon, now:now, app:wxNum(c.apparent_temperature), precip:wxNum(c.precipitation), cloud:wxNum(c.cloud_cover), pres:wxNum(c.surface_pressure), gust:wxNum(c.wind_gusts_10m), direct:wxNum(c.direct_radiation), diffuse:wxNum(c.diffuse_radiation),
+      tmax:dv('temperature_2m_max',i), tmin:dv('temperature_2m_min',i), sunrise:ds('sunrise',i), sunset:ds('sunset',i), daylight:dv('daylight_duration',i), sunshine:dv('sunshine_duration',i), uv:dv('uv_index_max',i),
+      rainSum:dv('precipitation_sum',i), pp:dv('precipitation_probability_max',i), wsMax:dv('wind_speed_10m_max',i), et0:dv('et0_fao_evapotranspiration',i), dliToday:dliAt(i), dliYest:(i>0 ? dliAt(i-1) : null), hours:hours, days:days};
+  }
+  function wxFetch(){
+    if(!wxConfigured() || wxBusy) return Promise.resolve(false);
+    wxBusy = true;
+    var lat = parseFloat(settings.weatherLat), lon = parseFloat(settings.weatherLon);
+    var base = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&timezone=auto&wind_speed_unit=ms';
+    var get = function(q){ return fetch(base+q).then(function(r){ if(!r.ok) throw new Error('weather '+r.status); return r.json(); }); };
+    var a = get('&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,shortwave_radiation,weather_code&hourly=shortwave_radiation&forecast_days=1').then(function(j){
+      wxData = wxParse(j, lat, lon); try{ localStorage.setItem('oroots_wx', JSON.stringify(wxData)); }catch(e){} return true;
+    }).catch(function(e){ console.warn('الطقس:', e && e.message); return false; });
+    var b = get('&current=apparent_temperature,precipitation,cloud_cover,surface_pressure,wind_gusts_10m,direct_radiation,diffuse_radiation&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,precipitation_sum,precipitation_probability_max,shortwave_radiation_sum,et0_fao_evapotranspiration,weather_code,wind_speed_10m_max&hourly=temperature_2m,weather_code,precipitation_probability&past_days=1&forecast_days=4').then(function(j){
+      wxExtra = wxParseB(j, lat, lon); try{ localStorage.setItem('oroots_wx2', JSON.stringify(wxExtra)); }catch(e){} return true;
+    }).catch(function(e){ console.warn('تفاصيل الطقس:', e && e.message); return false; });
+    return Promise.all([a, b]).then(function(r){ wxBusy = false; wxRender(); wxRenderDetail(); return r[0] || r[1]; });
+  }
+  function wxTick(){
+    var t = document.getElementById('wx-time'), dt = document.getElementById('wx-date');
+    if(!t) return;
+    var n = new Date();
+    t.textContent = ioPad(n.getHours())+':'+ioPad(n.getMinutes())+':'+ioPad(n.getSeconds());
+    if(dt){
+      try{ wxDateFmt = wxDateFmt || new Intl.DateTimeFormat('ar-EG-u-nu-latn', {weekday:'short', day:'numeric', month:'short', year:'numeric'}); dt.textContent = wxDateFmt.format(n); }
+      catch(e){ dt.textContent = n.toLocaleDateString(); }
+    }
+  }
+  function wxRender(){
+    var el = document.getElementById('wx-strip'); if(!el) return;
+    var d = (wxData && wxSame(wxData)) ? wxData : null, x = wxSame(wxExtra) ? wxExtra : null;
+    var html = '<div class="wx-clock"><span class="wx-time" id="wx-time"></span><span class="wx-date" id="wx-date"></span></div>';
+    if(d || x){
+      var stale = (Date.now() - ((d || x).t)) > 30*60*1000, cl = 'wx-chip'+(stale ? ' wx-stale' : '');
+      html += (settings.weatherName ? '<div class="wx-loc">📍 '+escH(settings.weatherName)+'</div>' : '');
+      if(d){
+        var ws = parseFloat(d.ws), dli = (d.dli!==undefined && d.dli!==null) ? d.dli : wxDli((d.jcm2||0)*1e4);
+        html += '<div class="'+cl+'" title="آخر تحديث: '+escH(ioFmtT((d.t), true))+'"><b>'+wxIcon(d.code)+' '+wxN(d.temp,1)+'°C</b><small>الحرارة</small></div>'+
+          '<div class="'+cl+'"><b>💧 '+wxN(d.rh,0)+'%</b><small>الرطوبة</small></div>'+
+          '<div class="'+cl+'"><b>🌬️ '+wxN(d.ws,1)+' m/s</b><small>'+(isFinite(ws) ? (wxDir(d.wd)+' · '+wxBeaufort(ws)+' بوفورت') : '—')+'</small></div>'+
+          '<div class="'+cl+'"><b>☀️ '+wxN(d.rad,0)+' W/m²</b><small>الإشعاع الحالي</small></div>'+
+          '<div class="'+cl+'"><b>'+wxN(d.jcm2,0)+' J/cm²</b><small>إشعاع النهارده</small></div>';
+        if(x && x.sunrise) html += '<div class="'+cl+'"><b>🌅 '+wxHHMM(x.sunrise)+' · 🌇 '+wxHHMM(x.sunset)+'</b><small>الشروق · الغروب</small></div>';
+        html += '<div class="'+cl+'"><b>DLI '+wxN(dli,1)+'</b><small>mol/m² لحد دلوقتي'+((x && x.dliToday!==null) ? (' · اليوم '+wxN(x.dliToday,1)) : '')+'</small></div>';
+      } else if(x && x.sunrise){
+        html += '<div class="'+cl+'"><b>🌅 '+wxHHMM(x.sunrise)+' · 🌇 '+wxHHMM(x.sunset)+'</b><small>الشروق · الغروب</small></div>';
+      }
+      html += '<button type="button" class="wx-toggle">'+(wxOpen ? 'إخفاء التفاصيل ⌃' : 'تفاصيل الطقس ⌄')+'</button>';
+    } else if(currentUserRole==='admin'){
+      html += '<div class="wx-loc">📍 حدّد منطقة الطقس من الإعدادات</div>';
+    }
+    el.innerHTML = html; wxTick();
+  }
+  function wxCard(label, value, sub){ return '<div class="wx-card"><small>'+label+'</small><b>'+value+'</b>'+(sub ? '<em>'+sub+'</em>' : '')+'</div>'; }
+  function wxDayName(date){ try{ return new Date(date+'T12:00:00').toLocaleDateString('ar-EG-u-nu-latn', {weekday:'long'}); }catch(e){ return date; } }
+  function wxRenderDetail(){
+    var el = document.getElementById('wx-detail'); if(!el) return;
+    var d = (wxData && wxSame(wxData)) ? wxData : null, x = wxSame(wxExtra) ? wxExtra : null;
+    if(!wxOpen || (!d && !x)){ el.innerHTML = ''; return; }
+    var h = '';
+    // الهواء
+    var air = '';
+    if(d){
+      air += wxCard('الرطوبة النسبية', wxN(d.rh,0)+'%')+wxCard('نقطة الندى', wxN(wxDew(d.temp, d.rh),1)+'', '°C')+
+        wxCard('VPD', wxN(climateVPD(parseFloat(d.temp), parseFloat(d.rh)),2), 'kPa')+wxCard('الرطوبة المطلقة AH', wxN(climateAH(parseFloat(d.temp), parseFloat(d.rh)),1), 'g/m³')+
+        wxCard('عجز الرطوبة HD', wxN(climateHD(parseFloat(d.temp), parseFloat(d.rh)),1), 'g/m³');
+    }
+    if(x){ air += wxCard('حرارة محسوسة', wxN(x.app,1)+'°C')+wxCard('الضغط الجوي', wxN(x.pres,0), 'hPa')+wxCard('الغطاء السحابي', wxN(x.cloud,0)+'%')+wxCard('الحرارة اليوم', wxN(x.tmin,1)+' – '+wxN(x.tmax,1)+'°C', 'صغرى – عظمى'); }
+    if(air) h += '<div class="wx-sec">🌡️ خواص الهواء</div><div class="wx-grid">'+air+'</div>';
+    // الرياح والمطر
+    if(x || d){
+      var wr = '';
+      if(d){ var ws = parseFloat(d.ws); wr += wxCard('سرعة الرياح', wxN(d.ws,1)+' m/s', isFinite(ws) ? (wxDir(d.wd)+' · '+wxBeaufort(ws)+' بوفورت') : ''); }
+      if(x){ wr += wxCard('هبّات الرياح', wxN(x.gust,1)+' m/s')+wxCard('أقصى رياح اليوم', wxN(x.wsMax,1)+' m/s')+wxCard('مطر الآن', wxN(x.precip,1)+' mm')+wxCard('مطر اليوم', wxN(x.rainSum,1)+' mm', x.pp!==null ? ('احتمال '+wxN(x.pp,0)+'%') : ''); }
+      if(wr) h += '<div class="wx-sec">🌬️ الرياح والمطر</div><div class="wx-grid">'+wr+'</div>';
+    }
+    // الشمس والإضاءة
+    var sun = '';
+    if(x){
+      var toSet = (x.sunset && x.now) ? wxMinsTo(x.sunset, x.now) : null, toRise = (x.sunrise && x.now) ? wxMinsTo(x.sunrise, x.now) : null, nextTxt = '';
+      if(toRise !== null && toRise > 0) nextTxt = 'الشروق بعد '+Math.floor(toRise/60)+'س '+(toRise%60)+'د';
+      else if(toSet !== null && toSet > 0) nextTxt = 'الغروب بعد '+Math.floor(toSet/60)+'س '+(toSet%60)+'د';
+      else if(toSet !== null) nextTxt = 'الشمس غربت';
+      sun += wxCard('🌅 الشروق', wxHHMM(x.sunrise))+wxCard('🌇 الغروب', wxHHMM(x.sunset), nextTxt)+wxCard('طول النهار', wxHM(x.daylight))+wxCard('ساعات الشمس', wxHM(x.sunshine))+
+        wxCard('إشعاع مباشر', wxN(x.direct,0), 'W/m²')+wxCard('إشعاع منتشر', wxN(x.diffuse,0), 'W/m²')+wxCard('UV (أقصى اليوم)', wxN(x.uv,1))+wxCard('التبخر ET0', wxN(x.et0,1), 'mm/يوم');
+    }
+    if(d) sun = wxCard('الإشعاع الحالي', wxN(d.rad,0), 'W/m²')+wxCard('إشعاع لحد دلوقتي', wxN(d.jcm2,0), 'J/cm²')+wxCard('DLI لحد دلوقتي', wxN((d.dli!==undefined && d.dli!==null) ? d.dli : wxDli((d.jcm2||0)*1e4),1), 'mol/m²')+sun;
+    if(x){ sun += wxCard('DLI اليوم (متوقع)', wxN(x.dliToday,1), 'mol/m² كامل اليوم')+wxCard('DLI إمبارح', wxN(x.dliYest,1), 'mol/m²'); }
+    if(sun) h += '<div class="wx-sec">☀️ الشمس والإضاءة (برا الصوبة)</div><div class="wx-grid">'+sun+'</div><div class="hint" style="margin:4px 0 0;">DLI بيتحسب من الإشعاع الكلي (45% منه PAR). جوه الصوبة هيقل حسب نفاذية الغطاء.</div>';
+    // توقعات
+    if(x && x.hours.length) h += '<div class="wx-sec">⏱️ الساعات الجاية</div><div class="wx-hours">'+x.hours.map(function(o){ return '<div class="wx-hr"><div>'+escH(o.h)+'</div><div>'+wxIcon(o.code)+'</div><b>'+wxN(o.temp,0)+'°</b>'+(o.pp!==null && o.pp>0 ? '<div style="font-size:.64rem;color:var(--muted);">💧'+wxN(o.pp,0)+'%</div>' : '')+'</div>'; }).join('')+'</div>';
+    if(x && x.days.length) h += '<div class="wx-sec">📅 الأيام الجاية</div><div class="wx-days">'+x.days.map(function(o){ return '<div class="wx-day"><b>'+escH(wxDayName(o.date))+'</b><span>'+wxIcon(o.code)+'</span><span style="direction:ltr;">'+wxN(o.tmin,0)+'° – '+wxN(o.tmax,0)+'°</span><span>💧 '+wxN(o.rain,1)+' mm'+(o.pp!==null ? (' ('+wxN(o.pp,0)+'%)') : '')+'</span><span>DLI '+wxN(o.dli,0)+'</span></div>'; }).join('')+'</div>';
+    el.innerHTML = h;
+  }
+  function wxMaybeRefetch(){
+    if(!wxConfigured()){ wxRender(); wxRenderDetail(); return; }
+    if(!wxSame(wxData) || !wxSame(wxExtra)){ if(!wxSame(wxData)) wxData = null; if(!wxSame(wxExtra)) wxExtra = null; wxRender(); wxRenderDetail(); wxFetch(); } else { wxRender(); wxRenderDetail(); }
+  }
+  function wxStart(){
+    wxRender(); wxRenderDetail();
+    if(!wxClockTimer) wxClockTimer = setInterval(wxTick, 1000);
+    if(!wxFetchTimer) wxFetchTimer = setInterval(wxFetch, WX_EVERY);
+    wxFetch();
+  }
+  document.addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('.wx-toggle') : null;
+    if(!b) return;
+    wxOpen = !wxOpen; try{ localStorage.setItem('oroots_wxopen', wxOpen ? '1' : '0'); }catch(e){}
+    wxRender(); wxRenderDetail();
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='visible' && wxFetchTimer && wxData && (Date.now() - wxData.t) > 5*60*1000) wxFetch();
+  });
+
+  /* إعدادات الطقس (المدير): بحث عن منطقة أو إحداثيات */
+  function fillWxForm(){
+    var n = $('#wx-name'), la = $('#wx-lat'), lo = $('#wx-lon'); if(!n || !la || !lo) return;
+    n.value = settings.weatherName || ''; la.value = (settings.weatherLat===undefined ? '' : settings.weatherLat); lo.value = (settings.weatherLon===undefined ? '' : settings.weatherLon);
+  }
+  function wxSearch(){
+    var q = (($('#wx-q') || {}).value || '').trim(), box = $('#wx-results');
+    if(q.length < 2){ toast('اكتب اسم المنطقة'); return; }
+    box.innerHTML = '<p class="hint">بيدوّر...</p>';
+    fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=8&language=ar&format=json').then(function(r){ return r.json(); }).then(function(j){
+      var list = j.results || [];
+      box.innerHTML = list.length ? list.map(function(r, i){
+        return '<button type="button" class="btn btn-ghost btn-sm wx-pick" data-i="'+i+'" style="display:block;width:100%;text-align:start;margin:4px 0;">📍 '+escH([r.name, r.admin1, r.country].filter(Boolean).join('، '))+' <span class="hint" style="margin:0;">('+Number(r.latitude).toFixed(2)+', '+Number(r.longitude).toFixed(2)+')</span></button>';
+      }).join('') : '<p class="hint">مفيش نتائج — جرّب اسم تاني أو اكتب الإحداثيات.</p>';
+      $all('.wx-pick', box).forEach(function(b){
+        b.addEventListener('click', function(){
+          var r = list[parseInt(b.getAttribute('data-i'), 10)]; if(!r) return;
+          $('#wx-name').value = r.name+(r.country ? ('، '+r.country) : ''); $('#wx-lat').value = r.latitude; $('#wx-lon').value = r.longitude; box.innerHTML = '<p class="hint">اتختارت — دوس "حفظ الموقع".</p>';
+        });
+      });
+    }).catch(function(){ box.innerHTML = '<p class="hint">تعذر البحث — تأكد من النت.</p>'; });
+  }
 
   function renderAll(){
     safe(applyTabVisibility);
     if(panelOn('panel-settings')) renderSettingsPanels();
     if(panelOn('panel-overview')) safe(renderSystemsOverview);
+  if(panelOn('panel-overview')) safe(renderOvCustom);
   if(panelOn('panel-charts')) safe(renderChartsPanel);
     if(panelOn('panel-water')) renderWaterTab();
     if(panelOn('panel-climate')) safe(renderClimatePanel);
@@ -10758,7 +11174,7 @@
       tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', inventory:'#panel-inventory', settings:'#panel-settings'
     };
     var renderMap = {
-      overview: renderSystemsOverview, charts: renderChartsPanel, water: renderWaterTab, climate: renderClimatePanel,
+      overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
       harvest: renderHarvestPanel, inventory: renderInventoryPanel, settings: renderSettingsPanels
     };
@@ -10780,6 +11196,8 @@
     $('#range-ec-min').value = settings.ec[0]; $('#range-ec-max').value = settings.ec[1];
     $('#range-temp-min').value = settings.temp[0]; $('#range-temp-max').value = settings.temp[1];
     fillRemindForm();
+    fillWxForm();
+    wxMaybeRefetch();
   }
   function fillRemindForm(){
     var f = $('#remind-from'), t = $('#remind-to'); if(!f || !t) return;
@@ -10811,6 +11229,19 @@
         $('#msg-ranges').classList.remove('hidden');
         setTimeout(function(){ $('#msg-ranges').classList.add('hidden'); }, 1800);
       });
+    });
+    $('#wx-search').addEventListener('click', wxSearch);
+    $('#wx-q').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); wxSearch(); } });
+    $('#btn-save-wx').addEventListener('click', function(){
+      var lat = parseFloat($('#wx-lat').value), lon = parseFloat($('#wx-lon').value);
+      if(!(lat>=-90 && lat<=90 && lon>=-180 && lon<=180)){ toast('اكتب إحداثيات صحيحة أو اختار من نتائج البحث'); return; }
+      saveSettings({weatherName:$('#wx-name').value.trim(), weatherLat:lat, weatherLon:lon}).then(function(){
+        $('#msg-wx').classList.remove('hidden'); setTimeout(function(){ $('#msg-wx').classList.add('hidden'); }, 1800);
+        wxData = null; wxFetch();
+      });
+    });
+    $('#btn-clear-wx').addEventListener('click', function(){
+      saveSettings({weatherName:'', weatherLat:'', weatherLon:''}).then(function(){ wxData = null; wxRender(); toast('اتخفى الطقس'); });
     });
     $('#btn-save-remind').addEventListener('click', function(){
       var f = parseInt($('#remind-from').value, 10), t = parseInt($('#remind-to').value, 10);
@@ -11049,6 +11480,7 @@
     hideSplash();
     if(DBG) showDbg();
     safe(remindInit);
+    safe(wxStart);
     if(!readingsPhase2Done){ readingsPhase2Done = true; ensureReadingsRange(30, true); try{ localStorage.setItem('oroots_rd30','1'); }catch(e){} }
   }
   function renderAllSoon(){
@@ -11213,7 +11645,9 @@
     });
 
     db.doc('settings/customCharts').onSnapshot(function(snap){
-      customCharts = (snap.exists && Array.isArray(snap.data().charts)) ? snap.data().charts : [];
+      var dd = snap.exists ? snap.data() : {};
+      customCharts = Array.isArray(dd.charts) ? dd.charts : [];
+      ovPrefs = {hidden:(dd.ov && dd.ov.hidden) || {}, titles:(dd.ov && dd.ov.titles) || {}};
       renderAllSoon();
     }, function(err){
       console.error('customCharts snapshot error', err);
