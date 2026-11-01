@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NKWfeS3W0dtGtac9vfenNPmearesKjcMryHe4AqCwyc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GFdzx317LbqnDYDiHm5GXE7tLaurXUHAF56blXqVywY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -388,6 +388,20 @@
   .icon-btn .ic{width:1.35em;height:1.35em;vertical-align:middle;} .tab-btn .ic{width:1.2em;height:1.2em;} .del-btn .ic,.pv-btn .ic{width:1em;height:1em;vertical-align:middle;}
   .ov-menu button .ic{margin-inline-end:6px;vertical-align:-.25em;} .wx-chip b .ic{width:1.1em;height:1.1em;} .status-pill .ic{width:1.05em;height:1.05em;vertical-align:-.18em;}
   .chev .ic{width:.9em;height:.9em;vertical-align:middle;} .io-btn .ic,.io-cal-nav .ic{width:1.1em;height:1.1em;vertical-align:middle;}
+  .tab-add{flex:0 0 auto;position:sticky;left:0;z-index:2;align-self:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-inline-start:6px;font-size:1.05rem;} .tab-add:hover{background:var(--surface-2);}
+  .db-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;} .db-head-a{display:flex;align-items:center;gap:6px;}
+  .db-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;align-items:start;}
+  .db-w{position:relative;min-width:0;} .db-wc{height:100%;overflow:auto;border-radius:14px;} .db-wc .io-card{margin:0;min-height:100%;box-sizing:border-box;}
+  .db-dc{background:var(--surface);border:1px solid var(--border);border-radius:14px;height:100%;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
+  .db-dh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex:none;} .db-dt{font-weight:800;font-size:.88rem;} .db-wa{display:flex;align-items:center;gap:2px;} .db-db{flex:1;overflow:auto;}
+  .db-tbl{width:100%;border-collapse:collapse;font-size:.82rem;} .db-tbl td{padding:7px 12px;border-bottom:1px solid var(--border);} .db-sec td{background:var(--surface-2);font-weight:800;font-size:.76rem;color:var(--muted);}
+  .db-v{text-align:end;font-weight:700;direction:ltr;white-space:nowrap;} .db-u{color:var(--muted);font-size:.72rem;width:1%;white-space:nowrap;}
+  .db-dc.db-full{position:fixed;inset:0;z-index:4000;border-radius:0;height:auto;background:var(--paper);padding-top:env(safe-area-inset-top,0px);}
+  .db-rs{position:absolute;bottom:3px;inset-inline-end:3px;width:22px;height:22px;display:flex;align-items:flex-end;justify-content:flex-start;color:var(--muted);cursor:nesw-resize;touch-action:none;opacity:.7;z-index:3;} .db-rs:hover{opacity:1;color:var(--ink);}
+  .db-chips{display:flex;align-items:center;gap:4px;padding:6px 10px;flex-wrap:wrap;} .db-chips span{font-size:.74rem;color:var(--muted);min-width:56px;}
+  .ov-menu .db-chips button{display:inline-block;width:auto;padding:5px 10px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;} .ov-menu .db-chips button.on{background:#1b6fa8;color:#fff;border-color:#1b6fa8;font-weight:800;}
+  .db-sub{display:block;font-weight:400;color:var(--muted);font-size:.74rem;margin-top:2px;}
+  @media (max-width:719px){ .db-w{grid-column:1/-1 !important;} }
   .io-wiz{position:fixed;inset:0;z-index:4800;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);}
   .io-sheet{width:100%;max-width:560px;height:52vh;background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.3);animation:ioUp .22s ease-out;padding-bottom:env(safe-area-inset-bottom,0px);} .io-sheet.tall{height:86vh;}
   @keyframes ioUp{from{transform:translateY(46px);opacity:.5;}to{transform:none;opacity:1;}}
@@ -845,6 +859,10 @@
     <section class="panel" id="panel-charts">
 <h1 class="page-title">📈 الشارتات</h1>
 <div id="charts-body"></div>
+</section>
+
+<section class="panel" id="panel-dash">
+<div id="dash-body"></div>
 </section>
 
 <section class="panel" id="panel-water">
@@ -2434,7 +2452,7 @@
   function applyTabVisibility(){
     $all('.tab-btn').forEach(function(btn){
       var tab = btn.getAttribute('data-tab');
-      if(tab==='overview' || tab==='charts'){ btn.classList.remove('hidden'); return; }
+      if(tab==='overview' || tab==='charts' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
@@ -10551,7 +10569,7 @@
     var id = chart.id;
     if(!ioState[id]){
       var saved = {}; try{ saved = (JSON.parse(localStorage.getItem('oroots_iostate') || '{}') || {})[id] || {}; }catch(e){}
-      ioState[id] = {days: saved.days || chart.days || 7, end: null, hidden: saved.hidden || {}, table: saved.table !== false, cursorT: null, full: false, custom: null};
+      ioState[id] = {days: saved.days || chart.days || 7, end: null, hidden: saved.hidden || {}, table: (saved.table===undefined ? !chart.noTable : saved.table !== false), cursorT: null, full: false, custom: null};
     }
     return ioState[id];
   }
@@ -10769,7 +10787,7 @@
 
   function ioDraw(host, ctx){
     var wrap = host.querySelector('.io-svgwrap'); if(!wrap) return;
-    var W = Math.max(280, Math.floor(wrap.clientWidth || 340)), H = ctx.st.full ? Math.max(300, Math.floor((window.innerHeight||700)*0.55)) : 250;
+    var W = Math.max(280, Math.floor(wrap.clientWidth || 340)), H = ctx.st.full ? Math.max(300, Math.floor((window.innerHeight||700)*0.55)) : (ctx.svgH || 250);
     var r = ioBuildSvg(ctx.series, ctx.from, ctx.to, W, H);
     ctx.geo = r.geo; wrap.innerHTML = r.svg+'<div class="io-tip"></div>';
     var svg = wrap.querySelector('svg');
@@ -10923,12 +10941,12 @@
     }
   });
 
-  function ioRenderCard(chart, host, canEditCharts, isDefault){
+  function ioRenderCard(chart, host, canEditCharts, isDefault, wctx){
     var st = ioSt(chart); ioNeedData(st);
     var catMap = ioCatMap(ioCatalog());
     var w = ioWin(st), end = w.to, from = w.from, live = st.custom ? (st.custom.to >= Date.now() - 60000) : !st.end;
     var series = ioBuildSeries(chart, st, catMap);
-    var ctx = {chart:chart, st:st, series:series, from:from, to:end, geo:null};
+    var ctx = {chart:chart, st:st, series:series, from:from, to:end, geo:null, svgH:(wctx && wctx.svgH) || null};
     var pills = [[1,'24 ساعة'],[7,'7 أيام'],[30,'30 يوم'],[90,'90 يوم']].map(function(p){ return '<button type="button" class="range-pill io-days'+(!st.custom && st.days===p[0] ? ' active' : '')+'" data-d="'+p[0]+'">'+p[1]+'</button>'; }).join('');
     var rows = series.map(function(s){
       var tag = (s.scale!==1 ? ' <span class="hint" style="margin:0;">(×'+ioFmt(s.scale)+')</span>' : '')+(s.axis==='R' ? ' <span class="hint" style="margin:0;">[R]</span>' : '');
@@ -10974,7 +10992,7 @@
     host.querySelector('.io-full-btn').addEventListener('click', function(){ st.full = !st.full; ioRefresh(); });
     $all('.io-tog', host).forEach(function(c){ c.addEventListener('change', function(){ var sid = c.getAttribute('data-sid'); if(c.checked) delete st.hidden[sid]; else st.hidden[sid] = true; rerender(); }); });
     var mb = host.querySelector('.io-menu-btn');
-    if(mb) mb.addEventListener('click', function(ev){ ev.stopPropagation(); ovShowMenu(mb, {kind:'custom', chart:chart, isDefault:isDefault}); });
+    if(mb) mb.addEventListener('click', function(ev){ ev.stopPropagation(); if(wctx && wctx.menu) wctx.menu(mb); else ovShowMenu(mb, {kind:'custom', chart:chart, isDefault:isDefault}); });
   }
 
   /* ====================== منشئ الشارت: نافذة نص شاشة (قسم ← نوع العنصر ← المكان) ====================== */
@@ -11146,6 +11164,7 @@
     if(!title){ toast('اكتب اسم الشارت'); return; }
     if(!d.series.length){ toast('أضف عنصر واحد على الأقل'); return; }
     var chart = {id:d.id, title:title, days:d.days || 7, ov:!!d.ov, series:d.series.map(function(s){ var sc = parseFloat(s.scale); return {id:s.id, ref:s.ref, color:s.color || '#2C8C6F', axis:s.axis==='R' ? 'R' : 'L', scale:(isFinite(sc) && sc!==0) ? sc : 1}; })};
+    if(d.target){ chart.noTable = true; dashSaveChartWidget(d.target, chart); return; }
     var base = ioMaterialized(), exists = base.some(function(c){ return c.id===chart.id; });
     var next = exists ? base.map(function(c){ return c.id===chart.id ? chart : c; }) : base.concat([chart]);
     var ovNext = null;
@@ -11158,6 +11177,364 @@
   }
   document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && ioWiz) ioWizAskClose(); });
 
+  /* ====================== اللوحات (زي IIVO): زر + ← تاب جديد / داشبورد / شارت، وأحجام قابلة للتعديل ====================== */
+  var dashPages = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_dashpages') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
+  var dashCur = null, dbWiz = null;
+  var DB_CATS = [
+    {k:'climate', n:'المناخ', emo:'🌡️', sl:'اختار الصوبة'}, {k:'irrigation', n:'الري', emo:'💧', sl:'اختار النظام'},
+    {k:'pests', n:'المكافحة', emo:'🐛', sl:'اختار الصوبة'}, {k:'spray', n:'الرش', emo:'🍃', sl:'اختار الصوبة'},
+    {k:'harvest', n:'الحصاد', emo:'🥬', sl:'اختار النظام'}, {k:'quality', n:'الجودة', emo:'📋', sl:null}, {k:'inventory', n:'المخزن', emo:'📦', sl:null}
+  ];
+  function dashCat(k){ for(var i=0; i<DB_CATS.length; i++){ if(DB_CATS[i].k===k) return DB_CATS[i]; } return null; }
+  function dashScopes(k){
+    var ghs = greenhouseGroups().map(function(g){ return {v:g.name, l:g.name}; });
+    var sys = systems.map(function(s){ return {v:s.id, l:systemLabel(s)}; });
+    if(k==='climate') return ghs;
+    if(k==='irrigation') return sys;
+    if(k==='pests' || k==='spray') return [{v:'*', l:'كل الصوب'}].concat(ghs);
+    if(k==='harvest') return [{v:'*', l:'كل الأنظمة'}].concat(sys);
+    return [];
+  }
+  function dashPage(id){ for(var i=0; i<dashPages.length; i++){ if(dashPages[i].id===id) return dashPages[i]; } return null; }
+  function dashWidget(pg, id){ for(var i=0; i<pg.widgets.length; i++){ if(pg.widgets[i].id===id) return pg.widgets[i]; } return null; }
+  function dashSave(){
+    if(!db){ try{ localStorage.setItem('oroots_dashpages', JSON.stringify(dashPages)); }catch(e){} return Promise.resolve(); }
+    return db.doc('settings/dashboards').set({pages:dashPages, updatedAt:Date.now(), updatedBy:currentUser||''});
+  }
+
+  /* ----- التابات المخصصة وزر + ----- */
+  function dashRenderTabs(){
+    var nav = document.getElementById('tabs'); if(!nav) return;
+    $all('.tab-btn[data-dash]', nav).forEach(function(b){ if(b.parentNode) b.parentNode.removeChild(b); });
+    var old = document.getElementById('tab-add'); if(old && old.parentNode) old.parentNode.removeChild(old);
+    var anchor = nav.querySelector('.tab-btn[data-tab="water"]');
+    dashPages.forEach(function(pg){
+      var b = document.createElement('button'); b.type = 'button';
+      b.className = 'tab-btn'+((dashCur===pg.id && panelOn('panel-dash')) ? ' active' : '');
+      b.setAttribute('data-tab', 'page:'+pg.id); b.setAttribute('data-dash', '1'); b.style.setProperty('--tab-color', 'var(--brand)');
+      b.textContent = '📄 '+pg.title;
+      b.addEventListener('click', function(){ dashActivate(pg.id); });
+      nav.insertBefore(b, anchor);
+    });
+    if(currentUserRole==='admin'){
+      var add = document.createElement('button'); add.type = 'button'; add.id = 'tab-add'; add.className = 'tab-add'; add.title = 'إضافة تاب أو داشبورد أو شارت'; add.setAttribute('aria-label', 'إضافة'); add.textContent = '➕';
+      add.addEventListener('click', function(){ dbWizOpen(panelOn('panel-dash') ? dashCur : null); });
+      nav.appendChild(add);
+    }
+  }
+  function dashActivate(id){
+    dashCur = id;
+    $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='page:'+id); });
+    $all('.panel').forEach(function(p){ p.classList.remove('active'); });
+    var panel = $('#panel-dash'); if(panel) panel.classList.add('active');
+    renderDashPanel();
+  }
+
+  /* ----- الصفحة والـ widgets ----- */
+  function renderDashPanel(){
+    var body = $('#dash-body'); if(!body) return;
+    var pg = dashPage(dashCur);
+    if(!pg){ body.innerHTML = '<p class="empty-note">التاب ده مش موجود.</p>'; return; }
+    var isAdmin = currentUserRole==='admin';
+    body.innerHTML = '<div class="db-head"><h1 class="page-title" style="margin:0;">'+escH(pg.title)+'</h1><div class="db-head-a">'+
+      (isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="db-add">➕ إضافة</button><button type="button" class="io-menu-btn" id="db-pmenu" title="خيارات التاب" aria-label="خيارات التاب">⋮</button>' : '')+'</div></div>'+
+      '<div class="db-grid" id="db-grid"></div>'+(pg.widgets.length ? '' : '<p class="empty-note">التاب فاضي. دوس "➕ إضافة" وضيف داشبورد أو شارت.</p>');
+    var grid = $('#db-grid', body);
+    pg.widgets.forEach(function(w){
+      var el = document.createElement('div'); el.className = 'db-w'; el.setAttribute('data-wid', w.id);
+      el.style.gridColumn = 'span '+(w.w || 6); el.style.height = (w.h || 380)+'px';
+      var wc = document.createElement('div'); wc.className = 'db-wc'; el.appendChild(wc);
+      try{
+        if(w.type==='chart'){
+          var host = document.createElement('div'); wc.appendChild(host);
+          ioRenderCard(w.chart, host, isAdmin, false, {svgH:Math.max(150, (w.h || 430) - 150), menu:function(btn){ dashWidgetMenu(btn, pg, w); }});
+        } else {
+          wc.innerHTML = '<div class="db-dc"><div class="db-dh"><div class="db-dt" dir="auto">'+escH(w.title || '')+'</div><div class="db-wa"><button type="button" class="io-exp-btn db-exp" title="تكبير" aria-label="تكبير">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="io-menu-btn db-wmenu" title="خيارات" aria-label="خيارات">⋮</button>' : '')+'</div></div><div class="db-db">'+dashContent(w)+'</div></div>';
+        }
+      }catch(e){ console.error('widget render', e); wc.innerHTML = '<p class="empty-note">تعذر عرض العنصر ده.</p>'; }
+      if(isAdmin){ var rs = document.createElement('div'); rs.className = 'db-rs'; rs.title = 'اسحب لتغيير الحجم'; rs.innerHTML = '<svg viewBox="0 0 12 12" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 5l6 6M1 1l10 10"/></svg>'; el.appendChild(rs); }
+      grid.appendChild(el);
+    });
+    grid.addEventListener('click', function(ev){
+      var t = ev.target; if(!t || !t.closest) return;
+      var ex = t.closest('.db-exp');
+      if(ex){ var card = ex.closest('.db-dc'); card.classList.toggle('db-full'); ex.innerHTML = card.classList.contains('db-full') ? IO_ICON_CMP : IO_ICON_EXP; return; }
+      var mn = t.closest('.db-wmenu');
+      if(mn){ ev.stopPropagation(); var w = dashWidget(pg, mn.closest('.db-w').getAttribute('data-wid')); if(w) dashWidgetMenu(mn, pg, w); }
+    });
+    if(isAdmin){
+      dashWireResize(grid, pg);
+      $('#db-add', body).addEventListener('click', function(){ dbWizOpen(pg.id); });
+      var pm = $('#db-pmenu', body); pm.addEventListener('click', function(ev){ ev.stopPropagation(); dashPageMenu(pm, pg); });
+    }
+  }
+  /* تغيير الحجم بالسحب من الركن: العرض بيتقسّم على 12 عمود، والارتفاع كل 20 بكسل */
+  function dashWireResize(grid, pg){
+    grid.addEventListener('pointerdown', function(ev){
+      var h = ev.target && ev.target.closest ? ev.target.closest('.db-rs') : null; if(!h) return;
+      ev.preventDefault();
+      var wEl = h.closest('.db-w'), w = dashWidget(pg, wEl.getAttribute('data-wid')); if(!w) return;
+      var gap = 12, colW = (grid.getBoundingClientRect().width + gap)/12, narrow = (window.innerWidth || 800) < 720;
+      var st = {x:ev.clientX, y:ev.clientY, h:w.h || 380, wpx:wEl.getBoundingClientRect().width};
+      try{ h.setPointerCapture(ev.pointerId); }catch(e){}
+      function mv(e){
+        var dx = e.clientX - st.x, dy = e.clientY - st.y;
+        if(!narrow){ var span = Math.max(3, Math.min(12, Math.round((st.wpx - dx + gap)/colW))); w.w = span; wEl.style.gridColumn = 'span '+span; }   // الصفحة RTL: السحب لليسار بيكبّر العرض
+        var nh = Math.max(160, Math.min(900, Math.round((st.h + dy)/20)*20)); w.h = nh; wEl.style.height = nh+'px';
+      }
+      function up(){ h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up); dashSave().then(function(){ renderDashPanel(); }); }
+      h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+    });
+  }
+
+  /* ----- قوايم (⋮) ----- */
+  function dbMenuPlace(m, btn){
+    document.body.appendChild(m);
+    var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 220, mh = m.offsetHeight || 300;
+    m.style.top = Math.max(8, Math.min(r.bottom + 4, (window.innerHeight || 700) - mh - 8))+'px';
+    m.style.left = Math.max(8, Math.min((window.innerWidth || 360) - mw - 8, r.left))+'px';
+  }
+  function dashWidgetMenu(btn, pg, w){
+    ovCloseMenu();
+    var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
+    var wv = [[4,'⅓'],[6,'½'],[8,'⅔'],[12,'كامل']], hv = [[280,'صغير'],[400,'متوسط'],[560,'كبير']];
+    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار</button>'+
+      '<div class="db-chips"><span>العرض</span>'+wv.map(function(x){ return '<button type="button" data-a="w" data-v="'+x[0]+'" class="'+((w.w || 6)===x[0] ? 'on' : '')+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="db-chips"><span>الارتفاع</span>'+hv.map(function(x){ return '<button type="button" data-a="h" data-v="'+x[0]+'" class="'+((w.h || 380)===x[0] ? 'on' : '')+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<button type="button" data-a="up">⬆ قدّمه</button><button type="button" data-a="down">⬇ أخّره</button><button type="button" data-a="del" class="ov-danger">🗑 حذف</button>';
+    dbMenuPlace(m, btn);
+    $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var a = b.getAttribute('data-a'), v = parseInt(b.getAttribute('data-v'), 10); ovCloseMenu(); dashWidgetAction(a, v, pg, w); }); });
+  }
+  function dashAfter(msg){ return dashSave().then(function(){ if(msg) toast(msg); renderDashPanel(); }); }
+  function dashWidgetAction(a, v, pg, w){
+    if(currentUserRole!=='admin'){ toast('تعديل اللوحات للمدير بس'); return; }
+    var i = pg.widgets.indexOf(w);
+    if(a==='w'){ w.w = v; dashAfter(); }
+    else if(a==='h'){ w.h = v; dashAfter(); }
+    else if(a==='up'){ if(i>0){ pg.widgets.splice(i, 1); pg.widgets.splice(i-1, 0, w); dashAfter(); } }
+    else if(a==='down'){ if(i<pg.widgets.length-1){ pg.widgets.splice(i, 1); pg.widgets.splice(i+1, 0, w); dashAfter(); } }
+    else if(a==='del'){
+      var nm = w.chart ? w.chart.title : w.title;
+      if(!confirm('تمسح "'+(nm || '')+'" من التاب؟')) return;
+      pg.widgets.splice(i, 1); dashAfter('اتمسح'); logAudit('delete', 'dash', 'مسح عنصر من لوحة: '+(nm || ''));
+    }
+    else if(a==='rename'){
+      var cur = w.chart ? w.chart.title : w.title, nt = window.prompt('الاسم:', cur || ''); if(nt===null) return; nt = nt.trim(); if(!nt) return;
+      if(w.chart) w.chart.title = nt; w.title = nt; dashAfter('اتغيّر الاسم');
+    }
+    else if(a==='dup'){
+      var cp = JSON.parse(JSON.stringify(w)); cp.id = genId();
+      if(cp.chart){ cp.chart.id = genId(); cp.chart.title = (cp.chart.title || 'شارت')+' (نسخة)'; cp.chart.series.forEach(function(s){ s.id = genId(); }); cp.title = cp.chart.title; } else cp.title = (cp.title || '')+' (نسخة)';
+      pg.widgets.splice(i+1, 0, cp); dashAfter('اتعمل نسخة');
+    }
+    else if(a==='edit'){
+      if(w.type==='chart'){ var dr = JSON.parse(JSON.stringify(w.chart)); dr.isNew = false; dr.noTable = true; dr.target = {pageId:pg.id, widgetId:w.id}; ioWizOpen(dr); }
+      else dbWizOpen(pg.id, {edit:w.id});
+    }
+  }
+  function dashPageMenu(btn, pg){
+    ovCloseMenu();
+    var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
+    m.innerHTML = '<button type="button" data-a="rename">🏷 تغيير اسم التاب</button><button type="button" data-a="del" class="ov-danger">🗑 حذف التاب</button>';
+    dbMenuPlace(m, btn);
+    $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){
+      ev.stopPropagation(); var a = b.getAttribute('data-a'); ovCloseMenu();
+      if(a==='rename'){ var nt = window.prompt('اسم التاب:', pg.title || ''); if(nt===null) return; nt = nt.trim(); if(!nt) return; pg.title = nt; dashSave().then(function(){ dashRenderTabs(); renderDashPanel(); toast('اتغيّر الاسم'); }); }
+      else { if(!confirm('تمسح التاب "'+pg.title+'" بكل اللي فيه؟')) return; dashPages = dashPages.filter(function(p){ return p.id!==pg.id; }); dashCur = null; dashSave().then(function(){ dashRenderTabs(); toast('اتمسح التاب'); var ov = document.querySelector('.tab-btn[data-tab="overview"]'); if(ov) ov.click(); }); }
+    }); });
+  }
+
+  /* ----- محتوى الداشبورد (أرقام حالية لكل قسم) ----- */
+  function dbAvg(a){ return a.length ? a.reduce(function(x, y){ return x + y; }, 0)/a.length : null; }
+  function dbLast(entries){ var b = null; entries.forEach(function(e){ if(!b || String(e.ts) > String(b.ts)) b = e; }); return b; }
+  function dbEmpty(msg){ return '<p class="empty-note" style="padding:14px;">'+msg+'</p>'; }
+  function dbTable(sections){
+    return '<table class="db-tbl"><tbody>'+sections.map(function(s){
+      return '<tr class="db-sec"><td colspan="3">'+escH(s.t)+'</td></tr>'+s.rows.map(function(r){ return '<tr><td dir="auto">'+r[0]+'</td><td class="db-u">'+escH(r[2] || '')+'</td><td class="db-v">'+r[1]+'</td></tr>'; }).join('');
+    }).join('')+'</tbody></table>';
+  }
+  function dbClimate(gh){
+    var ents = flattenEntries('climate', gh), last = dbLast(ents);
+    if(!last) return dbEmpty('مفيش قراءات مناخ للصوبة دي.');
+    var secs = [{t:'آخر قراءة — '+ioFmtT(new Date(last.ts).getTime(), true), rows:CL_METRICS.map(function(m){ return [escH(m.n), ioFmt(m.f(last)), m.u]; })}];
+    var today = todayStr(), te = ents.filter(function(e){ return String(e.ts).slice(0, 10)===today; });
+    if(te.length){
+      var tt = te.map(function(e){ return parseFloat(e.temp); }).filter(isFinite), rr = te.map(function(e){ return parseFloat(e.rh); }).filter(isFinite), ll = te.map(function(e){ return parseFloat(e.lux); }).filter(isFinite);
+      var dli = dailySeriesFor(ents, 'dli').filter(function(p){ return ioDayStr(p.x)===today; })[0];
+      secs.push({t:'النهارده ('+te.length+' قراءة)', rows:[['أقل حرارة', tt.length ? ioFmt(Math.min.apply(null, tt)) : '—', '°C'], ['أعلى حرارة', tt.length ? ioFmt(Math.max.apply(null, tt)) : '—', '°C'], ['متوسط الرطوبة', ioFmt(dbAvg(rr)), '%'], ['أعلى إضاءة', ll.length ? ioFmt(Math.max.apply(null, ll)) : '—', 'Lux'], ['DLI', dli ? ioFmt(dli.y) : '—', 'mol/m²']]});
+    }
+    return dbTable(secs);
+  }
+  function dbIrrigation(sysId){
+    var sys = systems.filter(function(s){ return s.id===sysId; })[0];
+    if(!sys) return dbEmpty('النظام ده مش موجود.');
+    var secs = [];
+    SOURCES.forEach(function(src){
+      var last = dbLast(flattenEntries(src.key, sys.id));
+      secs.push({t:src.label+(last ? ' — '+ioFmtT(new Date(last.ts).getTime(), true) : ''), rows:last ? WT_METRICS.map(function(m){ return [(m.k==='temp' ? 'حرارة المياه' : m.n), ioFmt(parseFloat(last[m.k])), m.u]; }) : [['مفيش قراءات', '—', '']]});
+    });
+    var lc = dbLast(calibForSystem(sys.id));
+    if(lc) secs.push({t:'آخر معايرة — '+ioFmtT(new Date(lc.ts).getTime(), true), rows:[['تصرف النقطة', ioFmt(lc.perPointLpm*1000), 'مل/د'], ['إجمالي النظام', (lc.systemLpm===null || lc.systemLpm===undefined) ? '—' : ioFmt(lc.systemLpm), 'لتر/د']]});
+    return dbTable(secs);
+  }
+  function dbPests(scope){
+    var inScope = function(g){ return scope==='*' || g===scope; }, now = Date.now(), d7 = now - 7*864e5, d30 = now - 30*864e5;
+    var inc = pestLog.filter(function(p){ return inScope(p.greenhouse); });
+    var r7 = inc.filter(function(p){ return new Date(p.ts).getTime() >= d7; }), r30 = inc.filter(function(p){ return new Date(p.ts).getTime() >= d30; });
+    var cnt = {}; r30.forEach(function(p){ var n = String(p.problemName || '—').trim(); cnt[n] = (cnt[n] || 0) + 1; });
+    var top = Object.keys(cnt).sort(function(a, b){ return cnt[b] - cnt[a]; })[0];
+    var lastTrap = function(arr){ var b = null; arr.filter(function(x){ return inScope(x.greenhouse); }).forEach(function(x){ if(!b || String(x.placedDate) > String(b.placedDate)) b = x; }); return b; };
+    var st = lastTrap(stickyTraps), ph = lastTrap(pheromoneTraps);
+    var bio30 = bioReleases.filter(function(r){ return inScope(r.greenhouse) && new Date(r.releaseDate+'T12:00:00').getTime() >= d30; }).length;
+    return dbTable([
+      {t:'الإصابات', rows:[['آخر 7 أيام', String(r7.length), 'إصابة'], ['آخر 30 يوم', String(r30.length), 'إصابة'], ['نشطة (لسه)', String(inc.filter(function(p){ return !p.eradicated; }).length), ''], ['اتقضي عليها', String(inc.filter(function(p){ return p.eradicated; }).length), ''], ['الأكتر ظهوراً (30 يوم)', top ? escH(top)+' ('+cnt[top]+')' : '—', '']]},
+      {t:'المصايد', rows:[['آخر عدّ لاصقة', st ? escH(st.count) : '—', st ? st.placedDate : ''], ['آخر عدّ فيرمونية', ph ? escH(ph.count) : '—', ph ? ph.placedDate : '']]},
+      {t:'المكافحة الحيوية', rows:[['إطلاقات آخر 30 يوم', String(bio30), '']]}]);
+  }
+  function dbSpray(scope){
+    var today = todayStr(), es = sprayPlan.filter(function(e){ return scope==='*' || (e.halls || []).indexOf(scope) >= 0; });
+    var td = es.filter(function(e){ return String(e.date).slice(0, 10)===today; }), act = td.filter(function(e){ return !e.skipped; });
+    var late = es.filter(function(e){ return String(e.date).slice(0, 10) < today && !e.done && !e.skipped; }).length;
+    var up = es.filter(function(e){ return String(e.date).slice(0, 10) > today && !e.skipped; }).sort(function(a, b){ return String(a.date).localeCompare(String(b.date)); }).slice(0, 4);
+    var secs = [{t:'النهارده', rows:[['المجدول', String(act.length), ''], ['تم', String(act.filter(function(e){ return e.done; }).length), ''], ['المتبقي', String(act.filter(function(e){ return !e.done; }).length), ''], ['اتلغى', String(td.filter(function(e){ return e.skipped; }).length), '']]}, {t:'متأخر', rows:[['فاتت ومتعملتش', String(late), '']]}];
+    if(up.length) secs.push({t:'الجاي', rows:up.map(function(e){ var k = SPRAY_KINDS[e.kind] || {}; return [escH(e.date)+' — '+escH(e.product || ''), escH(k.label || k.name || ''), '']; })});
+    return dbTable(secs);
+  }
+  function dbHarvest(scope){
+    var list = scope==='*' ? harvestLog : harvestForSystem(scope), today = todayStr(), now = Date.now();
+    var kg = function(h){ var q = parseFloat(h.quantity); return h.unit==='kg' ? q : (h.unit==='g' ? q/1000 : NaN); };
+    var sum = function(arr){ return arr.reduce(function(a, h){ var v = kg(h); return a + (isFinite(v) ? v : 0); }, 0); };
+    var td = list.filter(function(h){ return String(h.ts).slice(0, 10)===today; }), w7 = list.filter(function(h){ return new Date(h.ts).getTime() >= now - 7*864e5; }), last = dbLast(list);
+    var per = {}; td.forEach(function(h){ var v = kg(h); if(isFinite(v)) per[h.cropName] = (per[h.cropName] || 0) + v; });
+    var secs = [{t:'الحصاد', rows:[['النهارده', ioFmt(sum(td)), 'كجم'], ['آخر 7 أيام', ioFmt(sum(w7)), 'كجم'], ['تسجيلات النهارده', String(td.length), ''], ['آخر حصاد', last ? ioFmtT(new Date(last.ts).getTime(), true) : '—', '']]}];
+    var crops = Object.keys(per).sort(function(a, b){ return per[b] - per[a]; }).slice(0, 6);
+    if(crops.length) secs.push({t:'النهارده حسب الصنف', rows:crops.map(function(c){ return [escH(c), ioFmt(per[c]), 'كجم']; })});
+    return dbTable(secs);
+  }
+  function dbQuality(){
+    var today = todayStr(), d7 = ioDayStr(Date.now() - 6*864e5), byU = {};
+    qSorts.forEach(function(so){ if(String(so.date).slice(0, 10) < d7) return; (so.items || []).forEach(function(it){ var u = it.unit || 'kg', a = byU[u] || (byU[u] = {rec:0, w:0}); a.rec += qNum(it.received); a.w += qWaste(it); }); });
+    var open = qComplaints.filter(function(c){ return c.status==='new' || c.status==='review'; }).length, lastSort = null;
+    qSorts.forEach(function(so){ if(!lastSort || String(so.date) > String(lastSort)) lastSort = so.date; });
+    var secs = [{t:'الأوردرات والشكاوى', rows:[['أوردرات النهارده', String(qOrders.filter(function(o){ return String(o.date).slice(0, 10)===today; }).length), ''], ['شكاوى مفتوحة', String(open), ''], ['شكاوى كلها', String(qComplaints.length), '']]}];
+    var fr = Object.keys(byU).map(function(u){ var a = byU[u]; return ['فاقد الفرز (7 أيام) — '+escH(Q_UNITS[u] || u), a.rec>0 ? ioFmt(a.w/a.rec*100) : '—', '%']; });
+    secs.push({t:'الفرز', rows:fr.concat([['آخر جلسة فرز', lastSort ? escH(lastSort) : '—', '']])});
+    return dbTable(secs);
+  }
+  function dbInventory(){
+    var fert = inventoryItems.filter(function(i){ return i.type==='fertilizer'; }).length, pest = inventoryItems.filter(function(i){ return i.type==='pesticide'; }).length;
+    var withQ = inventoryItems.filter(function(i){ return isFinite(parseFloat(i.quantity)); }).sort(function(a, b){ return parseFloat(a.quantity) - parseFloat(b.quantity); }).slice(0, 8);
+    var secs = [{t:'الأصناف', rows:[['كل الأصناف', String(inventoryItems.length), ''], ['أسمدة', String(fert), ''], ['مبيدات', String(pest), '']]}];
+    if(withQ.length) secs.push({t:'الأقل كمية', rows:withQ.map(function(i){ return [escH(i.name), ioFmt(parseFloat(i.quantity)), i.unit || '']; })});
+    return dbTable(secs);
+  }
+  function dashContent(w){
+    try{
+      if(w.cat==='climate') return dbClimate(w.scope);
+      if(w.cat==='irrigation') return dbIrrigation(w.scope);
+      if(w.cat==='pests') return dbPests(w.scope);
+      if(w.cat==='spray') return dbSpray(w.scope);
+      if(w.cat==='harvest') return dbHarvest(w.scope);
+      if(w.cat==='quality') return dbQuality();
+      if(w.cat==='inventory') return dbInventory();
+    }catch(e){ console.error('dash content', e); }
+    return dbEmpty('مفيش بيانات.');
+  }
+
+  /* ----- نافذة الإضافة: تاب جديد / داشبورد / شارت ----- */
+  function dbWizOpen(pageId, opts){
+    dbWizClose();
+    opts = opts || {};
+    dbWiz = {pageId:pageId || null, step:opts.edit ? 'dcat' : 'add', edit:opts.edit || null, pending:null, cat:null, name:''};
+    try{ document.body.style.overflow = 'hidden'; }catch(e){}
+    dbWizRender();
+  }
+  function dbWizClose(){
+    var el = document.getElementById('db-wiz'); if(el && el.parentNode) el.parentNode.removeChild(el);
+    dbWiz = null;
+    try{ if(!document.getElementById('io-wiz')) document.body.style.overflow = ''; }catch(e){}
+  }
+  function dbWizRender(){
+    var w = dbWiz; if(!w) return;
+    var el = document.getElementById('db-wiz');
+    if(!el){ el = document.createElement('div'); el.id = 'db-wiz'; el.className = 'io-wiz'; document.body.appendChild(el); el.addEventListener('click', dbWizClick); el.addEventListener('input', dbWizInput); }
+    var pg = w.pageId ? dashPage(w.pageId) : null, head = '', body = '', foot = '';
+    var mkHead = function(title, crumb, back){ return '<div class="io-sh-head">'+(back ? '<button type="button" class="io-sh-btn" data-w="back" aria-label="رجوع">›</button>' : '')+'<div class="io-sh-ttl"><div class="io-sh-title">'+title+'</div>'+(crumb ? '<div class="io-sh-crumb">'+crumb+'</div>' : '')+'</div><button type="button" class="io-sh-btn" data-w="close" aria-label="إغلاق">✕</button></div>'; };
+    var row = function(a, k, t, sub, go){ return '<button type="button" class="io-row" data-w="'+a+'" data-k="'+escH(String(k))+'"><span class="io-row-t">'+t+(sub ? '<small class="db-sub">'+sub+'</small>' : '')+'</span><span class="io-row-go">'+(go===false ? '' : '‹')+'</span></button>'; };
+    if(w.step==='add'){
+      head = mkHead('عاوز تضيف إيه؟', pg ? 'في تاب: '+escH(pg.title) : '', false);
+      body = row('act', 'tab', '📄 تاب جديد', 'صفحة فاضية بتسميها وتملاها بداشبورد وشارتات')+row('act', 'dash', '🧩 داشبورد', 'أرقام وبيانات حالية لقسم (مناخ، ري، مكافحة...)')+row('act', 'chart', '📈 شارت', 'رسم بياني بالخطوط اللي تختارها');
+    } else if(w.step==='page'){
+      head = mkHead('أضيفه في أي تاب؟', '', true);
+      body = dashPages.map(function(p){ return row('page', p.id, '📄 '+escH(p.title), p.widgets.length+' عنصر'); }).join('')+row('page', '__new', '➕ تاب جديد', '');
+    } else if(w.step==='tabname'){
+      head = mkHead('تاب جديد', 'اكتب اسم التاب', true);
+      body = '<div class="field-sm"><label>اسم التاب</label><input type="text" maxlength="40" data-f="tabname" value="'+escH(w.name)+'" placeholder="مثال: لوحة المناخ" autofocus></div>';
+      foot = '<div class="io-sh-foot"><button type="button" class="btn btn-primary btn-sm" data-w="mktab">إنشاء</button><button type="button" class="btn btn-ghost btn-sm" data-w="close">إلغاء</button></div>';
+    } else if(w.step==='dcat'){
+      head = mkHead(w.edit ? 'تعديل الداشبورد' : 'داشبورد', 'عاوز تعرض بيانات إيه؟', !w.edit);
+      body = DB_CATS.map(function(c){ return row('dcat', c.k, c.emo+' '+escH(c.n), ''); }).join('');
+    } else {
+      var c = dashCat(w.cat), sc = dashScopes(w.cat);
+      head = mkHead(c.emo+' '+escH(c.n), escH(c.sl || ''), true);
+      body = sc.length ? sc.map(function(s){ return row('dscope', s.v, escH(s.l), '', false); }).join('') : '<p class="empty-note" style="padding:20px 10px;">مفيش حاجة مسجلة لسه في القسم ده.</p>';
+    }
+    el.innerHTML = '<div class="io-sheet" role="dialog" aria-modal="true">'+head+'<div class="io-sh-body">'+body+'</div>'+foot+'</div>';
+  }
+  function dbWizInput(ev){ var w = dbWiz, t = ev.target; if(w && t && t.getAttribute && t.getAttribute('data-f')==='tabname') w.name = t.value; }
+  function dbWizProceed(act){
+    var w = dbWiz;
+    if(act==='dash'){ w.step = 'dcat'; dbWizRender(); return; }
+    var pid = w.pageId; dbWizClose();
+    var dr = ioWizDraftNew(); dr.noTable = true; dr.target = {pageId:pid}; ioWizOpen(dr);
+  }
+  function dbWizFinish(scope){
+    var w = dbWiz, pg = dashPage(w.pageId), c = dashCat(w.cat); if(!pg || !c) return;
+    var title = c.n+(scope ? ' — '+scope.l : '');
+    if(w.edit){ var ex = dashWidget(pg, w.edit); if(ex){ ex.cat = w.cat; ex.scope = scope ? scope.v : null; ex.title = title; } }
+    else pg.widgets.push({id:genId(), type:'dash', w:6, h:380, cat:w.cat, scope:scope ? scope.v : null, title:title});
+    var pid = pg.id; dbWizClose();
+    dashSave().then(function(){ logAudit('add', 'dash', 'داشبورد: '+title); toast('اتضاف الداشبورد ✅'); dashActivate(pid); });
+  }
+  function dbWizClick(ev){
+    var w = dbWiz; if(!w) return;
+    var t = ev.target; if(!t || !t.closest) return;
+    if(t.id==='db-wiz'){ dbWizClose(); return; }
+    var b = t.closest('[data-w]'); if(!b) return;
+    var a = b.getAttribute('data-w'), k = b.getAttribute('data-k');
+    if(a==='close'){ dbWizClose(); return; }
+    if(a==='back'){ w.step = (w.step==='dscope') ? 'dcat' : 'add'; dbWizRender(); return; }
+    if(a==='act'){
+      if(k==='tab'){ w.pending = null; w.step = 'tabname'; dbWizRender(); return; }
+      w.pending = k;
+      if(w.pageId){ dbWizProceed(k); } else if(dashPages.length){ w.step = 'page'; dbWizRender(); } else { w.step = 'tabname'; dbWizRender(); }
+      return;
+    }
+    if(a==='page'){ if(k==='__new'){ w.step = 'tabname'; dbWizRender(); return; } w.pageId = k; dbWizProceed(w.pending); return; }
+    if(a==='mktab'){
+      var nm = (w.name || '').trim(); if(!nm){ toast('اكتب اسم التاب'); return; }
+      var pg = {id:genId(), title:nm, widgets:[]}; dashPages.push(pg); w.pageId = pg.id;
+      dashSave().then(function(){ dashRenderTabs(); if(w.pending){ dbWizProceed(w.pending); } else { dbWizClose(); dashActivate(pg.id); toast('اتعمل التاب'); } });
+      return;
+    }
+    if(a==='dcat'){ w.cat = k; var sc = dashScopes(k); if(sc.length){ w.step = 'dscope'; dbWizRender(); } else dbWizFinish(null); return; }
+    if(a==='dscope'){ var sl = dashScopes(w.cat).filter(function(s){ return String(s.v)===k; })[0]; dbWizFinish(sl || null); }
+  }
+  /* بيحفظ شارت اتعمل جوه تاب كـ widget (وبيحدّثه لو بيتعدّل) */
+  function dashSaveChartWidget(target, chart){
+    var pg = dashPage(target.pageId); if(!pg){ toast('التاب مش موجود'); return; }
+    var ex = target.widgetId ? dashWidget(pg, target.widgetId) : null;
+    if(ex){ ex.chart = chart; ex.title = chart.title; }
+    else pg.widgets.push({id:genId(), type:'chart', w:6, h:430, title:chart.title, chart:chart});
+    delete ioState[chart.id];
+    dashSave().then(function(){ logAudit(ex ? 'edit' : 'add', 'dash', 'شارت في لوحة: '+chart.title); toast('اتحفظ الشارت ✅'); ioWizClose(); dashActivate(pg.id); }).catch(function(){ toast('ما اتحفظش — تأكد إنك مدير'); });
+  }
+  document.addEventListener('keydown', function(ev){
+    if(ev.key!=='Escape') return;
+    if(dbWiz) dbWizClose();
+    $all('.db-dc.db-full').forEach(function(c){ c.classList.remove('db-full'); var e = c.querySelector('.db-exp'); if(e) e.innerHTML = IO_ICON_EXP; });
+  });
+
   function ioSaveAll(list, ov){
     customCharts = list; if(ov) ovPrefs = ov;
     if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(customCharts)); localStorage.setItem('oroots_ovprefs', JSON.stringify(ovPrefs)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
@@ -11166,7 +11543,7 @@
   function ioSaveCharts(list){ return ioSaveAll(list, null); }
   /* أول مرة بنعدّل: الشارتات الجاهزة بتتحفظ كلها عشان ما تختفيش */
   function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
-  function ioRefresh(){ if(panelOn('panel-overview')) safe(renderOvCustom); if(panelOn('panel-charts')) renderChartsPanel(); }
+  function ioRefresh(){ if(panelOn('panel-overview')) safe(renderOvCustom); if(panelOn('panel-charts')) renderChartsPanel(); if(panelOn('panel-dash')) safe(renderDashPanel); }
   function ioDefaults(){
     var out = [], g = greenhouseGroups()[0];
     if(g) out.push({id:'default-clim', title:'مناخ '+g.name, days:7, series:[
@@ -11582,6 +11959,7 @@
     if(panelOn('panel-overview')) safe(renderSystemsOverview);
   if(panelOn('panel-overview')) safe(renderOvCustom);
   if(panelOn('panel-charts')) safe(renderChartsPanel);
+  if(panelOn('panel-dash')) safe(renderDashPanel);
     if(panelOn('panel-water')) renderWaterTab();
     if(panelOn('panel-climate')) safe(renderClimatePanel);
     if(panelOn('panel-tasks')) safe(renderTasksPanel);
@@ -11921,6 +12299,7 @@
     if(DBG) showDbg();
     safe(remindInit);
     safe(wxStart);
+    safe(dashRenderTabs);
     if(!readingsPhase2Done){ readingsPhase2Done = true; ensureReadingsRange(30, true); try{ localStorage.setItem('oroots_rd30','1'); }catch(e){} }
   }
   function renderAllSoon(){
@@ -12084,6 +12463,13 @@
       console.error('nurseryPlans snapshot error', err);
     });
 
+    db.doc('settings/dashboards').onSnapshot(function(snap){
+      var dd = snap.exists ? snap.data() : {};
+      dashPages = Array.isArray(dd.pages) ? dd.pages : [];
+      dashRenderTabs(); renderAllSoon();
+    }, function(err){
+      console.error('dashboards snapshot error', err);
+    });
     db.doc('settings/customCharts').onSnapshot(function(snap){
       var dd = snap.exists ? snap.data() : {};
       customCharts = Array.isArray(dd.charts) ? dd.charts : [];
