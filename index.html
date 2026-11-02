@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GFdzx317LbqnDYDiHm5GXE7tLaurXUHAF56blXqVywY=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-iwviN8oKRQgf6eBciue2RyEMb3pCBgkls+1TlYgTiZQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1498,12 +1498,12 @@
   function overallStatus(e){
     return METRICS.every(function(k){ return metricStatus(k, e[k])==='good'; }) ? 'good' : 'alert';
   }
-  function toast(msg){
+  function toast(msg, ms){
     var t = $('#toast');
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(t._timer);
-    t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+    t._timer = setTimeout(function(){ t.classList.remove('show'); }, ms || 2600);
   }
   function csvEscape(v){
     var s = (v===undefined || v===null) ? '' : String(v);
@@ -5338,9 +5338,9 @@
       '<form class="entry-form" id="ws-'+key+'-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-'+key+'-ts')+'</div>'+
-          '<div class="field-sm"><label>الحموضة pH</label><input type="number" step="0.01" min="0" max="14" class="ltr" id="ws-'+key+'-ph" required></div>'+
-          '<div class="field-sm"><label>EC (mS/cm)</label><input type="number" step="0.01" min="0" max="15" class="ltr" id="ws-'+key+'-ec" required></div>'+
-          '<div class="field-sm"><label>حرارة الماء (°C)</label><input type="number" step="0.1" min="0" max="45" class="ltr" id="ws-'+key+'-temp" required></div>'+
+          '<div class="field-sm"><label>الحموضة pH</label><input type="number" step="any" min="0" max="14" class="ltr" id="ws-'+key+'-ph" required></div>'+
+          '<div class="field-sm"><label>EC (mS/cm)</label><input type="number" step="any" min="0" max="15" class="ltr" id="ws-'+key+'-ec" required></div>'+
+          '<div class="field-sm"><label>حرارة الماء (°C)</label><input type="number" step="any" min="0" max="45" class="ltr" id="ws-'+key+'-temp" required></div>'+
           '<div class="field-sm"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-'+key+'-note" placeholder="أي ملاحظة على القراءة"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة '+sourceObj.label+'</button></div>'+
@@ -5354,7 +5354,6 @@
     document.getElementById('ws-'+key+'-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var odd = qeUnusual(key, systemId, {ph:document.getElementById('ws-'+key+'-ph').value, ec:document.getElementById('ws-'+key+'-ec').value, temp:document.getElementById('ws-'+key+'-temp').value});
-      if(odd.length && !confirm('القراءة بعيدة عن آخر قراءة:\n\n'+odd.join('\n')+'\n\nتحفظ برضه؟')) return;
       addReading(key, {
         ts: nowLocalInputValue(),
         ph: document.getElementById('ws-'+key+'-ph').value,
@@ -5362,7 +5361,7 @@
         temp: document.getElementById('ws-'+key+'-temp').value,
         note: document.getElementById('ws-'+key+'-note').value
       }, systemId).then(function(){
-        toast('تم حفظ قراءة '+sourceObj.label);
+        toast('تم حفظ قراءة '+sourceObj.label+(odd.length ? (' — ⚠️ بعيدة عن آخر قراءة: '+odd.join('، ')+' (لو غلط امسحها)') : ''), odd.length ? 7000 : 0);
         renderWaterPanel();
       });
     });
@@ -5757,7 +5756,7 @@
     if(!g || !g.systems.length) return '';
     var rows = g.systems.map(function(sy){
       var inp = function(k, step, max){ return '<td><input type="number" class="ltr qe-in" data-k="'+k+'" step="'+step+'" min="0" max="'+max+'" inputmode="decimal" style="width:100%;min-width:56px;"></td>'; };
-      return '<tr data-sys="'+escH(sy.id)+'"><td><strong>'+escH(sy.name || systemLabel(sy))+'</strong></td>'+inp('ph','0.01',14)+inp('ec','0.01',15)+inp('temp','0.1',45)+'</tr>';
+      return '<tr data-sys="'+escH(sy.id)+'"><td><strong>'+escH(sy.name || systemLabel(sy))+'</strong></td>'+inp('ph','any',14)+inp('ec','any',15)+inp('temp','any',45)+'</tr>';
     }).join('');
     var srcOpts = SOURCES.map(function(s){ return '<option value="'+s.key+'"'+(s.key===qeSource?' selected':'')+'>'+s.label+'</option>'; }).join('');
     return '<details class="chart-card" id="qe-det" style="margin:0 0 14px;"><summary style="cursor:pointer;font-weight:700;">⚡ إدخال سريع لكل أنظمة '+escH(g.name)+'</summary>'+
@@ -5784,12 +5783,11 @@
       });
       if(incomplete.length){ toast('كمّل قراءات: '+incomplete.join('، ')); return; }
       if(!batch.length){ toast('مفيش قراءات مكتوبة'); return; }
-      if(odd.length && !confirm('في قراءات بعيدة عن آخر قراءة:\n\n'+odd.join('\n')+'\n\nتحفظ برضه؟')) return;
       var ts = nowLocalInputValue();
       batch.reduce(function(p, b){
         return p.then(function(){ return addReading(qeSource, {ts:ts, ph:b.d.ph, ec:b.d.ec, temp:b.d.temp, note:''}, b.sid); });
       }, Promise.resolve()).then(function(){
-        toast('اتحفظ '+batch.length+' قراءة');
+        toast('اتحفظ '+batch.length+' قراءة'+(odd.length ? (' — ⚠️ بعيدة عن آخر قراءة: '+odd.join(' | ')+' (لو غلط امسحها)') : ''), odd.length ? 8000 : 0);
         renderWaterPanel();
       }).catch(function(){ toast('حصلت مشكلة في الحفظ — راجع القراءات'); });
     });
