@@ -99,12 +99,22 @@ self.addEventListener('push', function(e){
   var d = {};
   try{ d = e.data ? e.data.json() : {}; }catch(err){ d = {}; }
   var p = d.data || d;   // رسائل FCM بتيجي بالبيانات جوه .data
-  var icon = new URL('icon-192.png', SCOPE).href;
-  e.waitUntil(self.registration.showNotification(p.title || "O'Roots", {
-    body: p.body || '', tag: p.tag || 'oroots-tasks', renotify: true, requireInteraction: true,
-    dir: 'rtl', lang: 'ar', vibrate: [300, 150, 300, 150, 500], icon: icon, badge: icon,
-    data: {url: p.url || SCOPE}
-  }));
+  var icon = new URL('icon-192.png', SCOPE).href, tag = p.tag || 'oroots-tasks';
+  e.waitUntil(
+    self.clients.matchAll({type:'window', includeUncontrolled:true}).then(function(cs){
+      // التطبيق مفتوح وظاهر قدام المستخدم: هو بيعرض الإشعار بنفسه (صوت + هزّة)، ومنكرّرش إشعار النظام
+      var visible = cs.filter(function(c){ return c.visibilityState === 'visible'; });
+      if(visible.length){ visible.forEach(function(c){ c.postMessage({type:'push', title:p.title, body:p.body, tag:tag}); }); return; }
+      // لو نفس الإشعار (نفس الـ tag) معروض بالفعل نبدّله من غير ما نرنّ تاني؛ غير كده بيرنّ بصوت الجهاز + اهتزاز
+      return self.registration.getNotifications({tag: tag}).then(function(shown){
+        return self.registration.showNotification(p.title || "O'Roots", {
+          body: p.body || '', tag: tag, renotify: shown.length === 0, silent: false, requireInteraction: true,
+          dir: 'rtl', lang: 'ar', vibrate: [300, 150, 300, 150, 500], icon: icon, badge: icon,
+          data: {url: p.url || SCOPE}
+        });
+      });
+    })
+  );
 });
 self.addEventListener('notificationclick', function(e){
   e.notification.close();

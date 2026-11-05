@@ -68,7 +68,8 @@ async function main(){
 
   for(const [email, list] of per){
     const tokSnap = await db.collection('pushTokens').where('email', '==', email).get();
-    const tokens = tokSnap.docs.map(d => d.data().token).filter(Boolean);
+    // remind:false = الموظف قفل تذكير المهام (لسه بيستقبل الإشعارات العادية). الأجهزة القديمة من غير الحقل ده بتتعامل كأنها شغّالة
+    const tokens = tokSnap.docs.map(d => d.data()).filter(t => t.token && t.remind !== false).map(t => t.token);
     if(!tokens.length){ console.log('مفيش جهاز مسجّل لـ', email); continue; }
     const m = buildMessage(list, now.date);
     const res = await admin.messaging().sendEachForMulticast({
