@@ -1,0 +1,21 @@
+name: push-notifications
+on:
+  schedule:
+    - cron: '*/5 * * * *'    # كل 5 دقايق (أقل فاصل بيسمح بيه GitHub)
+  workflow_dispatch:          # تشغيل يدوي للتجربة
+concurrency:
+  group: push-notifications
+  cancel-in-progress: false
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save firebase-admin@12
+      - run: node send-notifications.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
