@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6bP5nvuNJvQEl5d+9bs/cx3JQ8OKmZkqwrfxttliQuU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0V1Ljnb7QslJR5SH6Ry/F8G7KXjM+ILotODs4tqBDw8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -401,8 +401,9 @@
   #panel-growth .gr-cmp td:first-child{white-space:normal;} #panel-growth .gr-cmp th,#panel-growth .gr-cmp td{padding:8px 6px;}
   /* المساعدة + التلميحات */
   .help-note{display:none !important;}
-  .help-btn{user-select:none;-webkit-user-select:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:22px;margin-inline-start:6px;padding:0;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font:700 .74rem/1 inherit;cursor:pointer;vertical-align:middle;transition:background .15s,color .15s,border-color .15s;}
+  .help-btn{flex:none;user-select:none;-webkit-user-select:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:22px;margin-inline-start:6px;padding:0;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font:700 .74rem/1 inherit;cursor:pointer;vertical-align:middle;transition:background .15s,color .15s,border-color .15s;}
   .help-btn:hover,.help-btn:focus-visible{background:var(--brand);border-color:var(--brand);color:var(--on-brand);}
+  .help-btn:focus{outline:none;} .help-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
   .help-pop{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;}
   .hp-card{background:var(--surface);color:var(--ink);width:100%;max-width:540px;max-height:82vh;display:flex;flex-direction:column;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.25);}
   .hp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);font-size:1rem;}
@@ -415,6 +416,29 @@
   #oroots-tip.show{opacity:1;}
   [data-tip]:not(button):not(.tab-btn){cursor:help;}
   body.no-rise .panel.active :is(.stat-card,.nut-card,.chart-card,.settings-card){animation:none !important;}
+  details.strip > summary{display:flex;align-items:center;justify-content:flex-start;gap:6px;list-style:none;cursor:pointer;font-weight:700;font-size:1rem;user-select:none;}
+  details.strip > summary::-webkit-details-marker{display:none;} details.strip > summary::marker{content:'';}
+  details.strip > summary::after{content:"▾";color:var(--muted);transition:transform .2s;flex:none;margin-inline-start:auto;} details.strip[open] > summary::after{transform:rotate(180deg);}
+  .subtabs{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin:0 0 4px;}
+  .subtab-btn{flex:1 1 auto;text-align:center;padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .subtab-btn:hover{color:var(--ink);} .subtab-btn.active{background:linear-gradient(135deg,var(--brand),var(--brand-strong));color:var(--on-brand);border-color:transparent;box-shadow:0 4px 12px color-mix(in srgb,var(--brand) 30%,transparent);}
+  .panel[data-sub] [data-sub]{display:none;}
+  .panel[data-sub="entry"] [data-sub~="entry"],
+  .panel[data-sub="summary"] [data-sub~="summary"],
+  .panel[data-sub="charts"] [data-sub~="charts"],
+  .panel[data-sub="records"] [data-sub~="records"],
+  .panel[data-sub="instruments"] [data-sub~="instruments"],
+  .panel[data-sub="pipes"] [data-sub~="pipes"],
+  .panel[data-sub="bio"] [data-sub~="bio"],
+  .panel[data-sub="trend"] [data-sub~="trend"],
+  .panel[data-sub="plan"] [data-sub~="plan"],
+  .panel[data-sub="mine"] [data-sub~="mine"],
+  .panel[data-sub="assign"] [data-sub~="assign"],
+  .panel[data-sub="all"] [data-sub~="all"],
+  .panel[data-sub="sops"] [data-sub~="sops"],
+  .panel[data-sub="schedule"] [data-sub~="schedule"],
+  .panel[data-sub="ref"] [data-sub~="ref"]{display:block;}
+  #panel-water[data-sub="instruments"] .system-picker{display:none;}
   .gr-ok{color:var(--good);font-weight:700;} .gr-hi{color:var(--alert);font-weight:700;} .gr-lo{color:var(--water);font-weight:700;}
   .db-tbl{width:100%;min-width:0;max-width:460px;border-collapse:collapse;font-size:.85rem;} .db-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);} .db-tbl td:first-child{white-space:normal;text-align:right;} .db-tbl tbody tr:not(.db-sec):nth-child(even) td{background:color-mix(in srgb,var(--surface-2) 55%,transparent);} .db-tbl td:nth-child(2){padding-inline:4px 2px;} .db-tbl td:nth-child(3){padding-inline-start:4px;} .db-sec td{background:var(--surface-2);font-weight:800;font-size:.76rem;color:var(--muted);}
   .db-v{text-align:end;font-weight:700;direction:ltr;white-space:nowrap;} .db-u{color:var(--muted);font-size:.72rem;width:1%;white-space:nowrap;}
@@ -920,9 +944,11 @@
       <div class="system-picker" id="system-picker"></div>
       <div id="water-body"></div>
 
+      <div data-sub="instruments">
       <h2 class="section-title">معايرة أجهزة القياس</h2>
       <p class="hint help-note" style="margin-top:-4px;">تابع معايرة أجهزة الـ pH والـ EC نفسها (مختلف عن معايرة تصرف نقط الري اللي فوق، واللي بتتبع لكل نظام لوحده — دي عامة لكل الأجهزة في المزرعة).</p>
       <div id="instrument-calib-body"></div>
+      </div>
     </section>
 
     <section class="panel" id="panel-climate">
@@ -3650,7 +3676,7 @@
     el.textContent = 'ماسورة '+(i+1)+' — '+g.crop+' — '+map.plantsPerPipe+' نبتة — عمر '+Math.max(0,age)+' يوم'+(c.max>1?(' — قطفة '+Math.min(c.done+1,c.max)+' من '+c.max):'')+' — '+
       (r.st==='ready' ? (c.max>1 ? 'جاهزة للقطفة ✅' : 'جاهزة للحصاد ✅') : (r.st==='over' ? (c.max>1 ? 'متأخرة عن القطفة ⚠️' : 'متأخرة عن الحصاد ⚠️') : (r.st==='future' ? 'لسه ما اتزرعتش' : 'تجهز بعد '+left+' يوم')));
   }
-  function pipeOpenEdit(id){ pipeEditId = id; renderHarvestPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
+  function pipeOpenEdit(id){ panelSubSet('harvest','pipes'); pipeEditId = id; renderHarvestPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
   function wirePipeGroups(){
     $all('.pipe-grp').forEach(function(card){
       var id = card.getAttribute('data-gid');
@@ -4747,11 +4773,12 @@
     overdueInstr.slice(0,6).forEach(function(x){
       rows.push('<tr><td><span class="status-pill alert">معايرة جهاز</span></td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td class="ltr num">'+x.nextDueDate+'</td></tr>');
     });
-    el.innerHTML = '<div class="chart-card" style="border-color:var(--alert);">'+
-      '<h3 style="color:var(--alert);">⚠️ تنبيهات متأخرة ('+totalAlerts+')</h3>'+
-      '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'+
+    el.innerHTML = '<details class="chart-card strip" id="overdue-details" style="border-color:var(--alert);"'+(overdueAlertsOpen?' open':'')+'>'+
+      '<summary style="color:var(--alert);">⚠️ تنبيهات متأخرة ('+totalAlerts+')</summary>'+
+      '<div class="table-wrap" style="margin-top:10px;"><table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'+
       (totalAlerts>rows.length ? '<p class="hint" style="margin:6px 0 0;">+'+(totalAlerts-rows.length)+' تنبيه إضافي — راجع تابات المهام والمكافحة.</p>' : '')+
-    '</div>';
+    '</details>';
+    var od = $('#overdue-details'); if(od) od.addEventListener('toggle', function(){ overdueAlertsOpen = od.open; });
   }
 
 
@@ -4772,7 +4799,7 @@
   ];
   var cropRefs = null;          // null = القيم الافتراضية، أو قايمة المدير المحفوظة
   var cropRefEditId = null;     // 'new' أو id الصف اللي بيتعدّل
-  var cropRefsOpen = true;
+  var cropRefsOpen = false, overdueAlertsOpen = false;   // الكارتين شريط مقفول لحد ما تفتحهم
   function getCropRefs(){ return Array.isArray(cropRefs) ? cropRefs : DEFAULT_CROP_REFS; }
   function fmtRange(r, d){
     if(!r || r.length<2 || r[0]==null || r[1]==null || r[0]==='' || r[1]==='' || isNaN(Number(r[0])) || isNaN(Number(r[1]))) return '—';
@@ -4821,7 +4848,7 @@
       (cropRefs!==null ? ' <button type="button" class="btn btn-ghost btn-sm" id="cr-reset">رجّع القيم الافتراضية</button>' : '')+'</div>') : '';
 
     el.innerHTML =
-      '<details class="chart-card" id="cropref-details"'+(cropRefsOpen?' open':'')+'>'+
+      '<details class="chart-card strip" id="cropref-details"'+(cropRefsOpen?' open':'')+'>'+
         '<summary style="cursor:pointer;font-weight:700;font-size:1rem;">📋 القيم المثلى للأصناف (مرجع للقراءات)</summary>'+
         '<div class="table-wrap cropref-wrap scroll-8" style="margin-top:10px;"><table><thead><tr><th>الصنف</th><th>EC</th><th>pH</th><th>هواء °C</th><th>محلول °C</th>'+(isAdminUser?'<th></th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
         (list.length ? '' : '<p class="empty-note">الجدول فاضي.</p>')+
@@ -5682,8 +5709,8 @@
       : '<p class="empty-note">لسه مفيش حصاد مسجل للنظام ده.</p>';
 
     inner.innerHTML =
-      '<div class="system-header"><h2>'+systemLabel(sys)+' — سجل الحصاد</h2></div>'+
-      '<h2 class="section-title">تسجيل حصاد جديد</h2>'+
+      '<div data-sub="entry pipes charts records"><div class="system-header"><h2>'+systemLabel(sys)+' — سجل الحصاد</h2></div></div>'+
+      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>التاريخ والوقت</label><input type="datetime-local" class="ltr" id="hv-ts" required></div>'+
@@ -5696,21 +5723,21 @@
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="hv-note"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الحصاد</button></div>'+
-      '</form>'+
-      '<details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 إنفوجراف المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details>'+
-      statsHtml+
+      '</form></div>'+
+      '<div data-sub="pipes"><details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 إنفوجراف المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details></div>'+
+      '<div data-sub="charts">'+statsHtml+
       (crops.length ?
         '<h2 class="section-title">شارت المحصول</h2>'+
         '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>'+
         '<label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0;"><input type="checkbox" id="harvest-compare-season" style="width:auto;"'+(harvestCompareLastSeason?' checked':'')+'> قارن بنفس الفترة من الموسم اللي فات (سنة قبل كده)</label>'+
         '<div class="chart-card"><h3>حصاد '+(harvestChartCrop||'')+' عبر الزمن</h3><div class="chart-wrap"><div id="harvest-chart" class="svg-chart-holder"></div></div><p class="hint" id="harvest-chart-total" style="margin:6px 0 0;"></p></div>'
-      : '')+
-      '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
+      : '')+'</div>'+
+      '<div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
       (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>' : '')+
       lfBarHtml('harvest')+
       '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
       '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
-      '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p>';
+      '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p></div>';
 
     $('#hv-ts', inner).value = nowLocalInputValue();
     var pipeDet = $('#pipe-section', inner); if(pipeDet) pipeDet.addEventListener('toggle', function(){ pipeSectionClosed = !pipeDet.open; });
@@ -5904,6 +5931,56 @@
       }).catch(function(){ toast('حصلت مشكلة في الحفظ — راجع القراءات'); });
     });
   }
+  /* ====================== التابات الفرعية (محرك واحد لكل التابات اللي ينفع تتقسم) ======================
+     كل تاب فيه أغلفة data-sub="اسم القسم"؛ والمحرك بيعرض القسم المختار بس وبيحفظ آخر قسم على الجهاز. */
+  var SUBTABS = {
+    water:   {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['charts','📈 الشارتس'],['records','📋 السجلات'],['instruments','🔧 معايرة الأجهزة']]},
+    climate: {def:'entry',    tabs:[['entry','📝 إدخال القراءة'],['summary','📊 الملخص'],['charts','📈 الشارتس'],['records','📋 السجل']]},
+    harvest: {def:'entry',    tabs:[['entry','📝 تسجيل حصاد'],['pipes','🌿 المواسير'],['charts','📈 الإنتاج والشارت'],['records','📋 السجل']]},
+    pests:   {def:'entry',    tabs:[['entry','📝 تسجيل إصابة'],['bio','🐞 المكافحة الحيوية'],['trend','📈 الاتجاه'],['records','📋 السجل']]},
+    nursery: {def:'entry',    tabs:[['entry','📝 تسجيل صينية'],['records','📋 السجل'],['plan','📊 الملخص والخطة']]},
+    tasks:   {def:'mine',     tabs:[['mine','✅ مهامّك'],['assign','➕ تعيين مهمة'],['all','📋 كل المهام'],['sops','📖 الإجراءات']]},
+    spray:   {def:'schedule', tabs:[['schedule','📅 الجدول'],['entry','➕ إضافة رش/تسميد']]},
+    growth:  {def:'entry',    tabs:[['entry','📝 إدخال وزنة'],['summary','📊 الملخص والتنبؤ'],['records','📋 السجل'],['ref','🌿 المعايير المثلى']]}
+  };
+  function panelSubGet(pk){
+    var d = SUBTABS[pk]; if(!d) return '';
+    var v = null; try{ v = localStorage.getItem('oroots_sub_'+pk) || (pk==='water' ? localStorage.getItem('oroots_water_sub') : null); }catch(e){}
+    return d.tabs.some(function(t){ return t[0]===v; }) ? v : d.def;
+  }
+  function panelSubSet(pk, sub, persist){
+    var d = SUBTABS[pk], panel = document.getElementById('panel-'+pk); if(!d || !panel) return;
+    if(!d.tabs.some(function(t){ return t[0]===sub; })) sub = d.def;
+    panel.setAttribute('data-sub', sub);
+    $all('.subtabs .subtab-btn', panel).forEach(function(b){ var on = b.getAttribute('data-subtab')===sub; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    if(persist){ try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} }
+    // الشارتس اللي اتعملت وهي مخفية (عرضها صفر) بنعيد رسمها دلوقتي عشان تاخد عرضها الصح
+    $all('.svg-chart-holder[id]', panel).forEach(function(h){ var a = svgChartArgs[h.id]; if(a && h.offsetParent!==null) renderSvgChart(h, a.ds, a.opts); });
+  }
+  /* بيخبّي زرار أي قسم مفيهوش محتوى دلوقتي (مثلاً "تعيين مهمة" لموظف ملوش صلاحية)، ولو القسم الحالي اختفى بيروح لأول قسم موجود */
+  function panelSubRefresh(pk){
+    var panel = document.getElementById('panel-'+pk), bar = panel && panel.querySelector('.subtabs'); if(!bar) return;
+    var first = null, any = !!panel.querySelector('[data-sub]');
+    $all('.subtab-btn', bar).forEach(function(b){ var k = b.getAttribute('data-subtab'), has = !!panel.querySelector('[data-sub~="'+k+'"]'); b.style.display = has ? '' : 'none'; if(has && !first) first = k; });
+    bar.style.display = any ? '' : 'none';
+    var cur = panel.getAttribute('data-sub');
+    if(any && first && !panel.querySelector('[data-sub~="'+cur+'"]')) panelSubSet(pk, first, false);
+  }
+  (function(){
+    Object.keys(SUBTABS).forEach(function(pk){
+      var panel = document.getElementById('panel-'+pk), h1 = panel && panel.querySelector('h1.page-title'); if(!h1) return;
+      h1.insertAdjacentHTML('afterend', '<div class="subtabs" role="tablist" aria-label="أقسام التاب">'+SUBTABS[pk].tabs.map(function(t){ return '<button type="button" class="subtab-btn" role="tab" data-subtab="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>');
+      panelSubSet(pk, panelSubGet(pk), false);
+      panel.querySelector('.subtabs').addEventListener('click', function(ev){
+        var b = ev.target && ev.target.closest ? ev.target.closest('.subtab-btn') : null; if(!b) return;
+        panelSubSet(pk, b.getAttribute('data-subtab'), true);
+        try{ var bar = panel.querySelector('.subtabs'), top = bar.getBoundingClientRect().top; if(top < 0) window.scrollTo({top: window.scrollY + top - 70, behavior:'auto'}); }catch(e){}
+      });
+      var tm = null;
+      if(window.MutationObserver) new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(function(){ panelSubRefresh(pk); }, 0); }).observe(panel, {childList:true, subtree:true});
+      panelSubRefresh(pk);
+    });
+  })();
   function renderWaterPanel(){
     renderSystemsSettingsList();
 
@@ -5912,12 +5989,12 @@
       $('#system-picker').innerHTML = '';
       var emptyBody = $('#water-body');
       emptyBody.innerHTML =
-        '<div class="empty-systems">لسه مفيش أنظمة مضافة.<br>ضيف أول نظام من هنا.</div>'+
+        '<div data-sub="entry charts records"><div class="empty-systems">لسه مفيش أنظمة مضافة.<br>ضيف أول نظام من هنا.</div>'+
         '<div class="inline-add-form" style="margin-top:14px;">'+
           '<input type="text" id="quick-add-greenhouse" placeholder="اسم الصوبة">'+
           '<input type="text" id="quick-add-name" placeholder="اسم/رقم النظام">'+
           '<button class="btn btn-primary btn-sm" id="quick-add-system-btn">إضافة نظام</button>'+
-        '</div>';
+        '</div></div>';
       var qbtn = $('#quick-add-system-btn');
       if(qbtn) qbtn.addEventListener('click', function(){
         var gh = $('#quick-add-greenhouse').value.trim();
@@ -5938,11 +6015,11 @@
     var sys = getSystem(selectedSystemId);
 
     body.innerHTML =
-      (canEdit('water') ? quickEntryHtml() : '')+
-      '<div class="system-header"><h2>'+systemLabel(sys)+'</h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div>'+
-      '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div>'+
-      '<h2 class="section-title wt-group">📈 الشارتس</h2><div id="water-compare"></div><div id="water-calib-charts"></div>'+
-      '<h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div>';
+      '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(sys)+'</h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
+      '<div data-sub="entry">'+(canEdit('water') ? quickEntryHtml() : '')+
+        '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div></div>'+
+      '<div data-sub="charts"><h2 class="section-title wt-group">📈 الشارتس</h2><div id="water-compare"></div><div id="water-calib-charts"></div></div>'+
+      '<div data-sub="records"><h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div></div>';
 
     $('#btn-delete-system').addEventListener('click', function(){ deleteSystem(selectedSystemId); });
     wireQuickEntry(body);
@@ -6023,8 +6100,8 @@
     var dailyRangeHtml = rngHtml('cdaily');
 
     body.innerHTML =
-      '<div class="system-header"><h2>'+gh+'</h2></div>'+
-      '<h2 class="section-title" style="margin-top:0;">تسجيل قراءة مناخ جديدة</h2>'+
+      '<div data-sub="entry summary charts records"><div class="system-header"><h2>'+gh+'</h2></div></div>'+
+      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل قراءة مناخ جديدة</h2>'+
       '<form class="entry-form" id="climate-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت (سيبه كده لو دلوقتي، أو غيّره لقراءة قديمة)</label><div style="display:flex;gap:6px;align-items:center;"><input type="datetime-local" class="ltr" id="climate-ts" required value="'+nowLocalInputValue()+'" style="flex:1;"><button type="button" class="btn btn-ghost btn-sm" id="climate-ts-now" title="رجّع الوقت لدلوقتي">الآن</button></div></div>'+
@@ -6035,12 +6112,12 @@
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ القراءة</button></div>'+
       '</form>'+
-      '<h2 class="section-title">آخر قراءة</h2>'+
+      '</div><div data-sub="summary"><h2 class="section-title" style="margin-top:0;">آخر قراءة</h2>'+
       latestStatsHtml+
       '<h2 class="section-title">ملخص يوم محدد</h2>'+
       '<div class="day-picker-row"><label for="climate-day-picker">اختر اليوم:</label><input type="date" id="climate-day-picker" class="ltr"></div>'+
       dailyHtml+
-      '<h2 class="section-title">اتجاه DLI والإشعاع التراكمي عبر الأيام</h2>'+
+      '</div><div data-sub="charts"><h2 class="section-title" style="margin-top:0;">اتجاه DLI والإشعاع التراكمي عبر الأيام</h2>'+
       dailyRangeHtml+
       '<div class="mini-charts">'+
         '<div class="chart-card"><h3>DLI اليومي (mol/m²/يوم)</h3><div class="chart-wrap"><div id="cl-chart-dli" class="svg-chart-holder"></div></div></div>'+
@@ -6056,12 +6133,12 @@
         '<div class="chart-card"><h3>شدة الإضاءة (Lux)</h3><div class="chart-wrap"><div id="cl-chart-lux" class="svg-chart-holder"></div></div></div>'+
         '<div class="chart-card"><h3>PPFD (µmol/m²/s)</h3><div class="chart-wrap"><div id="cl-chart-ppfd" class="svg-chart-holder"></div></div></div>'+
       '</div>'+
-      '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="climate-export">تصدير CSV</button></div>'+
+      '</div><div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="climate-export">تصدير CSV</button></div>'+
       lfBarHtml('climate')+
       '<div class="table-wrap"><table><thead><tr>'+
         '<th>الوقت</th><th>حرارة</th><th>رطوبة</th><th>Lux</th><th>VPD</th><th>AH</th><th>HD</th><th>W/m²</th><th>PPFD</th><th>بواسطة</th><th>ملاحظة</th><th></th>'+
       '</tr></thead><tbody id="climate-tbody"></tbody></table></div>'+
-      (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من الفورم فوق.</p>');
+      (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من قسم "إدخال القراءة".</p>')+'</div>';
 
     $('#climate-day-picker').value = lookupDay;
     $('#climate-day-picker').max = todayStr();
@@ -6479,18 +6556,18 @@
     }).join('') : '<p class="empty-note">لسه مفيش إجراءات قياسية مضافة.</p>';
 
     body.innerHTML =
-      assignSectionHtml+
-      '<h2 class="section-title"'+(assignSectionHtml ? '' : ' style="margin-top:0;"')+'>مهامّك</h2>'+
+      (assignSectionHtml ? '<div data-sub="assign">'+assignSectionHtml+'</div>' : '')+
+      '<div data-sub="mine"><h2 class="section-title" style="margin-top:0;">مهامّك</h2>'+
       remindRowHtml()+
-      '<div class="tasks-list">'+myTasksHtml+'</div>'+
+      '<div class="tasks-list">'+myTasksHtml+'</div></div>'+
 
-      '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">الإجراءات القياسية (SOPs)</h2><button class="btn btn-primary btn-sm" id="btn-new-sop">+ إجراء جديد</button></div>'+
+      '<div data-sub="sops"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">الإجراءات القياسية (SOPs)</h2><button class="btn btn-primary btn-sm" id="btn-new-sop">+ إجراء جديد</button></div>'+
       '<div id="sop-form-holder"></div>'+
-      '<div id="sop-list">'+sopListHtml+'</div>'+
+      '<div id="sop-list">'+sopListHtml+'</div></div>'+
 
-      taskStatsHtml(allTasks, isAdminView)+
+      '<div data-sub="all">'+taskStatsHtml(allTasks, isAdminView)+
       waSectionHtml(allTasks, tomorrowStr, isAdminView)+
-      allTasksSectionHtml;
+      allTasksSectionHtml+'</div>';
     lfWire('tasks');
     var waDate = $('#wa-date', body);
     if(waDate) waDate.addEventListener('change', function(){ waDay = this.value || null; waOpen = true; renderTasksPanel(); });
@@ -7384,7 +7461,7 @@
     var pestEditing = pestEditId ? pestLog.filter(function(x){ return x.id===pestEditId; })[0] : null;
     if(pestEditId && !pestEditing) pestEditId = null;
     body.innerHTML =
-      '<h2 class="section-title" style="margin-top:0;" id="pest-form-title">'+(pestEditing?'✏️ تعديل إصابة':'تسجيل إصابة/معاملة جديدة')+'</h2>'+
+      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;" id="pest-form-title">'+(pestEditing?'✏️ تعديل إصابة':'تسجيل إصابة/معاملة جديدة')+'</h2>'+
       '<form class="entry-form" id="pest-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="pest-ts" required></div>'+
@@ -7403,15 +7480,15 @@
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="pest-note" maxlength="200"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="pest-submit-btn">'+(pestEditing?'حفظ التعديل':'حفظ')+'</button>'+(pestEditing?' <button type="button" class="btn btn-ghost btn-sm" id="pest-edit-cancel">إلغاء</button>':'')+'</div>'+
-      '</form>'+
+      '</form></div>'+
 
-      renderBioControlSectionHtml(gh)+
-      pestTrendHtml(gh)+
-      '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
+      '<div data-sub="bio">'+renderBioControlSectionHtml(gh)+'</div>'+
+      '<div data-sub="trend">'+pestTrendHtml(gh)+'</div>'+
+      '<div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="pests-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
       '<div class="range-filter">'+statusPillsHtml+'</div>'+
       lfBarHtml('pests')+
-      '<div class="tasks-list">'+listHtml+'</div>';
+      '<div class="tasks-list">'+listHtml+'</div></div>';
 
     $('#pest-ts').value = nowLocalInputValue();
     pestTrendWire(gh);
@@ -7553,7 +7630,7 @@
 
     $all('.pest-edit-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        pestEditId = btn.closest('.pest-card').getAttribute('data-id'); pestTreatId = null;
+        panelSubSet('pests','entry'); pestEditId = btn.closest('.pest-card').getAttribute('data-id'); pestTreatId = null;
         renderPestsPanel();
         var f = $('#pest-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
       });
@@ -8259,18 +8336,18 @@
     var planSectionHtml = nurseryTilesHtml();
 
     body.innerHTML =
-      '<h2 class="section-title">'+(tBatch?'نقل صواني للسيستم':(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة'))+'</h2>'+
+      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">'+(tBatch?'نقل صواني للسيستم':(editingBatch?'تعديل سجل الصينية':'تسجيل صينية جديدة'))+'</h2>'+
       '<div id="nursery-form-holder"></div>'+
 
       (nurseryLastMsg ? '<div class="stat-card" style="margin:12px 0;border-inline-start:4px solid var(--brand);">✅ '+escH(nurseryLastMsg)+'</div>' : '') +
-      '<div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
+      '</div><div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">السجل</h2><button class="btn btn-ghost btn-sm" id="nursery-export">تصدير CSV</button></div>'+
       '<div class="range-filter">'+filterPillsHtml+'</div>'+
       cropPillsHtml+
       lfBarHtml('nursery')+
       '<div class="table-wrap"><table><thead><tr><th>تاريخ الزراعة</th><th>الصنف</th><th>الصواني</th><th>العمر</th><th>الحالة</th><th>ملاحظة</th><th></th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
-      (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>') +
-      nurserySummaryHtml(all) +
-      planSectionHtml;
+      (list.length ? '' : '<p class="empty-note">لا توجد سجلات.</p>') +'</div>'+
+      '<div data-sub="plan">'+nurserySummaryHtml(all) +
+      planSectionHtml+'</div>';
 
     wireNurseryTiles(body);
     lfWire('nursery');
@@ -8295,14 +8372,14 @@
     });
     $all('.nursery-edit-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        nurseryEditingId = btn.closest('tr').getAttribute('data-id');
+        panelSubSet('nursery','entry'); nurseryEditingId = btn.closest('tr').getAttribute('data-id');
         nurseryTransplantId = null;
         renderNurseryPanel();
       });
     });
     $all('.nursery-transplant-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        nurseryTransplantId = btn.closest('tr').getAttribute('data-id');
+        panelSubSet('nursery','entry'); nurseryTransplantId = btn.closest('tr').getAttribute('data-id');
         nurseryEditingId = null;
         renderNurseryPanel();
       });
@@ -9493,9 +9570,9 @@
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(editing?'حفظ التعديل':'ضيف للجدول')+'</button>'+(editing?' <button type="button" class="btn btn-ghost btn-sm" id="sp-cancel">إلغاء</button>':'')+'</div></form>';
 
     body.innerHTML =
-      '<div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div>'+
-      '<h3 class="section-title" id="sp-form-title" style="margin-top:12px;">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml+
-      '<h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
+      '<div data-sub="schedule"><div class="sp-nav"><button type="button" class="btn btn-ghost btn-sm" id="sp-prev">‹ السابق</button><input type="date" class="ltr" id="sp-pick" value="'+sprayDate+'"><button type="button" class="btn btn-ghost btn-sm" id="sp-next">التالي ›</button><button type="button" class="btn btn-primary btn-sm" id="sp-today">النهارده</button></div></div>'+
+      '<div data-sub="entry"><h3 class="section-title" id="sp-form-title" style="margin-top:0;">'+(editing?'✏️ تعديل رشة/تسميد':'＋ ضيف رش أو تسميد')+'</h3>'+formHtml+'</div>'+
+      '<div data-sub="schedule"><h2 class="section-title" style="margin-top:12px;">'+SPRAY_DAYS[new Date(sprayDate+'T00:00:00').getDay()]+' '+sprayDate+(sprayDate===today?' (النهارده)':'')+'</h2>'+
       '<div class="climate-stats">'+climateStatChip('اتنفّذ', cnt.done, periodLabel)+climateStatChip('النهارده', cnt.today, 'مجدول')+climateStatChip('متأخر', cnt.late, periodLabel)+climateStatChip('جاي', cnt.planned, 'مجدول')+(cnt.skipped ? climateStatChip('اتلغى', cnt.skipped, periodLabel) : '')+'</div>'+
       '<details class="chart-card" id="sp-print-box" style="margin-top:12px;"><summary style="cursor:pointer;font-weight:700;">🖨️ طباعة الجدول كتقرير</summary>'+
         '<div class="form-grid" style="margin-top:10px;">'+
@@ -9505,7 +9582,7 @@
       '<div class="range-filter" id="sp-view" style="margin-top:12px;"><button type="button" class="range-pill'+(isMonth?'':' active')+'" data-v="week">📅 الأسبوع</button><button type="button" class="range-pill'+(isMonth?' active':'')+'" data-v="month">🗓️ الشهر كامل</button></div>'+
       (isMonth ? '<div class="sp-mnav"><button type="button" class="btn btn-ghost btn-sm" id="sp-mprev">‹ الشهر السابق</button><strong class="sp-mtitle">'+SPRAY_MONTHS[new Date(sprayDate+'T00:00:00').getMonth()]+' '+new Date(sprayDate+'T00:00:00').getFullYear()+'</strong><button type="button" class="btn btn-ghost btn-sm" id="sp-mnext">الشهر التالي ›</button></div>' : '')+
       '<h3 class="section-title">'+(isMonth ? '🗓️ جدول الشهر كامل (اضغط على يوم)' : '📅 جدول الأسبوع (اضغط على يوم)')+'</h3>'+matrix+
-      '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div>';
+      '<h3 class="section-title">📋 جدول اليوم لكل صالة</h3><div id="sp-day">'+dayHtml+'</div></div>';
 
     // ربط الأحداث
     $('#sp-prev').addEventListener('click', function(){ sprayDate = sprayAdd(sprayDate,-1); renderSprayPanel(); });
@@ -9525,7 +9602,7 @@
       var u = card.querySelector('.sp-undo'); if(u) u.addEventListener('click', function(){ sprayMarkDone(e, false).then(function(){ toast('اترجّع'); }); });
       var sk = card.querySelector('.sp-skip'); if(sk) sk.addEventListener('click', function(){ sprayAskSkip(card, e); });
       var us = card.querySelector('.sp-unskip'); if(us) us.addEventListener('click', function(){ sprayUnskip(e); });
-      var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
+      var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ panelSubSet('spray','entry'); sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
       var dl = card.querySelector('.sp-del'); if(dl) dl.addEventListener('click', function(){
         if(!requireAdminForDelete()) return;
         if(!confirm('تمسح "'+sprayTitle(e)+'" من الجدول؟'+(e.taskId?' (وهتتمسح من مهام '+(e.assignedTo||'الموظف')+' كمان)':''))) return;
@@ -9580,7 +9657,7 @@
       }
       done.then(function(){
         toast(wasEditing ? 'اتحفظ التعديل' : 'اتضاف للجدول'+(assignee?(' واتبعت لـ '+assignee.displayName):''));
-        sprayEditId = null; sprayDate = date; renderSprayPanel();
+        sprayEditId = null; sprayDate = date; panelSubSet('spray','schedule'); renderSprayPanel();
       }).catch(function(e){ console.error(e); toast('حصل خطأ، حاول تاني'); btn.disabled = false; });
     });
     applyPermissionLock(body, 'spray');
@@ -12495,7 +12572,11 @@
     }
     var alertCfg = '<div class="field-sm" style="max-width:240px;margin-top:8px;"><label>حساسية التنبيه: أقل من المتوقع بنسبة (%)</label><input type="number" min="1" max="90" step="1" class="ltr" id="gr-alertpct" value="'+growthAlertPct()+'"></div>';
     body.innerHTML =
-      '<div class="entry-form">'+selHtml+alertCfg+'</div>'+alertHtml+formHtml+statsHtml+predHtml+chartHtml+tblHtml+refHtml;
+      '<div data-sub="entry summary records ref"><div class="entry-form">'+selHtml+alertCfg+'</div>'+alertHtml+'</div>'+
+      '<div data-sub="entry">'+formHtml+'</div>'+
+      '<div data-sub="summary">'+statsHtml+predHtml+chartHtml+(series.length ? '' : '<p class="empty-note">سجّل أول وزنة من قسم "إدخال وزنة".</p>')+'</div>'+
+      '<div data-sub="records">'+tblHtml+(series.length ? '' : '<p class="empty-note">مفيش وزنات لسه.</p>')+'</div>'+
+      '<div data-sub="ref">'+refHtml+'</div>';
 
     /* ---- ربط الأحداث ---- */
     $('#gr-gh').addEventListener('change', function(){ growthSel.gh = this.value; growthSel.batch = ''; renderGrowthPanel(); });
@@ -12525,19 +12606,19 @@
   /* ====================== المساعدة: زرار ؟ جنب كل قسم بيفتح شرحه + تلميح مختصر لما الماوس يقف على الاسم ======================
      الشروحات المكتوبة جوه الصفحة (اللي عليها class="help-note") بتتخفي من الشاشة، وبتتجمّع تحت العنوان اللي قبلها،
      وبتظهر لما تدوس على الـ ؟ اللي جنب العنوان. */
-  var HELP_HEADS = 'h1,h2,h3,.io-title,.db-dt';
+  var HELP_HEADS = 'h1,h2,h3,.io-title,.db-dt,details.strip > summary';
   var HELP_TABS = {
     overview:  {t:'نظرة عامة', tip:'ملخص كل الصوب والأنظمة ومؤشرات آخر 30 يوم', intro:'ملخص سريع لكل المزرعة: مؤشرات آخر 30 يوم، التنبيهات المتأخرة، وشارتات الري والمناخ لكل الصوب.', items:['اضغط على أي صوبة أو نظام عشان تفتح تفاصيله.','الفلتر فوق كل شارت بيحدد الفترة: 24 ساعة أو 7 أيام أو 30 يوم أو بين تاريخين تختارهم من التقويم.','زرار التكبير بيفتح الشارت ملء الشاشة. زرار ⋮ (للمدير) بيخفي الشارت أو بيغيّر اسمه.']},
     charts:    {t:'الشارتات', tip:'شارتات مخصصة بتجمع أي مقاييس مع بعض', intro:'بتركّب شارتات بنفسك: أي مقياس من أي مكان (مناخ، مياه، حصاد، مكافحة...) على نفس الرسم.', items:['اختار القسم ← نوع العنصر ← المكان (صوبة أو نظام أو صنف) وضيف أكتر من خط.','اللي أرقامه مختلفة الحجم حطّه على المحور الأيمن، أو كبّره/صغّره بمعامل الضرب.','من جدول الشارت شغّل أو اقفل أي خط، وسحب صباعك على الشارت بيعرض القيم في الوقت ده.']},
-    water:     {t:'بيانات المياه', tip:'قراءات pH وEC وحرارة الري لكل نظام', intro:'تسجيل ومتابعة قراءات المياه (pH وEC والحرارة) لكل نظام: الري والصرف والخزان، ومعايرة تصرف نقط الري.', items:['اختار الصوبة وبعدها النظام عشان تشوف بياناته.','القراءة اللي برّه المدى المضبوط في الإعدادات بتتلوّن بلون التنبيه.','معايرة الري بتحسب تصرف النقطة والنظام (لتر/دقيقة) وبتتستخدم في حساب استهلاك المياه في تاب نمو النبات.']},
-    climate:   {t:'بيانات المناخ', tip:'قراءات الحرارة والرطوبة والإضاءة وحساب DLI وVPD', intro:'تسجيل قراءات مناخ الصوبة (حرارة، رطوبة، إضاءة) ومنها بيتحسب VPD وAH وHD وPPFD والإشعاع والـ DLI.', items:['الوقت بيتسجل لحظة الحفظ، وتقدر تغيّره لقراءة قديمة.','الـ DLI بيتحسب من قراءات اللوكس خلال ساعات النهار، فكل ما القراءات أكتر الرقم أدق.']},
-    spray:     {t:'الرش والتسميد', tip:'خطة الرش والتسميد وتكليف الموظفين', intro:'جدولة الرش والتسميد على الصوب بالأيام، وتعيين المسؤول، ومتابعة اللي اتنفّذ واللي اتأجّل.', items:[]},
-    tasks:     {t:'المهام والإجراءات', tip:'مهام الموظفين والتذكيرات', intro:'مهام الفريق: تضيف مهمة (حتى بالصوت) وتكلّف بيها موظف، وبتتابع المتأخر والمنجز.', items:['الموظف بيستلم إشعار بالمهمة، والتذكير بيفضل كل ساعة لحد ما يدوس "تم ✓".']},
+    water:     {t:'بيانات المياه', tip:'قراءات pH وEC وحرارة الري لكل نظام', intro:'تسجيل ومتابعة قراءات المياه (pH وEC والحرارة) لكل نظام: الري والصرف والخزان، ومعايرة تصرف نقط الري.', items:['التاب مقسّم لأقسام فرعية: إدخال القياسات (كل فورمات الإدخال والإدخال السريع)، والشارتس، والسجلات، ومعايرة الأجهزة.','اختار الصوبة وبعدها النظام عشان تشوف بياناته.','القراءة اللي برّه المدى المضبوط في الإعدادات بتتلوّن بلون التنبيه.','معايرة الري بتحسب تصرف النقطة والنظام (لتر/دقيقة) وبتتستخدم في حساب استهلاك المياه في تاب نمو النبات.']},
+    climate:   {t:'بيانات المناخ', tip:'قراءات الحرارة والرطوبة والإضاءة وحساب DLI وVPD', intro:'تسجيل قراءات مناخ الصوبة (حرارة، رطوبة، إضاءة) ومنها بيتحسب VPD وAH وHD وPPFD والإشعاع والـ DLI.', items:['التاب مقسّم لأقسام فرعية: إدخال القراءة، والملخص (آخر قراءة وملخص اليوم)، والشارتس، والسجل.','الوقت بيتسجل لحظة الحفظ، وتقدر تغيّره لقراءة قديمة.','الـ DLI بيتحسب من قراءات اللوكس خلال ساعات النهار، فكل ما القراءات أكتر الرقم أدق.']},
+    spray:     {t:'الرش والتسميد', tip:'خطة الرش والتسميد وتكليف الموظفين', intro:'جدولة الرش والتسميد على الصوب بالأيام، وتعيين المسؤول، ومتابعة اللي اتنفّذ واللي اتأجّل.', items:['التاب مقسّم لقسمين: الجدول (يوم/أسبوع/شهر)، وإضافة رش أو تسميد.',]},
+    tasks:     {t:'المهام والإجراءات', tip:'مهام الموظفين والتذكيرات', intro:'مهام الفريق: تضيف مهمة (حتى بالصوت) وتكلّف بيها موظف، وبتتابع المتأخر والمنجز.', items:['التاب مقسّم لأقسام فرعية: مهامّك، وتعيين مهمة (لمن عنده صلاحية)، وكل المهام، والإجراءات القياسية.','الموظف بيستلم إشعار بالمهمة، والتذكير بيفضل كل ساعة لحد ما يدوس "تم ✓".']},
     nutrients: {t:'المعادلات السمادية', tip:'حاسبة وصفات التسميد بالـ ppm', intro:'حاسبة بتحوّل هدفك الغذائي (ppm لكل عنصر) لوصفة بالأسمدة المتاحة عندك مع الكميات والـ EC المتوقع.', items:[]},
-    pests:     {t:'المكافحة', tip:'الإصابات والمعاملات والأعداء الحيوية والمصايد', intro:'تسجيل الإصابات والمعاملات بالمبيدات والإطلاقات الحيوية والمصايد، وتحليل اتجاه الإصابة.', items:[]},
-    nursery:   {t:'المشتل', tip:'صواني الزراعة وخطة الشتل واحتياج الصوب', intro:'متابعة صواني المشتل من الزراعة للشتل، وخطة الاحتياج لكل صوبة ونظام ومقارنتها بالموجود.', items:[]},
-    harvest:   {t:'الحصاد', tip:'تسجيل الحصاد وجدول المواسير والإنتاج', intro:'تسجيل الحصاد بالكيلو والجرام، ومتابعة مواسير كل صنف وعمر النبات وموعد القطفة الجاية.', items:[]},
-    growth:    {t:'نمو النبات', tip:'وزنات النبات ومعدل النمو والتنبؤ والمعايير المثلى', intro:'بتسجّل متوسط وزن عينة نباتات بشكل دوري لكل دفعة، والتطبيق بيحسب منها النمو ومعاملات التحويل ويتنبأ بالوزن.', items:['معامل تحويل الضوء = الزيادة في الوزن ÷ مجموع الـ DLI في الفترة.','معامل تحويل المياه = الزيادة في وزن الدفعة ÷ لترات المياه المستهلكة (يدوي أو من معايرة الري × دقائق الري).','التنبؤ بيقرب أكتر لما تسجّل وزنات أكتر وتحدد وزن الحصاد المستهدف.','التنبيه بيظهر لو النمو أقل من المتوقع أو الوزن نزل أو الحصاد هيتأخر.']},
+    pests:     {t:'المكافحة', tip:'الإصابات والمعاملات والأعداء الحيوية والمصايد', intro:'تسجيل الإصابات والمعاملات بالمبيدات والإطلاقات الحيوية والمصايد، وتحليل اتجاه الإصابة.', items:['التاب مقسّم لأقسام فرعية: تسجيل إصابة، والمكافحة الحيوية والمصايد، والاتجاه، والسجل.',]},
+    nursery:   {t:'المشتل', tip:'صواني الزراعة وخطة الشتل واحتياج الصوب', intro:'متابعة صواني المشتل من الزراعة للشتل، وخطة الاحتياج لكل صوبة ونظام ومقارنتها بالموجود.', items:['التاب مقسّم لأقسام فرعية: تسجيل صينية، والسجل، والملخص وخطة الاحتياج.',]},
+    harvest:   {t:'الحصاد', tip:'تسجيل الحصاد وجدول المواسير والإنتاج', intro:'تسجيل الحصاد بالكيلو والجرام، ومتابعة مواسير كل صنف وعمر النبات وموعد القطفة الجاية.', items:['التاب مقسّم لأقسام فرعية: تسجيل حصاد، والمواسير، والإنتاج والشارت، والسجل.',]},
+    growth:    {t:'نمو النبات', tip:'وزنات النبات ومعدل النمو والتنبؤ والمعايير المثلى', intro:'بتسجّل متوسط وزن عينة نباتات بشكل دوري لكل دفعة، والتطبيق بيحسب منها النمو ومعاملات التحويل ويتنبأ بالوزن.', items:['التاب مقسّم لأقسام فرعية: إدخال وزنة، والملخص والتنبؤ، والسجل، والمعايير المثلى.','معامل تحويل الضوء = الزيادة في الوزن ÷ مجموع الـ DLI في الفترة.','معامل تحويل المياه = الزيادة في وزن الدفعة ÷ لترات المياه المستهلكة (يدوي أو من معايرة الري × دقائق الري).','التنبؤ بيقرب أكتر لما تسجّل وزنات أكتر وتحدد وزن الحصاد المستهدف.','التنبيه بيظهر لو النمو أقل من المتوقع أو الوزن نزل أو الحصاد هيتأخر.']},
     quality:   {t:'الجودة', tip:'الأوردرات وجلسات الفرز والشكاوى', intro:'متابعة أوردرات العملاء، وجلسات فرز الإنتاج وفاقدها، وشكاوى الجودة وإجراءاتها.', items:[]},
     inventory: {t:'المخازن', tip:'مخزن الأسمدة والمبيدات وبياناتها', intro:'قايمة الأسمدة والمبيدات المتاحة بالكميات، مع المادة الفعالة والمستهدف والجرعة.', items:['المبيدات المسجّلة هنا بتظهر تلقائي في قايمة المبيدات في تاب المكافحة.','خانة البحث بتدوّر بالاسم أو المادة الفعالة أو المستهدف.']},
     settings:  {t:'الإعدادات', tip:'حسابات الموظفين والأنظمة والنسخ الاحتياطي', intro:'إعدادات النظام: حسابات الموظفين وصلاحياتهم، الأصناف، الأنظمة، حدود التنبيه، النسخ الاحتياطي، وسجل النشاط.', items:[]}
