@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-g0mdxdQuv7p4bBwYc54lHjddiKDWeAkNdcWDqtlgzpo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wLNZu4E+ulrkg5DfMtBTnpYBiG1jFogPqLoocS6yG6c=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -12820,7 +12820,13 @@
   function ioSaveCharts(list){ return ioSaveAll(list, null); }
   /* أول مرة بنعدّل: المخططات الجاهزة بتتحفظ كلها عشان ما تختفيش */
   function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
-  function ioRefresh(){ if(panelOn('panel-overview')) safe(renderOvCustom); if(panelOn('panel-charts')) renderChartsPanel(); if(panelOn('panel-dash')) safe(renderDashPanel); }
+  function ioRefresh(){
+    var sy = window.pageYOffset || 0, root = document.querySelector('.panel.active'), hh = root ? root.offsetHeight : 0;
+    if(root && hh) root.style.minHeight = hh+'px';   // الصفحة ما تقصرش لحظة إعادة الرسم (وإلا المتصفح بيطلّعك لفوق)
+    if(panelOn('panel-overview')) safe(renderOvCustom); if(panelOn('panel-charts')) renderChartsPanel(); if(panelOn('panel-dash')) safe(renderDashPanel);
+    window.scrollTo(0, sy);
+    if(root) setTimeout(function(){ root.style.minHeight = ''; window.scrollTo(0, sy); }, 60);
+  }
   function ioDefaults(){
     var out = [], g = greenhouseGroups()[0];
     if(g) out.push({id:'default-clim', title:'مناخ '+g.name, days:7, series:[
@@ -12893,13 +12899,15 @@
     var isAdmin = currentUserRole==='admin';
     var saved = customCharts.length > 0, charts = saved ? customCharts : ioDefaults();
     body.innerHTML =
-      '<div class="form-actions" style="margin:0 0 10px;">'+(isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="io-new">➕ مخطط جديد</button>' : '')+
+      '<div class="form-actions" style="margin:0 0 10px;">'+(isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="io-new">➕ مخطط جديد</button>' : '')+(isAdmin && Object.keys(ovPrefs.hidden).length ? '<button type="button" class="btn btn-ghost btn-sm" id="io-restore-hidden">🔄 إظهار المخططات المخفية ('+Object.keys(ovPrefs.hidden).length+')</button>' : '')+
       '<span class="hint help-note" style="margin:0;">شغّل/اقفل أي خط من المفتاح في الجدول، واسحب صباعك على المخطط تشوف القيم في الوقت ده.'+(isAdmin ? '' : ' (إنشاء المخططات للمدير)')+'</span></div>'+
       ''+
       '<div id="io-list"></div>'+
       (charts.length ? '' : '<p class="empty-note">لسه مفيش بيانات كفاية. سجّل قراءات مناخ أو مياه وهتظهر هنا مخططات جاهزة.</p>');
     var nb = $('#io-new', body);
     if(nb) nb.addEventListener('click', function(){ ioWizOpen(ioWizDraftNew()); });
+    var rh = $('#io-restore-hidden', body);
+    if(rh) rh.addEventListener('click', function(){ ovPrefs.hidden = {}; ioSaveAll(customCharts, ovPrefs).then(function(){ toast('اتظهرت المخططات المخفية'); }); });
     ioWireBuilder(body);
     var list = $('#io-list', body);
     charts.forEach(function(c){
@@ -12942,8 +12950,7 @@
   function ovShowMenu(btn, ctx){
     ovCloseMenu();
     var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
-    var tabOnly = ctx.kind==='builtin' && ctx.inOv===false;   // مخطط جاهز في تبويب (مش نظرة عامة): تعديل وتكرار بس
-    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button>'+(tabOnly ? '' : '<button type="button" data-a="rename">🏷 تغيير الاسم</button>')+'<button type="button" data-a="dup">📑 تكرار المخطط</button>'+(tabOnly ? '' : '<button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>');
+    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button><button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>';
     document.body.appendChild(m);
     var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 190;
     m.style.top = Math.min(r.bottom + 4, (window.innerHeight || 700) - 190)+'px';
@@ -12960,12 +12967,14 @@
     if(a==='rename'){
       var nt = window.prompt('اسم المخطط:', cur); if(nt===null) return; nt = nt.trim(); if(!nt) return;
       ovPrefs.titles[id] = nt;
+      (function(){ var hd = document.getElementById(id), tt = hd && hd.closest('.chart-card') && hd.closest('.chart-card').querySelector('.ov-title'); if(tt) tt.textContent = nt; })();
       ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('edit','charts','غيّر اسم مخطط: '+cur+' ← '+nt); toast('اتغيّر الاسم'); });
       return;
     }
     if(a==='del'){
       if(!confirm('تشيل المخطط "'+cur+'" من نظرة عامة؟\n(تقدر ترجّعه من زر "إظهار المخططات المخفية")')) return;
       ovPrefs.hidden[id] = true;
+      (function(){ var hd = document.getElementById(id), cd = hd && hd.closest('.chart-card'); if(cd) cd.style.display = 'none'; })();
       ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('delete','charts','شال مخطط من نظرة عامة: '+cur); toast('اتشال المخطط'); });
       return;
     }
@@ -12976,7 +12985,7 @@
       ioSaveAll(ioMaterialized().concat([def]), null).then(function(){ logAudit('add','charts','نسخ مخطط: '+cur); toast('اتعمل نسخة في قسم "مخططاتي" تحت'); });
       return;
     }
-    if(a==='edit'){ def.isNew = true; def.replaces = id; ioWizOpen(def); }
+    if(a==='edit'){ def.isNew = true; if(ctx.inOv!==false) def.replaces = id; else def.ov = false; ioWizOpen(def); }
   }
   function ovCustomAction(a, ctx){
     var chart = ctx.chart, list = ioMaterialized(), i = -1;
@@ -13007,13 +13016,13 @@
       var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3'); if(!holder || !h3) return;
       var id = holder.id, inOv = !!card.closest('#panel-overview');
       if(inOv){
-        if(ovPrefs.hidden[id]){ card.style.display = 'none'; return; }
-        card.style.display = '';
       }
+      if(ovPrefs.hidden[id]){ card.style.display = 'none'; return; }
+      if(inOv || card.style.display==='none') card.style.display = '';
       if(h3.querySelector('.ov-title')) return;
       var orig = helpHeadText(h3);
       h3.setAttribute('data-orig', orig); h3.className = 'ov-h3';
-      h3.innerHTML = '<span class="ov-title">'+escH((inOv && ovPrefs.titles[id]) || orig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير المخطط">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات المخطط" aria-label="خيارات المخطط">⋮</button>' : '')+'</span>';
+      h3.innerHTML = '<span class="ov-title">'+escH(ovPrefs.titles[id] || orig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير المخطط">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات المخطط" aria-label="خيارات المخطط">⋮</button>' : '')+'</span>';
     });
   }
   function renderOvCustom(){
