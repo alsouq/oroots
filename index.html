@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s2K1GxNOImAauOCRfujk9PwBB+4tqY0TGrjSNgfsXFw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-E8m3jUjxxKRiJs6F6jPt6MPdbI5M6tp1OGJWecppYqg=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1775,7 +1775,7 @@
 
     el.innerHTML =
       (overdue.length ? '<div class="climate-stats">'+climateStatChip('أجهزة متأخرة المعايرة', overdue.length, '')+'</div>' : '')+
-      '<form class="entry-form" id="instr-calib-form">'+
+      (!canEdit('water') ? '<p class="hint" style="margin:0 0 10px;">👁️ عندك صلاحية عرض بس — تسجيل المعايرة لصاحب صلاحية التعديل.</p>' : '<form class="entry-form" id="instr-calib-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm"><label>نوع الجهاز</label><select id="instr-type">'+INSTRUMENT_TYPES.map(function(t){ return '<option value="'+t.v+'">'+t.l+'</option>'; }).join('')+'</select></div>'+
           '<div class="field-sm"><label>اسم/موقع الجهاز</label><input type="text" id="instr-name" maxlength="100" placeholder="مثال: جهاز pH الرئيسي"></div>'+
@@ -1785,20 +1785,21 @@
           '<div class="field-sm full"><label>ملاحظة النتيجة (اختياري)</label><input type="text" id="instr-result" maxlength="200"></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المعايرة</button></div>'+
-      '</form>'+
+      '</form>')+
       '<div class="table-toolbar"><span></span><button class="btn btn-ghost btn-sm" id="instr-calib-export">تصدير CSV</button></div>'+
       lfBarHtml('instr')+
       '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الجهاز</th><th>تاريخ المعايرة</th><th>القادمة</th><th>المحلول</th><th>النتيجة</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 
-    $('#instr-cal-date').value = todayStr();
-    $('#instr-calib-form').addEventListener('submit', function(ev){
+    var icForm = $('#instr-calib-form');
+    if(icForm){ $('#instr-cal-date').value = todayStr();
+    icForm.addEventListener('submit', function(ev){
       ev.preventDefault();
       saveInstrumentCalib({
         instrumentType: $('#instr-type').value, instrumentName: $('#instr-name').value.trim(),
         calibrationDate: $('#instr-cal-date').value || todayStr(), nextDueDate: $('#instr-next-date').value,
         solutionUsed: $('#instr-solution').value.trim(), resultNote: $('#instr-result').value.trim()
       }).then(function(){ toast('اتسجّلت المعايرة'); renderInstrumentCalibSection(); });
-    });
+    }); }
     $all('.instr-calib-del', el).forEach(function(btn){
       btn.addEventListener('click', function(){ deleteInstrumentCalib(btn.closest('tr').getAttribute('data-id')); });
     });
@@ -12108,7 +12109,7 @@
   });
 
   function ioRenderCard(chart, host, canEditCharts, isDefault, wctx){
-    var st = ioSt(chart); ioNeedData(st);
+    var st = ioSt(chart); if(chart.tableOnly) st.table = true; ioNeedData(st);
     var catMap = ioCatMap(ioCatalog());
     var w = ioWin(st), end = w.to, from = w.from, live = st.custom ? (st.custom.to >= Date.now() - 60000) : !st.end;
     var series = ioBuildSeries(chart, st, catMap);
@@ -12129,8 +12130,8 @@
       '<div class="io-ctl"><span class="io-pills">'+pills+'</span><span class="io-range"><button type="button" class="io-btn io-reset" title="رجوع لآخر فترة" aria-label="رجوع لآخر فترة">↺</button>'+
         '<button type="button" class="io-rangebox" title="اختار الفترة"><span class="io-rtxt">'+ioFmtD(from)+' – '+ioFmtD(end)+'</span>'+IO_ICON_CAL+'</button>'+
         '<button type="button" class="io-btn io-prev">‹</button><button type="button" class="io-btn io-next"'+(live ? ' disabled' : '')+'>›</button></span></div>'+
-      '<div class="io-svgwrap"></div>'+
-      '<button type="button" class="io-link io-tbl-toggle">'+(st.table ? 'إخفاء الجدول' : 'إظهار الجدول')+'</button>'+
+      '<div class="io-svgwrap"'+(chart.tableOnly ? ' style="height:0;overflow:hidden;"' : '')+'></div>'+
+      (chart.tableOnly ? '' : '<button type="button" class="io-link io-tbl-toggle">'+(st.table ? 'إخفاء الجدول' : 'إظهار الجدول')+'</button>')+
       (st.table ? '<div class="io-tbl-wrap"><table class="io-table"><thead><tr><th></th><th>Item</th><th>Group</th><th>Unit</th><th>Min</th><th>Max</th><th>Avg</th><th class="io-cur-h"></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '');
     ioDraw(host, ctx);
     var rerender = function(){ ioNeedData(st); ioSaveSt(chart.id); ioRefresh(); };
@@ -12154,7 +12155,7 @@
       var w2 = ioWin(st);
       ioCalOpen(rbx, w2.from, w2.to, function(range){ st.custom = range; st.cursorT = null; rerender(); });
     });
-    host.querySelector('.io-tbl-toggle').addEventListener('click', function(){ st.table = !st.table; rerender(); });
+    var tbt = host.querySelector('.io-tbl-toggle'); if(tbt) tbt.addEventListener('click', function(){ st.table = !st.table; rerender(); });
     host.querySelector('.io-full-btn').addEventListener('click', function(){ st.full = !st.full; ioRefresh(); });
     $all('.io-tog', host).forEach(function(c){ c.addEventListener('change', function(){ var sid = c.getAttribute('data-sid'); if(c.checked) delete st.hidden[sid]; else st.hidden[sid] = true; rerender(); }); });
     var mb = host.querySelector('.io-menu-btn');
@@ -12325,12 +12326,12 @@
   }
   function ioWizSave(){
     var w = ioWiz, d = w.draft;
-    if(currentUserRole!=='admin'){ toast('إنشاء المخططات للمدير بس'); return; }
+    if(currentUserRole!=='admin' && !(d.target && dashPage(d.target.pageId) && dashPage(d.target.pageId).priv)){ toast('إنشاء المخططات للمدير بس'); return; }
     var title = (d.title || '').trim();
     if(!title){ toast('اكتب اسم المخطط'); return; }
     if(!d.series.length){ toast('أضف عنصر واحد على الأقل'); return; }
     var chart = {id:d.id, title:title, days:d.days || 7, ov:!!d.ov, series:d.series.map(function(s){ var sc = parseFloat(s.scale); return {id:s.id, ref:s.ref, color:s.color || '#2C8C6F', axis:s.axis==='R' ? 'R' : 'L', scale:(isFinite(sc) && sc!==0) ? sc : 1}; })};
-    if(d.target){ chart.noTable = true; dashSaveChartWidget(d.target, chart); return; }
+    if(d.target){ chart.noTable = true; if(d.tableOnly) chart.tableOnly = true; dashSaveChartWidget(d.target, chart); return; }
     var base = ioMaterialized(), exists = base.some(function(c){ return c.id===chart.id; });
     var next = exists ? base.map(function(c){ return c.id===chart.id ? chart : c; }) : base.concat([chart]);
     var ovNext = null;
@@ -12361,6 +12362,8 @@
     if(k==='harvest') return [{v:'*', l:'كل الأنظمة'}].concat(sys);
     return [];
   }
+  /* التابات الخاصة (🔒) أي موظف يعملها ويديرها بنفسه (حتى لو صلاحيته عرض بس)؛ التابات العامة للمدير بس */
+  function canManagePage(pg){ return currentUserRole==='admin' || !!(pg && pg.priv); }
   function dashPage(id){ for(var i=0; i<dashPages.length; i++){ if(dashPages[i].id===id) return dashPages[i]; } return null; }
   function dashWidget(pg, id){ for(var i=0; i<pg.widgets.length; i++){ if(pg.widgets[i].id===id) return pg.widgets[i]; } return null; }
   /* التبويبات نوعين: عامة (settings/dashboards — الكل يشوفها) وخاصة (userData/بريدك الإلكتروني — إنت بس، والقواعد بتمنع غيرك يقراها) */
@@ -12378,7 +12381,7 @@
     if(!db){ try{ localStorage.setItem('oroots_dashpages', JSON.stringify(dashPages)); }catch(e){} return Promise.resolve(); }
     var sp = dashSplit(), shS = JSON.stringify(sp.sh), mS = JSON.stringify(sp.mine), jobs = [];
     sp.sh.forEach(function(p){ delete p.priv; });
-    if(shS !== dashSigShared) jobs.push(db.doc('settings/dashboards').set({pages:sp.sh, updatedAt:Date.now(), updatedBy:currentUser||''}).then(function(){ dashSigShared = shS; }));
+    if(currentUserRole==='admin' && shS !== dashSigShared) jobs.push(db.doc('settings/dashboards').set({pages:sp.sh, updatedAt:Date.now(), updatedBy:currentUser||''}).then(function(){ dashSigShared = shS; }));
     if(mS !== dashSigMine) jobs.push(db.doc('userData/'+myMail()).set({pages:sp.mine, updatedAt:Date.now()}, {merge:true}).then(function(){ dashSigMine = mS; }));
     return Promise.all(jobs);
   }
@@ -12439,13 +12442,8 @@
       nav.insertBefore(b, anchor);
     });
     var add = document.createElement('button'); add.type = 'button'; add.id = 'tab-add'; add.className = 'tab-add';
-    if(currentUserRole==='admin'){
-      add.title = 'إضافة تبويب أو لوحة مؤشرات أو مخطط أو ترتيب التبويبات'; add.setAttribute('aria-label', 'إضافة'); add.textContent = '➕';
-      add.addEventListener('click', function(){ dbWizOpen(panelOn('panel-dash') ? dashCur : null); });
-    } else {
-      add.title = 'ترتيب التبويبات'; add.setAttribute('aria-label', 'ترتيب التبويبات'); add.textContent = '↕';
-      add.addEventListener('click', function(){ dbWizOpen(null, {step:'order'}); });
-    }
+    add.title = 'إضافة تبويب أو لوحة مؤشرات أو مخطط أو جدول أو ترتيب التبويبات'; add.setAttribute('aria-label', 'إضافة'); add.textContent = '➕';
+    add.addEventListener('click', function(){ var cp = panelOn('panel-dash') ? dashPage(dashCur) : null; dbWizOpen(cp && canManagePage(cp) ? cp.id : null); });
     nav.appendChild(add);
     tabApplyNames();
     tabApplyOrder();
@@ -12463,7 +12461,7 @@
     var body = $('#dash-body'); if(!body) return;
     var pg = dashPage(dashCur);
     if(!pg){ body.innerHTML = '<p class="empty-note">التبويب ده مش موجود.</p>'; return; }
-    var isAdmin = currentUserRole==='admin';
+    var isAdmin = canManagePage(pg);
     body.innerHTML = '<div class="db-head"><h1 class="page-title" style="margin:0;">'+escH(pg.title)+'</h1><div class="db-head-a">'+
       (isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="db-add">➕ إضافة</button><button type="button" class="io-menu-btn" id="db-pmenu" title="خيارات التبويب" aria-label="خيارات التبويب">⋮</button>' : '')+'</div></div>'+
       '<div class="db-grid" id="db-grid"></div>'+(pg.widgets.length ? '' : '<p class="empty-note">التبويب فاضي. دوس "➕ إضافة" وضيف لوحة مؤشرات أو مخطط.</p>');
@@ -12535,7 +12533,7 @@
   }
   function dashAfter(msg){ return dashSave().then(function(){ if(msg) toast(msg); renderDashPanel(); }); }
   function dashWidgetAction(a, v, pg, w){
-    if(currentUserRole!=='admin'){ toast('تعديل اللوحات للمدير بس'); return; }
+    if(!canManagePage(pg)){ toast('تعديل اللوحات العامة للمدير بس'); return; }
     var i = pg.widgets.indexOf(w);
     if(a==='w'){ w.w = v; dashAfter(); }
     else if(a==='h'){ w.h = v; dashAfter(); }
@@ -12563,7 +12561,7 @@
   function dashPageMenu(btn, pg){
     ovCloseMenu();
     var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
-    var canVis = !!db && (pg.priv || !pg.owner || pg.owner===myMail());
+    var canVis = !!db && currentUserRole==='admin' && (pg.priv || !pg.owner || pg.owner===myMail());
     m.innerHTML = '<button type="button" data-a="rename">🏷 تغيير اسم التبويب</button>'+(canVis ? '<button type="button" data-a="vis">'+(pg.priv ? '👥 شاركه مع الكل' : '🔒 خليه خاص بيا')+'</button>' : '')+'<button type="button" data-a="del" class="ov-danger">🗑 حذف التبويب</button>';
     dbMenuPlace(m, btn);
     $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){
@@ -12693,10 +12691,10 @@
     var row = function(a, k, t, sub, go){ return '<button type="button" class="io-row" data-w="'+a+'" data-k="'+escH(String(k))+'"><span class="io-row-t">'+t+(sub ? '<small class="db-sub">'+sub+'</small>' : '')+'</span><span class="io-row-go">'+(go===false ? '' : '‹')+'</span></button>'; };
     if(w.step==='add'){
       head = mkHead('عاوز تضيف إيه؟', pg ? 'في تبويب: '+escH(pg.title) : '', false);
-      body = row('act', 'tab', '📄 تبويب جديد', 'صفحة فاضية بتسميها وتملاها بلوحة مؤشرات ومخططات')+row('act', 'dash', '🧩 لوحة مؤشرات', 'أرقام وبيانات حالية لقسم (مناخ، ري، مكافحة...)')+row('act', 'chart', '📈 مخطط', 'رسم بياني بالخطوط اللي تختارها')+row('act', 'order', '↕️ ترتيب التبويبات وأسمائها', 'غيّر الترتيب أو الاسم عندك إنت بس');
+      body = row('act', 'tab', '📄 تبويب جديد', 'صفحة فاضية بتسميها وتملاها بلوحة مؤشرات ومخططات')+row('act', 'dash', '🧩 لوحة مؤشرات', 'أرقام وبيانات حالية لقسم (مناخ، ري، مكافحة...)')+row('act', 'chart', '📈 مخطط', 'رسم بياني بالخطوط اللي تختارها')+row('act', 'table', '📋 جدول', 'جدول بأدنى وأقصى ومتوسط القيم لعناصر تختارها')+row('act', 'order', '↕️ ترتيب التبويبات وأسمائها', 'غيّر الترتيب أو الاسم عندك إنت بس');
     } else if(w.step==='order'){
       var vb = tabVisibleBtns();
-      head = mkHead('↕️ ترتيب التبويبات وأسمائها', 'الترتيب والأسماء بيتحفظوا لحسابك إنت بس', currentUserRole==='admin');
+      head = mkHead('↕️ ترتيب التبويبات وأسمائها', 'الترتيب والأسماء بيتحفظوا لحسابك إنت بس', true);
       body = vb.map(function(b, i){
         var k = b.getAttribute('data-tab');
         return '<div class="io-row" style="cursor:default;"><span class="io-row-t">'+escH(b.textContent.trim())+(tabNames[k] ? ' <small class="db-sub">(اسمه الأصلي: '+escH(tabDefaultName(k))+')</small>' : '')+'</span>'+
@@ -12707,11 +12705,11 @@
       foot = '<div class="io-sh-foot"><button type="button" class="btn btn-primary btn-sm" data-w="close">تم</button><button type="button" class="btn btn-ghost btn-sm" data-w="orderreset">رجّع الترتيب الأصلي</button></div>';
     } else if(w.step==='page'){
       head = mkHead('أضيفه في أي تبويب؟', '', true);
-      body = dashPages.map(function(p){ return row('page', p.id, '📄 '+escH(p.title), p.widgets.length+' عنصر'); }).join('')+row('page', '__new', '➕ تبويب جديد', '');
+      body = dashPages.filter(canManagePage).map(function(p){ return row('page', p.id, '📄 '+escH(p.title), p.widgets.length+' عنصر'); }).join('')+row('page', '__new', '➕ تبويب جديد', '');
     } else if(w.step==='tabname'){
       head = mkHead('تبويب جديد', 'اكتب اسم التبويب', true);
       body = '<div class="field-sm"><label>اسم التبويب</label><input type="text" maxlength="40" data-f="tabname" value="'+escH(w.name)+'" placeholder="مثال: لوحة المناخ" autofocus></div>'+
-        '<div class="field-sm"><label>مين يشوف التبويب؟</label><select data-f="tabvis"><option value="me"'+(w.vis==='all'?'':' selected')+'>🔒 أنا بس (خاص)</option><option value="all"'+(w.vis==='all'?' selected':'')+'>👥 كل الفريق</option></select></div>';
+        (currentUserRole!=='admin' ? '<p class="hint">🔒 التبويب ده هيبقى ليك إنت بس.</p>' : '')+'<div class="field-sm"'+(currentUserRole!=='admin' ? ' style="display:none;"' : '')+'><label>مين يشوف التبويب؟</label><select data-f="tabvis"><option value="me"'+(w.vis==='all'?'':' selected')+'>🔒 أنا بس (خاص)</option><option value="all"'+(w.vis==='all'?' selected':'')+'>👥 كل الفريق</option></select></div>';
       foot = '<div class="io-sh-foot"><button type="button" class="btn btn-primary btn-sm" data-w="mktab">إنشاء</button><button type="button" class="btn btn-ghost btn-sm" data-w="close">إلغاء</button></div>';
     } else if(w.step==='dcat'){
       head = mkHead(w.edit ? 'تعديل لوحة المؤشرات' : 'لوحة مؤشرات', 'عاوز تعرض بيانات إيه؟', !w.edit);
@@ -12728,7 +12726,7 @@
     var w = dbWiz;
     if(act==='dash'){ w.step = 'dcat'; dbWizRender(); return; }
     var pid = w.pageId; dbWizClose();
-    var dr = ioWizDraftNew(); dr.noTable = true; dr.target = {pageId:pid}; ioWizOpen(dr);
+    var dr = ioWizDraftNew(); dr.noTable = true; if(act==='table'){ dr.tableOnly = true; dr.title = ''; } dr.target = {pageId:pid}; ioWizOpen(dr);
   }
   function dbWizFinish(scope){
     var w = dbWiz, pg = dashPage(w.pageId), c = dashCat(w.cat); if(!pg || !c) return;
@@ -12758,13 +12756,13 @@
       if(k==='order'){ w.step = 'order'; dbWizRender(); return; }
       if(k==='tab'){ w.pending = null; w.step = 'tabname'; dbWizRender(); return; }
       w.pending = k;
-      if(w.pageId){ dbWizProceed(k); } else if(dashPages.length){ w.step = 'page'; dbWizRender(); } else { w.step = 'tabname'; dbWizRender(); }
+      if(w.pageId){ dbWizProceed(k); } else if(dashPages.some(canManagePage)){ w.step = 'page'; dbWizRender(); } else { w.step = 'tabname'; dbWizRender(); }
       return;
     }
     if(a==='page'){ if(k==='__new'){ w.step = 'tabname'; dbWizRender(); return; } w.pageId = k; dbWizProceed(w.pending); return; }
     if(a==='mktab'){
       var nm = (w.name || '').trim(); if(!nm){ toast('اكتب اسم التبويب'); return; }
-      var pg = {id:genId(), title:nm, widgets:[], owner:myMail()}; if(w.vis !== 'all') pg.priv = true; dashPages.push(pg); w.pageId = pg.id;
+      var pg = {id:genId(), title:nm, widgets:[], owner:myMail()}; if(w.vis !== 'all' || currentUserRole!=='admin') pg.priv = true; dashPages.push(pg); w.pageId = pg.id;
       dashSave().then(function(){ dashRenderTabs(); if(w.pending){ dbWizProceed(w.pending); } else { dbWizClose(); dashActivate(pg.id); toast('اتعمل التبويب'); } });
       return;
     }
