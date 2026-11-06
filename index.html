@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KPoT0SHxbBW8zBM7SZTAAqtTLJReddBgeIwpq6OuBGc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UVsN0t59vZUWuMNW7Eqz9pgR0SXHCfqxwr1ntV6BvUo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -907,6 +907,28 @@
   /* الأرصاد: كل البيانات في منتصف الصفحة */
   .wx-strip{justify-content:safe center;} .wx-toggle{margin-inline-start:0;}
   .wx-detail{text-align:center;} .wx-detail > *{max-width:980px;margin-inline:auto;} .wx-grid{justify-content:center;} .wx-hours{justify-content:safe center;}
+
+  /* ===== مظهر «زاهي» (اختياري): ألوان أنضر على نفس التصميم ===== */
+  :root[data-palette="vivid"]{--ink:#0A1A13;--paper:#F3FAF6;--surface:#FFFFFF;--surface-2:#E3F4EA;--border:#C9E6D6;--muted:#476558;
+    --brand:#00B368;--brand-strong:#008C52;--brand-soft:#C8F4DF;--on-brand:#FFFFFF;
+    --water:#0B7DDB;--water-soft:#D3EAFF;--tank:#F59E0B;--tank-soft:#FFEBC2;--alert:#E5383B;--alert-soft:#FFD9DA;--good:#12A150;--good-soft:#CDF3DB;
+    --shadow-card:0 1px 2px rgba(0,60,35,.07),0 12px 28px -14px rgba(0,120,70,.28);--shadow-raised:0 18px 44px -12px rgba(0,80,50,.34);}
+  @media (prefers-color-scheme: dark){:root[data-palette="vivid"]:not([data-theme="light"]){--ink:#E6F7EE;--paper:#04120B;--surface:#0A1F15;--surface-2:#10301F;--border:#1B4630;--muted:#86B79C;
+    --brand:#19E08F;--brand-strong:#5CF0B2;--brand-soft:#0B3B27;--on-brand:#03150E;
+    --water:#4DB8FF;--water-soft:#0F2D45;--tank:#FFB938;--tank-soft:#3A2A08;--alert:#FF6B6E;--alert-soft:#42171A;--good:#3DDC84;--good-soft:#0F3A22;}}
+  :root[data-palette="vivid"][data-theme="dark"]{--ink:#E6F7EE;--paper:#04120B;--surface:#0A1F15;--surface-2:#10301F;--border:#1B4630;--muted:#86B79C;
+    --brand:#19E08F;--brand-strong:#5CF0B2;--brand-soft:#0B3B27;--on-brand:#03150E;
+    --water:#4DB8FF;--water-soft:#0F2D45;--tank:#FFB938;--tank-soft:#3A2A08;--alert:#FF6B6E;--alert-soft:#42171A;--good:#3DDC84;--good-soft:#0F3A22;}
+  :root[data-palette="vivid"] body{background:radial-gradient(900px 420px at 100% -8%,color-mix(in srgb,var(--brand) 20%,transparent),transparent 70%),radial-gradient(700px 360px at 0% 100%,color-mix(in srgb,var(--water) 12%,transparent),transparent 70%),var(--paper);background-attachment:fixed;}
+  .pal-opt.active{background:var(--brand);color:var(--on-brand);border-color:var(--brand);}
+  :root[data-palette="vivid"] #app > header{background:linear-gradient(90deg,color-mix(in srgb,var(--brand) 16%,var(--surface)),color-mix(in srgb,var(--water) 10%,var(--surface)));border-bottom-color:color-mix(in srgb,var(--brand) 30%,var(--border));}
+  :root[data-palette="vivid"] .wx-strip{background:color-mix(in srgb,var(--water) 8%,var(--surface));border-bottom-color:color-mix(in srgb,var(--water) 25%,var(--border));}
+  :root[data-palette="vivid"] nav.tabs#tabs{background:color-mix(in srgb,var(--brand) 7%,var(--surface));border-inline-end-color:color-mix(in srgb,var(--brand) 28%,var(--border));}
+  :root[data-palette="vivid"] nav.tabs#tabs .tab-btn.active{background:color-mix(in srgb,var(--tab-color,var(--brand)) 24%,var(--surface));color:var(--ink);box-shadow:inset 4px 0 0 var(--tab-color,var(--brand));}
+  :root[data-palette="vivid"] nav.tabs#tabs .tab-btn:not(.active) .ic{color:var(--tab-color,var(--muted));}
+  :root[data-palette="vivid"] h1.page-title{color:var(--brand-strong);}
+  :root[data-palette="vivid"] .stat-card,:root[data-palette="vivid"] .chart-card,:root[data-palette="vivid"] .settings-card{border-color:color-mix(in srgb,var(--brand) 22%,var(--border));}
+  :root[data-palette="vivid"] .range-pill.active,:root[data-palette="vivid"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
 </style>
 </head>
 <body>
@@ -943,6 +965,7 @@
     <div class="header-actions">
       <span class="hello" id="hello-user"></span>
       <button class="icon-btn notif-bell" id="btn-notif" title="التنبيهات" aria-label="التنبيهات">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
+      <button class="icon-btn" id="btn-palette" title="ألوان التطبيق: هادي / زاهي" aria-label="ألوان التطبيق">🎨</button>
       <button class="icon-btn" id="btn-theme" title="تبديل المظهر">◐</button>
       <button class="icon-btn" id="btn-logout" title="تسجيل الخروج">⎋</button>
     </div>
@@ -1092,6 +1115,12 @@
 
     <section class="panel" id="panel-settings">
       <h1 class="page-title">الإعدادات</h1>
+
+      <div class="settings-card" id="palette-card">
+        <h3>🎨 ألوان التطبيق</h3>
+        <p class="hint help-note">«هادي» هو الشكل المعتاد، و«زاهي» ألوان أنضر (أخضر وأزرق وكهرماني وأحمر أوضح). الاختيار خاص بحسابك ويتزامن بين أجهزتك، وتقدر تبدّل منه أو من زرار 🎨 اللي فوق.</p>
+        <div class="range-filter"><button type="button" class="range-pill pal-opt" data-pal="calm">هادي</button><button type="button" class="range-pill pal-opt" data-pal="vivid">زاهي</button></div>
+      </div>
 
       <div class="settings-card">
         <h3>الأصناف / المحاصيل</h3>
@@ -1358,6 +1387,7 @@
     'search':'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
     'lock':'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     'tag':'<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.7 8.71a2 2 0 0 0 2.82 0l7.18-7.18a2 2 0 0 0 0-2.82Z"/><path d="M7.5 7.5h.01"/>',
+    'palette':'<circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.1-.7-.4-1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.9-4.5-9-10-9Z"/>',
     'soil':'<path d="m12 2 10 5-10 5L2 7l10-5Z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/>',
     'home':'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>',
     'spray':'<path d="M3 3h.01M7 5h.01M11 7h.01M3 7h.01M7 9h.01M3 11h.01"/><rect width="4" height="4" x="15" y="5"/><path d="m19 9 2 2v10c0 .6-.4 1-1 1h-6c-.6 0-1-.4-1-1V11l2-2"/><path d="m13 14 8-2M13 19l8-2"/>',
@@ -1379,7 +1409,7 @@
     '⚙':'settings','▾':'chevron-down','⌄':'chevron-down','⌃':'chevron-up','‹':'chevron-left','›':'chevron-right',
     '🍄':'mushroom','🆕':'sparkles','🧮':'calculator','🌬':'wind','◐':'contrast','⎋':'log-out','👁':'eye',
     '⏩':'fast-forward','⚡':'zap','🧪':'flask','🔴':'circle-dot','🟡':'circle','🪤':'funnel','💬':'message-circle',
-    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🧴':'spray','🪴':'potted'
+    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🎨':'palette','🧴':'spray','🪴':'potted'
   };
   var ICON_RE = /(?:[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF])\uFE0F?/gu;
   var ICON_QUICK = /[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF]/u;
@@ -14294,7 +14324,19 @@
   }
 
   /* ---------- theme ---------- */
+  function setPalette(p, persist){
+    var root = document.documentElement;
+    if(p==='vivid') root.setAttribute('data-palette', 'vivid'); else root.removeAttribute('data-palette');
+    try{ localStorage.setItem('oroots_palette', p==='vivid' ? 'vivid' : 'calm'); }catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.classList.toggle('active', b.getAttribute('data-pal')===(p==='vivid' ? 'vivid' : 'calm')); });
+    if(persist && db && currentUser) db.doc('userData/'+myMail()).set({palette:(p==='vivid' ? 'vivid' : 'calm')}, {merge:true}).catch(function(){});
+    if(persist){ try{ renderAll(); }catch(e){} }
+  }
   function setupTheme(){
+    var pal = null; try{ pal = localStorage.getItem('oroots_palette'); }catch(e){}
+    setPalette(pal==='vivid' ? 'vivid' : 'calm', false);
+    $('#btn-palette').addEventListener('click', function(){ var next = document.documentElement.getAttribute('data-palette')==='vivid' ? 'calm' : 'vivid'; setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : 'اتفعّل المظهر الهادي'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.addEventListener('click', function(){ setPalette(b.getAttribute('data-pal'), true); }); });
     var saved = null;
     try{ saved = localStorage.getItem('oroots_theme'); }catch(e){}
     if(saved) document.documentElement.setAttribute('data-theme', saved);
@@ -14672,6 +14714,7 @@
     db.doc('userData/'+myMail()).onSnapshot(function(snap){
       var ud = snap.exists ? snap.data() : {};
       dashMine = Array.isArray(ud.pages) ? ud.pages : [];
+      if(ud.palette==='vivid' || ud.palette==='calm') setPalette(ud.palette, false);
       ownCharts = Array.isArray(ud.charts) ? ud.charts : null; ownOv = (ud.ov && typeof ud.ov === 'object') ? ud.ov : null; ioMergeCharts();
       if(ud.tabNames && typeof ud.tabNames === 'object' && !Array.isArray(ud.tabNames)){ tabNames = ud.tabNames; try{ localStorage.setItem('oroots_tabnames', JSON.stringify(tabNames)); }catch(e){} }
       if(Array.isArray(ud.tabOrder)){ tabOrder = ud.tabOrder; try{ localStorage.setItem('oroots_taborder', JSON.stringify(tabOrder)); }catch(e){} }
