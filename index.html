@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+QlLC31ipG1AhprsiOPeYdJWyjYMcPyajcWAW2GdcxU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UHbc3v1+LNTXoCTFLK9KcaBvxRvk6P0ofpLnukQn2js=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -6206,7 +6206,7 @@
       var v = function(k){ return document.getElementById('ws-soil-'+k).value; };
       addReading('soil', {ts:nowLocalInputValue(), ph:v('ph'), ec:v('ec'), temp:v('temp'), moist:v('moist'), note:v('note')}, systemId).then(function(){
         toast('تم حفظ قراءة التربة'); renderSoilPanel();
-      });
+      }).catch(function(err){ console.error('soil save', err); toast('⛔ قراءة التربة ما اتحفظتش'+(err && err.code==='permission-denied' ? ': مفيش صلاحية كتابة (صلاحية التربة/المياه أو قواعد Firestore)' : (err && err.message ? (': '+err.message) : '')), 9000); });
     });
     document.getElementById('ws-soil-export').addEventListener('click', function(){ exportSoilCSV(systemId); });
     var tb = document.getElementById('ws-soil-tbody');
@@ -14344,7 +14344,7 @@
   }
   /* معالج أخطاء عام: أي خطأ غير متوقع بيتسجل في سجل التدقيق (بحد أقصى 5 في الجلسة) ويظهر للمستخدم تنبيه، عشان الأخطاء الصامتة ما تستخبّاش */
   function installErrorReporter(){
-    var seen = {}, count = 0;
+    var seen = {}, count = 0, permWarned = 0;
     function report(msg, where){
       var key = String(msg).slice(0, 120); if(seen[key] || count >= 5) return; seen[key] = 1; count++;
       try{ if(currentUser) logAudit('error', 'client', String(msg).slice(0, 300)+(where ? (' @ '+where) : '')); }catch(e){}
@@ -14356,6 +14356,10 @@
     });
     window.addEventListener('unhandledrejection', function(ev){
       var r = ev && ev.reason, m = r && (r.message || String(r));
+      if(m && ((r && r.code === 'permission-denied') || /Missing or insufficient permissions|permission-denied/i.test(m))){
+        if(!permWarned || Date.now() - permWarned > 8000){ permWarned = Date.now(); try{ toast('⛔ ما اتحفظش: مفيش صلاحية كتابة على السيرفر. اتأكد من صلاحياتك عند المدير، ومن إن قواعد Firestore الأخيرة اتنشرت (وإن المدير فتح التطبيق مرة بعد التحديث).', 9000); }catch(e){} }
+        return;
+      }
       if(!m || /permission|offline|network|Failed to fetch|unavailable|quota/i.test(m)) return;
       report('وعد مرفوض: '+m);
     });
