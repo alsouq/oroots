@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tq6SnOAaVY7zsFLMf/UL3e1a2HgB4Jsn35L2JykujWw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+QlLC31ipG1AhprsiOPeYdJWyjYMcPyajcWAW2GdcxU=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -185,23 +185,22 @@
   .pipe{position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;--leaf-d:#9aa59d;--leaf-l:#c9d1cc;}
   .nft{position:relative;width:100%;padding:8px 7% 5px;border-radius:7px;background:linear-gradient(90deg,#d9e1e6 0%,#fff 20%,#fff 80%,#d9e1e6 100%);border:1px solid rgba(70,90,100,.42);box-shadow:0 3px 5px -1px rgba(0,0,0,.32),inset 0 0 0 1px rgba(255,255,255,.85);}
   .nft-cap{position:absolute;top:-1px;left:-1px;right:-1px;height:6px;border-radius:7px 7px 2px 2px;background:var(--gc,transparent);}
-  .nft-pl{display:grid;grid-template-columns:1fr 1fr;padding-bottom:45%;}
-  .slot{position:relative;width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
-  .slot::before{content:'';position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle,#2c3236 0 50%,#6a737a 52% 66%,#c8d1d7 68% 100%);}
-    .slot:nth-child(2n){transform:translateY(50%);}
-  .plw{position:absolute;left:50%;top:50%;margin:-62.5% 0 0 -62.5%;z-index:1;width:125%;aspect-ratio:1;transform:scale(calc(.13 + var(--p,0)*.87));transition:transform .9s cubic-bezier(.2,.8,.2,1);pointer-events:none;}
-  .plw .pl{display:block;width:100%;height:100%;overflow:visible;}
   @keyframes plTurn{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
   .st-seed{--leaf-d:#7fb48d;--leaf-l:#cdeed3;} .st-grow{--leaf-d:#2f9e63;--leaf-l:#86d9a9;} .st-almost{--leaf-d:#1f8a4f;--leaf-l:#5cc98c;}
   .st-ready{--leaf-d:#0f7a3d;--leaf-l:#3fcf7a;} .st-over{--leaf-d:#a97918;--leaf-l:#f2d24f;}
-  .st-empty .plw,.st-future .plw{visibility:hidden;} .st-future .nft{opacity:.55;border-style:dashed;} .st-empty .nft{opacity:.85;}
-  .st-ready .nft{box-shadow:0 0 0 2px rgba(47,191,113,.65),0 0 14px rgba(47,191,113,.65),0 3px 5px -1px rgba(0,0,0,.3);animation:pipeGlow 2.2s ease-in-out infinite;}
-  .st-over .nft{box-shadow:0 0 0 2px rgba(224,168,46,.7),0 0 12px rgba(224,168,46,.6),0 3px 5px -1px rgba(0,0,0,.3);animation:pipeGlowY 2.6s ease-in-out infinite;}
+  .st-ready .nft{box-shadow:0 0 0 2px rgba(47,191,113,.65),0 0 14px rgba(47,191,113,.65),0 3px 5px -1px rgba(0,0,0,.3);}
+  .st-over .nft{box-shadow:0 0 0 2px rgba(224,168,46,.7),0 0 12px rgba(224,168,46,.6),0 3px 5px -1px rgba(0,0,0,.3);}
   .st-ready .nft::after,.st-over .nft::after{content:'✓';position:absolute;bottom:-6px;inset-inline-start:50%;margin-inline-start:-7px;width:14px;height:14px;border-radius:50%;background:#1f9d57;color:#fff;font-size:.6rem;font-weight:800;line-height:14px;text-align:center;z-index:9;box-shadow:0 1px 3px rgba(0,0,0,.35);} .st-over .nft::after{content:'!';background:#d99a1f;}
   .pipe-grid.z-s .nft::after{width:10px !important;height:10px !important;margin-inline-start:-5px !important;font-size:.46rem !important;line-height:10px !important;}
   .nft .pipe-cut{top:-7px;right:-7px;z-index:10;}
   .pipe-n{font-size:.56rem;color:var(--muted);margin-top:8px;line-height:1;} .pipe-grid.z-s .pipe-n{font-size:.46rem;margin-top:6px;} .pipe.sel .nft{outline:2px solid var(--brand);outline-offset:3px;}
-  @media (prefers-reduced-motion:reduce){.plw,.plw .pl,.nft{animation:none !important;transition:none !important;}}
+  .pipe{contain:layout style;}
+  .nft{padding:6px 4px 4px;}
+  .pl1{position:relative;width:100%;aspect-ratio:1;}
+  .pl1::before{content:'';position:absolute;left:24%;right:24%;bottom:5%;height:17%;border-radius:50%;background:radial-gradient(ellipse,#3a4247 0 55%,#8a949a 58% 100%);}
+  .pl1 .pl{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform-origin:50% 80%;transform:scale(calc(.2 + var(--p,0)*.74));}
+  .st-empty .pl1 .pl,.st-future .pl1 .pl{display:none;}
+  .st-future .nft{opacity:.55;border-style:dashed;} .st-empty .nft{opacity:.85;}
   .pipe-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin:4px 0 8px;} .pipe-legend span{display:inline-flex;align-items:center;gap:5px;}
   .lg{display:inline-block;width:12px;height:12px;border-radius:4px;} .lg-seed{background:#b6e3c0;} .lg-grow{background:#4fb87f;} .lg-almost{background:#2b9a5d;} .lg-ready{background:#0f7a3d;box-shadow:0 0 6px #3fcf7a;} .lg-over{background:#e0a82e;} .lg-empty{border:2px solid var(--border);}
   .cn-map{box-sizing:border-box;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:0.92rem;}
@@ -419,6 +418,10 @@
   /* المساعدة + التلميحات */
   .help-note{display:none !important;}
   .help-btn{flex:none;user-select:none;-webkit-user-select:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:22px;margin-inline-start:6px;padding:0;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font:700 .74rem/1 inherit;cursor:pointer;vertical-align:middle;transition:background .15s,color .15s,border-color .15s;}
+  .term-btn{flex:none;user-select:none;-webkit-user-select:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;min-width:18px;margin-inline-start:6px;padding:0;border-radius:50%;border:1.3px solid var(--muted);background:transparent;color:var(--muted);font:700 .66rem/1 inherit;cursor:pointer;vertical-align:middle;}
+  .term-btn:hover,.term-btn:focus-visible{background:var(--brand);border-color:var(--brand);color:var(--on-brand);outline:none;}
+  .db-tbl td:first-child{text-align:start;} .db-tbl .term-btn{float:inline-end;margin-inline-start:8px;margin-top:2px;}
+  .hp-more{display:inline-flex;align-items:center;gap:6px;margin-top:10px;text-decoration:none;}
   .help-btn:hover,.help-btn:focus-visible{background:var(--brand);border-color:var(--brand);color:var(--on-brand);}
   .help-btn:focus{outline:none;} .help-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
   .help-pop{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;}
@@ -3677,9 +3680,50 @@
   }
   /* حجم رسم المواسير: صغير/متوسط/كبير، بيتحفظ على الجهاز (الافتراضي صغير لو المواسير كتير) */
   function pipeZoomGet(map){ var v = null; try{ v = localStorage.getItem('oroots_pipe_zoom'); }catch(e){} return (v==='s' || v==='m' || v==='l') ? v : ((map && map.totalPipes > 60) ? 's' : 'm'); }
+  /* نوع الشكل المرسوم حسب اسم المحصول: خس / ريحان / جرجير / أي ورقيات تانية */
+  function pipeCropKind(name){
+    var n = String(name||'').toLowerCase().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
+    if(/خس|lettuce|romaine|رومين|كابوتشا|ايس ?برج|اوك|oak|ليتل|بتر ?هيد|butter|frill|فريلي/.test(n)) return 'lettuce';
+    if(/ريحان|basil|نعناع|mint|زعتر|thyme|روزماري|rosemary|مرمريه|sage/.test(n)) return 'basil';
+    if(/جرجير|arugula|rocket|روكا|فجل|radish|كرنب|كيل|kale|سلق|chard|سبانخ|spinach/.test(n)) return 'arugula';
+    return 'rosette';
+  }
+  function pipeSymbolsHtml(){
+    var L = function(cx,cy,rx,ry,rot,ox,oy){ return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" transform="rotate('+rot+' '+ox+' '+oy+')"/>'; };
+    var i;
+    var wavy = function(r, amp, n, ph){ var d = '', t, rr, x, y; for(t=0;t<=64;t++){ var th = t/64*2*Math.PI; rr = r + amp*Math.sin(n*th+ph); x = 20+rr*Math.cos(th); y = 19.5+rr*Math.sin(th); d += (t?'L':'M')+x.toFixed(2)+' '+y.toFixed(2); } return d+'Z'; };
+    var vein = function(ang, r0, r1){ var c = Math.cos(ang), sn = Math.sin(ang); return 'M'+(20+r0*c).toFixed(1)+' '+(19.5+r0*sn).toFixed(1)+'L'+(20+r1*c).toFixed(1)+' '+(19.5+r1*sn).toFixed(1); };
+    var lettuce = '<path d="'+wavy(16.8,1.3,7,0)+'" style="fill:var(--leaf-d);stroke:rgba(0,0,0,.2);stroke-width:.6"/>'+
+      '<path d="'+wavy(13,1.1,6,.6)+'" style="fill:color-mix(in srgb,var(--leaf-d) 72%,var(--leaf-l));stroke:rgba(0,0,0,.16);stroke-width:.5"/>'+
+      '<path d="'+wavy(9.4,.9,5,1.1)+'" style="fill:color-mix(in srgb,var(--leaf-d) 38%,var(--leaf-l));stroke:rgba(0,0,0,.14);stroke-width:.5"/>'+
+      '<path d="'+wavy(5.5,.7,4,.3)+'" style="fill:var(--leaf-l);stroke:rgba(0,0,0,.12);stroke-width:.4"/><g style="stroke:var(--leaf-l);stroke-width:.7;stroke-linecap:round;fill:none;opacity:.55">';
+    for(i=0;i<10;i++){ lettuce += '<path d="'+vein(i/10*2*Math.PI+.15, 10.5, 15.2)+'"/>'; }
+    lettuce += '</g><g style="stroke:color-mix(in srgb,var(--leaf-d) 60%,#000);stroke-width:.6;stroke-linecap:round;fill:none;opacity:.55">';
+    for(i=0;i<6;i++){ lettuce += '<path d="'+vein(i/6*2*Math.PI+.4, 1, 5.6)+'"/>'; }
+    lettuce += '</g><path d="M13.2 29.5C10 22.5 13 14.5 19 13.5 20.4 21 19.4 26.6 13.2 29.5Z" style="fill:var(--leaf-l);stroke:rgba(0,0,0,.16);stroke-width:.5;opacity:.92"/>'+
+      '<path d="M26.8 29.5C30 22.5 27 14.5 21 13.5 19.6 21 20.6 26.6 26.8 29.5Z" style="fill:var(--leaf-l);stroke:rgba(0,0,0,.16);stroke-width:.5;opacity:.92"/>'+
+      '<g style="stroke:color-mix(in srgb,var(--leaf-d) 55%,#fff);stroke-width:.6;stroke-linecap:round;fill:none"><path d="M13.6 28.6C14.6 23 16.2 18.4 18.6 14.6"/><path d="M26.4 28.6C25.4 23 23.8 18.4 21.4 14.6"/></g>';
+    var basil = '<path d="M20 31 V8" style="stroke:var(--leaf-d);stroke-width:1.6;fill:none;stroke-linecap:round"/><g style="fill:var(--leaf-d);stroke:rgba(0,0,0,.18);stroke-width:.5">';
+    [[27,-38,5.6,3.2],[27,38,5.6,3.2],[20,-34,6.6,3.8],[20,34,6.6,3.8],[13,-30,5.8,3.4],[13,30,5.8,3.4]].forEach(function(q){ var x = q[1]<0 ? 20-q[2] : 20+q[2]; basil += L(x,q[0],q[2],q[3],q[1],20,q[0]); });
+    basil += '</g><g style="fill:var(--leaf-l);stroke:rgba(0,0,0,.12);stroke-width:.4">'+L(16.4,8,4.6,2.6,-24,20,8)+L(23.6,8,4.6,2.6,24,20,8)+L(20,4.6,2.6,4.2,0,20,8)+'</g>';
+    var aru = '<g style="fill:var(--leaf-d);stroke:rgba(0,0,0,.15);stroke-width:.4">';
+    [-50,-37,-24,-11,11,24,37,50].forEach(function(r){ aru += L(20,17,2.6,11,r,20,31); });
+    aru += '</g><g style="fill:var(--leaf-l);stroke:rgba(0,0,0,.1);stroke-width:.3">';
+    [-40,-20,0,20,40].forEach(function(r){ aru += L(20,21,2.2,8,r,20,31); });
+    aru += '</g>';
+    var ros = '<g style="fill:var(--leaf-d);stroke:rgba(0,0,0,.15);stroke-width:.5">', k;
+    [-62,-31,0,31,62].forEach(function(r){ ros += L(20,18,6,9,r,20,30); });
+    ros += '</g><g style="fill:var(--leaf-l);stroke:rgba(0,0,0,.1);stroke-width:.4">';
+    [-45,0,45].forEach(function(r){ ros += L(20,22,4,6.4,r,20,30); });
+    ros += '</g>';
+    return '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>'+
+      '<symbol id="pk-lettuce" viewBox="0 0 40 40">'+lettuce+'</symbol><symbol id="pk-basil" viewBox="0 0 40 40">'+basil+'</symbol>'+
+      '<symbol id="pk-arugula" viewBox="0 0 40 40">'+aru+'</symbol><symbol id="pk-rosette" viewBox="0 0 40 40">'+ros+'</symbol></defs></svg>';
+  }
   function pipeGridHtml(map, sim){
-    var slots = pipeSlots(map), html = '', nPl = Math.max(2, Math.min(40, parseInt(map.plantsPerPipe,10) || 30)), slotsAll = '';
-    for(var k=0;k<nPl;k++) slotsAll += '<span class="slot"><span class="plw"><svg class="pl" viewBox="0 0 40 40" aria-hidden="true"><use href="#nft-top"/></svg></span></span>';
+    var slots = pipeSlots(map), html = '', plants = {};
+    map.groups.forEach(function(g, k){ plants[k] = '<div class="pl1"><svg class="pl" viewBox="0 0 40 40" aria-hidden="true"><use href="#pk-'+pipeCropKind(g.crop)+'"/></svg></div>'; });
+    var emptyPl = '<div class="pl1"></div>';
     for(var i=0;i<map.totalPipes;i++){
       var gi = slots[i], g = gi>=0 ? map.groups[gi] : null, st = 'empty', p = 0, title = 'ماسورة '+(i+1)+' — فاضية';
       var gc = '', cutBadge = '';
@@ -3690,7 +3734,7 @@
         if(cl.done>0) cutBadge = '<i class="pipe-cut">'+cl.done+'</i>';
       }
       html += '<div class="pipe st-'+st+(pipeSel===i?' sel':'')+'" data-i="'+i+'" style="--p:'+p.toFixed(3)+';--i:'+i+(gc?(';--gc:'+gc):'')+'" title="'+escH(title)+'">'+
-        '<div class="nft"><i class="nft-cap"></i><div class="nft-pl">'+slotsAll+'</div>'+cutBadge+'</div><span class="pipe-n">'+(i+1)+'</span></div>';
+        '<div class="nft"><i class="nft-cap"></i>'+(g ? plants[gi] : emptyPl)+cutBadge+'</div><span class="pipe-n">'+(i+1)+'</span></div>';
     }
     return html;
   }
@@ -3905,16 +3949,12 @@
     var defMax = editing ? (parseInt(editing.maxCuts,10)||1) : 1, defRegrow = editing ? (parseFloat(editing.regrowDays)||'') : '';
     var defCuts = editing ? (parseInt(editing.cuts,10)||0) : 0, defLast = editing ? (editing.lastCutDate||'') : '';
     var cropsList = pipeKnownCrops().map(function(c){ return '<option value="'+escH(c)+'"></option>'; }).join('');
-    return '<p class="hint help-note">النظام بيتعرض من فوق (Top view): كل قناة NFT بيضا والنبات بيتشاف من فوق وهو بيكبر ويتغير لونه حسب عمره (شتلة ← بتكبر ← قربت ← جاهزة ✓ ← متأخرة)، والجاهزة بتنوّر. بتتعرض للنظام المختار فوق، وتقدر تكبّر أو تصغّر الشكل.</p>'+
+    return '<p class="hint help-note">كل ماسورة بتتعرض كنبتة واحدة بشكل المحصول (خس أو ريحان أو جرجير...) وهي بتكبر ويتغير لونها حسب عمره (شتلة ← بتكبر ← قربت ← جاهزة ✓ ← متأخرة)، والجاهزة بتنوّر. بتتعرض للنظام المختار فوق، وتقدر تكبّر أو تصغّر الشكل.</p>'+
       '<div id="pipe-summary">'+pipeSummaryHtml(map, pipeSimDays)+'</div>'+
       '<div class="pipe-sim"><label for="pipe-sim">⏩ شوف الوضع بعد: <strong id="pipe-sim-val">'+pipeDayLabel(pipeSimDays)+'</strong> <span class="hint" id="pipe-sim-date" style="margin:0;"></span></label>'+
         '<input type="range" id="pipe-sim" min="0" max="45" step="1" value="'+pipeSimDays+'"></div>'+
-      '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="nft-top" viewBox="0 0 40 40">'+
-        '<g style="fill:var(--leaf-d);stroke:rgba(0,0,0,.18);stroke-width:.5"><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(0.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(45.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(90.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(135.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(180.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(225.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(270.0 20 20)"/><ellipse cx="20" cy="9.5" rx="6.4" ry="10.2" transform="rotate(315.0 20 20)"/></g>'+
-        '<g style="fill:color-mix(in srgb,var(--leaf-d) 55%,var(--leaf-l));stroke:rgba(0,0,0,.14);stroke-width:.5"><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(30.0 20 20)"/><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(90.0 20 20)"/><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(150.0 20 20)"/><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(210.0 20 20)"/><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(270.0 20 20)"/><ellipse cx="20" cy="13" rx="4.8" ry="7.6" transform="rotate(330.0 20 20)"/></g>'+
-        '<g style="fill:var(--leaf-l);stroke:rgba(0,0,0,.1);stroke-width:.4"><ellipse cx="20" cy="16.2" rx="3.2" ry="5" transform="rotate(15.0 20 20)"/><ellipse cx="20" cy="16.2" rx="3.2" ry="5" transform="rotate(87.0 20 20)"/><ellipse cx="20" cy="16.2" rx="3.2" ry="5" transform="rotate(159.0 20 20)"/><ellipse cx="20" cy="16.2" rx="3.2" ry="5" transform="rotate(231.0 20 20)"/><ellipse cx="20" cy="16.2" rx="3.2" ry="5" transform="rotate(303.0 20 20)"/></g>'+
-        '<circle cx="20" cy="20" r="2.1" style="fill:color-mix(in srgb,var(--leaf-l) 70%,#fff)"/></symbol></defs></svg>'+
-      '<div class="pipe-zoom"><span>🔍 منظر علوي (Top view) — حجم الشكل:</span><button type="button" data-z="s">صغير</button><button type="button" data-z="m">متوسط</button><button type="button" data-z="l">كبير</button></div>'+
+      pipeSymbolsHtml()+
+      '<div class="pipe-zoom"><span>🔍 حجم الشكل:</span><button type="button" data-z="s">صغير</button><button type="button" data-z="m">متوسط</button><button type="button" data-z="l">كبير</button></div>'+
       '<div class="pipe-grid z-'+pipeZoomGet(map)+'" id="pipe-grid">'+pipeGridHtml(map, pipeSimDays)+'</div>'+
       '<p class="hint" id="pipe-info" style="min-height:1.4em;">اضغط على أي ماسورة عشان تشوف تفاصيلها.</p>'+
       '<div class="pipe-legend"><span><i class="lg lg-seed"></i>شتلة</span><span><i class="lg lg-grow"></i>بتكبر</span><span><i class="lg lg-almost"></i>قربت</span><span><i class="lg lg-ready"></i>جاهزة ✓</span><span><i class="lg lg-over"></i>متأخرة</span><span><i class="lg lg-empty"></i>فاضية</span></div>'+
@@ -3999,7 +4039,7 @@
   }
   function wirePipeInfographic(){
     var sim = $('#pipe-sim'); if(!sim) return;
-    sim.addEventListener('input', function(){ pipeSimDays = parseInt(this.value,10)||0; pipeRefresh(); });
+    var simRaf = 0; sim.addEventListener('input', function(){ pipeSimDays = parseInt(this.value,10)||0; if(simRaf) return; simRaf = requestAnimationFrame(function(){ simRaf = 0; pipeRefresh(); }); });
     $('#pipe-grid').addEventListener('click', function(ev){
       var el = ev.target.closest ? ev.target.closest('.pipe') : null;
       if(el) pipeShowInfo(parseInt(el.getAttribute('data-i'),10));
@@ -12882,7 +12922,7 @@
   function dbEmpty(msg){ return '<p class="empty-note" style="padding:14px;">'+msg+'</p>'; }
   function dbTable(sections){
     return '<table class="db-tbl"><tbody>'+sections.map(function(s){
-      return '<tr class="db-sec"><td colspan="3">'+escH(s.t)+'</td></tr>'+s.rows.map(function(r){ return '<tr><td dir="auto">'+r[0]+'</td><td class="db-u">'+escH(r[2] || '')+'</td><td class="db-v">'+r[1]+'</td></tr>'; }).join('');
+      return '<tr class="db-sec"><td colspan="3">'+escH(s.t)+'</td></tr>'+s.rows.map(function(r){ return '<tr><td dir="rtl">'+r[0]+'</td><td class="db-u">'+escH(r[2] || '')+'</td><td class="db-v">'+r[1]+'</td></tr>'; }).join('');
     }).join('')+'</tbody></table>';
   }
   function dbClimate(gh){
@@ -14017,6 +14057,49 @@
     'المادة الفعالة': 'المركّب الكيميائي اللي بيعمل التأثير في المنتج.',
     'ppm': 'جزء في المليون: تركيز العنصر بالملجم في اللتر.'
   };
+  /* قاموس المصطلحات: الاسم الكامل + جملة البحث في جوجل (بيظهر جنب المصطلح علامة ؟ بتفتح الشرح) */
+  var TERM_Q_RAW = {
+    'pH': ['pH — درجة الحموضة', 'pH hydroponics nutrient solution'],
+    'EC': ['EC — Electrical Conductivity (التوصيلية الكهربية)', 'EC electrical conductivity hydroponics nutrient solution'],
+    'VPD': ['VPD — Vapor Pressure Deficit (عجز ضغط البخار)', 'VPD vapor pressure deficit greenhouse plants'],
+    'AH': ['AH — Absolute Humidity (الرطوبة المطلقة)', 'absolute humidity AH g/m3 greenhouse'],
+    'الرطوبة المطلقة AH': ['AH — Absolute Humidity (الرطوبة المطلقة)', 'absolute humidity AH g/m3 greenhouse'],
+    'HD': ['HD — Humidity Deficit (عجز الرطوبة)', 'humidity deficit HD g/m3 greenhouse'],
+    'عجز الرطوبة HD': ['HD — Humidity Deficit (عجز الرطوبة)', 'humidity deficit HD g/m3 greenhouse'],
+    'Lux': ['Lux — شدة الإضاءة (اللوكس)', 'lux light intensity plants greenhouse'],
+    'شدة الإضاءة': ['Lux — شدة الإضاءة (اللوكس)', 'lux light intensity plants greenhouse'],
+    'PPFD': ['PPFD — Photosynthetic Photon Flux Density', 'PPFD photosynthetic photon flux density plants'],
+    'DLI': ['DLI — Daily Light Integral (التكامل الضوئي اليومي)', 'DLI daily light integral greenhouse'],
+    'DLI اليومي': ['DLI — Daily Light Integral (التكامل الضوئي اليومي)', 'DLI daily light integral greenhouse'],
+    'الإشعاع': ['الإشعاع الشمسي (W/m²)', 'solar radiation W/m2 greenhouse plants'],
+    'RGR': ['RGR — Relative Growth Rate (معدل النمو النسبي)', 'relative growth rate RGR plants'],
+    'معدل النمو النسبي RGR': ['RGR — Relative Growth Rate (معدل النمو النسبي)', 'relative growth rate RGR plants'],
+    'ppm': ['ppm — Parts Per Million (جزء في المليون)', 'ppm parts per million hydroponics nutrients']
+  };
+  var TERM_Q = null;
+  function termMap(){ if(!TERM_Q){ TERM_Q = {}; Object.keys(TERM_Q_RAW).forEach(function(k){ TERM_Q[tipNorm(k)] = {key:k, v:TERM_Q_RAW[k]}; }); } return TERM_Q; }
+  function termBtnHtml(key){ return '<span role="button" tabindex="0" class="term-btn" data-term="'+escH(key)+'" aria-label="شرح المصطلح" title="شرح المصطلح">?</span>'; }
+  function termDecorate(){
+    var tm = termMap(), tp = tipsMap();
+    $all('td:first-child, th, label, .cc-label, .metric-name, .kpi-card .hint').forEach(function(el){
+      if(el.querySelector('.term-btn') || el.closest('#help-pop') || el.closest('#print-report') || el.querySelector('input, select, textarea, table')) return;
+      var clone = el.cloneNode(true); $all('.help-btn, .term-btn, button', clone).forEach(function(x){ x.parentNode.removeChild(x); });
+      var txt = clone.textContent; if(txt.length > 40) return;
+      var hit = tm[tipNorm(txt)]; if(!hit) return;
+      if(!el.hasAttribute('data-tip') && tp[tipNorm(txt)]) el.setAttribute('data-tip', tp[tipNorm(txt)]);
+      el.insertAdjacentHTML('beforeend', ' '+termBtnHtml(hit.key));
+    });
+  }
+  function termOpen(btn){
+    var key = btn.getAttribute('data-term'), ent = TERM_Q_RAW[key]; if(!ent) return;
+    var expl = TIPS_RAW[key] || '';
+    helpClose();
+    var pop = document.createElement('div'); pop.id = 'help-pop'; pop.className = 'help-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'شرح المصطلح');
+    pop.innerHTML = '<div class="hp-card"><div class="hp-head"><strong dir="auto">'+escH(ent[0])+'</strong><button type="button" class="hp-close" aria-label="إغلاق">✕</button></div><div class="hp-body"><p>'+escH(expl || 'مصطلح فني مستخدم في التطبيق.')+'</p>'+
+      '<a class="btn btn-primary btn-sm hp-more" target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?q='+encodeURIComponent(ent[1])+'">🔎 اعرف أكتر (بحث في جوجل)</a></div></div>';
+    document.body.appendChild(pop);
+    pop.addEventListener('click', function(ev){ if(ev.target===pop || ev.target.closest('.hp-close')) helpClose(); });
+  }
   var TIPS = null;
   function tipNorm(t){ return String(t==null?'':t).replace(/\([^)]*\)/g,' ').replace(/[^ء-يA-Za-z0-9\s]/g,' ').replace(/\s+/g,' ').trim(); }
   function tipsMap(){ if(!TIPS){ TIPS = {}; Object.keys(TIPS_RAW).forEach(function(k){ TIPS[tipNorm(k)] = TIPS_RAW[k]; }); } return TIPS; }
@@ -14056,7 +14139,7 @@
         host.insertAdjacentHTML('beforeend', ' '+helpBtnHtml());
       });
     });
-    tipDecorate();
+    tipDecorate(); termDecorate();
   }
   function helpClose(){ var p = document.getElementById('help-pop'); if(p && p.parentNode) p.parentNode.removeChild(p); }
   function helpOpen(btn){
@@ -14095,11 +14178,14 @@
     var tm = null;
     document.addEventListener('click', function(ev){
       var t = ev.target; if(!t || !t.closest) return;
+      var tb = t.closest('.term-btn');
+      if(tb){ ev.preventDefault(); ev.stopPropagation(); tipHide(); termOpen(tb); return; }
       var b = t.closest('.help-btn');
       if(b){ ev.preventDefault(); ev.stopPropagation(); tipHide(); helpOpen(b); }
     }, true);
     document.addEventListener('keydown', function(ev){
       if(ev.key==='Escape') helpClose();
+      else if((ev.key==='Enter' || ev.key===' ') && ev.target && ev.target.classList && ev.target.classList.contains('term-btn')){ ev.preventDefault(); termOpen(ev.target); }
       else if((ev.key==='Enter' || ev.key===' ') && ev.target && ev.target.classList && ev.target.classList.contains('help-btn')){ ev.preventDefault(); helpOpen(ev.target); }
     });
     document.addEventListener('mouseover', function(ev){
