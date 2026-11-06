@@ -6,7 +6,7 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "dir": "rtl",
   "lang": "ar",
   "background_color": "#FFFFFF",
