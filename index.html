@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OBMeBRwRQVjTALzjS8jz/mhTyQKbsBY0g1nyGXAs7JI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tq6SnOAaVY7zsFLMf/UL3e1a2HgB4Jsn35L2JykujWw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -360,9 +360,9 @@
   .chart-tooltip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);border-radius:9px;padding:8px 11px;font-size:0.74rem;line-height:1.6;box-shadow:var(--shadow-raised);opacity:0;transition:opacity .1s;z-index:5;white-space:nowrap;}
   .chart-tooltip.show{opacity:1;}
   .chart-tooltip .tt-time{display:block;margin-bottom:4px;color:#C7D0BC;font-family:var(--font-mono);direction:ltr;text-align:right;font-size:0.7rem;}
-  .chart-tooltip .tt-row{display:flex;align-items:center;gap:7px;}
+  .chart-tooltip{direction:rtl;text-align:start;} .chart-tooltip .tt-row{display:flex;align-items:center;gap:7px;direction:rtl;} .chart-tooltip .tt-time{text-align:start;}
   .chart-tooltip .tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .chart-tooltip .tt-val{font-family:var(--font-mono);margin-inline-start:auto;padding-inline-start:10px;direction:ltr;}
+  .chart-tooltip .tt-val{font-family:var(--font-mono);margin-inline-start:auto;padding-inline-start:10px;direction:ltr;unicode-bidi:isolate;}
   .legend-item{display:inline-flex;align-items:center;gap:5px;}
   .legend-toggle{cursor:pointer;user-select:none;transition:opacity .15s;}
   .range-filter{display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap;}
@@ -886,9 +886,11 @@
   /* ===== شريط التابات الجانبي (يتقفل لأيقونات بس) + الطقس في النص ===== */
   :root{--sb-w:224px;--sb-c:54px;--sb-cur:var(--sb-w);--hdr-h:58px;}
   body.sb-collapsed{--sb-cur:var(--sb-c);}
+  .wx-strip{position:sticky;top:var(--hdr-h);z-index:19;}
+  nav.tabs#tabs{top:calc(var(--hdr-h) + var(--wx-h,0px));}
   #app{padding-inline-start:var(--sb-cur);transition:padding .2s ease;}
   #app > header{margin-inline-start:calc(-1 * var(--sb-cur));transition:margin .2s ease;}
-  nav.tabs#tabs{position:fixed;top:var(--hdr-h);bottom:0;inset-inline-start:0;width:var(--sb-cur);flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:2px;overflow-x:hidden;overflow-y:auto;padding:8px 6px 14px;border-bottom:none;border-inline-end:1px solid var(--border);z-index:30;transition:width .2s ease;scrollbar-width:thin;}
+  nav.tabs#tabs{position:fixed;bottom:0;inset-inline-start:0;width:var(--sb-cur);flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:2px;overflow-x:hidden;overflow-y:auto;padding:8px 6px 14px;border-bottom:none;border-inline-end:1px solid var(--border);z-index:30;transition:width .2s ease;scrollbar-width:thin;}
   nav.tabs#tabs .tab-btn{width:100%;flex:0 0 auto;justify-content:flex-start;gap:10px;border-radius:12px;border-bottom:none;padding:10px 12px;font-size:.88rem;text-align:start;}
   nav.tabs#tabs .tab-btn .ic{width:20px;height:20px;flex:none;}
   nav.tabs#tabs .tab-btn.active{background:color-mix(in srgb,var(--tab-color,var(--ink)) 14%,transparent);box-shadow:inset 3px 0 0 var(--tab-color,var(--ink));}
@@ -908,6 +910,7 @@
   .wx-strip{justify-content:safe center;} .wx-toggle{margin-inline-start:0;}
   .wx-detail{text-align:center;} .wx-detail > *{max-width:980px;margin-inline:auto;} .wx-grid{justify-content:center;} .wx-hours{justify-content:safe center;}
 
+  .io-tip{direction:rtl;text-align:start;} .io-tip-h{direction:rtl;text-align:start;unicode-bidi:isolate;} .io-tip-r{direction:rtl;gap:8px !important;} .io-tip-n{direction:rtl;unicode-bidi:isolate;text-align:start;flex:1 1 auto;} .io-tip-v{direction:ltr;unicode-bidi:isolate;white-space:nowrap;text-align:left;}
   /* ===== مظهر «زاهي» (اختياري): ألوان أنضر على نفس التصميم ===== */
   :root[data-palette="vivid"]{--ink:#0A1A13;--paper:#F3FAF6;--surface:#FFFFFF;--surface-2:#E3F4EA;--border:#C9E6D6;--muted:#476558;
     --brand:#00B368;--brand-strong:#008C52;--brand-soft:#C8F4DF;--on-brand:#FFFFFF;
@@ -932,6 +935,22 @@
   :root[data-palette="vivid"] h1.page-title{color:var(--brand-strong);}
   :root[data-palette="vivid"] .stat-card,:root[data-palette="vivid"] .chart-card,:root[data-palette="vivid"] .settings-card{border-color:color-mix(in srgb,var(--brand) 22%,var(--border));}
   :root[data-palette="vivid"] .range-pill.active,:root[data-palette="vivid"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
+
+  /* ===== مظهر CMYK: سماوي (C) + ماجنتا (M) + أصفر (Y) + أسود (K) ===== */
+  :root[data-palette="cmyk"]{--ink:#1D1D1B;--paper:#F6F7F5;--surface:#FFFFFF;--surface-2:#EAF3F7;--border:#D5DFE4;--muted:#566066;--brand:#00AEEF;--brand-strong:#0079AD;--brand-soft:#D3F1FD;--on-brand:#0B1F2A;--water:#00AEEF;--water-soft:#D3F1FD;--tank:#F2B600;--tank-soft:#FFF1BD;--alert:#EC008C;--alert-soft:#FFD3EC;--good:#0094CC;--good-soft:#D3F1FD;--shadow-card:0 1px 2px rgba(29,29,27,.07),0 12px 28px -14px rgba(0,120,175,.30);--shadow-raised:0 18px 44px -12px rgba(0,80,120,.34);}
+  @media (prefers-color-scheme: dark){:root[data-palette="cmyk"]:not([data-theme="light"]){--ink:#F1F3F4;--paper:#0D0E0F;--surface:#161819;--surface-2:#1E2326;--border:#2C3438;--muted:#9AA5AB;--brand:#00B9FF;--brand-strong:#5DD3FF;--brand-soft:#06344A;--on-brand:#06141C;--water:#00B9FF;--water-soft:#06344A;--tank:#FFD21F;--tank-soft:#3D3205;--alert:#FF2DA6;--alert-soft:#4A0A32;--good:#2FC6FF;--good-soft:#06344A;}}
+  :root[data-palette="cmyk"][data-theme="dark"]{--ink:#F1F3F4;--paper:#0D0E0F;--surface:#161819;--surface-2:#1E2326;--border:#2C3438;--muted:#9AA5AB;--brand:#00B9FF;--brand-strong:#5DD3FF;--brand-soft:#06344A;--on-brand:#06141C;--water:#00B9FF;--water-soft:#06344A;--tank:#FFD21F;--tank-soft:#3D3205;--alert:#FF2DA6;--alert-soft:#4A0A32;--good:#2FC6FF;--good-soft:#06344A;}
+  :root[data-palette="cmyk"] body{background:radial-gradient(900px 420px at 100% -8%,color-mix(in srgb,#00AEEF 14%,transparent),transparent 70%),radial-gradient(700px 360px at 0% 100%,color-mix(in srgb,#EC008C 8%,transparent),transparent 70%),radial-gradient(600px 300px at 50% 120%,color-mix(in srgb,#FFD400 9%,transparent),transparent 70%),var(--paper);background-attachment:fixed;}
+  :root[data-palette="cmyk"] #app > header{background:var(--surface);border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#00AEEF 0 25%,#EC008C 25% 50%,#FFD400 50% 75%,#1D1D1B 75% 100%) 1;}
+  :root[data-palette="cmyk"][data-theme="dark"] #app > header{border-image:linear-gradient(90deg,#00B9FF 0 25%,#FF2DA6 25% 50%,#FFD21F 50% 75%,#ECECEC 75% 100%) 1;}
+  :root[data-palette="cmyk"] .wx-strip{background:color-mix(in srgb,#00AEEF 7%,var(--surface));border-bottom-color:color-mix(in srgb,#00AEEF 25%,var(--border));}
+  :root[data-palette="cmyk"] nav.tabs#tabs{background:var(--surface);border-inline-end-color:color-mix(in srgb,#00AEEF 30%,var(--border));}
+  :root[data-palette="cmyk"] nav.tabs#tabs .tab-btn.active{background:color-mix(in srgb,var(--brand) 16%,var(--surface));color:var(--ink);box-shadow:inset 4px 0 0 var(--brand);}
+  :root[data-palette="cmyk"] nav.tabs#tabs .tab-btn:not(.active) .ic{color:var(--ink);}
+  :root[data-palette="cmyk"] h1.page-title{color:var(--ink);border-bottom:3px solid #EC008C;display:inline-block;padding-bottom:2px;}
+  :root[data-palette="cmyk"] .stat-card,:root[data-palette="cmyk"] .chart-card,:root[data-palette="cmyk"] .settings-card{border-color:color-mix(in srgb,#00AEEF 24%,var(--border));}
+  :root[data-palette="cmyk"] .sync-dot{background:var(--brand);} :root[data-palette="cmyk"] .sync-dot.off{background:var(--tank);}
+  :root[data-palette="cmyk"] .range-pill.active,:root[data-palette="cmyk"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
 </style>
 </head>
 <body>
@@ -968,7 +987,7 @@
     <div class="header-actions">
       <span class="hello" id="hello-user"></span>
       <button class="icon-btn notif-bell" id="btn-notif" title="التنبيهات" aria-label="التنبيهات">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
-      <button class="icon-btn" id="btn-palette" title="ألوان التطبيق: هادي / زاهي" aria-label="ألوان التطبيق">🎨</button>
+      <button class="icon-btn" id="btn-palette" title="ألوان التطبيق: هادي / زاهي / CMYK" aria-label="ألوان التطبيق">🎨</button>
       <button class="icon-btn" id="btn-theme" title="تبديل المظهر">◐</button>
       <button class="icon-btn" id="btn-logout" title="تسجيل الخروج">⎋</button>
     </div>
@@ -1121,8 +1140,8 @@
 
       <div class="settings-card" id="palette-card">
         <h3>🎨 ألوان التطبيق</h3>
-        <p class="hint help-note">«هادي» هو الشكل المعتاد، و«زاهي» ألوان أنضر (أخضر وأزرق وكهرماني وأحمر أوضح). الاختيار خاص بحسابك ويتزامن بين أجهزتك، وتقدر تبدّل منه أو من زرار 🎨 اللي فوق.</p>
-        <div class="range-filter"><button type="button" class="range-pill pal-opt" data-pal="calm">هادي</button><button type="button" class="range-pill pal-opt" data-pal="vivid">زاهي</button></div>
+        <p class="hint help-note">«هادي» هو الشكل المعتاد، و«زاهي» ألوان أنضر، و«CMYK» ألوان الطباعة: سماوي (C) وماجنتا (M) وأصفر (Y) وأسود (K) في الواجهة وكل الشارتس (الماجنتا للتنبيه والأصفر للتحذير والسماوي للمياه). الاختيار خاص بحسابك ويتزامن بين أجهزتك، وتقدر تبدّل منه أو من زرار 🎨 اللي فوق.</p>
+        <div class="range-filter"><button type="button" class="range-pill pal-opt" data-pal="calm">هادي</button><button type="button" class="range-pill pal-opt" data-pal="vivid">زاهي</button><button type="button" class="range-pill pal-opt" data-pal="cmyk">CMYK</button></div>
       </div>
 
       <div class="settings-card">
@@ -4893,6 +4912,40 @@
 
   var PRIVA_COLORS = {'#2C7A8C':'#3B82F6','#C9932F':'#F5A623','#6FA22E':'#2DBE6C','#D8543A':'#EF7B5B','#2C8C6F':'#2DBE6C','#8C6FA2':'#7B4FB0','#D08A1E':'#F5A623'};
   function priColor(c){ return PRIVA_COLORS[c] || c; }
+  /* ===== ألوان CMYK للشارتس: كل لون بيتحوّل لأقرب حبر (C/M/Y/K) ومفيش لونين متطابقين في نفس الشارت ===== */
+  function cmykOn(){ return document.documentElement.getAttribute('data-palette')==='cmyk'; }
+  function cmykDark(){ var r = document.documentElement, t = r.getAttribute('data-theme'); return t==='dark' || (t!=='light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+  function cmykKeyOf(hex){
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex||'')); if(!m) return null;
+    var n = parseInt(m[1],16), r = n>>16&255, g = n>>8&255, b = n&255, mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx-mn;
+    if(d < 28) return null;
+    var h; if(mx===r) h = ((g-b)/d + 6) % 6; else if(mx===g) h = (b-r)/d + 2; else h = (r-g)/d + 4; h *= 60;
+    if(h < 18 || h >= 330) return 'M';
+    if(h < 75) return 'Y';
+    if(h < 165) return 'C';
+    if(h < 255) return 'C2';
+    if(h < 290) return 'K';
+    return 'M';
+  }
+  function cmykVal(k){
+    var dk = cmykDark();
+    return ({C: dk ? '#00B9FF' : '#00AEEF', M: dk ? '#FF2DA6' : '#EC008C', Y: dk ? '#FFD21F' : '#F2B600', K: dk ? '#ECECEC' : '#1D1D1B',
+             C2: dk ? '#4F8DFF' : '#0067B1', M2: dk ? '#FF8AD0' : '#B0006B', Y2: dk ? '#FF9F1C' : '#C97A00', K2: dk ? '#8E9AA0' : '#6B7378'})[k];
+  }
+  function dc(c){ if(!cmykOn() || !c || /^var\(/.test(c)) return c; var k = cmykKeyOf(c); return k ? cmykVal(k) : c; }
+  var CMYK_CYCLE = ['C','M','Y','K','C2','M2','Y2','K2'];
+  function cmykAssign(list){
+    if(!cmykOn() || !list) return list;
+    var used = {};
+    list.forEach(function(d){
+      var k = cmykKeyOf(d.color); if(!k) return;
+      var kk = k; if(used[kk]){ var base = kk.charAt(0), alt = base+'2'; kk = used[alt] ? null : alt; }
+      if(!kk){ for(var i=0;i<CMYK_CYCLE.length;i++){ if(!used[CMYK_CYCLE[i]]){ kk = CMYK_CYCLE[i]; break; } } }
+      if(!kk) kk = k;
+      used[kk] = 1; d.color = cmykVal(kk);
+    });
+    return list;
+  }
   var svgDetailsOpen = {}, svgHiddenSeries = {};
   /* أول مرة: خط واحد بس ظاهر (أول واحد عنده بيانات)، وانت بتضيف باقي الخطوط للمقارنة. الاختيار بيتشارك بين المخططات اللي ليها نفس الخطوط. */
   function visApply(map, datasets){
@@ -4929,6 +4982,7 @@
     if(container.id && !opts.__full) svgChartArgs[container.id] = {ds:datasets, opts:opts};
     var srcDatasets = datasets;
     datasets = datasets.map(function(d, di){ var c = {}; for(var k in d){ c[k] = d[k]; } c.color = priColor(d.color); if(!opts.onToggle && container.id && svgHiddenSeries[container.id+'|'+(d.key || di)]) c.hidden = true; return c; });
+    cmykAssign(datasets);
     var szId = container.id && ovPrefs && ovPrefs.sizes && ovPrefs.sizes[container.id], H = (szId && szId.h && SZ_SVGH[szId.h]) || opts.height || 200;
     var visible = datasets.filter(function(d){ return !d.hidden; });
     var totalPoints = visible.reduce(function(n,d){ return n+d.points.length; }, 0);
@@ -5536,7 +5590,7 @@
       var chips = last
         ? climateStatChip('pH', last.ph, '') + climateStatChip('EC', last.ec, 'mS/cm') + climateStatChip('حرارة', last.temp, '°C') + climateStatChip('آخر قراءة', fmtTs(last.ts), '')
         : '<p class="empty-note">لا توجد قراءات.</p>';
-      return '<div class="chart-card"><h3 style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+s.colorHex+'"></span>'+s.title+'</h3>'+
+      return '<div class="chart-card"><h3 style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc(s.colorHex)+'"></span>'+s.title+'</h3>'+
         '<div class="climate-stats">'+chips+'</div>'+
       '</div>';
     }).join('');
@@ -6022,7 +6076,7 @@
     var entries = flattenEntries(key, systemId).slice().reverse();
     parts.form.innerHTML =
       '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
-        '<span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>'+sourceObj.title+
+        '<span class="tab-dot" style="background:'+dc(sourceObj.colorHex)+'"></span>'+sourceObj.title+
       '</h3>'+
       '<form class="entry-form" id="ws-'+key+'-form">'+
         '<div class="form-grid">'+
@@ -6035,7 +6089,7 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة '+sourceObj.label+'</button></div>'+
       '</form>';
     parts.table.innerHTML =
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>سجل '+sourceObj.title+'</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc(sourceObj.colorHex)+'"></span>سجل '+sourceObj.title+'</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
       lfBarHtml('w-'+key)+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الحالة</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-'+key+'-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من النموذج فوق.</p>');
@@ -6093,7 +6147,7 @@
   function renderSoilSection(parts, systemId){
     var entries = flattenEntries('soil', systemId).slice().reverse();
     parts.form.innerHTML =
-      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:#8D6E63"></span>قياسات التربة</h3>'+
+      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc('#8D6E63')+'"></span>قياسات التربة</h3>'+
       '<form class="entry-form" id="ws-soil-form"><div class="form-grid">'+
         '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-soil-ts')+'</div>'+
         '<div class="field-sm"><label>حموضة التربة pH</label><input type="number" step="any" min="0" max="14" class="ltr" id="ws-soil-ph" required></div>'+
@@ -6103,7 +6157,7 @@
         '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-soil-note" placeholder="مثال: الصف 3، على بعد 20 سم من النقاط"></div>'+
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة التربة</button></div></form>';
     parts.table.innerHTML =
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:#8D6E63"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc('#8D6E63')+'"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
       lfBarHtml('w-soil')+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الرطوبة %</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-soil-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قياسات تربة. سجّل أول قياس من النموذج فوق.</p>');
@@ -12088,14 +12142,14 @@
   }
   function ioBuildSeries(chart, st, catMap){
     var w = ioWin(st), end = w.to, from = w.from;
-    return (chart.series || []).map(function(d){
+    return cmykAssign((chart.series || []).map(function(d){
       var meta = catMap[d.ref] || {name:String(d.ref), group:'(غير متاح)', unit:''};
       var scale = parseFloat(d.scale); if(!isFinite(scale) || scale===0) scale = 1;
       var win = ioData(d.ref).filter(function(p){ return p.x >= from && p.x <= end; });
       var mn = null, mx = null, sum = 0;
       win.forEach(function(p){ if(mn===null || p.y<mn) mn = p.y; if(mx===null || p.y>mx) mx = p.y; sum += p.y; });
       return {def:d, meta:meta, scale:scale, axis:(d.axis==='R' ? 'R' : 'L'), color:d.color || '#2C8C6F', visible:!st.hidden[d.id], win:win, min:mn, max:mx, avg:win.length ? sum/win.length : null, gap:ioGap(win)};
-    });
+    }));
   }
 
   /* رسم الـ SVG (دالة نقية: بتاخد البيانات وبترجّع نص الـ SVG والأبعاد) */
@@ -12160,7 +12214,7 @@
     ctx.series.forEach(function(s){
       if(!s.visible) return;
       var p = ioNearest(s, t, Math.max((geo.to-geo.from)*0.03, s.gap*0.6));
-      if(p) rows.push('<div class="io-tip-r" dir="auto"><span class="io-dot" style="background:'+s.color+';"></span>'+escH(s.meta.name)+': <b>'+ioFmt(p.y)+'</b> '+escH(s.meta.unit||'')+'</div>');
+      if(p) rows.push('<div class="io-tip-r"><span class="io-dot" style="background:'+s.color+';"></span><span class="io-tip-n">'+escH(s.meta.name)+'</span><span class="io-tip-v" dir="ltr"><b>'+ioFmt(p.y)+'</b> '+escH(s.meta.unit||'')+'</span></div>');
       var cell = host.querySelector('.io-cur-v[data-sid="'+s.def.id+'"]');
       if(cell) cell.textContent = p ? ioFmt(p.y) : '-';
       if(p) html += '<circle cx="'+geo.X(p.x).toFixed(1)+'" cy="'+geo.Y(s.axis, p.y*s.scale).toFixed(1)+'" r="3.5" fill="'+s.color+'" stroke="#fff" stroke-width="1"/>';
@@ -14195,10 +14249,11 @@
   /* ---------- theme ---------- */
   function setPalette(p, persist){
     var root = document.documentElement;
-    if(p==='vivid') root.setAttribute('data-palette', 'vivid'); else root.removeAttribute('data-palette');
-    try{ localStorage.setItem('oroots_palette', p==='vivid' ? 'vivid' : 'calm'); }catch(e){}
-    Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.classList.toggle('active', b.getAttribute('data-pal')===(p==='vivid' ? 'vivid' : 'calm')); });
-    if(persist && db && currentUser) db.doc('userData/'+myMail()).set({palette:(p==='vivid' ? 'vivid' : 'calm')}, {merge:true}).catch(function(){});
+    p = (p==='vivid' || p==='cmyk') ? p : 'calm';
+    if(p==='calm') root.removeAttribute('data-palette'); else root.setAttribute('data-palette', p);
+    try{ localStorage.setItem('oroots_palette', p); }catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.classList.toggle('active', b.getAttribute('data-pal')===p); });
+    if(persist && db && currentUser) db.doc('userData/'+myMail()).set({palette:p}, {merge:true}).catch(function(){});
     if(persist){ try{ renderAll(); }catch(e){} }
   }
   /* معالج أخطاء عام: أي خطأ غير متوقع بيتسجل في سجل التدقيق (بحد أقصى 5 في الجلسة) ويظهر للمستخدم تنبيه، عشان الأخطاء الصامتة ما تستخبّاش */
@@ -14232,8 +14287,8 @@
   function setupTheme(){
     installErrorReporter(); checkDeviceClock();
     var pal = null; try{ pal = localStorage.getItem('oroots_palette'); }catch(e){}
-    setPalette(pal==='vivid' ? 'vivid' : 'calm', false);
-    $('#btn-palette').addEventListener('click', function(){ var next = document.documentElement.getAttribute('data-palette')==='vivid' ? 'calm' : 'vivid'; setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : 'اتفعّل المظهر الهادي'); });
+    setPalette((pal==='vivid' || pal==='calm' || pal==='cmyk') ? pal : 'cmyk', false);
+    $('#btn-palette').addEventListener('click', function(){ var cur = document.documentElement.getAttribute('data-palette') || 'calm', next = cur==='calm' ? 'vivid' : (cur==='vivid' ? 'cmyk' : 'calm'); setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : (next==='cmyk' ? 'اتفعّل مظهر CMYK' : 'اتفعّل المظهر الهادي')); });
     Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.addEventListener('click', function(){ setPalette(b.getAttribute('data-pal'), true); }); });
     var saved = null;
     try{ saved = localStorage.getItem('oroots_theme'); }catch(e){}
@@ -14622,7 +14677,7 @@
     db.doc('userData/'+myMail()).onSnapshot(function(snap){
       var ud = snap.exists ? snap.data() : {};
       dashMine = Array.isArray(ud.pages) ? ud.pages : [];
-      if(ud.palette==='vivid' || ud.palette==='calm') setPalette(ud.palette, false);
+      if(ud.palette==='vivid' || ud.palette==='calm' || ud.palette==='cmyk') setPalette(ud.palette, false);
       ownCharts = Array.isArray(ud.charts) ? ud.charts : null; ownOv = (ud.ov && typeof ud.ov === 'object') ? ud.ov : null; ioMergeCharts();
       if(ud.tabNames && typeof ud.tabNames === 'object' && !Array.isArray(ud.tabNames)){ tabNames = ud.tabNames; try{ localStorage.setItem('oroots_tabnames', JSON.stringify(tabNames)); }catch(e){} }
       if(Array.isArray(ud.tabOrder)){ tabOrder = ud.tabOrder; try{ localStorage.setItem('oroots_taborder', JSON.stringify(tabOrder)); }catch(e){} }
@@ -14839,8 +14894,8 @@
         tip.classList.add('show'); clearTimeout(tipTm); tipTm = setTimeout(function(){ tip.classList.remove('show'); }, 1400);
       } else if(mobile()){ setCollapsed(true, false); }
     });
-    function hdr(){ var hd = document.querySelector('#app > header'); if(hd) document.documentElement.style.setProperty('--hdr-h', hd.offsetHeight+'px'); }
-    hdr(); window.addEventListener('resize', hdr); setTimeout(hdr, 600); setTimeout(hdr, 2500);
+    function hdr(){ var hd = document.querySelector('#app > header'); if(hd) document.documentElement.style.setProperty('--hdr-h', hd.offsetHeight+'px'); var wx = document.getElementById('wx-strip'); document.documentElement.style.setProperty('--wx-h', (wx && wx.offsetHeight ? wx.offsetHeight : 0)+'px'); }
+    hdr(); window.addEventListener('resize', hdr); try{ var wxs = document.getElementById('wx-strip'); if(wxs && window.ResizeObserver) new ResizeObserver(hdr).observe(wxs); }catch(e){} setTimeout(hdr, 600); setTimeout(hdr, 2500);
   })();
 (function(){
   var cards = document.querySelectorAll('#panel-settings .settings-card');
