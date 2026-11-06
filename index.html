@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/F41kuiki3+FJsAfHGpr4RDnVhx05/hzNB1fxn8ljKI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s2K1GxNOImAauOCRfujk9PwBB+4tqY0TGrjSNgfsXFw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -2623,6 +2623,7 @@
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
+    if(typeof SUBTABS !== 'undefined') Object.keys(SUBTABS).forEach(function(k){ try{ panelSubRefresh(k); }catch(e){} });
   }
   function addSystem(greenhouse, name){
     if(!name) return Promise.resolve();
@@ -6382,14 +6383,24 @@
     spray:   {def:'schedule', tabs:[['schedule','📅 الجدول'],['entry','➕ إضافة رش/تسميد']]},
     growth:  {def:'entry',    tabs:[['entry','📝 إدخال وزنة'],['summary','📊 الملخص والتنبؤ'],['records','📋 السجل'],['ref','🌿 المعايير المثلى']]}
   };
+  /* قسم "إدخال/تسجيل" بيظهر بس للي عنده صلاحية تعديل على التاب (المدير أو صلاحية "تعديل") */
+  var SUBPERM = {water:'water', climate:'climate', harvest:'harvest', pests:'pests', nursery:'nursery', spray:'spray', growth:'growth'};
+  function subAllowed(pk, sub){
+    if(sub!=='entry' || !SUBPERM[pk] || !currentUser) return true;   // قبل تسجيل الدخول مفيش حكم لسه
+    return canEdit(SUBPERM[pk]);
+  }
+  function subFirstAllowed(pk){
+    var d = SUBTABS[pk], t = d.tabs.filter(function(x){ return subAllowed(pk, x[0]); });
+    return subAllowed(pk, d.def) ? d.def : (t[0] ? t[0][0] : d.def);
+  }
   function panelSubGet(pk){
     var d = SUBTABS[pk]; if(!d) return '';
     var v = null; try{ v = localStorage.getItem('oroots_sub_'+pk) || (pk==='water' ? localStorage.getItem('oroots_water_sub') : null); }catch(e){}
-    return d.tabs.some(function(t){ return t[0]===v; }) ? v : d.def;
+    return d.tabs.some(function(t){ return t[0]===v; }) && subAllowed(pk, v) ? v : subFirstAllowed(pk);
   }
   function panelSubSet(pk, sub, persist){
     var d = SUBTABS[pk], panel = document.getElementById('panel-'+pk); if(!d || !panel) return;
-    if(!d.tabs.some(function(t){ return t[0]===sub; })) sub = d.def;
+    if(!d.tabs.some(function(t){ return t[0]===sub; }) || !subAllowed(pk, sub)) sub = subFirstAllowed(pk);
     panel.setAttribute('data-sub', sub);
     $all('.subtabs .subtab-btn', panel).forEach(function(b){ var on = b.getAttribute('data-subtab')===sub; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
     if(persist){ try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} }
@@ -6400,10 +6411,10 @@
   function panelSubRefresh(pk){
     var panel = document.getElementById('panel-'+pk), bar = panel && panel.querySelector('.subtabs'); if(!bar) return;
     var first = null, any = !!panel.querySelector('[data-sub]');
-    $all('.subtab-btn', bar).forEach(function(b){ var k = b.getAttribute('data-subtab'), has = !!panel.querySelector('[data-sub~="'+k+'"]'); b.style.display = has ? '' : 'none'; if(has && !first) first = k; });
+    $all('.subtab-btn', bar).forEach(function(b){ var k = b.getAttribute('data-subtab'), has = !!panel.querySelector('[data-sub~="'+k+'"]') && subAllowed(pk, k); b.style.display = has ? '' : 'none'; if(has && !first) first = k; });
     bar.style.display = any ? '' : 'none';
     var cur = panel.getAttribute('data-sub');
-    if(any && first && !panel.querySelector('[data-sub~="'+cur+'"]')) panelSubSet(pk, first, false);
+    if(any && first && (!panel.querySelector('[data-sub~="'+cur+'"]') || !subAllowed(pk, cur))) panelSubSet(pk, first, false);
   }
   (function(){
     Object.keys(SUBTABS).forEach(function(pk){
