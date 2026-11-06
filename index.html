@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-E8m3jUjxxKRiJs6F6jPt6MPdbI5M6tp1OGJWecppYqg=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-g0mdxdQuv7p4bBwYc54lHjddiKDWeAkNdcWDqtlgzpo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -2620,7 +2620,8 @@
   function applyTabVisibility(){
     $all('.tab-btn').forEach(function(btn){
       var tab = btn.getAttribute('data-tab');
-      if(tab==='overview' || tab==='charts' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
+      if(tab==='charts'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
+      if(tab==='overview' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
@@ -6404,7 +6405,7 @@
     if(!d.tabs.some(function(t){ return t[0]===sub; }) || !subAllowed(pk, sub)) sub = subFirstAllowed(pk);
     panel.setAttribute('data-sub', sub);
     $all('.subtabs .subtab-btn', panel).forEach(function(b){ var on = b.getAttribute('data-subtab')===sub; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
-    if(persist){ try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} }
+    if(persist){ panel.setAttribute('data-want', sub); try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} }
     // المخططات اللي اتعملت وهي مخفية (عرضها صفر) بنعيد رسمها دلوقتي عشان تاخد عرضها الصح
     $all('.svg-chart-holder[id]', panel).forEach(function(h){ var a = svgChartArgs[h.id]; if(a && h.offsetParent!==null) renderSvgChart(h, a.ds, a.opts); });
   }
@@ -6414,14 +6415,15 @@
     var first = null, any = !!panel.querySelector('[data-sub]');
     $all('.subtab-btn', bar).forEach(function(b){ var k = b.getAttribute('data-subtab'), has = !!panel.querySelector('[data-sub~="'+k+'"]') && subAllowed(pk, k); b.style.display = has ? '' : 'none'; if(has && !first) first = k; });
     bar.style.display = any ? '' : 'none';
-    var cur = panel.getAttribute('data-sub');
+    var cur = panel.getAttribute('data-sub'), want = panel.getAttribute('data-want');
+    if(want && want!==cur && subAllowed(pk, want) && panel.querySelector('[data-sub~="'+want+'"]')){ panelSubSet(pk, want, false); return; }   // المحتوى اللي كنت عاوزه ظهر بعد ما اتحوّلت مؤقتًا لقسم تاني
     if(any && first && (!panel.querySelector('[data-sub~="'+cur+'"]') || !subAllowed(pk, cur))) panelSubSet(pk, first, false);
   }
   (function(){
     Object.keys(SUBTABS).forEach(function(pk){
       var panel = document.getElementById('panel-'+pk), h1 = panel && panel.querySelector('h1.page-title'); if(!h1) return;
       h1.insertAdjacentHTML('afterend', '<div class="subtabs" role="tablist" aria-label="أقسام التبويب">'+SUBTABS[pk].tabs.map(function(t){ return '<button type="button" class="subtab-btn" role="tab" data-subtab="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>');
-      panelSubSet(pk, panelSubGet(pk), false);
+      panelSubSet(pk, panelSubGet(pk), false); panel.setAttribute('data-want', panelSubGet(pk));
       panel.querySelector('.subtabs').addEventListener('click', function(ev){
         var b = ev.target && ev.target.closest ? ev.target.closest('.subtab-btn') : null; if(!b) return;
         panelSubSet(pk, b.getAttribute('data-subtab'), true);
@@ -12249,15 +12251,40 @@
     if(ioWiz && ioWiz.dirty && !window.confirm('تقفل من غير ما تحفظ المخطط؟')) return;
     ioWizClose();
   }
+  /* توزيع المحاور تلقائي: القيم القريبة في الحجم والوحدة في جنب واحد، والمختلفة في الجنب التاني، عشان شكل المخطط يبقى متناسق */
+  var IO_UNIT_MAG = {'°C':25, '%':60, 'kPa':1.5, 'Lux':20000, 'W/m²':400, 'µmol/m²/s':800, 'mol/m²':20, 'g/m³':10, 'mS/cm':2};
+  function ioSeriesMag(s, cm){
+    var pts = ioData(s.ref) || [], v = [], i, sc = Math.abs(parseFloat(s.scale)) || 1;
+    for(i=0;i<pts.length;i++){ var y = Math.abs(pts[i].y); if(isFinite(y)) v.push(y); }
+    if(v.length){ v.sort(function(a,b){ return a-b; }); return Math.max(v[Math.floor((v.length-1)*0.9)]*sc, 1e-6); }
+    var u = (cm[s.ref] || {}).unit || ''; return (IO_UNIT_MAG[u] || 10)*sc;
+  }
+  function ioAutoAxes(series, cm){
+    if(!series || !series.length) return;
+    if(series.length < 2){ series[0].axis = 'L'; return; }
+    var groups = {}, order = [];
+    series.forEach(function(s){
+      var u = (cm[s.ref] || {}).unit || '', k = u || ('#'+s.ref);
+      if(!groups[k]){ groups[k] = {items:[], lg:[]}; order.push(k); }
+      groups[k].items.push(s); groups[k].lg.push(Math.log(ioSeriesMag(s, cm))/Math.LN10);
+    });
+    var gs = order.map(function(k){ var g = groups[k]; g.lg.sort(function(a,b){ return a-b; }); g.mid = g.lg[Math.floor(g.lg.length/2)]; return g; }).sort(function(a,b){ return a.mid-b.mid; });
+    if(gs.length < 2 || gs[gs.length-1].mid - gs[0].mid <= 0.7){ series.forEach(function(s){ s.axis = 'L'; }); return; }
+    function rng(a, b){ var lo = Infinity, hi = -Infinity, i; for(i=a;i<b;i++){ lo = Math.min(lo, gs[i].mid); hi = Math.max(hi, gs[i].mid); } return b > a ? hi-lo : 0; }
+    var best = 1, bestCost = Infinity, k;
+    for(k=1;k<gs.length;k++){ var c = rng(0, k) + rng(k, gs.length); if(c < bestCost - 1e-9){ bestCost = c; best = k; } }
+    var firstInLow = gs.slice(0, best).some(function(g){ return g.items.indexOf(series[0]) >= 0; });   // جنب أول عنصر بيفضل يسار
+    gs.forEach(function(g, i){ var low = i < best; g.items.forEach(function(s){ s.axis = (low === firstInLow) ? 'L' : 'R'; }); });
+  }
   function ioWizUnit(ref, cm){ var m = cm[ref]; return m ? (m.unit || '') : ''; }
   function ioWizAddRefs(refs){
     var w = ioWiz, d = w.draft, cm = ioCatMap(ioCatalog()), added = 0;
     refs.forEach(function(ref){
       if(d.series.length >= IO_MAX_SERIES) return;
       var used = d.series.map(function(s){ return s.color; }), col = IO_COLORS.filter(function(c){ return used.indexOf(c) < 0; })[0] || IO_COLORS[d.series.length % IO_COLORS.length];
-      var firstUnit = d.series.length ? ioWizUnit(d.series[0].ref, cm) : null, u = ioWizUnit(ref, cm);
-      d.series.push({id:genId(), ref:ref, color:col, axis:(d.series.length && u!==firstUnit) ? 'R' : 'L', scale:1}); added++;
+      d.series.push({id:genId(), ref:ref, color:col, axis:'L', scale:1}); added++;
     });
+    if(!d.axisManual) ioAutoAxes(d.series, cm);
     if(refs.length > added) toast('أقصى عدد خطوط '+IO_MAX_SERIES);
     if(!(d.title||'').trim() && d.series.length){ var m0 = cm[d.series[0].ref]; if(m0) d.title = m0.name+' — '+m0.group.replace(ICON_RE, '').replace(/^\s+/, '').replace(/^[^—]*—\s*/, ''); }
     w.dirty = true; w.sel = {}; w.step = 'hub';
@@ -12293,8 +12320,8 @@
             '<div class="io-line-c"><span class="io-seg"><button type="button" data-w="axis" data-i="'+i+'" data-v="L" class="'+(s.axis!=='R' ? 'on' : '')+'">يسار</button><button type="button" data-w="axis" data-i="'+i+'" data-v="R" class="'+(s.axis==='R' ? 'on' : '')+'">يمين</button></span>'+
             '<label class="io-mul">الرقم ×<input type="number" step="any" class="ltr" data-f="scale" data-i="'+i+'" value="'+escH(String(s.scale===undefined ? 1 : s.scale))+'"></label></div></div>';
         }).join('')+
-        '<button type="button" class="btn btn-ghost btn-sm" data-w="more" style="margin:6px 0 2px;">➕ أضف عنصر</button>'+
-        '<p class="hint help-note" style="margin:8px 0 0;">المحور اليمين مفيد لو القيم مختلفة في الحجم. الرقم × بيصغّر أو يكبّر الخط على الرسم بس (زي ×0.1) من غير ما يغيّر الأرقام في الجدول.</p>';
+        '<button type="button" class="btn btn-ghost btn-sm" data-w="more" style="margin:6px 0 2px;">➕ أضف عنصر</button>'+(d.series.length > 1 ? ' <button type="button" class="btn btn-ghost btn-sm" data-w="autoaxis" style="margin:6px 0 2px;">⚖️ وزّع المحاور تلقائي</button>' : '')+
+        '<p class="hint help-note" style="margin:8px 0 0;">المحاور بتتوزّع تلقائي: القيم القريبة في الحجم في جنب والمختلفة في الجنب التاني (وتقدر تغيّر يدوي). المحور اليمين مفيد لو القيم مختلفة في الحجم. الرقم × بيصغّر أو يكبّر الخط على الرسم بس (زي ×0.1) من غير ما يغيّر الأرقام في الجدول.</p>';
       foot = '<div class="io-sh-foot"><button type="button" class="btn btn-primary btn-sm" data-w="save">حفظ المخطط</button><button type="button" class="btn btn-ghost btn-sm" data-w="close">إلغاء</button></div>';
     }
     el.innerHTML = '<div class="io-sheet'+(tall ? ' tall' : '')+'" role="dialog" aria-modal="true">'+head+'<div class="io-sh-body">'+body+'</div>'+foot+'</div>';
@@ -12314,7 +12341,8 @@
     if(a==='addsel'){ var sc = w.tree[w.ci].types[w.ti].scopes, refs = sc.filter(function(s){ return w.sel[s.ref]; }).map(function(s){ return s.ref; }); if(!refs.length) return; ioWizAddRefs(refs); ioWizRender(); return; }
     if(a==='more'){ w.step = 'cat'; w.sel = {}; ioWizRender(); return; }
     if(a==='rm'){ if(d.series.length <= 1){ toast('لازم يبقى فيه عنصر واحد على الأقل'); return; } d.series.splice(i, 1); w.dirty = true; ioWizRender(); return; }
-    if(a==='axis'){ d.series[i].axis = b.getAttribute('data-v')==='R' ? 'R' : 'L'; w.dirty = true; ioWizRender(); return; }
+    if(a==='axis'){ d.series[i].axis = b.getAttribute('data-v')==='R' ? 'R' : 'L'; d.axisManual = true; w.dirty = true; ioWizRender(); return; }
+    if(a==='autoaxis'){ d.axisManual = false; ioAutoAxes(d.series, ioCatMap(ioCatalog())); w.dirty = true; ioWizRender(); toast('اتوزّعت المحاور تلقائي'); return; }
     if(a==='save'){ ioWizSave(); }
   }
   function ioWizInput(ev){
@@ -12881,8 +12909,16 @@
   }
   /* ====================== نظرة عامة: قايمة ⋮ لكل مخطط (تعديل / تغيير الاسم / تكرار / إزالة) ====================== */
   /* بيحوّل أي مخطط جاهز في نظرة عامة لتعريف قابل للتعديل (خطوط من الكتالوج) */
-  function ovDefFor(id, title){
-    var ser = [], m, sysId = overviewSystemId, gh = overviewGreenhouse;
+  function ovDefFor(id0, title){
+    var id = id0, ser = [], m, sysId = overviewSystemId, gh = overviewGreenhouse;
+    if(!/^ov/.test(id0)){   // مخططات التبويبات (المناخ / المياه / الحصاد): بتتبني على الصوبة والنظام المختارين فيها
+      sysId = selectedSystemId; gh = selectedGreenhouse;
+      if((m = /^cl-chart-(temp|rh|vpd|lux|ppfd|ahhd|dli)$/.exec(id0))) id = 'ovd-cl-'+m[1];
+      else if(id0==='cl-chart-radsum') id = 'ovd-cl-rad';
+      else if((m = /^cmp-chart-(ph|ec|temp)$/.exec(id0))) id = 'ovd-w-'+m[1];
+      else if(id0==='calib-chart-point') id = 'ovd-calib-point';
+      else if(id0==='calib-chart-sys') id = 'ovd-calib-sys';
+    }
     function one(ref, color){ ser.push({ref:ref, color:color}); }
     if((m = /^ov-chart-water-(ph|ec|temp)$/.exec(id))) systems.forEach(function(sy, i){ one('w|'+sy.id+'|irrigation|'+m[1], paletteColor(i)); });
     else if(id==='ov-chart-water-calib') systems.forEach(function(sy, i){ one('k|'+sy.id+'|point', paletteColor(i)); });
@@ -12896,15 +12932,18 @@
     else if(id==='ovd-cl-rad'){ if(gh) one('cd|'+gh+'|rad', '#8C6FA2'); }
     else if((m = /^ovd-hv-(\d+)$/.exec(id))){ var crop = sysId ? harvestCropsForSystem(sysId)[parseInt(m[1], 10)] : null; if(crop) one('hs|'+sysId+'|'+crop, '#C9932F'); }
     else if(id==='ovd-pests'){ if(gh) one('p|'+gh+'|*', '#D8543A'); }
+    else if(id==='harvest-chart'){ if(sysId && harvestChartCrop) one('hs|'+sysId+'|'+harvestChartCrop, '#C9932F'); }
     if(!ser.length) return null;
     ser.forEach(function(s){ s.id = genId(); s.axis = 'L'; s.scale = 1; });
+    ioAutoAxes(ser, ioCatMap(ioCatalog()));
     return {id:genId(), title:title, days:30, ov:true, series:ser};
   }
   function ovCloseMenu(){ var m = document.getElementById('ov-menu'); if(m && m.parentNode) m.parentNode.removeChild(m); }
   function ovShowMenu(btn, ctx){
     ovCloseMenu();
     var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
-    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button><button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>';
+    var tabOnly = ctx.kind==='builtin' && ctx.inOv===false;   // مخطط جاهز في تبويب (مش نظرة عامة): تعديل وتكرار بس
+    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button>'+(tabOnly ? '' : '<button type="button" data-a="rename">🏷 تغيير الاسم</button>')+'<button type="button" data-a="dup">📑 تكرار المخطط</button>'+(tabOnly ? '' : '<button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>');
     document.body.appendChild(m);
     var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 190;
     m.style.top = Math.min(r.bottom + 4, (window.innerHeight || 700) - 190)+'px';
@@ -12931,7 +12970,7 @@
       return;
     }
     var def = ovDefFor(id, cur);
-    if(!def){ toast('المخطط ده لسه مفيهوش بيانات تتعدّل'); return; }
+    if(!def){ toast(id==='gr-chart' ? 'مخطط النمو متحسب من وزناتك مع منحنى التوقع، فمش قابل للتعديل كمخطط عادي' : 'المخطط ده لسه مفيهوش بيانات تتعدّل'); return; }
     if(a==='dup'){
       def.title = cur+' (نسخة)';
       ioSaveAll(ioMaterialized().concat([def]), null).then(function(){ logAudit('add','charts','نسخ مخطط: '+cur); toast('اتعمل نسخة في قسم "مخططاتي" تحت'); });
@@ -12974,7 +13013,7 @@
       if(h3.querySelector('.ov-title')) return;
       var orig = helpHeadText(h3);
       h3.setAttribute('data-orig', orig); h3.className = 'ov-h3';
-      h3.innerHTML = '<span class="ov-title">'+escH((inOv && ovPrefs.titles[id]) || orig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير المخطط">'+IO_ICON_EXP+'</button>'+(isAdmin && inOv ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات المخطط" aria-label="خيارات المخطط">⋮</button>' : '')+'</span>';
+      h3.innerHTML = '<span class="ov-title">'+escH((inOv && ovPrefs.titles[id]) || orig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير المخطط">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات المخطط" aria-label="خيارات المخطط">⋮</button>' : '')+'</span>';
     });
   }
   function renderOvCustom(){
@@ -13005,7 +13044,7 @@
     if(b){
       ev.stopPropagation();
       var h3 = b.closest('h3'), tt = h3 ? h3.querySelector('.ov-title') : null;
-      ovShowMenu(b, {kind:'builtin', id:b.getAttribute('data-cid'), title:tt ? tt.textContent : '', orig:h3 ? (h3.getAttribute('data-orig') || '') : ''});
+      ovShowMenu(b, {kind:'builtin', inOv:!!b.closest('#panel-overview'), id:b.getAttribute('data-cid'), title:tt ? tt.textContent : '', orig:h3 ? (h3.getAttribute('data-orig') || '') : ''});
       return;
     }
     if(!t.closest('#ov-menu')) ovCloseMenu();
@@ -13222,6 +13261,7 @@
     if(panelOn('panel-harvest')) safe(renderHarvestPanel);
     if(panelOn('panel-growth')) safe(renderGrowthPanel);
     if(panelOn('panel-inventory')) safe(renderInventoryPanel);
+    if(!panelOn('panel-overview')) safe(ovDecorate);   // زرار ⋮ / تكبير على مخططات التبويبات كمان
     safe(renderNotifBar);
     safe(updateSyncBadge);
   }
