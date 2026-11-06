@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o4MzmtaYSV/odSg161Cu/hvXJ3nk4bJA3sDIEgs+zp0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MwxDfdbwYv1fgw4BmHLs+ICaA+y1PjbY3a/OZ9B4OWo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -4905,6 +4905,7 @@
       return;
     }
     var W = Math.round(container.clientWidth) > 160 ? Math.round(container.clientWidth) : 600;
+    container._svgW = W;
     var padL = 40, padR = 12, padT = 10, padB = 24;
     var plotW = W - padL - padR, plotH = H - padT - padB;
 
@@ -12823,6 +12824,14 @@
   function ioSaveCharts(list){ return ioSaveAll(list, null); }
   /* أول مرة بنعدّل: المخططات الجاهزة بتتحفظ كلها عشان ما تختفيش */
   function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
+  /* لما عرض الكارت يتغير (حجم / تدوير الشاشة) الرسم بيتعاد بالعرض الجديد عشان ما يتمطّش */
+  function svgRedrawAll(){
+    Object.keys(svgChartArgs).forEach(function(id){
+      var hd = document.getElementById(id), a = svgChartArgs[id];
+      if(!hd || !a || hd.offsetParent===null) return;
+      if(Math.abs(Math.round(hd.clientWidth) - (hd._svgW || 0)) > 6) { try{ renderSvgChart(hd, a.ds, a.opts); }catch(e){} }
+    });
+  }
   var SZ_SVGH = {280:150, 400:230, 560:350};   // ارتفاع الرسم لكل حجم (صغير / متوسط / كبير)
   function szApply(el, w){ if(!el) return; if(w){ el.style.gridColumn = 'span '+w; el.setAttribute('data-sz', '1'); } else { el.style.gridColumn = ''; el.removeAttribute('data-sz'); } }
   function ioRefresh(){
@@ -12982,7 +12991,7 @@
     if(a==='w' || a==='h'){
       var sz = ovPrefs.sizes[id] = Object.assign({}, ovPrefs.sizes[id] || {}); sz[a] = v;
       var hd = document.getElementById(id), cd = hd && hd.closest('.chart-card');
-      if(a==='w') szApply(cd, v);
+      if(a==='w'){ szApply(cd, v); setTimeout(svgRedrawAll, 60); }
       else { var ar = svgChartArgs[id]; if(hd && ar) renderSvgChart(hd, ar.ds, ar.opts); }
       ioSaveAll(customCharts, ovPrefs).then(function(){ toast('اتغيّر الحجم'); });
       return;
@@ -13034,7 +13043,7 @@
   }
   /* بيزوّد كل مخطط جاهز في نظرة عامة بعنوان قابل للتغيير وزرار ⋮، وبيخفي اللي اتشال */
   function ovDecorate(){
-    var root = document;
+    var root = document, sizedAny = false;
     var isAdmin = currentUserRole==='admin';
     $all('.chart-card', root).forEach(function(card){
       var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3'); if(!holder || !h3) return;
@@ -13044,11 +13053,13 @@
       if(ovPrefs.hidden[id]){ card.style.display = 'none'; return; }
       if(inOv || card.style.display==='none') card.style.display = '';
       szApply(card, ovPrefs.sizes[id] && ovPrefs.sizes[id].w);
+      sizedAny = sizedAny || !!(ovPrefs.sizes[id] && ovPrefs.sizes[id].w);
       if(h3.querySelector('.ov-title')) return;
       var orig = helpHeadText(h3);
       h3.setAttribute('data-orig', orig); h3.className = 'ov-h3';
       h3.innerHTML = '<span class="ov-title">'+escH(ovPrefs.titles[id] || orig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير المخطط">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(id)+'" title="خيارات المخطط" aria-label="خيارات المخطط">⋮</button>' : '')+'</span>';
     });
+    if(sizedAny) setTimeout(svgRedrawAll, 30);
   }
   function renderOvCustom(){
     var el = $('#ov-custom'); if(!el) return;
@@ -13090,7 +13101,7 @@
     if(window.MutationObserver) $all('.panel').forEach(function(root){ new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(ovDecorate, 0); }).observe(root, {childList:true, subtree:true}); });
   })();
 
-  (function(){ var tm = null; window.addEventListener('resize', function(){ clearTimeout(tm); tm = setTimeout(function(){ ioRefresh(); }, 250); }); })();
+  (function(){ var tm = null; window.addEventListener('resize', function(){ clearTimeout(tm); tm = setTimeout(function(){ ioRefresh(); svgRedrawAll(); }, 250); }); })();
 
   /* ====================== شريط التاريخ والوقت والطقس (زي IIVO) — المصدر: Open-Meteo ====================== */
   function wxLS(k){ try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } }
