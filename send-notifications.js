@@ -3,7 +3,7 @@
    وبيبعتها لأجهزة المستلم (مجموعة pushTokens)، وبعدين بيعلّم الإشعار pushedAt عشان ما يتبعتش تاني. */
 'use strict';
 const APP_URL = process.env.APP_URL || 'https://alsouq.github.io/oroots/';
-const LOOKBACK_MS = 6 * 3600 * 1000;
+const LOOKBACK_MS = 1 * 3600 * 1000;
 const BAD_TOKEN = /registration-token-not-registered|invalid-registration-token|invalid-argument/;
 
 function buildPush(n, appUrl){
