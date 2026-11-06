@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wLNZu4E+ulrkg5DfMtBTnpYBiG1jFogPqLoocS6yG6c=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o4MzmtaYSV/odSg161Cu/hvXJ3nk4bJA3sDIEgs+zp0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -558,8 +558,11 @@
   .cc-unit{font-size:0.66rem;color:var(--muted);font-weight:500;}
   .legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
   .chart-empty-msg{color:var(--muted);font-size:0.82rem;padding:34px 4px;text-align:center;margin:0;}
-  .mini-charts{display:grid;grid-template-columns:1fr;gap:12px;}
-  @media(min-width:820px){.mini-charts{grid-template-columns:repeat(3,1fr);}}
+  .mini-charts{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;}
+  .mini-charts > *{grid-column:span 12;} @media(min-width:820px){.mini-charts > *{grid-column:span 4;}}
+  #io-list,#ov-custom-list,#water-compare,#water-calib-charts{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:12px;row-gap:0;align-items:start;}
+  #io-list > *,#ov-custom-list > *,#water-compare > *,#water-calib-charts > *{grid-column:span 12;}
+  @media(max-width:819px){[data-sz]{grid-column:span 12 !important;}}
 
   /* Entry form */
   .entry-form{
@@ -4863,7 +4866,7 @@
     if(container.id && !opts.__full) svgChartArgs[container.id] = {ds:datasets, opts:opts};
     var srcDatasets = datasets;
     datasets = datasets.map(function(d, di){ var c = {}; for(var k in d){ c[k] = d[k]; } c.color = priColor(d.color); if(!opts.onToggle && container.id && svgHiddenSeries[container.id+'|'+(d.key || di)]) c.hidden = true; return c; });
-    var H = opts.height || 200;
+    var szId = container.id && ovPrefs && ovPrefs.sizes && ovPrefs.sizes[container.id], H = (szId && szId.h && SZ_SVGH[szId.h]) || opts.height || 200;
     var visible = datasets.filter(function(d){ return !d.hidden; });
     var totalPoints = visible.reduce(function(n,d){ return n+d.points.length; }, 0);
 
@@ -11705,7 +11708,7 @@
   /* بيرسم التبويب المفتوح بس — باقي التبويبات بتترسم أول ما تفتحها (setupTabs) */
   /* ====================== المخططات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + مخططات مخصصة ====================== */
   var customCharts = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_customcharts') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
-  var ovPrefs = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_ovprefs') || 'null'); if(o && typeof o==='object') return {hidden:o.hidden || {}, titles:o.titles || {}}; }catch(e){} return {hidden:{}, titles:{}}; })();
+  var ovPrefs = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_ovprefs') || 'null'); if(o && typeof o==='object') return {hidden:o.hidden || {}, titles:o.titles || {}, sizes:o.sizes || {}}; }catch(e){} return {hidden:{}, titles:{}, sizes:{}}; })();
   var ioState = {}, ioBuilder = null, IO_MAX_SERIES = 12;
   var IO_COLORS = ['#2C8C6F','#D8543A','#2C7A8C','#C9932F','#8C6FA2','#3B82F6','#6FA22E','#E0457B','#7A5C2E','#0F766E'];
   var CL_METRICS = [
@@ -12820,6 +12823,8 @@
   function ioSaveCharts(list){ return ioSaveAll(list, null); }
   /* أول مرة بنعدّل: المخططات الجاهزة بتتحفظ كلها عشان ما تختفيش */
   function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
+  var SZ_SVGH = {280:150, 400:230, 560:350};   // ارتفاع الرسم لكل حجم (صغير / متوسط / كبير)
+  function szApply(el, w){ if(!el) return; if(w){ el.style.gridColumn = 'span '+w; el.setAttribute('data-sz', '1'); } else { el.style.gridColumn = ''; el.removeAttribute('data-sz'); } }
   function ioRefresh(){
     var sy = window.pageYOffset || 0, root = document.querySelector('.panel.active'), hh = root ? root.offsetHeight : 0;
     if(root && hh) root.style.minHeight = hh+'px';   // الصفحة ما تقصرش لحظة إعادة الرسم (وإلا المتصفح بيطلّعك لفوق)
@@ -12911,8 +12916,8 @@
     ioWireBuilder(body);
     var list = $('#io-list', body);
     charts.forEach(function(c){
-      var host = document.createElement('div'); list.appendChild(host);
-      try{ ioRenderCard(c, host, isAdmin, !saved); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم المخطط.</p>'; }
+      var host = document.createElement('div'); list.appendChild(host); szApply(host, c.w);
+      try{ ioRenderCard(c, host, isAdmin, !saved, c.h ? {svgH:SZ_SVGH[c.h] || Math.max(150, c.h-150)} : null); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم المخطط.</p>'; }
     });
   }
   /* ====================== نظرة عامة: قايمة ⋮ لكل مخطط (تعديل / تغيير الاسم / تكرار / إزالة) ====================== */
@@ -12947,23 +12952,41 @@
     return {id:genId(), title:title, days:30, ov:true, series:ser};
   }
   function ovCloseMenu(){ var m = document.getElementById('ov-menu'); if(m && m.parentNode) m.parentNode.removeChild(m); }
+  /* العرض والارتفاع (نفس اختيارات لوحات التبويبات) */
+  function ovCurSize(ctx){
+    if(ctx.kind==='builtin') return ovPrefs.sizes[ctx.id] || {};
+    var c = ctx.chart || {}; return {w:c.w, h:c.h};
+  }
+  function ovSizeChips(ctx){
+    var cur = ovCurSize(ctx), wv = [[4,'⅓'],[6,'½'],[8,'⅔'],[12,'كامل']], hv = [[280,'صغير'],[400,'متوسط'],[560,'كبير']];
+    return '<div class="db-chips"><span>العرض</span>'+wv.map(function(x){ return '<button type="button" data-a="w" data-v="'+x[0]+'" class="'+(cur.w===x[0] ? 'on' : '')+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="db-chips"><span>الارتفاع</span>'+hv.map(function(x){ return '<button type="button" data-a="h" data-v="'+x[0]+'" class="'+(cur.h===x[0] ? 'on' : '')+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  }
   function ovShowMenu(btn, ctx){
     ovCloseMenu();
     var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
-    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button><button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>';
+    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button>'+ovSizeChips(ctx)+'<button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>';
     document.body.appendChild(m);
     var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 190;
     m.style.top = Math.min(r.bottom + 4, (window.innerHeight || 700) - 190)+'px';
     m.style.left = Math.max(8, Math.min((window.innerWidth || 360) - mw - 8, r.left))+'px';
-    $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var a = b.getAttribute('data-a'); ovCloseMenu(); ovAction(a, ctx); }); });
+    $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var a = b.getAttribute('data-a'), v = parseInt(b.getAttribute('data-v'), 10); ovCloseMenu(); ovAction(a, ctx, v); }); });
   }
   function ovScrollToBuilder(){ setTimeout(function(){ var f = document.getElementById('io-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 80); }
-  function ovAction(a, ctx){
+  function ovAction(a, ctx, v){
     if(currentUserRole!=='admin'){ toast('تعديل المخططات للمدير بس'); return; }
-    if(ctx.kind==='builtin') ovBuiltinAction(a, ctx); else ovCustomAction(a, ctx);
+    if(ctx.kind==='builtin') ovBuiltinAction(a, ctx, v); else ovCustomAction(a, ctx, v);
   }
-  function ovBuiltinAction(a, ctx){
+  function ovBuiltinAction(a, ctx, v){
     var id = ctx.id, cur = ctx.title || ctx.orig || id;
+    if(a==='w' || a==='h'){
+      var sz = ovPrefs.sizes[id] = Object.assign({}, ovPrefs.sizes[id] || {}); sz[a] = v;
+      var hd = document.getElementById(id), cd = hd && hd.closest('.chart-card');
+      if(a==='w') szApply(cd, v);
+      else { var ar = svgChartArgs[id]; if(hd && ar) renderSvgChart(hd, ar.ds, ar.opts); }
+      ioSaveAll(customCharts, ovPrefs).then(function(){ toast('اتغيّر الحجم'); });
+      return;
+    }
     if(a==='rename'){
       var nt = window.prompt('اسم المخطط:', cur); if(nt===null) return; nt = nt.trim(); if(!nt) return;
       ovPrefs.titles[id] = nt;
@@ -12987,10 +13010,11 @@
     }
     if(a==='edit'){ def.isNew = true; if(ctx.inOv!==false) def.replaces = id; else def.ov = false; ioWizOpen(def); }
   }
-  function ovCustomAction(a, ctx){
+  function ovCustomAction(a, ctx, v){
     var chart = ctx.chart, list = ioMaterialized(), i = -1;
     for(var k=0; k<list.length; k++){ if(list[k].id===chart.id){ i = k; break; } }
     if(i < 0){ toast('المخطط مش موجود'); return; }
+    if(a==='w' || a==='h'){ var upd = {}; upd[a] = v; list[i] = Object.assign({}, list[i], upd); ioSaveAll(list, null).then(function(){ toast('اتغيّر الحجم'); ioRefresh(); }); return; }
     if(a==='rename'){
       var nt = window.prompt('اسم المخطط:', list[i].title || ''); if(nt===null) return; nt = nt.trim(); if(!nt) return;
       list[i] = Object.assign({}, list[i], {title:nt});
@@ -13019,6 +13043,7 @@
       }
       if(ovPrefs.hidden[id]){ card.style.display = 'none'; return; }
       if(inOv || card.style.display==='none') card.style.display = '';
+      szApply(card, ovPrefs.sizes[id] && ovPrefs.sizes[id].w);
       if(h3.querySelector('.ov-title')) return;
       var orig = helpHeadText(h3);
       h3.setAttribute('data-orig', orig); h3.className = 'ov-h3';
@@ -13040,8 +13065,8 @@
     ioWireBuilder(el);
     var box = $('#ov-custom-list', el);
     list.forEach(function(c){
-      var host = document.createElement('div'); box.appendChild(host);
-      try{ ioRenderCard(c, host, isAdmin, false); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم المخطط.</p>'; }
+      var host = document.createElement('div'); box.appendChild(host); szApply(host, c.w);
+      try{ ioRenderCard(c, host, isAdmin, false, c.h ? {svgH:SZ_SVGH[c.h] || Math.max(150, c.h-150)} : null); }catch(e){ console.error('chart render', e); host.innerHTML = '<p class="empty-note">تعذر رسم المخطط.</p>'; }
     });
     ovDecorate();
   }
@@ -14311,7 +14336,7 @@
     db.doc('settings/customCharts').onSnapshot(function(snap){
       var dd = snap.exists ? snap.data() : {};
       customCharts = Array.isArray(dd.charts) ? dd.charts : [];
-      ovPrefs = {hidden:(dd.ov && dd.ov.hidden) || {}, titles:(dd.ov && dd.ov.titles) || {}};
+      ovPrefs = {hidden:(dd.ov && dd.ov.hidden) || {}, titles:(dd.ov && dd.ov.titles) || {}, sizes:(dd.ov && dd.ov.sizes) || {}};
       renderAllSoon();
     }, function(err){
       console.error('customCharts snapshot error', err);
