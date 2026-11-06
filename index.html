@@ -921,6 +921,9 @@
     --water:#4DB8FF;--water-soft:#0F2D45;--tank:#FFB938;--tank-soft:#3A2A08;--alert:#FF6B6E;--alert-soft:#42171A;--good:#3DDC84;--good-soft:#0F3A22;}
   :root[data-palette="vivid"] body{background:radial-gradient(900px 420px at 100% -8%,color-mix(in srgb,var(--brand) 20%,transparent),transparent 70%),radial-gradient(700px 360px at 0% 100%,color-mix(in srgb,var(--water) 12%,transparent),transparent 70%),var(--paper);background-attachment:fixed;}
   .pal-opt.active{background:var(--brand);color:var(--on-brand);border-color:var(--brand);}
+  /* لوجو الهيدر في الوضع الداكن: بيتحط على شارة فاتحة عشان الكتابة السودا والأخضر يفضلوا بألوانهم الأصلية */
+  :root[data-theme="dark"] .brand-mark img{background:#F3F8F5;border-radius:12px;padding:5px 10px;box-shadow:0 0 0 1px rgba(255,255,255,.08);}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .brand-mark img{background:#F3F8F5;border-radius:12px;padding:5px 10px;box-shadow:0 0 0 1px rgba(255,255,255,.08);}}
   :root[data-palette="vivid"] #app > header{background:linear-gradient(90deg,color-mix(in srgb,var(--brand) 16%,var(--surface)),color-mix(in srgb,var(--water) 10%,var(--surface)));border-bottom-color:color-mix(in srgb,var(--brand) 30%,var(--border));}
   :root[data-palette="vivid"] .wx-strip{background:color-mix(in srgb,var(--water) 8%,var(--surface));border-bottom-color:color-mix(in srgb,var(--water) 25%,var(--border));}
   :root[data-palette="vivid"] nav.tabs#tabs{background:color-mix(in srgb,var(--brand) 7%,var(--surface));border-inline-end-color:color-mix(in srgb,var(--brand) 28%,var(--border));}
