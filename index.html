@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wgSsXd5D9e548eAbd0OnPwA7quXaA7/c1K/DXm/QXqk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KPoT0SHxbBW8zBM7SZTAAqtTLJReddBgeIwpq6OuBGc=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -882,6 +882,31 @@
   .voice-card{margin-top:8px;padding:8px;border-radius:8px;background:var(--surface);}
   .voice-chip{display:inline-block;background:var(--surface-2);border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:.8rem;}
   .voice-chip.bad{background:var(--alert-soft);color:var(--alert);}
+
+  /* ===== شريط التابات الجانبي (يتقفل لأيقونات بس) + الطقس في النص ===== */
+  :root{--sb-w:224px;--sb-c:54px;--sb-cur:var(--sb-w);--hdr-h:58px;}
+  body.sb-collapsed{--sb-cur:var(--sb-c);}
+  #app{padding-inline-start:var(--sb-cur);transition:padding .2s ease;}
+  #app > header{margin-inline-start:calc(-1 * var(--sb-cur));transition:margin .2s ease;}
+  nav.tabs#tabs{position:fixed;top:var(--hdr-h);bottom:0;inset-inline-start:0;width:var(--sb-cur);flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:2px;overflow-x:hidden;overflow-y:auto;padding:8px 6px 14px;border-bottom:none;border-inline-end:1px solid var(--border);z-index:30;transition:width .2s ease;scrollbar-width:thin;}
+  nav.tabs#tabs .tab-btn{width:100%;flex:0 0 auto;justify-content:flex-start;gap:10px;border-radius:12px;border-bottom:none;padding:10px 12px;font-size:.88rem;text-align:start;}
+  nav.tabs#tabs .tab-btn .ic{width:20px;height:20px;flex:none;}
+  nav.tabs#tabs .tab-btn.active{background:color-mix(in srgb,var(--tab-color,var(--ink)) 14%,transparent);box-shadow:inset 3px 0 0 var(--tab-color,var(--ink));}
+  body.sb-collapsed nav.tabs#tabs .tab-btn{font-size:0;gap:0;justify-content:center;padding:10px 0;}
+  nav.tabs#tabs .tab-add{position:static;margin:8px auto 0;flex:none;}
+  .sb-toggle{flex:none;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:12px;padding:8px;margin-bottom:6px;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:700;}
+  .sb-toggle .sb-arrow{transition:transform .2s;} .sb-toggle.flip .sb-arrow{transform:rotate(180deg);}
+  #sb-tip{position:fixed;z-index:60;background:var(--ink);color:var(--surface);padding:6px 12px;border-radius:10px;font-size:.8rem;font-weight:700;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;transform:translateY(-50%);white-space:nowrap;}
+  #sb-tip.show{opacity:1;}
+  @media(max-width:719px){
+    #app{padding-inline-start:var(--sb-c);} #app > header{margin-inline-start:calc(-1 * var(--sb-c));}
+    body:not(.sb-collapsed) nav.tabs#tabs{box-shadow:0 0 30px rgba(0,0,0,.28);}
+    main{padding-inline:10px;}
+  }
+  @media print{ nav.tabs#tabs,#sb-tip{display:none !important;} }
+  /* الأرصاد: كل البيانات في منتصف الصفحة */
+  .wx-strip{justify-content:safe center;} .wx-toggle{margin-inline-start:0;}
+  .wx-detail{text-align:center;} .wx-detail > *{max-width:980px;margin-inline:auto;} .wx-grid{justify-content:center;} .wx-hours{justify-content:safe center;}
 </style>
 </head>
 <body>
@@ -929,6 +954,7 @@
     <button class="tab-btn active" data-tab="overview" style="--tab-color:var(--ink)">🏠 نظرة عامة</button>
 <button class="tab-btn" data-tab="charts" style="--tab-color:var(--water)">📈 المخططات</button>
     <button class="tab-btn" data-tab="water" style="--tab-color:var(--brand)">💧 بيانات المياه</button>
+    <button class="tab-btn" data-tab="soil" style="--tab-color:var(--tank)">🟫 بيانات التربة</button>
     <button class="tab-btn" data-tab="climate" style="--tab-color:var(--tank)">🌡 بيانات المناخ</button>
     <button class="tab-btn" data-tab="tasks" style="--tab-color:var(--water)">📋 المهام والإجراءات</button>
     <button class="tab-btn" data-tab="spray" style="--tab-color:var(--brand)">🧴 الرش والتسميد</button>
@@ -992,7 +1018,14 @@
 <div id="dash-body"></div>
 </section>
 
-<section class="panel" id="panel-water">
+<section class="panel" id="panel-soil">
+      <h1 class="page-title">بيانات التربة</h1>
+      <div class="system-picker" id="soil-greenhouse-picker"></div>
+      <div class="system-picker" id="soil-system-picker"></div>
+      <div id="soil-body"></div>
+    </section>
+
+    <section class="panel" id="panel-water">
       <h1 class="page-title">بيانات المياه</h1>
       <div class="system-picker" id="greenhouse-picker"></div>
       <div class="system-picker" id="system-picker"></div>
@@ -1092,6 +1125,7 @@
         <div id="systems-list"></div>
         <div class="inline-add-form">
           <input type="text" id="new-system-greenhouse" placeholder="اسم الصوبة">
+          <select id="new-system-gtype" title="نوع الصوبة"><option value="leafy">ورقيات (هيدروبونيك NFT)</option><option value="fruit">ثمريات (تربة — طماطم)</option></select>
           <input type="text" id="new-system-name" placeholder="اسم/رقم النظام">
           <button class="btn btn-primary btn-sm" id="btn-add-system">إضافة نظام</button>
         </div>
@@ -1324,6 +1358,7 @@
     'search':'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
     'lock':'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     'tag':'<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.7 8.71a2 2 0 0 0 2.82 0l7.18-7.18a2 2 0 0 0 0-2.82Z"/><path d="M7.5 7.5h.01"/>',
+    'soil':'<path d="m12 2 10 5-10 5L2 7l10-5Z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/>',
     'home':'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>',
     'spray':'<path d="M3 3h.01M7 5h.01M11 7h.01M3 7h.01M7 9h.01M3 11h.01"/><rect width="4" height="4" x="15" y="5"/><path d="m19 9 2 2v10c0 .6-.4 1-1 1h-6c-.6 0-1-.4-1-1V11l2-2"/><path d="m13 14 8-2M13 19l8-2"/>',
     'potted':'<path d="M12 11V8"/><path d="M12 8c0-2.5-1.8-4.2-4.5-4.5C7.2 6 9 8 12 8Z"/><path d="M12 8c0-2.5 1.8-4.2 4.5-4.5C16.8 6 15 8 12 8Z"/><path d="M5 11h14l-1.5 9a1 1 0 0 1-1 .9h-9a1 1 0 0 1-1-.9Z"/>',
@@ -1344,7 +1379,7 @@
     '⚙':'settings','▾':'chevron-down','⌄':'chevron-down','⌃':'chevron-up','‹':'chevron-left','›':'chevron-right',
     '🍄':'mushroom','🆕':'sparkles','🧮':'calculator','🌬':'wind','◐':'contrast','⎋':'log-out','👁':'eye',
     '⏩':'fast-forward','⚡':'zap','🧪':'flask','🔴':'circle-dot','🟡':'circle','🪤':'funnel','💬':'message-circle',
-    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🧴':'spray','🪴':'potted'
+    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🧴':'spray','🪴':'potted'
   };
   var ICON_RE = /(?:[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF])\uFE0F?/gu;
   var ICON_QUICK = /[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF]/u;
@@ -1447,6 +1482,15 @@
     {key:'tank',       label:'الخزان', title:'خزان التغذية (Silo)', color:'var(--tank)', colorHex:'#F5A623'}
   ];
   var METRICS = ['ph','ec','temp'];
+  /* نوع الصوبة: ورقيات (هيدروبونيك NFT) أو ثمريات (تربة: طماطم...) — بيتحدد على مستوى الصوبة */
+  var GH_TYPES = {leafy:{label:'ورقيات (هيدروبونيك NFT)', short:'ورقيات'}, fruit:{label:'ثمريات (تربة — طماطم وخلافه)', short:'ثمريات'}};
+  var SRC_FRUIT = [{key:'irrigation', label:'خزان الري', title:'خزان الري', color:'var(--tank)', colorHex:'#F5A623'}];
+  var SOIL_COLORS = {ph:'#2DBE6C', ec:'#3B82F6', temp:'#F5A623', moist:'#8D6E63'};
+  function ghNameOf(sys){ return (sys && sys.greenhouse && sys.greenhouse.trim()) ? sys.greenhouse.trim() : 'بدون صوبة'; }
+  function ghTypeByName(name){ return systems.some(function(s){ return ghNameOf(s)===name && s.gtype==='fruit'; }) ? 'fruit' : 'leafy'; }
+  function sysGType(sys){ return sys ? ghTypeByName(ghNameOf(sys)) : 'leafy'; }
+  function isFruitSys(id){ return sysGType(getSystem(id))==='fruit'; }
+  function sourcesFor(sysId){ return isFruitSys(sysId) ? SRC_FRUIT : SOURCES; }
 
   var NUTRIENT_ELEMENTS = [
     {key:'N_NO3', label:'نيتروجين نتراتي N-NO3'}, {key:'N_NH4', label:'نيتروجين أمونيومي N-NH4'},
@@ -1606,8 +1650,8 @@
   var currentUser = null;
   var currentUserRole = null;
   var currentUserPermissions = {};
-  var TAB_KEYS = ['water','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory'];
-  var TAB_LABELS = {water:'بيانات المياه', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
+  var TAB_KEYS = ['water','soil','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory'];
+  var TAB_LABELS = {water:'بيانات المياه', soil:'بيانات التربة', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
   var appUsers = [];
   var localMode = false;
   var sourceVisibility = {irrigation:true, drainage:false, tank:false};
@@ -2335,6 +2379,7 @@
       ph: parseFloat(data.ph), ec: parseFloat(data.ec), temp: parseFloat(data.temp),
       note: data.note || '', by: currentUser || '', createdAt: Date.now()
     };
+    if(data.moist!==undefined && data.moist!=='' && isFinite(parseFloat(data.moist))) entry.moist = parseFloat(data.moist);
     var existing = findDoc(sourceKey, dateKey, systemId);
     var entries = existing ? existing.entries.slice() : [];
     entries.push(entry);
@@ -2465,11 +2510,13 @@
     });
   }
 
+  function permOf(tabKey){ var v = currentUserPermissions[tabKey]; return (v===undefined && tabKey==='soil') ? currentUserPermissions.water : v; }   // بيانات التربة بتتبع صلاحية المياه لحد ما تتحدد لوحدها
   function canEdit(tabKey){
-    return currentUserRole==='admin' || currentUserPermissions[tabKey]==='edit';
+    return currentUserRole==='admin' || permOf(tabKey)==='edit';
   }
   function canView(tabKey){
-    return currentUserRole==='admin' || (currentUserPermissions[tabKey] && currentUserPermissions[tabKey]!=='none');
+    var v = permOf(tabKey);
+    return currentUserRole==='admin' || !!(v && v!=='none');
   }
   /* ---------- نسخة احتياطية كاملة (Export / Import) ---------- */
   function buildBackupObject(){
@@ -2623,16 +2670,25 @@
   function applyTabVisibility(){
     $all('.tab-btn').forEach(function(btn){
       var tab = btn.getAttribute('data-tab');
-      if(tab==='charts'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
-      if(tab==='overview' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
+      if(tab==='soil'){ btn.classList.toggle('hidden', !canView('soil') || !systems.some(function(s){ return sysGType(s)==='fruit'; })); return; }
+      if(tab==='overview' || tab==='charts' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
     if(typeof SUBTABS !== 'undefined') Object.keys(SUBTABS).forEach(function(k){ try{ panelSubRefresh(k); }catch(e){} });
   }
-  function addSystem(greenhouse, name){
+  function setGhType(ghName, type){
+    return saveSystems(systems.map(function(s){
+      if(ghNameOf(s)!==ghName) return s;
+      var c = Object.assign({}, s); if(type==='fruit') c.gtype = 'fruit'; else delete c.gtype; return c;
+    })).then(function(){ renderAll(); });
+  }
+  function addSystem(greenhouse, name, gtype){
     if(!name) return Promise.resolve();
     var sys = {id:genId(), greenhouse:greenhouse||'', name:name};
+    var gname = (greenhouse && greenhouse.trim()) ? greenhouse.trim() : 'بدون صوبة';
+    var exists = systems.some(function(s){ return ghNameOf(s)===gname; });
+    if((exists ? ghTypeByName(gname) : gtype)==='fruit') sys.gtype = 'fruit';
     return saveSystems(systems.concat([sys])).then(function(){
       selectedSystemId = sys.id;
       selectedGreenhouse = (greenhouse && greenhouse.trim()) ? greenhouse.trim() : 'بدون صوبة';
@@ -5478,7 +5534,7 @@
     if(!sys){ el.innerHTML = ''; return; }
 
     /* ---- water: 3 sources ---- */
-    var waterHtml = SOURCES.map(function(s){
+    var waterHtml = sourcesFor(overviewSystemId).map(function(s){
       var entries = flattenEntries(s.key, overviewSystemId);
       var last = entries.length ? entries[entries.length-1] : null;
       var chips = last
@@ -5549,7 +5605,7 @@
     function chartCard(id, title){ return '<div class="chart-card"><h3>'+title+'</h3><div class="chart-wrap"><div id="'+id+'" class="svg-chart-holder"></div></div></div>'; }
     var rangeHtml = rngHtml('ovd');
 
-    var hasWater = SOURCES.some(function(s){ return flattenEntries(s.key, overviewSystemId).length>1; });
+    var hasWater = sourcesFor(overviewSystemId).some(function(s){ return flattenEntries(s.key, overviewSystemId).length>1; });
     var waterCharts = hasWater ? chartCard('ovd-w-ph','الحموضة pH — الري / الصرف / الخزان')+chartCard('ovd-w-ec','EC (mS/cm) — الري / الصرف / الخزان')+chartCard('ovd-w-temp','حرارة الماء (°C) — الري / الصرف / الخزان') : '';
     var calibCharts = '';
     if(calibList.length>1){
@@ -5587,7 +5643,7 @@
 
     ['ph','ec','temp'].forEach(function(metric){
       var c = byId('ovd-w-'+metric); if(!c) return;
-      var ds = SOURCES.map(function(s){
+      var ds = sourcesFor(overviewSystemId).map(function(s){
         var k = 'ovd-'+s.key;
         return {key:k, label:s.label, color:s.colorHex, points:filterPointsByRange(pointsFor(flattenEntries(s.key, overviewSystemId), metric), ovdRangeDays)};
       });
@@ -5752,6 +5808,35 @@
     });
   }
 
+  /* نافذة إضافة نظام: الصوبة + نوعها (ورقيات / ثمريات) + اسم النظام */
+  function openSystemAdd(defGh){
+    var old = document.getElementById('sa-wiz'); if(old && old.parentNode) old.parentNode.removeChild(old);
+    var el = document.createElement('div'); el.id = 'sa-wiz'; el.className = 'io-wiz';
+    el.innerHTML = '<div class="io-sheet" role="dialog" aria-modal="true" style="height:auto;max-height:92vh;">'+
+      '<div class="io-sh-head"><div class="io-sh-ttl"><div class="io-sh-title">➕ نظام جديد</div></div><button type="button" class="io-sh-btn" data-s="close" aria-label="إغلاق">✕</button></div>'+
+      '<div class="io-sh-body"><div class="form-grid">'+
+        '<div class="field-sm full"><label>الصوبة</label><input type="text" id="sa-gh" list="sa-gh-list" maxlength="60" value="'+escH(defGh||'')+'" placeholder="اسم صوبة موجودة أو جديدة"><datalist id="sa-gh-list">'+greenhouseGroups().map(function(g){ return '<option value="'+escH(g.name)+'"></option>'; }).join('')+'</datalist></div>'+
+        '<div class="field-sm full"><label>نوع الصوبة</label><select id="sa-type"><option value="leafy">ورقيات (هيدروبونيك NFT)</option><option value="fruit">ثمريات (تربة — طماطم)</option></select></div>'+
+        '<div class="field-sm full"><label>اسم/رقم النظام</label><input type="text" id="sa-name" maxlength="60"></div></div>'+
+        '<p class="hint" id="sa-hint" style="margin:8px 0 0;"></p></div>'+
+      '<div class="io-sh-foot"><button type="button" class="btn btn-primary btn-sm" data-s="go">إضافة</button><button type="button" class="btn btn-ghost btn-sm" data-s="close">إلغاء</button></div></div>';
+    document.body.appendChild(el);
+    function close(){ if(el.parentNode) el.parentNode.removeChild(el); }
+    function sync(){
+      var nm = $('#sa-gh').value.trim() || 'بدون صوبة', ex = systems.some(function(s){ return ghNameOf(s)===nm; }), sel = $('#sa-type');
+      if(ex){ sel.value = ghTypeByName(nm); sel.disabled = true; $('#sa-hint').textContent = 'الصوبة موجودة: نوعها '+GH_TYPES[ghTypeByName(nm)].short+' (مش بيتغيّر من هنا).'; }
+      else { sel.disabled = false; $('#sa-hint').textContent = ''; }
+    }
+    $('#sa-gh').addEventListener('input', sync); sync();
+    el.addEventListener('click', function(ev){
+      if(ev.target===el){ close(); return; }
+      var b = ev.target.closest && ev.target.closest('[data-s]'); if(!b) return;
+      if(b.getAttribute('data-s')==='close'){ close(); return; }
+      var gh = $('#sa-gh').value.trim(), nm = $('#sa-name').value.trim();
+      if(!nm){ $('#sa-hint').textContent = 'اكتب اسم/رقم النظام'; return; }
+      var ty = $('#sa-type').value; close(); addSystem(gh, nm, ty);
+    });
+  }
   function renderSystemPicker(el){
     if(!el) return;
     var groups = greenhouseGroups();
@@ -5771,9 +5856,7 @@
     var addPill = el.querySelector('[data-role="add-pill"]');
     if(addPill) addPill.addEventListener('click', function(){
       var suggestedGh = (selectedGreenhouse && selectedGreenhouse!=='بدون صوبة') ? selectedGreenhouse : '';
-      var gh = prompt('اسم الصوبة:', suggestedGh) || '';
-      var nm = prompt('اسم/رقم النظام:', '');
-      if(nm && nm.trim()) addSystem(gh.trim(), nm.trim());
+      openSystemAdd(suggestedGh);
     });
   }
 
@@ -5801,9 +5884,18 @@
       el.innerHTML = '<p class="hint" style="margin:0 0 4px;">لسه مفيش أنظمة مضافة.</p>';
       return;
     }
-    el.innerHTML = systems.map(function(sys){
-      return '<div class="systems-list-row"><span>'+systemLabel(sys)+'</span><button class="del-btn" data-sysid="'+sys.id+'" title="حذف">✕</button></div>';
+    el.innerHTML = greenhouseGroups().map(function(g){
+      var ty = ghTypeByName(g.name);
+      return '<div class="systems-list-row" style="background:var(--surface-2);font-weight:700;"><span>🏠 '+escH(g.name)+' <span class="status-pill">'+GH_TYPES[ty].short+'</span></span><button class="btn-ghost btn-sm gh-type-btn" data-gh="'+escH(g.name)+'" style="border-radius:8px;">تغيير النوع</button></div>'+
+        g.systems.map(function(sys){ return '<div class="systems-list-row"><span>'+systemLabel(sys)+'</span><button class="del-btn" data-sysid="'+sys.id+'" title="حذف">✕</button></div>'; }).join('');
     }).join('');
+    $all('.gh-type-btn', el).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var gh = btn.getAttribute('data-gh'), cur = ghTypeByName(gh), nx = cur==='fruit' ? 'leafy' : 'fruit';
+        if(!confirm('تغيّر نوع الصوبة "'+gh+'" من '+GH_TYPES[cur].short+' إلى '+GH_TYPES[nx].short+'؟\nالبيانات المسجلة قبل كده مش بتتمسح.')) return;
+        setGhType(gh, nx).then(function(){ toast('اتغيّر نوع الصوبة'); });
+      });
+    });
     $all('.del-btn[data-sysid]', el).forEach(function(btn){
       btn.addEventListener('click', function(){ deleteSystem(btn.getAttribute('data-sysid')); });
     });
@@ -5906,8 +5998,9 @@
     RNG.cmp = {get:function(){ return chartRangeDays; }, set:function(v){ chartRangeDays = v; }, apply:function(){ renderSystemComparisonCharts(container, systemId); }, opts:RNG_OPTS, def:30};
     var filterBarHtml = rngHtml('cmp');
 
+    var fruit = isFruitSys(systemId), srcs = sourcesFor(systemId);
     container.innerHTML =
-      '<h2 class="section-title" style="margin-top:0;">مقارنة الري والصرف والخزان</h2>'+
+      '<h2 class="section-title" style="margin-top:0;">'+(fruit ? 'قياسات خزان الري' : 'مقارنة الري والصرف والخزان')+'</h2>'+
       filterBarHtml+
       '<div class="chart-card"><h3>الحموضة pH</h3><div class="chart-wrap"><div id="cmp-chart-ph" class="svg-chart-holder"></div></div></div>'+
       '<div class="chart-card"><h3>EC (mS/cm)</h3><div class="chart-wrap"><div id="cmp-chart-ec" class="svg-chart-holder"></div></div></div>'+
@@ -5917,7 +6010,7 @@
     METRICS.forEach(function(metric){
       var el = document.getElementById('cmp-chart-'+metric);
       if(!el) return;
-      var datasets = SOURCES.map(function(s){
+      var datasets = srcs.map(function(s){
         var pts = filterPointsByRange(pointsFor(flattenEntries(s.key, systemId), metric), chartRangeDays);
         return {key:s.key, label:s.label, color:s.colorHex, points:pts, hidden: sourceVisibility[s.key]===false};
       });
@@ -5992,6 +6085,234 @@
     lfWire('w-'+key);
   }
 
+  /* ---------- قياسات التربة (للثمريات): pH / EC / حرارة / رطوبة ---------- */
+  function exportSoilCSV(systemId){
+    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
+    var rows = flattenEntries('soil', systemId).filter(function(e){ return lfInRange('w-soil', e.ts); });
+    if(!rows.length){ toast('لا توجد بيانات للتصدير'); return; }
+    var lines = [['الوقت','pH','EC (mS/cm)','حرارة التربة (°C)','رطوبة التربة (%)','بواسطة','ملاحظة'].map(csvEscape).join(',')];
+    rows.forEach(function(e){ lines.push([e.ts, e.ph, e.ec, e.temp, e.moist, e.by, e.note].map(csvEscape).join(',')); });
+    downloadsCap.save({filename:'oroots-soil-'+systemId+'-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); }).catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
+  }
+  function renderSoilSection(parts, systemId){
+    var entries = flattenEntries('soil', systemId).slice().reverse();
+    parts.form.innerHTML =
+      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:#8D6E63"></span>قياسات التربة</h3>'+
+      '<form class="entry-form" id="ws-soil-form"><div class="form-grid">'+
+        '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-soil-ts')+'</div>'+
+        '<div class="field-sm"><label>حموضة التربة pH</label><input type="number" step="any" min="0" max="14" class="ltr" id="ws-soil-ph" required></div>'+
+        '<div class="field-sm"><label>EC التربة (mS/cm)</label><input type="number" step="any" min="0" max="20" class="ltr" id="ws-soil-ec" required></div>'+
+        '<div class="field-sm"><label>حرارة التربة (°C)</label><input type="number" step="any" min="0" max="60" class="ltr" id="ws-soil-temp" required></div>'+
+        '<div class="field-sm"><label>رطوبة التربة (%)</label><input type="number" step="any" min="0" max="100" class="ltr" id="ws-soil-moist" required></div>'+
+        '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-soil-note" placeholder="مثال: الصف 3، على بعد 20 سم من النقاط"></div>'+
+      '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة التربة</button></div></form>';
+    parts.table.innerHTML =
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:#8D6E63"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
+      lfBarHtml('w-soil')+
+      '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الرطوبة %</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-soil-tbody"></tbody></table></div>'+
+      (entries.length ? '' : '<p class="empty-note">لسه مفيش قياسات تربة. سجّل أول قياس من النموذج فوق.</p>');
+    document.getElementById('ws-soil-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var v = function(k){ return document.getElementById('ws-soil-'+k).value; };
+      addReading('soil', {ts:nowLocalInputValue(), ph:v('ph'), ec:v('ec'), temp:v('temp'), moist:v('moist'), note:v('note')}, systemId).then(function(){
+        toast('تم حفظ قراءة التربة'); renderSoilPanel();
+      });
+    });
+    document.getElementById('ws-soil-export').addEventListener('click', function(){ exportSoilCSV(systemId); });
+    var tb = document.getElementById('ws-soil-tbody');
+    entries.forEach(function(e){
+      var dateKey = e.ts.slice(0,10), tr = document.createElement('tr');
+      tr.setAttribute('data-lf', 'w-soil'); tr.setAttribute('data-d', dateKey);
+      tr.innerHTML = '<td class="ltr num">'+fmtTs(e.ts)+'</td><td class="num ltr">'+e.ph+'</td><td class="num ltr">'+e.ec+'</td><td class="num ltr">'+e.temp+'</td><td class="num ltr">'+(e.moist===undefined ? '—' : e.moist)+'</td><td>'+(e.by||'—')+'</td><td>'+escH(e.note||'—')+'</td><td><button class="del-btn" title="حذف">✕</button></td>';
+      tr.querySelector('.del-btn').addEventListener('click', function(){ if(confirm('تحذف القراءة دي؟')) deleteReading('soil', dateKey, e.id, systemId).then(function(){ toast('اتحذفت'); renderSoilPanel(); }); });
+      tb.appendChild(tr);
+    });
+    lfWire('w-soil');
+  }
+  /* ---------- جدول الري: ورقيات (ON/OFF + كمية من المعايرة وعدد المواسير المزروعة) / ثمريات (كل كام ساعة/دقيقة + التصرف الكلي) ---------- */
+  var irrigPlans = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_irrig_plans') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
+  function getIrrigPlan(sysId){ return irrigPlans.filter(function(x){ return x.systemId===sysId; })[0] || {systemId:sysId, programs:[], pointsPerPipe:1, every:2, unit:'h', runMin:10, from:'06:00', to:'18:00', drippers:'', flowVal:'', flowUnit:'mlmin'}; }
+  function saveIrrigPlan(plan){
+    plan = Object.assign({}, plan, {systemId:plan.systemId, updatedAt:Date.now(), updatedBy:currentUser||''});
+    irrigPlans = irrigPlans.filter(function(x){ return x.systemId!==plan.systemId; }).concat([plan]);
+    if(db) return db.collection('irrigSchedules').doc(plan.systemId).set(plan);
+    try{ localStorage.setItem('oroots_irrig_plans', JSON.stringify(irrigPlans)); }catch(e){}
+    return Promise.resolve();
+  }
+  function irrNum(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function irrMin(t){ var m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? parseInt(m[1],10)*60 + parseInt(m[2],10) : null; }
+  function irrHM(min){ min = ((Math.round(min) % 1440) + 1440) % 1440; return pad(Math.floor(min/60))+':'+pad(min%60); }
+  function irrDur(on, off){ var a = irrMin(on), b = irrMin(off); if(a===null || b===null) return 0; var d = b - a; return d <= 0 ? d + 1440 : d; }
+  function irrL(l){ l = irrNum(l); return l >= 1000 ? (Math.round(l/10)/100)+' م³' : (Math.round(l*10)/10)+' لتر'; }
+  function irrPlantedPipes(sysId){ return getPipeMap(sysId).groups.reduce(function(s, g){ return s + (pipeAgeDays(g, 0) >= 0 ? g.pipes : 0); }, 0); }
+  /* ورقيات: برنامج = فترة (من/إلى) بيتكرر جواها "شغّل X دقيقة / اقفل Y دقيقة" */
+  function irrProgCalc(pr){
+    var a = irrMin(pr.from), b = irrMin(pr.to), on = irrNum(pr.onMin), off = irrNum(pr.offMin);
+    if(a===null || b===null || on <= 0) return {win:0, period:0, cycles:0, onMin:0, a:a, on:on, off:off};
+    var win = b - a; if(win <= 0) win += 1440;
+    var period = on + Math.max(0, off), full = Math.floor(win/period), rem = win - full*period;
+    return {win:win, period:period, cycles:full + (rem > 0 ? 1 : 0), onMin:full*on + Math.min(rem, on), a:a, on:on, off:off};
+  }
+  /* حالة البرنامج دلوقتي: شغّال/مقفول ولحد امتى */
+  function irrProgNow(pr, c, now){
+    if(!c.period) return null;
+    var t = ((now - c.a) % 1440 + 1440) % 1440;
+    if(t >= c.win) return null;
+    var pos = t % c.period, isOn = pos < c.on, left = isOn ? c.on - pos : c.period - pos;
+    left = Math.min(left, c.win - t);
+    return {on:isOn, until:irrHM(now + left)};
+  }
+  function irrLeafyCalc(sysId, plan){
+    var cal = calibForSystem(sysId), last = cal.length ? cal[cal.length-1] : null, map = getPipeMap(sysId);
+    var perPoint = last ? last.perPointLpm : 0, pipes = irrPlantedPipes(sysId), ppp = Math.max(1, irrNum(plan.pointsPerPipe) || 1);
+    var points = pipes*ppp, src = 'pipes';
+    if(!points && last && last.totalPoints){ points = last.totalPoints; src = 'calib'; }
+    var totalLpm = perPoint*points;
+    var progs = (plan.programs || []).map(function(pr){ var c = irrProgCalc(pr); return {p:pr, c:c, liters:(pr.enabled===false ? 0 : c.onMin*totalLpm)}; });
+    var dailyL = progs.reduce(function(s, x){ return s + x.liters; }, 0), dailyMin = progs.reduce(function(s, x){ return s + (x.p.enabled===false ? 0 : x.c.onMin); }, 0);
+    return {last:last, perPoint:perPoint, pipes:pipes, ppp:ppp, points:points, src:src, totalLpm:totalLpm, progs:progs, dailyL:dailyL, dailyMin:dailyMin, plants:pipes*(parseFloat(map.plantsPerPipe)||0), totalPipes:map.totalPipes};
+  }
+  function irrFruitCalc(plan){
+    var every = irrNum(plan.every), everyMin = plan.unit==='m' ? every : every*60, run = irrNum(plan.runMin), d = irrNum(plan.drippers), fv = irrNum(plan.flowVal);
+    var mlMin = plan.flowUnit==='lph' ? fv*1000/60 : fv, perPointLpm = mlMin/1000, totalLpm = perPointLpm*d, perIrrL = totalLpm*run;
+    var a = irrMin(plan.from), b = irrMin(plan.to), times = [];
+    if(everyMin > 0 && a !== null && b !== null){ if(b < a) b += 1440; for(var t = a; t <= b && times.length < 96; t += everyMin) times.push(t); }
+    return {everyMin:everyMin, run:run, drippers:d, mlMin:mlMin, perPointLpm:perPointLpm, lph:mlMin*60/1000, totalLpm:totalLpm, perIrrL:perIrrL, times:times, dailyL:perIrrL*times.length};
+  }
+  function irrNowMin(){ var d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+  function renderIrrigSchedule(box, sysId){
+    if(!box) return;
+    var plan = getIrrigPlan(sysId), edit = canEdit('water'), fruit = isFruitSys(sysId);
+    function persist(p, msg){ saveIrrigPlan(p).then(function(){ if(msg) toast(msg); renderIrrigSchedule(box, sysId); }).catch(function(){ toast('ما اتحفظش — تأكد من نشر قواعد Firestore الجديدة'); }); }
+    var dis = edit ? '' : ' disabled';
+    if(!fruit){
+      var c = irrLeafyCalc(sysId, plan), now = irrNowMin(), status = '';
+      var live = c.progs.filter(function(x){ return x.p.enabled!==false; }).map(function(x){ return irrProgNow(x.p, x.c, now); }).filter(Boolean)[0];
+      if(live) status = live.on ? '<span class="status-pill good">🟢 الري شغّال دلوقتي لحد '+live.until+'</span>' : '<span class="status-pill">⏸ الري مقفول دلوقتي لحد '+live.until+'</span>';
+      else if(c.progs.length) status = '<span class="status-pill">⏳ برّه فترات الري دلوقتي</span>';
+      var chips = '<div class="climate-stats">'+
+        climateStatChip('تصرف النقطة', c.last ? fmtNum(c.perPoint*1000) : '—', 'مل/د')+
+        climateStatChip('مواسير مزروعة (إنفوجراف)', c.pipes, 'ماسورة')+
+        climateStatChip('نقاطات عاملة', c.points, c.src==='calib' ? '(من المعايرة)' : '')+
+        climateStatChip('تصرف النظام وقت التشغيل', c.last ? (Math.round(c.totalLpm*100)/100) : '—', 'لتر/د')+
+        (c.dailyL ? climateStatChip('وقت التشغيل اليومي', c.dailyMin, 'دقيقة') : '')+
+        (c.dailyL ? climateStatChip('كمية الري اليومية', irrL(c.dailyL), c.plants ? '≈ '+fmtNum(c.dailyL*1000/c.plants)+' مل/نبتة' : '') : '')+'</div>';
+      var warn = (!c.last ? '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ مفيش معايرة للنقاط للنظام ده — سجّل معايرة من «إدخال القياسات» عشان تتحسب الكميات.</div>' : '')+
+        (!c.pipes ? '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">ℹ️ مفيش مواسير مزروعة في إنفوجراف الحصاد للنظام ده'+(c.src==='calib' ? '، فاتحسبت من إجمالي نقاط المعايرة' : '')+'.</div>' : '');
+      var rows = c.progs.map(function(x, i){
+        var off = x.p.enabled===false;
+        return '<tr data-i="'+i+'"><td><div style="display:flex;gap:4px;align-items:center;"><input type="time" class="ltr irr-from" value="'+escH(x.p.from)+'"'+dis+'><span>→</span><input type="time" class="ltr irr-to" value="'+escH(x.p.to)+'"'+dis+'></div></td>'+
+          '<td><input type="number" min="1" step="any" class="ltr irr-onm" style="width:70px;" value="'+escH(x.p.onMin)+'"'+dis+'></td><td><input type="number" min="0" step="any" class="ltr irr-offm" style="width:70px;" value="'+escH(x.p.offMin)+'"'+dis+'></td>'+
+          '<td class="num">'+(off ? '—' : x.c.cycles)+'</td><td class="num">'+(off ? '—' : x.c.onMin+' د')+'</td><td class="num">'+(off ? '—' : irrL(x.liters))+'</td>'+
+          '<td><label class="io-sw"><input type="checkbox" class="irr-en"'+(off ? '' : ' checked')+dis+'><span></span></label></td>'+
+          '<td>'+(edit ? '<button class="del-btn irr-del" title="حذف">✕</button>' : '')+'</td></tr>';
+      }).join('');
+      box.innerHTML = '<p class="hint help-note">حدد لكل فترة من اليوم كام دقيقة الري يشتغل (ON) وكام دقيقة يقفل (OFF)، وبيتكرر طول الفترة. الكمية بتتحسب لوحدها = دقايق التشغيل × تصرف النقطة (من آخر معايرة) × عدد النقاطات العاملة (المواسير المزروعة حاليًا في إنفوجراف المواسير). لو سجلت معايرة جديدة أو اتغيّر الزرع، الكميات بتتحدّث لوحدها.</p>'+
+        '<div style="margin:6px 0;">'+status+'</div>'+chips+warn+
+        '<div class="table-wrap"><table><thead><tr><th>الفترة (من → إلى)</th><th>شغل (د)</th><th>غلق (د)</th><th>مرات التشغيل</th><th>دقايق التشغيل</th><th>الكمية</th><th>مفعّلة</th><th></th></tr></thead><tbody>'+(rows || '<tr><td colspan="8" class="empty-note">لسه مفيش برنامج ري. ضيف أول برنامج.</td></tr>')+'</tbody>'+
+        (c.progs.length ? '<tfoot><tr><th colspan="4">الإجمالي اليومي</th><th>'+c.dailyMin+' د</th><th>'+irrL(c.dailyL)+'</th><th colspan="2"></th></tr></tfoot>' : '')+'</table></div>'+
+        (edit ? '<form class="entry-form" id="irr-add" style="margin-top:10px;"><div class="form-grid">'+
+          '<div class="field-sm"><label>من الساعة</label><input type="time" class="ltr" id="irr-new-from" value="00:00" required></div><div class="field-sm"><label>إلى الساعة</label><input type="time" class="ltr" id="irr-new-to" value="00:00" required></div>'+
+          '<div class="field-sm"><label>شغل (دقيقة)</label><input type="number" min="1" step="any" class="ltr" id="irr-new-on" value="15" required></div><div class="field-sm"><label>غلق (دقيقة)</label><input type="number" min="0" step="any" class="ltr" id="irr-new-off" value="15" required></div>'+
+          '<div class="field-sm"><label>نقاطات في الماسورة</label><input type="number" min="1" step="1" class="ltr" id="irr-ppp" value="'+c.ppp+'"></div></div>'+
+          '<p class="hint" style="margin:6px 0 0;">من 00:00 إلى 00:00 = اليوم كله. ممكن تعمل أكتر من فترة (مثلاً نهار 15/15 وليل 15/45).</p>'+
+          '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">➕ إضافة برنامج ري</button></div></form>' : '');
+      if(edit){
+        $('#irr-add', box).addEventListener('submit', function(ev){
+          ev.preventDefault();
+          var on = irrNum($('#irr-new-on', box).value), off = irrNum($('#irr-new-off', box).value);
+          if(!(on > 0) || off < 0){ toast('اكتب دقايق الشغل (أكبر من صفر) والغلق'); return; }
+          persist(Object.assign({}, plan, {programs:(plan.programs || []).concat([{id:genId(), from:$('#irr-new-from', box).value, to:$('#irr-new-to', box).value, onMin:on, offMin:off, enabled:true}])}), 'اتضاف برنامج الري');
+        });
+        $('#irr-ppp', box).addEventListener('change', function(){ persist(Object.assign({}, plan, {pointsPerPipe:Math.max(1, parseInt(this.value, 10) || 1)}), 'اتحفظ'); });
+        $all('tbody tr[data-i]', box).forEach(function(tr){
+          var i = parseInt(tr.getAttribute('data-i'), 10);
+          function upd(patch){ var pg = (plan.programs || []).slice(); pg[i] = Object.assign({}, pg[i], patch); persist(Object.assign({}, plan, {programs:pg})); }
+          tr.querySelector('.irr-from').addEventListener('change', function(){ if(this.value) upd({from:this.value}); });
+          tr.querySelector('.irr-to').addEventListener('change', function(){ if(this.value) upd({to:this.value}); });
+          tr.querySelector('.irr-onm').addEventListener('change', function(){ if(irrNum(this.value) > 0) upd({onMin:irrNum(this.value)}); });
+          tr.querySelector('.irr-offm').addEventListener('change', function(){ if(irrNum(this.value) >= 0) upd({offMin:irrNum(this.value)}); });
+          tr.querySelector('.irr-en').addEventListener('change', function(){ upd({enabled:this.checked}); });
+          tr.querySelector('.irr-del').addEventListener('click', function(){ if(!confirm('تحذف البرنامج ده؟')) return; var pg = (plan.programs || []).slice(); pg.splice(i, 1); persist(Object.assign({}, plan, {programs:pg}), 'اتحذف'); });
+        });
+      }
+      return;
+    }
+    // ثمريات
+    var f = irrFruitCalc(plan), now2 = irrNowMin();
+    var nextT = f.times.map(function(t){ return t >= now2 ? t : t + 1440; }).sort(function(a, b){ return a-b; })[0];
+    var chips2 = '<div class="climate-stats">'+
+      climateStatChip('تصرف النقطة', f.mlMin ? fmtNum(f.mlMin) : '—', 'مل/د'+(f.mlMin ? ' ('+(Math.round(f.lph*100)/100)+' لتر/س)' : ''))+
+      climateStatChip('عدد النقاطات', f.drippers || '—', '')+
+      climateStatChip('التصرف الكلي للنظام', f.totalLpm ? (Math.round(f.totalLpm*100)/100) : '—', 'لتر/د')+
+      climateStatChip('وقت التشغيل', f.run || '—', 'دقيقة')+
+      climateStatChip('كمية الريّة الواحدة', f.perIrrL ? irrL(f.perIrrL) : '—', '')+
+      climateStatChip('مرات الري في اليوم', f.times.length || '—', '')+
+      climateStatChip('الكمية اليومية', f.dailyL ? irrL(f.dailyL) : '—', '')+'</div>';
+    box.innerHTML = '<p class="hint help-note">حدد الري كل كام ساعة أو دقيقة ووقت التشغيل، وتصرف النقطة وعدد النقاطات، والنظام بيحسب التصرف الكلي في الدقيقة وكمية كل ريّة والكمية اليومية.</p>'+
+      (f.times.length && f.run ? '<div style="margin:6px 0;"><span class="status-pill">⏳ أقرب ريّة: '+irrHM(nextT)+'</span></div>' : '')+chips2+
+      '<form class="entry-form" id="irr-fruit"><div class="form-grid">'+
+        '<div class="field-sm"><label>الري كل</label><input type="number" min="1" step="any" class="ltr" id="irf-every" value="'+escH(plan.every)+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>الوحدة</label><select id="irf-unit"'+dis+'><option value="h"'+(plan.unit==='m' ? '' : ' selected')+'>ساعة</option><option value="m"'+(plan.unit==='m' ? ' selected' : '')+'>دقيقة</option></select></div>'+
+        '<div class="field-sm"><label>وقت التشغيل (دقيقة)</label><input type="number" min="0.5" step="any" class="ltr" id="irf-run" value="'+escH(plan.runMin)+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>من الساعة</label><input type="time" class="ltr" id="irf-from" value="'+escH(plan.from || '06:00')+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>لحد الساعة</label><input type="time" class="ltr" id="irf-to" value="'+escH(plan.to || '18:00')+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>عدد النقاطات</label><input type="number" min="1" step="1" class="ltr" id="irf-drip" value="'+escH(plan.drippers)+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>تصرف النقطة</label><input type="number" min="0" step="any" class="ltr" id="irf-flow" value="'+escH(plan.flowVal)+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>وحدة التصرف</label><select id="irf-fu"'+dis+'><option value="mlmin"'+(plan.flowUnit==='lph' ? '' : ' selected')+'>مل/دقيقة</option><option value="lph"'+(plan.flowUnit==='lph' ? ' selected' : '')+'>لتر/ساعة</option></select></div>'+
+        '<div class="field-sm"><label>أو احسبه: حجم (مل)</label><input type="number" min="0" step="any" class="ltr" id="irf-vol"'+dis+'></div>'+
+        '<div class="field-sm"><label>في مدة (ثانية)</label><input type="number" min="1" step="any" class="ltr" id="irf-sec" value="60"'+dis+'></div></div>'+
+        '<p class="hint" id="irf-calc" style="margin:6px 0 0;"></p>'+
+        (edit ? '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ جدول الري</button></div>' : '')+'</form>'+
+      (f.times.length ? '<p class="hint" style="margin:10px 0 0;">مواعيد الري: '+f.times.map(irrHM).join(' · ')+'</p>' : '');
+    function fcalc(){
+      var v = irrNum($('#irf-vol', box).value), s = irrNum($('#irf-sec', box).value), el = $('#irf-calc', box);
+      if(v > 0 && s > 0){ var ml = v*60/s; el.textContent = 'القياس ده يساوي '+fmtNum(ml)+' مل/دقيقة للنقطة (اضغط حفظ لتطبيقه).'; el.setAttribute('data-ml', ml); } else { el.textContent = ''; el.removeAttribute('data-ml'); }
+    }
+    $('#irf-vol', box).addEventListener('input', fcalc); $('#irf-sec', box).addEventListener('input', fcalc);
+    if(edit) $('#irr-fruit', box).addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var ml = parseFloat($('#irf-calc', box).getAttribute('data-ml')), flowVal = $('#irf-flow', box).value, flowUnit = $('#irf-fu', box).value;
+      if(isFinite(ml)){ flowVal = String(Math.round(ml*100)/100); flowUnit = 'mlmin'; }
+      var np = Object.assign({}, plan, {every:$('#irf-every', box).value, unit:$('#irf-unit', box).value, runMin:$('#irf-run', box).value, from:$('#irf-from', box).value, to:$('#irf-to', box).value, drippers:$('#irf-drip', box).value, flowVal:flowVal, flowUnit:flowUnit});
+      persist(np, 'اتحفظ جدول الري');
+    });
+  }
+  var soilSystemId = null, soilRangeDays = 30;
+  function renderSoilCharts(box, systemId){
+    RNG.soil = {get:function(){ return soilRangeDays; }, set:function(v){ soilRangeDays = v; }, apply:function(){ renderSoilCharts(box, systemId); }, opts:RNG_OPTS, def:30};
+    var labels = {ph:['حموضة التربة pH', 'pH'], ec:['EC التربة (mS/cm)', 'EC'], temp:['حرارة التربة (°C)', 'الحرارة'], moist:['رطوبة التربة (%)', 'الرطوبة']};
+    box.innerHTML = rngHtml('soil')+'<div class="mini-charts">'+['ph','ec','temp','moist'].map(function(m){
+      return '<div class="chart-card"><h3>'+labels[m][0]+'</h3><div class="chart-wrap"><div id="soil-chart-'+m+'" class="svg-chart-holder"></div></div></div>';
+    }).join('')+'</div>';
+    var entries = flattenEntries('soil', systemId);
+    ['ph','ec','temp','moist'].forEach(function(m){
+      var el = document.getElementById('soil-chart-'+m); if(!el) return;
+      renderSvgChart(el, [{key:'soil-'+m, label:labels[m][1], color:SOIL_COLORS[m], points:filterPointsByRange(pointsFor(entries, m), soilRangeDays)}], {height:200});
+    });
+  }
+  function renderSoilPanel(){
+    var body = $('#soil-body'); if(!body) return;
+    var ghEl = $('#soil-greenhouse-picker'), sysEl = $('#soil-system-picker');
+    var fruit = systems.filter(function(s){ return sysGType(s)==='fruit'; });
+    if(!fruit.length){
+      ghEl.innerHTML = ''; sysEl.innerHTML = '';
+      body.innerHTML = '<div class="empty-systems">مفيش صوب ثمريات لسه.<br>ضيف صوبة من نوع «ثمريات» من الإعدادات ← الصوب والأنظمة.</div>';
+      return;
+    }
+    if(!soilSystemId || !fruit.some(function(s){ return s.id===soilSystemId; })) soilSystemId = fruit[0].id;
+    var cur = getSystem(soilSystemId), curGh = ghNameOf(cur), ghs = [];
+    fruit.forEach(function(s){ var n = ghNameOf(s); if(ghs.indexOf(n) < 0) ghs.push(n); });
+    ghEl.innerHTML = ghs.length > 1 ? ghs.map(function(n){ return '<button type="button" class="system-pill'+(n===curGh ? ' active' : '')+'" data-gh="'+escH(n)+'">'+escH(n)+'</button>'; }).join('') : '';
+    sysEl.innerHTML = fruit.filter(function(s){ return ghNameOf(s)===curGh; }).map(function(s){ return '<button type="button" class="system-pill'+(s.id===soilSystemId ? ' active' : '')+'" data-sysid="'+escH(s.id)+'">'+escH(s.name)+'</button>'; }).join('');
+    $all('.system-pill[data-gh]', ghEl).forEach(function(b){ b.addEventListener('click', function(){ var f = fruit.filter(function(s){ return ghNameOf(s)===b.getAttribute('data-gh'); })[0]; if(f){ soilSystemId = f.id; renderSoilPanel(); } }); });
+    $all('.system-pill[data-sysid]', sysEl).forEach(function(b){ b.addEventListener('click', function(){ soilSystemId = b.getAttribute('data-sysid'); renderSoilPanel(); }); });
+    body.innerHTML = '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(cur)+'</h2></div></div>'+
+      '<div data-sub="entry"><div id="soil-forms"></div></div><div data-sub="charts"><div id="soil-charts"></div></div><div data-sub="records"><div id="soil-tables"></div></div>';
+    renderSoilSection({form: $('#soil-forms'), table: $('#soil-tables')}, soilSystemId);
+    renderSoilCharts($('#soil-charts'), soilSystemId);
+    applyPermissionLock($('#panel-soil'), 'soil');
+  }
   function renderCalibrationSection(parts, systemId){
     function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function f3(v){ return (Math.round(v*1000)/1000).toString(); }
@@ -6191,8 +6512,8 @@
           '<div class="field-sm"><label>الصنف / المحصول</label>'+cropFieldHtml('hv-crop','',true)+'</div>'+
           '<div class="field-sm"><label>الكمية</label><input type="number" step="any" min="0.001" class="ltr" id="hv-qty" required></div>'+
           '<div class="field-sm"><label>الوحدة</label><select id="hv-unit">'+HARVEST_UNITS.map(function(u){ return '<option value="'+u+'">'+HARVEST_UNIT_LABELS[u]+'</option>'; }).join('')+'</select></div>'+
-          '<div class="field-sm"><label>عدد المواسير اللي اتحصدت (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="hv-pipes"></div>'+
-          '<div class="field-sm"><label>المخطط</label><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="hv-pipes-deduct" checked style="width:auto;"> اخصمها من مخطط المواسير</label></div>'+
+          '<div class="field-sm"'+(isFruitSys(selectedSystemId) ? ' style="display:none;"' : '')+'><label>عدد المواسير اللي اتحصدت (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="hv-pipes"></div>'+
+          '<div class="field-sm"'+(isFruitSys(selectedSystemId) ? ' style="display:none;"' : '')+'><label>المخطط</label><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="hv-pipes-deduct" checked style="width:auto;"> اخصمها من مخطط المواسير</label></div>'+
           '<p class="hint full" id="hv-pipes-hint" style="margin:0;"></p>'+
           '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="hv-note"></div>'+
         '</div>'+
@@ -6354,7 +6675,7 @@
     applyPermissionLock(inner, 'harvest');
   }
 
-  /* ---------- تنبيه القيم الغريبة + إدخال سريع لكل أنظمة الصوبة ---------- */
+  /* ---------- تنبيه القيم الغريبة (لو القراءة بعيدة عن آخر قراءة) ---------- */
   var QE_JUMP = {ph:1.5, ec:1.5, temp:8};
   function qeUnusual(sourceKey, systemId, d){
     var last = flattenEntries(sourceKey, systemId).slice(-1)[0], msgs = [];
@@ -6366,53 +6687,12 @@
     return msgs;
   }
   var qeSource = 'irrigation';
-  function quickEntryHtml(){
-    var groups = greenhouseGroups();
-    var g = groups.filter(function(x){ return x.name===selectedGreenhouse; })[0] || groups[0];
-    if(!g || !g.systems.length) return '';
-    var rows = g.systems.map(function(sy){
-      var inp = function(k, step, max){ return '<td><input type="number" class="ltr qe-in" data-k="'+k+'" step="'+step+'" min="0" max="'+max+'" inputmode="decimal" style="width:100%;min-width:56px;"></td>'; };
-      return '<tr data-sys="'+escH(sy.id)+'"><td><strong>'+escH(sy.name || systemLabel(sy))+'</strong></td>'+inp('ph','any',14)+inp('ec','any',15)+inp('temp','any',45)+'</tr>';
-    }).join('');
-    var srcOpts = SOURCES.map(function(s){ return '<option value="'+s.key+'"'+(s.key===qeSource?' selected':'')+'>'+s.label+'</option>'; }).join('');
-    return '<details class="chart-card" id="qe-det" style="margin:0 0 14px;"><summary style="cursor:pointer;font-weight:700;">⚡ إدخال سريع لكل أنظمة '+escH(g.name)+'</summary>'+
-      '<div class="field-sm" style="max-width:240px;margin-top:10px;"><label>المصدر</label><select id="qe-source">'+srcOpts+'</select></div>'+
-      '<div class="table-wrap cropref-wrap scroll-8" style="margin-top:8px;"><table><thead><tr><th>النظام</th><th>pH</th><th>EC</th><th>الحرارة</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-      '<p class="hint help-note" style="margin-top:8px;">اكتب القراءات الثلاثة للنظام (pH وEC والحرارة). الصفوف الفاضية بتتخطّى، والصف الناقص بيتوقف الحفظ ويقولك مين. الوقت بيتسجّل لحظة الحفظ.</p>'+
-      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="qe-save">حفظ كل الصفوف المكتوبة</button></div></details>';
-  }
-  function wireQuickEntry(root){
-    var det = $('#qe-det', root); if(!det) return;
-    var src = $('#qe-source', root);
-    src.addEventListener('change', function(){ qeSource = src.value; });
-    $('#qe-save', root).addEventListener('click', function(){
-      var batch = [], incomplete = [], odd = [];
-      $all('tbody tr', det).forEach(function(tr){
-        var d = {}, filled = 0;
-        $all('.qe-in', tr).forEach(function(i){ d[i.getAttribute('data-k')] = i.value; if(i.value!=='') filled++; });
-        var name = tr.querySelector('strong').textContent, sid = tr.getAttribute('data-sys');
-        if(filled===0) return;
-        if(filled<3){ incomplete.push(name); return; }
-        var m = qeUnusual(qeSource, sid, d);
-        if(m.length) odd.push(name+': '+m.join('، '));
-        batch.push({sid:sid, d:d});
-      });
-      if(incomplete.length){ toast('كمّل قراءات: '+incomplete.join('، ')); return; }
-      if(!batch.length){ toast('مفيش قراءات مكتوبة'); return; }
-      var ts = nowLocalInputValue();
-      batch.reduce(function(p, b){
-        return p.then(function(){ return addReading(qeSource, {ts:ts, ph:b.d.ph, ec:b.d.ec, temp:b.d.temp, note:''}, b.sid); });
-      }, Promise.resolve()).then(function(){
-        toast('اتحفظ '+batch.length+' قراءة'+(odd.length ? (' — ⚠️ بعيدة عن آخر قراءة: '+odd.join(' | ')+' (لو غلط امسحها)') : ''), odd.length ? 8000 : 0);
-        renderWaterPanel();
-      }).catch(function(){ toast('حصلت مشكلة في الحفظ — راجع القراءات'); });
-    });
-  }
   /* ====================== التبويبات الفرعية (محرك واحد لكل التبويبات اللي ينفع تتقسم) ======================
      كل تبويب فيه أغلفة data-sub="اسم القسم"؛ والمحرك بيعرض القسم المختار بس وبيحفظ آخر قسم على الجهاز. */
   var SUBTABS = {
-    water:   {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['charts','📈 المخططات'],['records','📋 السجلات'],['instruments','🔧 معايرة الأجهزة']]},
+    water:   {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['schedule','🕒 جدول الري'],['charts','📈 المخططات'],['records','📋 السجلات'],['instruments','🔧 معايرة الأجهزة']]},
     climate: {def:'entry',    tabs:[['entry','📝 إدخال القراءة'],['summary','📊 الملخص'],['charts','📈 المخططات'],['records','📋 السجل']]},
+    soil:    {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['charts','📈 المخططات'],['records','📋 السجل']]},
     harvest: {def:'entry',    tabs:[['entry','📝 تسجيل حصاد'],['pipes','🌿 المواسير'],['charts','📈 الإنتاج والمخطط'],['records','📋 السجل']]},
     pests:   {def:'entry',    tabs:[['entry','📝 تسجيل إصابة'],['bio','🐞 المكافحة الحيوية'],['trend','📈 الاتجاه'],['records','📋 السجل']]},
     nursery: {def:'entry',    tabs:[['entry','📝 تسجيل صينية'],['auto','🗓️ خطة الزراعة'],['records','📋 السجل'],['plan','📊 الملخص والخطة']]},
@@ -6421,8 +6701,9 @@
     growth:  {def:'entry',    tabs:[['entry','📝 إدخال وزنة'],['summary','📊 الملخص والتنبؤ'],['records','📋 السجل'],['ref','🌿 المعايير المثلى']]}
   };
   /* قسم "إدخال/تسجيل" بيظهر بس للي عنده صلاحية تعديل على التاب (المدير أو صلاحية "تعديل") */
-  var SUBPERM = {water:'water', climate:'climate', harvest:'harvest', pests:'pests', nursery:'nursery', spray:'spray', growth:'growth'};
+  var SUBPERM = {water:'water', soil:'soil', climate:'climate', harvest:'harvest', pests:'pests', nursery:'nursery', spray:'spray', growth:'growth'};
   function subAllowed(pk, sub){
+    if(pk==='harvest' && sub==='pipes' && selectedSystemId && isFruitSys(selectedSystemId)) return false;   // المواسير للـ NFT بس
     if(sub!=='entry' || !SUBPERM[pk] || !currentUser) return true;   // قبل تسجيل الدخول مفيش حكم لسه
     return canEdit(SUBPERM[pk]);
   }
@@ -6480,6 +6761,7 @@
         '<div data-sub="entry charts records"><div class="empty-systems">لسه مفيش أنظمة مضافة.<br>ضيف أول نظام من هنا.</div>'+
         '<div class="inline-add-form" style="margin-top:14px;">'+
           '<input type="text" id="quick-add-greenhouse" placeholder="اسم الصوبة">'+
+          '<select id="quick-add-gtype" title="نوع الصوبة"><option value="leafy">ورقيات (هيدروبونيك NFT)</option><option value="fruit">ثمريات (تربة — طماطم)</option></select>'+
           '<input type="text" id="quick-add-name" placeholder="اسم/رقم النظام">'+
           '<button class="btn btn-primary btn-sm" id="quick-add-system-btn">إضافة نظام</button>'+
         '</div></div>';
@@ -6488,7 +6770,7 @@
         var gh = $('#quick-add-greenhouse').value.trim();
         var nm = $('#quick-add-name').value.trim();
         if(!nm){ toast('اكتب اسم النظام'); return; }
-        addSystem(gh, nm);
+        addSystem(gh, nm, $('#quick-add-gtype').value);
       });
       return;
     }
@@ -6503,25 +6785,31 @@
     var sys = getSystem(selectedSystemId);
 
     body.innerHTML =
-      '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(sys)+'</h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
-      '<div data-sub="entry">'+(canEdit('water') ? quickEntryHtml() : '')+
+      '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(sys)+' <span class="status-pill" style="font-size:.7rem;vertical-align:middle;">'+GH_TYPES[sysGType(sys)].short+'</span></h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
+      '<div data-sub="entry">'+
         '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div></div>'+
+      '<div data-sub="schedule"><h2 class="section-title wt-group">🕒 جدول الري</h2><div id="water-schedule"></div></div>'+
       '<div data-sub="charts"><h2 class="section-title wt-group">📈 المخططات</h2><div id="water-compare"></div><div id="water-calib-charts"></div></div>'+
       '<div data-sub="records"><h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div></div>';
 
     $('#btn-delete-system').addEventListener('click', function(){ deleteSystem(selectedSystemId); });
-    wireQuickEntry(body);
 
     renderSystemComparisonCharts($('#water-compare'), selectedSystemId);
+    renderIrrigSchedule($('#water-schedule'), selectedSystemId);
 
     var formsEl = $('#water-forms'), tablesEl = $('#water-tables');
     function mkBlock(parent){ var d = document.createElement('div'); d.className = 'water-source-block'; parent.appendChild(d); return d; }
-    // الترتيب: خزان التغذية (Silo) ← ماء الصرف ← ماء الري ← معايرة النقاط
-    ['tank','drainage','irrigation'].forEach(function(k){
-      var src = SOURCES.filter(function(x){ return x.key===k; })[0];
-      renderSourceSection({form: mkBlock(formsEl), table: mkBlock(tablesEl)}, src, selectedSystemId);
-    });
-    renderCalibrationSection({form: mkBlock(formsEl), chart: $('#water-calib-charts'), table: mkBlock(tablesEl)}, selectedSystemId);
+    if(isFruitSys(selectedSystemId)){
+      // صوبة ثمريات (تربة): خزان الري بس (قياسات التربة في تبويب «بيانات التربة»)
+      renderSourceSection({form: mkBlock(formsEl), table: mkBlock(tablesEl)}, SRC_FRUIT[0], selectedSystemId);
+    } else {
+      // الترتيب: خزان التغذية (Silo) ← ماء الصرف ← ماء الري ← معايرة النقاط
+      ['tank','drainage','irrigation'].forEach(function(k){
+        var src = SOURCES.filter(function(x){ return x.key===k; })[0];
+        renderSourceSection({form: mkBlock(formsEl), table: mkBlock(tablesEl)}, src, selectedSystemId);
+      });
+      renderCalibrationSection({form: mkBlock(formsEl), chart: $('#water-calib-charts'), table: mkBlock(tablesEl)}, selectedSystemId);
+    }
     applyPermissionLock($('#panel-water'), 'water');
   }
 
@@ -12211,7 +12499,7 @@
       {n:'DLI اليومي', u:'mol/m²/يوم', sl:'اختار الصوبة', scopes:ghSc(function(g){ return 'cd|'+g+'|dli'; })},
       {n:'الإشعاع التراكمي اليومي', u:'J/cm²', sl:'اختار الصوبة', scopes:ghSc(function(g){ return 'cd|'+g+'|rad'; })}])});
     // الري
-    var wsc = function(metric){ var out = []; systems.forEach(function(sys){ SOURCES.forEach(function(src){ out.push({label:systemLabel(sys)+' — '+src.label, ref:'w|'+sys.id+'|'+src.key+'|'+metric}); }); }); return out; };
+    var wsc = function(metric){ var out = []; systems.forEach(function(sys){ sourcesFor(sys.id).forEach(function(src){ out.push({label:systemLabel(sys)+' — '+src.label, ref:'w|'+sys.id+'|'+src.key+'|'+metric}); }); }); return out; };
     var ksc = function(kind){ return systems.map(function(sys){ return {label:systemLabel(sys), ref:'k|'+sys.id+'|'+kind}; }); };
     tree.push({k:'irrigation', n:'الري', emo:'💧', types:WT_METRICS.map(function(m){ return {n:(m.k==='temp' ? 'حرارة المياه' : m.n), u:m.u, sl:'اختار النظام والمصدر', scopes:wsc(m.k)}; }).concat([
       {n:'تصرف النقطة الواحدة (معايرة)', u:'مل/دقيقة', sl:'اختار النظام', scopes:ksc('point')},
@@ -12389,7 +12677,7 @@
   }
   function ioWizSave(){
     var w = ioWiz, d = w.draft;
-    if(currentUserRole!=='admin' && !(d.target && dashPage(d.target.pageId) && dashPage(d.target.pageId).priv)){ toast('إنشاء المخططات للمدير بس'); return; }
+    if(d.target && dashPage(d.target.pageId) && !canManagePage(dashPage(d.target.pageId))){ toast('التبويب ده عام للمدير بس'); return; }
     var title = (d.title || '').trim();
     if(!title){ toast('اكتب اسم المخطط'); return; }
     if(!d.series.length){ toast('أضف عنصر واحد على الأقل'); return; }
@@ -12453,7 +12741,7 @@
   var tabOrder = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_taborder') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
   var tabDefault = (function(){ var n = document.getElementById('tabs'); return n ? Array.prototype.map.call(n.querySelectorAll('.tab-btn'), function(b){ return b.getAttribute('data-tab'); }) : []; })();
   var tabNames = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_tabnames') || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }catch(e){ return {}; } })();
-  var TAB_DEFS = {overview:['🏠','نظرة عامة'], charts:['📈','المخططات'], water:['💧','بيانات المياه'], climate:['🌡','بيانات المناخ'], tasks:['📋','المهام والإجراءات'], spray:['🧴','الرش والتسميد'],
+  var TAB_DEFS = {overview:['🏠','نظرة عامة'], charts:['📈','المخططات'], water:['💧','بيانات المياه'], soil:['🟫','بيانات التربة'], climate:['🌡','بيانات المناخ'], tasks:['📋','المهام والإجراءات'], spray:['🧴','الرش والتسميد'],
     nutrients:['🧪','المعادلات السمادية'], pests:['🐛','المكافحة'], nursery:['🪴','المشتل'], harvest:['🧺','الحصاد'], growth:['🌱','نمو النبات'], quality:['✅','الجودة'], inventory:['📦','المخازن'], settings:['⚙','الإعدادات']};
   function tabDefaultName(k){ if(TAB_DEFS[k]) return TAB_DEFS[k][1]; var m = /^page:(.+)$/.exec(k || ''), pg = m ? dashPage(m[1]) : null; return pg ? pg.title : ''; }
   /* الأسماء المخصصة بتغيّر اللي بيظهر في شريط التبويبات عندك إنت بس (عنوان الصفحة نفسها بيفضل زي ما هو) */
@@ -12660,7 +12948,7 @@
     var sys = systems.filter(function(s){ return s.id===sysId; })[0];
     if(!sys) return dbEmpty('النظام ده مش موجود.');
     var secs = [];
-    SOURCES.forEach(function(src){
+    sourcesFor(sys.id).forEach(function(src){
       var last = dbLast(flattenEntries(src.key, sys.id));
       secs.push({t:src.label+(last ? ' — '+ioFmtT(new Date(last.ts).getTime(), true) : ''), rows:last ? WT_METRICS.map(function(m){ return [(m.k==='temp' ? 'حرارة المياه' : m.n), ioFmt(parseFloat(last[m.k])), m.u]; }) : [['مفيش قراءات', '—', '']]});
     });
@@ -12847,10 +13135,20 @@
     $all('.db-dc.db-full').forEach(function(c){ c.classList.remove('db-full'); var e = c.querySelector('.db-exp'); if(e) e.innerHTML = IO_ICON_EXP; });
   });
 
+  /* المخططات لكل موظف لوحده: بتتحفظ في بياناته الخاصة (userData/إيميله) ومحدش تاني بيشوفها. لحد ما يعدّل بنفسه بيشوف المخططات العامة القديمة (لو فيه) */
+  var sharedCharts = [], sharedOv = {hidden:{}, titles:{}, sizes:{}}, ownCharts = null, ownOv = null;
+  function ioMergeCharts(){
+    var base = (ownCharts && ownCharts.length) ? ownCharts : sharedCharts;
+    customCharts = JSON.parse(JSON.stringify(base || []));
+    var ov = ownOv || sharedOv || {};
+    ovPrefs = {hidden:ov.hidden || {}, titles:ov.titles || {}, sizes:ov.sizes || {}};
+    ovPrefs = JSON.parse(JSON.stringify(ovPrefs));
+  }
   function ioSaveAll(list, ov){
     customCharts = list; if(ov) ovPrefs = ov;
+    ownCharts = JSON.parse(JSON.stringify(customCharts)); ownOv = JSON.parse(JSON.stringify(ovPrefs));
     if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(customCharts)); localStorage.setItem('oroots_ovprefs', JSON.stringify(ovPrefs)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
-    return db.doc('settings/customCharts').set({charts:customCharts, ov:ovPrefs, updatedAt:Date.now(), updatedBy:currentUser||''});
+    return db.doc('userData/'+myMail()).set({charts:ownCharts, ov:ownOv, updatedAt:Date.now()}, {merge:true});
   }
   function ioSaveCharts(list){ return ioSaveAll(list, null); }
   /* أول مرة بنعدّل: المخططات الجاهزة بتتحفظ كلها عشان ما تختفيش */
@@ -12925,7 +13223,6 @@
     $('#io-cancel', form).addEventListener('click', function(){ ioBuilder = null; ioRefresh(); });
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
-      if(currentUserRole!=='admin'){ toast('إنشاء المخططات للمدير بس'); return; }
       var title = (b.title||'').trim();
       if(!title){ toast('اكتب اسم المخطط'); return; }
       if(!b.series.length || b.series.some(function(s){ return !s.ref; })){ toast('اختار المقياس لكل خط'); return; }
@@ -12941,7 +13238,7 @@
 
   function renderChartsPanel(){
     var body = $('#charts-body'); if(!body) return;
-    var isAdmin = currentUserRole==='admin';
+    var isAdmin = !!currentUser;
     var saved = customCharts.length > 0, charts = saved ? customCharts : ioDefaults();
     body.innerHTML =
       '<div class="form-actions" style="margin:0 0 10px;">'+(isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="io-new">➕ مخطط جديد</button>' : '')+(isAdmin && Object.keys(ovPrefs.hidden).length ? '<button type="button" class="btn btn-ghost btn-sm" id="io-restore-hidden">🔄 إظهار المخططات المخفية ('+Object.keys(ovPrefs.hidden).length+')</button>' : '')+
@@ -13014,7 +13311,6 @@
   }
   function ovScrollToBuilder(){ setTimeout(function(){ var f = document.getElementById('io-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 80); }
   function ovAction(a, ctx, v){
-    if(currentUserRole!=='admin'){ toast('تعديل المخططات للمدير بس'); return; }
     if(ctx.kind==='builtin') ovBuiltinAction(a, ctx, v); else ovCustomAction(a, ctx, v);
   }
   function ovBuiltinAction(a, ctx, v){
@@ -13075,7 +13371,7 @@
   /* بيزوّد كل مخطط جاهز في نظرة عامة بعنوان قابل للتغيير وزرار ⋮، وبيخفي اللي اتشال */
   function ovDecorate(){
     var root = document, sizedAny = false;
-    var isAdmin = currentUserRole==='admin';
+    var isAdmin = !!currentUser;
     $all('.chart-card', root).forEach(function(card){
       var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3'); if(!holder || !h3) return;
       var id = holder.id, inOv = !!card.closest('#panel-overview');
@@ -13094,7 +13390,7 @@
   }
   function renderOvCustom(){
     var el = $('#ov-custom'); if(!el) return;
-    var isAdmin = currentUserRole==='admin', list = customCharts.filter(function(c){ return c.ov; });
+    var isAdmin = !!currentUser, list = customCharts.filter(function(c){ return c.ov; });
     var showBuilder = false, hid = Object.keys(ovPrefs.hidden).length;
     if(!list.length && !showBuilder && !(isAdmin && hid)){ el.innerHTML = ''; ovDecorate(); return; }
     el.innerHTML =
@@ -13327,6 +13623,7 @@
   if(panelOn('panel-charts')) safe(renderChartsPanel);
   if(panelOn('panel-dash')) safe(renderDashPanel);
     if(panelOn('panel-water')) renderWaterTab();
+    if(panelOn('panel-soil')) safe(renderSoilPanel);
     if(panelOn('panel-climate')) safe(renderClimatePanel);
     if(panelOn('panel-tasks')) safe(renderTasksPanel);
     if(panelOn('panel-spray')) safe(renderSprayPanel);
@@ -13707,6 +14004,7 @@
   var HELP_TABS = {
     overview:  {t:'نظرة عامة', tip:'ملخص كل الصوب والأنظمة ومؤشرات آخر 30 يوم', intro:'ملخص سريع لكل المزرعة: مؤشرات آخر 30 يوم، التنبيهات المتأخرة، ومخططات الري والمناخ لكل الصوب.', items:['اضغط على أي صوبة أو نظام عشان تفتح تفاصيله.','التصفية فوق كل مخطط بتحدد الفترة: 24 ساعة أو 7 أيام أو 30 يوم أو بين تاريخين تختارهم من التقويم.','زرار التكبير بيفتح المخطط ملء الشاشة. زرار ⋮ (للمدير) بيخفي المخطط أو بيغيّر اسمه.']},
     charts:    {t:'المخططات', tip:'مخططات مخصصة بتجمع أي مقاييس مع بعض', intro:'بتركّب مخططات بنفسك: أي مقياس من أي مكان (مناخ، مياه، حصاد، مكافحة...) على نفس الرسم.', items:['اختار القسم ← نوع العنصر ← المكان (صوبة أو نظام أو صنف) وضيف أكتر من خط.','اللي أرقامه مختلفة الحجم حطّه على المحور الأيمن، أو كبّره/صغّره بمعامل الضرب.','من جدول المخطط شغّل أو اقفل أي خط، وسحب صباعك على المخطط بيعرض القيم في الوقت ده.']},
+    soil:      {t:'بيانات التربة', tip:'pH وEC وحرارة ورطوبة التربة لصوب الثمريات', intro:'قياسات التربة لصوب الثمريات (طماطم وخلافه): pH وEC وحرارة ورطوبة التربة، مع مخططات وسجل وتصدير.'},
     water:     {t:'بيانات المياه', tip:'قراءات pH وEC وحرارة الري لكل نظام', intro:'تسجيل ومتابعة قراءات المياه (pH وEC والحرارة) لكل نظام: الري والصرف والخزان، ومعايرة تصرف نقط الري.', items:['التبويب مقسّم لأقسام فرعية: إدخال القياسات (كل نماذج الإدخال والإدخال السريع)، والمخططات، والسجلات، ومعايرة الأجهزة.','اختار الصوبة وبعدها النظام عشان تشوف بياناته.','القراءة اللي برّه المدى المضبوط في الإعدادات بتتلوّن بلون التنبيه.','معايرة الري بتحسب تصرف النقطة والنظام (لتر/دقيقة) وبتتستخدم في حساب استهلاك المياه في تبويب نمو النبات.']},
     climate:   {t:'بيانات المناخ', tip:'قراءات الحرارة والرطوبة والإضاءة وحساب DLI وVPD', intro:'تسجيل قراءات مناخ الصوبة (حرارة، رطوبة، إضاءة) ومنها بيتحسب VPD وAH وHD وPPFD والإشعاع والـ DLI.', items:['التبويب مقسّم لأقسام فرعية: إدخال القراءة، والملخص (آخر قراءة وملخص اليوم)، والمخططات، والسجل.','الوقت بيتسجل لحظة الحفظ، وتقدر تغيّره لقراءة قديمة.','الـ DLI بيتحسب من قراءات اللوكس خلال ساعات النهار، فكل ما القراءات أكتر الرقم أدق.']},
     spray:     {t:'الرش والتسميد', tip:'خطة الرش والتسميد وتكليف الموظفين', intro:'جدولة الرش والتسميد على الصوب بالأيام، وتعيين المسؤول، ومتابعة اللي اتنفّذ واللي اتأجّل.', items:['التبويب مقسّم لقسمين: الجدول (يوم/أسبوع/شهر)، وإضافة رش أو تسميد.',]},
@@ -13866,11 +14164,11 @@
 
   function setupTabs(){
     var panelMap = {
-      overview:'#panel-overview', charts:'#panel-charts', water:'#panel-water', climate:'#panel-climate',
+      overview:'#panel-overview', charts:'#panel-charts', water:'#panel-water', soil:'#panel-soil', climate:'#panel-climate',
       tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', growth:'#panel-growth', inventory:'#panel-inventory', settings:'#panel-settings'
     };
     var renderMap = {
-      overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, climate: renderClimatePanel,
+      overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, soil: renderSoilPanel, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
       harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, settings: renderSettingsPanels
     };
@@ -13910,10 +14208,14 @@
       var gh = $('#new-system-greenhouse').value.trim();
       var nm = $('#new-system-name').value.trim();
       if(!nm){ toast('اكتب اسم النظام'); return; }
-      addSystem(gh, nm).then(function(){
+      addSystem(gh, nm, $('#new-system-gtype').value).then(function(){
         $('#new-system-greenhouse').value = '';
         $('#new-system-name').value = '';
       });
+    });
+    $('#new-system-greenhouse').addEventListener('input', function(){   // صوبة موجودة: النوع بتاعها هو اللي يتطبق
+      var nm = this.value.trim(), sel = $('#new-system-gtype'), ex = systems.some(function(s){ return ghNameOf(s)===nm; });
+      if(ex){ sel.value = ghTypeByName(nm); sel.disabled = true; } else sel.disabled = false;
     });
 
     $('#btn-save-ranges').addEventListener('click', function(){
@@ -14114,6 +14416,7 @@
   renderQualityPanel = fsWrap(renderQualityPanel);
   renderAuditPanel = fsWrap(renderAuditPanel);
   renderClimatePanel = fsWrap(renderClimatePanel);
+  renderSoilPanel = fsWrap(renderSoilPanel);
   renderHarvestPanel = fsWrap(renderHarvestPanel);
   renderInventoryPanel = fsWrap(renderInventoryPanel);
   renderNurseryPanel = fsWrap(renderNurseryPanel);
@@ -14369,6 +14672,7 @@
     db.doc('userData/'+myMail()).onSnapshot(function(snap){
       var ud = snap.exists ? snap.data() : {};
       dashMine = Array.isArray(ud.pages) ? ud.pages : [];
+      ownCharts = Array.isArray(ud.charts) ? ud.charts : null; ownOv = (ud.ov && typeof ud.ov === 'object') ? ud.ov : null; ioMergeCharts();
       if(ud.tabNames && typeof ud.tabNames === 'object' && !Array.isArray(ud.tabNames)){ tabNames = ud.tabNames; try{ localStorage.setItem('oroots_tabnames', JSON.stringify(tabNames)); }catch(e){} }
       if(Array.isArray(ud.tabOrder)){ tabOrder = ud.tabOrder; try{ localStorage.setItem('oroots_taborder', JSON.stringify(tabOrder)); }catch(e){} }
       dashMerge(); dashRenderTabs(); renderAllSoon();
@@ -14377,8 +14681,9 @@
     });
     db.doc('settings/customCharts').onSnapshot(function(snap){
       var dd = snap.exists ? snap.data() : {};
-      customCharts = Array.isArray(dd.charts) ? dd.charts : [];
-      ovPrefs = {hidden:(dd.ov && dd.ov.hidden) || {}, titles:(dd.ov && dd.ov.titles) || {}, sizes:(dd.ov && dd.ov.sizes) || {}};
+      sharedCharts = Array.isArray(dd.charts) ? dd.charts : [];
+      sharedOv = {hidden:(dd.ov && dd.ov.hidden) || {}, titles:(dd.ov && dd.ov.titles) || {}, sizes:(dd.ov && dd.ov.sizes) || {}};
+      ioMergeCharts();
       renderAllSoon();
     }, function(err){
       console.error('customCharts snapshot error', err);
@@ -14447,6 +14752,10 @@
       bootTick('k25', snap); renderAllSoon();
     }, function(err){ console.error('customers snapshot error', err); });
 
+    db.collection('irrigSchedules').onSnapshot(function(snap){
+      irrigPlans = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      renderAllSoon();
+    }, function(err){ console.error('irrigSchedules snapshot error', err); });
     db.doc('settings/leaves').onSnapshot(function(snap){
       var dd = snap.exists ? snap.data() : {};
       leaves = Array.isArray(dd.list) ? dd.list : [];
@@ -14548,6 +14857,39 @@
     up.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
     document.body.appendChild(up);
     window.addEventListener('scroll', function(){ up.classList.toggle('show', window.scrollY>500); }, {passive:true});
+  })();
+  /* ----- الشريط الجانبي: فتح/قفل الأسماء ----- */
+  (function(){
+    var nav = document.getElementById('tabs'); if(!nav) return;
+    function mobile(){ return (window.innerWidth || 800) < 720; }
+    var saved = null; try{ saved = localStorage.getItem('oroots_sb'); }catch(e){}
+    function setCollapsed(c, persist){
+      document.body.classList.toggle('sb-collapsed', !!c);
+      var t = document.getElementById('sb-toggle');
+      if(t){ t.classList.toggle('flip', !!c); t.title = c ? 'إظهار أسماء التبويبات' : 'إخفاء الأسماء'; t.setAttribute('aria-label', t.title); }
+      if(persist){ try{ localStorage.setItem('oroots_sb', c ? '1' : '0'); }catch(e){} }
+    }
+    var t = document.createElement('button'); t.type = 'button'; t.id = 'sb-toggle'; t.className = 'sb-toggle';
+    t.innerHTML = '<svg class="sb-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+    nav.insertBefore(t, nav.firstChild);
+    setCollapsed(saved===null ? mobile() : saved==='1', false);
+    t.addEventListener('click', function(){ setCollapsed(!document.body.classList.contains('sb-collapsed'), true); });
+    /* اسم كل تبويب كتلميح (ولو مقفول: بيظهر الاسم لحظة لما تضغط على الأيقونة) */
+    function labelTitles(){ Array.prototype.forEach.call(nav.querySelectorAll('.tab-btn'), function(b){ b.title = b.textContent.trim(); }); }
+    labelTitles();
+    new MutationObserver(function(){ labelTitles(); }).observe(nav, {childList:true, subtree:true, characterData:true});
+    var tip = document.createElement('div'); tip.id = 'sb-tip'; document.body.appendChild(tip); var tipTm = null;
+    nav.addEventListener('click', function(ev){
+      var b = ev.target.closest ? ev.target.closest('.tab-btn') : null; if(!b) return;
+      if(document.body.classList.contains('sb-collapsed')){
+        var r = b.getBoundingClientRect(), rtl = getComputedStyle(document.documentElement).direction === 'rtl';
+        tip.textContent = b.textContent.trim(); tip.style.top = (r.top + r.height/2)+'px';
+        if(rtl){ tip.style.right = (window.innerWidth - r.left + 8)+'px'; tip.style.left = 'auto'; } else { tip.style.left = (r.right + 8)+'px'; tip.style.right = 'auto'; }
+        tip.classList.add('show'); clearTimeout(tipTm); tipTm = setTimeout(function(){ tip.classList.remove('show'); }, 1400);
+      } else if(mobile()){ setCollapsed(true, false); }
+    });
+    function hdr(){ var hd = document.querySelector('#app > header'); if(hd) document.documentElement.style.setProperty('--hdr-h', hd.offsetHeight+'px'); }
+    hdr(); window.addEventListener('resize', hdr); setTimeout(hdr, 600); setTimeout(hdr, 2500);
   })();
 (function(){
   var cards = document.querySelectorAll('#panel-settings .settings-card');
