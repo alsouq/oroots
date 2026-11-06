@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MwxDfdbwYv1fgw4BmHLs+ICaA+y1PjbY3a/OZ9B4OWo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wgSsXd5D9e548eAbd0OnPwA7quXaA7/c1K/DXm/QXqk=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -5013,6 +5013,7 @@
 
       hits.sort(function(a,b){ return Math.abs(a.p.x-dataX) - Math.abs(b.p.x-dataX); });
       var anchor = hits[0].p;
+      svgSyncShow(container, anchor.x);   // نفس اللحظة تظهر على باقي المخططات اللي جنب بعض
       var gx = xPix(anchor.x);
       guideEl.setAttribute('x1', gx); guideEl.setAttribute('x2', gx); guideEl.setAttribute('opacity','1');
 
@@ -5038,13 +5039,43 @@
       tooltipEl.style.top = top+'px';
     }
 
+    /* المزامنة: لما تقف على لحظة في مخطط، نفس اللحظة بتظهر (خط + نقط + قيم) في باقي مخططات نفس المجموعة */
+    function showAtTime(t){
+      if(!(t >= xMin && t <= xMax)){ hideHover(); return; }
+      var gx = xPix(t), rows = '';
+      guideEl.setAttribute('x1', gx); guideEl.setAttribute('x2', gx); guideEl.setAttribute('opacity','1');
+      visible.forEach(function(d){
+        if(!d.points.length) return;
+        var nearest = d.points[0], best = Math.abs(d.points[0].x - t);
+        d.points.forEach(function(p){ var diff = Math.abs(p.x - t); if(diff < best){ best = diff; nearest = p; } });
+        var dot = dotEls[d.key||''];
+        if(dot){ dot.setAttribute('cx', xPix(nearest.x)); dot.setAttribute('cy', yPix(nearest.y)); dot.setAttribute('opacity','1'); }
+        rows += '<div class="tt-row"><span class="tt-dot" style="background:'+d.color+'"></span>'+d.label+'<span class="tt-val">'+fmtNum(nearest.y)+'</span></div>';
+      });
+      tooltipEl.innerHTML = '<span class="tt-time">'+fmtAxisDateFull(t)+'</span>'+rows;
+      tooltipEl.classList.add('show');
+      var sr = svgEl.getBoundingClientRect(), wr = wrapEl.getBoundingClientRect();
+      var left = (sr.left - wr.left) + gx/W*sr.width + 10, top = (sr.top - wr.top) + 8, tw = tooltipEl.offsetWidth, th = tooltipEl.offsetHeight;
+      if(left + tw > wr.width) left = (sr.left - wr.left) + gx/W*sr.width - tw - 10;
+      if(left < 0) left = 4;
+      if(top + th > wr.height) top = Math.max(4, wr.height - th - 4);
+      tooltipEl.style.left = left+'px'; tooltipEl.style.top = top+'px';
+    }
+    container._svgShowAt = showAtTime; container._svgHide = hideHover;
+
     captureEl.addEventListener('mousemove', function(ev){ onMove(ev.clientX, ev.clientY); });
-    captureEl.addEventListener('mouseleave', hideHover);
+    captureEl.addEventListener('mouseleave', function(){ hideHover(); svgSyncHide(container); });
     captureEl.addEventListener('touchmove', function(ev){
       if(ev.touches && ev.touches[0]){ onMove(ev.touches[0].clientX, ev.touches[0].clientY); ev.preventDefault(); }
     }, {passive:false});
-    captureEl.addEventListener('touchend', hideHover);
+    captureEl.addEventListener('touchend', function(){ hideHover(); svgSyncHide(container); });
   }
+  function svgSyncPeers(container){
+    var g = container.closest ? container.closest('.mini-charts, #water-compare') : null;
+    return g ? $all('.svg-chart-holder', g).filter(function(x){ return x!==container; }) : [];
+  }
+  function svgSyncShow(container, t){ svgSyncPeers(container).forEach(function(x){ if(x._svgShowAt) x._svgShowAt(t); }); }
+  function svgSyncHide(container){ svgSyncPeers(container).forEach(function(x){ if(x._svgHide) x._svgHide(); }); }
 
   /* ---------- systems overview (grouped by greenhouse) ---------- */
   function combinedSystemStatus(systemId){
