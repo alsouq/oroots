@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UVsN0t59vZUWuMNW7Eqz9pgR0SXHCfqxwr1ntV6BvUo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OBMeBRwRQVjTALzjS8jz/mhTyQKbsBY0g1nyGXAs7JI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1265,6 +1265,12 @@
         <div id="trash-box"></div>
       </div>
 
+      <div class="settings-card" id="reads-card">
+        <h3>📊 قراءات قاعدة البيانات</h3>
+        <p class="hint help-note">عدد المستندات اللي اتقرت من Firestore في الجلسة دي، لمتابعة استهلاك الحصة اليومية. سجل التدقيق والسلة بيتحمّلوا لما تفتح الإعدادات بس.</p>
+        <div id="reads-box"></div>
+      </div>
+
       <div class="settings-card" id="audit-card">
         <h3>سجل النشاط (Logs)</h3>
         <p class="hint help-note">أي دخول أو خروج أو إضافة أو تعديل أو حذف أو تصدير من أي حد في الفريق بيتسجّل هنا فورًا بالتاريخ والوقت واسم المستخدم. السجل للعرض والتصدير بس، ومفيش زرار حذف ليه.</p>
@@ -1734,55 +1740,13 @@
   }
   function csvEscape(v){
     var s = (v===undefined || v===null) ? '' : String(v);
-    if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    if(typeof v==='string' && /^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'"+s;   // حماية من حقن الصيغ لما الملف يتفتح في Excel
+    if(/[",\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
     return s;
   }
 
   /* ---------- local fallback persistence ---------- */
-  function loadLocal(){
-    try{
-      var r = localStorage.getItem('oroots_local_readings');
-      if(r) readingsDocs = JSON.parse(r);
-      var s = localStorage.getItem('oroots_local_settings');
-      if(s) settings = Object.assign({}, settings, JSON.parse(s));
-      var sy = localStorage.getItem('oroots_local_systems');
-      if(sy) systems = JSON.parse(sy);
-      var so = localStorage.getItem('oroots_local_sops');
-      if(so) sops = JSON.parse(so);
-      var fz = localStorage.getItem('oroots_local_fertilizers');
-      if(fz) customFertilizers = JSON.parse(fz);
-      var rc = localStorage.getItem('oroots_local_recipes');
-      if(rc) nutrientRecipes = JSON.parse(rc);
-      var tp = localStorage.getItem('oroots_local_target_profiles');
-      if(tp) targetProfiles = JSON.parse(tp);
-      var pl = localStorage.getItem('oroots_local_pestlog');
-      if(pl) pestLog = JSON.parse(pl);
-      var br = localStorage.getItem('oroots_local_bioreleases');
-      if(br) bioReleases = JSON.parse(br);
-      var st = localStorage.getItem('oroots_local_stickytraps');
-      if(st) stickyTraps = JSON.parse(st);
-      var pt = localStorage.getItem('oroots_local_pheromonetraps');
-      if(pt) pheromoneTraps = JSON.parse(pt);
-      var nl = localStorage.getItem('oroots_local_nursery');
-      if(nl) nurseryLog = JSON.parse(nl);
-      var hv = localStorage.getItem('oroots_local_harvest');
-      if(hv) harvestLog = JSON.parse(hv);
-      var inv = localStorage.getItem('oroots_local_inventory');
-      if(inv) inventoryItems = JSON.parse(inv);
-      var ic = localStorage.getItem('oroots_local_irrig_calib');
-      if(ic) irrigCalib = JSON.parse(ic);
-      var al = localStorage.getItem('oroots_local_audit');
-      if(al) auditLog = JSON.parse(al);
-      var us = localStorage.getItem('oroots_local_users');
-      if(us){ var parsedUsers = JSON.parse(us); if(parsedUsers.length) appUsers = parsedUsers; }
-      var np = localStorage.getItem('oroots_local_nursery_plans');
-      if(np) nurseryPlans = JSON.parse(np);
-      var ins = localStorage.getItem('oroots_local_instrument_calib');
-      if(ins) instrumentCalibrations = JSON.parse(ins);
-      var pgl = localStorage.getItem('oroots_local_plant_growth'); if(pgl) plantGrowth = JSON.parse(pgl);
-    }catch(e){}
-    settingsLoaded = true;
-  }
+  
   function persistLocalReadings(){
     try{ localStorage.setItem('oroots_local_readings', JSON.stringify(readingsDocs)); }catch(e){}
   }
@@ -1890,9 +1854,9 @@
   /* ---------- سجل النشاط (Audit Log) ---------- */
   var AUDIT_AREAS = {auth:'تسجيل الدخول', water:'بيانات المياه', climate:'بيانات المناخ', tasks:'المهام والإجراءات',
     nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', inventory:'المخازن', instruments:'معايرة الأجهزة', admin:'الإدارة والإعدادات', growth:'نمو النبات', data:'البيانات'};
-  var AUDIT_ACTIONS = {login:'دخول', login_failed:'محاولة دخول فاشلة', logout:'خروج', add:'إضافة', edit:'تعديل',
+  var AUDIT_ACTIONS = {error:'خطأ في التطبيق', login:'دخول', login_failed:'محاولة دخول فاشلة', logout:'خروج', add:'إضافة', edit:'تعديل',
     delete:'حذف', export:'تصدير', clear:'مسح', seed:'بيانات تجريبية'};
-  var AUDIT_ACTION_CLASS = {login:'good', add:'good', login_failed:'alert', delete:'alert', clear:'alert', edit:'warn'};
+  var AUDIT_ACTION_CLASS = {error:'alert', login:'good', add:'good', login_failed:'alert', delete:'alert', clear:'alert', edit:'warn'};
 
   function auditEsc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function persistLocalAudit(){
@@ -1921,7 +1885,8 @@
   function subscribeAudit(){
     if(!db || auditSubscribed) return;
     auditSubscribed = true;
-    db.collection('auditLog').orderBy('createdAt','desc').limit(2000).onSnapshot(function(snap){
+    db.collection('auditLog').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+      noteReads('auditLog', snap);
       auditLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       safe(renderAuditPanel);
     }, function(err){
@@ -2192,20 +2157,7 @@
       persistLocalInventory(); renderAll(); toast('اتحذف');
     }
   }
-  function exportInventoryCSV(){
-    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var list = inventoryFilterType ? inventoryItems.filter(function(x){ return x.type===inventoryFilterType; }) : inventoryItems;
-    if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['النوع','الاسم','المادة الفعالة','يستهدف (مرض/آفة)','الجرعة الموصى بها','التوقيت','الطور المستهدف','الكمية بالمخزن','بواسطة','ملاحظة'];
-    var lines = [header.map(csvEscape).join(',')];
-    list.forEach(function(x){
-      lines.push([x.type==='pesticide'?'مبيد':'سماد', x.name, x.activeIngredient||'', x.targets||'', x.dose||'', x.timing||'',
-        x.type==='pesticide'?pestStageLabels(x.stages):'', (x.quantity!=null?x.quantity+' '+(x.unit||''):''), x.by||'', x.note||''].map(csvEscape).join(','));
-    });
-    downloadsCap.save({filename:'oroots-inventory-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){
-      toast('تم حفظ الملف');
-    }).catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
-  }
+  
 
   function showInventoryForm(existing){
     var holder = $('#inventory-form-holder');
@@ -2386,12 +2338,43 @@
     return null;
   }
 
+  /* كتابة آمنة من التعارض: بنقارن اللي كان عندنا (base) باللي المستخدم عدّله (next) ونطبّق الفرق بس على أحدث نسخة من السيرفر جوه transaction، فلو موظفين كتبوا في نفس المستند مفيش قراءة بتضيع. لو مفيش نت بنرجع للكتابة العادية (بتتخزّن وتتبعت لما النت يرجع). */
+  function txMerge(ref, field, base, next, keyOf, extra, sortFn){
+    var baseMap = {}, nextMap = {}, added = [], changed = [], removed = [];
+    (base || []).forEach(function(x){ baseMap[keyOf(x)] = x; });
+    (next || []).forEach(function(x){ nextMap[keyOf(x)] = x; });
+    Object.keys(nextMap).forEach(function(k){ if(!(k in baseMap)) added.push(k); else if(JSON.stringify(baseMap[k]) !== JSON.stringify(nextMap[k])) changed.push(k); });
+    Object.keys(baseMap).forEach(function(k){ if(!(k in nextMap)) removed.push(k); });
+    function plain(){ var d = Object.assign({}, extra); d[field] = next; return ref.set(d); }
+    if(!db || !db.runTransaction || (typeof navigator !== 'undefined' && navigator.onLine === false)) return plain();
+    return db.runTransaction(function(tx){
+      return tx.get(ref).then(function(snap){
+        if(!snap.exists){ var first = Object.assign({}, extra); first[field] = next; tx.set(ref, first); return; }   // مفيش نسخة على السيرفر: بنكتب كل اللي عندنا
+        var data = snap.exists ? snap.data() : {}, cur = Array.isArray(data[field]) ? data[field].slice() : [], idx = {};
+        cur.forEach(function(x, i){ idx[keyOf(x)] = i; });
+        removed.forEach(function(k){ if(k in idx) cur[idx[k]] = null; });
+        cur = cur.filter(function(x){ return x !== null; }); idx = {};
+        cur.forEach(function(x, i){ idx[keyOf(x)] = i; });
+        changed.forEach(function(k){ if(k in idx) cur[idx[k]] = nextMap[k]; });
+        added.forEach(function(k){ if(k in idx) cur[idx[k]] = nextMap[k]; else cur.push(nextMap[k]); });
+        if(sortFn) cur.sort(sortFn);
+        var out = Object.assign({}, data, extra); out[field] = cur;
+        tx.set(ref, out);
+      });
+    }).catch(function(err){
+      var c = err && err.code, m = String(err && err.message || '');
+      if(c === 'unavailable' || c === 'deadline-exceeded' || c === 'failed-precondition' || /offline|network|unavailable/i.test(m)) return plain();
+      throw err;
+    });
+  }
   function saveDocRaw(sourceKey, dateKey, entries, systemId){
     var body = {source:sourceKey, date:dateKey, entries:entries};
     if(systemId) body.systemId = systemId;
     var id = docId(sourceKey, dateKey, systemId);
     if(db){
-      return db.collection('readings').doc(id).set(body);
+      var baseDoc = findDoc(sourceKey, dateKey, systemId), extra = {source:sourceKey, date:dateKey};
+      if(systemId) extra.systemId = systemId;
+      return txMerge(db.collection('readings').doc(id), 'entries', baseDoc ? baseDoc.entries : [], entries, function(x){ return x && x.id ? x.id : JSON.stringify(x); }, extra, function(a, b){ return String(a.ts || '').localeCompare(String(b.ts || '')); });
     }
     var idx = -1;
     for(var i=0;i<readingsDocs.length;i++){
@@ -2466,9 +2449,10 @@
     return null;
   }
   function saveSystemsRaw(list){
+    var baseSys = systems.slice();
     systems = list;
     if(db){
-      return db.doc('settings/systems').set({list:list});
+      return txMerge(db.doc('settings/systems'), 'list', baseSys, list, function(x){ return x.id; }, {});
     }
     persistLocalSystems();
     renderAll();
@@ -2479,9 +2463,7 @@
   function emptyPermissions(){
     var p={}; TAB_KEYS.forEach(function(k){ p[k]='none'; }); return p;
   }
-  function fullPermissions(){
-    var p={}; TAB_KEYS.forEach(function(k){ p[k]='edit'; }); return p;
-  }
+  
   function persistLocalUsers(){
     try{ localStorage.setItem('oroots_local_users', JSON.stringify(appUsers)); }catch(e){}
   }
@@ -2518,7 +2500,7 @@
       })
       .then(function(){
         var user = {id:genId(), username:email, displayName:displayName||'', phone:phone||'', role:role||'employee', permissions:permissions||emptyPermissions()};
-        return saveUsers(appUsers.concat([user])).then(function(){ return db.doc('roles/'+email).set({role:user.role}); });
+        return saveUsers(appUsers.concat([user])).then(function(){ return db.doc('roles/'+email).set({role:user.role, perms:(user.role==='admin' ? {} : (user.permissions || {}))}); });
       })
       .then(function(){ return true; })
       .catch(function(e){ if(!(e && e.code==='app/cancelled')) toast(friendlyAuthError(e)); return false; });
@@ -2527,8 +2509,16 @@
     var target = getUser(id);
     var list = appUsers.map(function(u){ return u.id===id ? Object.assign({}, u, patch) : u; });
     return saveUsers(list).then(function(){
-      if(db && target && patch.role) return db.doc('roles/'+String(target.username).toLowerCase()).set({role:patch.role});
+      if(db && target && (patch.role || patch.permissions)){ var nu = Object.assign({}, target, patch); return db.doc('roles/'+String(target.username).toLowerCase()).set({role:nu.role || 'employee', perms:(nu.role==='admin' ? {} : (nu.permissions || {}))}); }
     });
+  }
+  /* بيزامن صلاحيات كل الموظفين لمستندات roles (القواعد بتقراها وبتمنع الكتابة لمن صلاحيته عرض) — مرة لما تتغير */
+  function syncRolesOnce(){
+    if(!db || currentUserRole!=='admin' || !appUsers.length) return;
+    var payload = appUsers.map(function(u){ return {e:String(u.username).toLowerCase(), r:u.role || 'employee', p:(u.role==='admin' ? {} : (u.permissions || {}))}; });
+    var sig = JSON.stringify(payload);
+    try{ if(localStorage.getItem('oroots_rolesync')===sig) return; }catch(e){}
+    Promise.all(payload.map(function(x){ return db.doc('roles/'+x.e).set({role:x.r, perms:x.p}); })).then(function(){ try{ localStorage.setItem('oroots_rolesync', sig); }catch(e){} }).catch(function(e){ console.warn('roles sync', e); });
   }
   function deleteUser(id){
     if(!requireAdminForDelete()) return;
@@ -3377,7 +3367,7 @@
   }
   function saveNurseryPlanRaw(plan){
     if(db){
-      return db.doc('settings/nurseryPlans').set({list: nurseryPlans.filter(function(p){return p.systemId!==plan.systemId;}).concat([plan])});
+      return txMerge(db.doc('settings/nurseryPlans'), 'list', nurseryPlans.slice(), nurseryPlans.filter(function(p){return p.systemId!==plan.systemId;}).concat([plan]), function(x){ return x.systemId; }, {});
     }
     nurseryPlans = nurseryPlans.filter(function(p){ return p.systemId!==plan.systemId; }).concat([plan]);
     persistLocalNurseryPlans();
@@ -3525,23 +3515,7 @@
       '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحدث</th><th>نزل / المطلوب</th><th>جاهزة</th><th>بتحضّن</th><th>متبقي</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
       (list.length ? '' : '<p class="empty-note">لسه مفيش سجل للخطة دي.</p>');
   }
-  function planOverviewHtml(){
-    if(!systems.length) return '';
-    var rows = systems.map(function(sy){
-      var plan = getNurseryPlan(sy.id);
-      var sel = sy.id===nurseryPlanSystemId ? ' style="background:var(--surface-2,rgba(0,0,0,0.04));"' : '';
-      if(!plan || !plan.cropName){
-        return '<tr class="plan-ov-row" data-sys="'+escH(sy.id)+'"'+sel+'><td>'+escH(systemLabel(sy))+'</td><td colspan="6" style="color:var(--muted);">مفيش خطة — اضغط وضيف</td></tr>';
-      }
-      var pr = computePlanProgress(plan);
-      var next = pr.schedule.length ? (pr.schedule[0].ready ? 'جاهزة الآن' : pr.schedule[0].date) : '—';
-      return '<tr class="plan-ov-row" data-sys="'+escH(sy.id)+'"'+sel+'><td>'+escH(systemLabel(sy))+'</td><td>'+escH(plan.cropName)+'</td>'+
-        '<td class="num">'+pr.target+'</td><td class="num">'+pr.transplanted+'</td><td class="num">'+pr.ready+'</td><td class="num">'+pr.remaining+'</td><td class="ltr num">'+escH(next)+'</td></tr>';
-    }).join('');
-    return '<h2 class="section-title" style="margin-top:0;">ملخص الخطط لكل الأنظمة</h2>'+
-      '<div class="table-wrap cropref-wrap plan-ov-wrap"><table><thead><tr><th>النظام</th><th>المحصول</th><th>المطلوب</th><th>نزل</th><th>جاهزة</th><th>متبقي</th><th>أقرب شتل</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-      '<p class="hint help-note">الأرقام بالصواني. اضغط على أي نظام عشان تفتح خطته وتعدّلها.</p>';
-  }
+  
 
   /* ---------- مخطط المواسير: كل ماسورة بتتلوّن وتكبر حسب عمر النبات ---------- */
   var PIPE_OVERDUE = 5;   // بعد ميعاد الحصاد بكام يوم النبات يتعتبر متأخر
@@ -3559,9 +3533,9 @@
     return m || {systemId:sysId, totalPipes:100, plantsPerPipe:30, groups:[]};
   }
   function savePipeMap(map){
-    var list = pipeMaps.filter(function(x){ return x.systemId!==map.systemId; }).concat([map]);
+    var basePm = pipeMaps.slice(), list = pipeMaps.filter(function(x){ return x.systemId!==map.systemId; }).concat([map]);
     pipeMaps = list;
-    if(db) return db.doc('settings/pipeMaps').set({list:list});
+    if(db) return txMerge(db.doc('settings/pipeMaps'), 'list', basePm, list, function(x){ return x.systemId; }, {});
     renderAll(); return Promise.resolve();
   }
   function pipeAgeDays(g, sim){ return dayDiff(g.plantDate, planAddDays(todayStr(), sim||0)); }
@@ -5110,7 +5084,7 @@
       hits.forEach(function(h){
         var dot = dotEls[h.d.key||''];
         if(dot){ dot.setAttribute('cx', xPix(h.p.x)); dot.setAttribute('cy', yPix(h.p.y)); dot.setAttribute('opacity','1'); }
-        rows += '<div class="tt-row"><span class="tt-dot" style="background:'+h.d.color+'"></span>'+h.d.label+
+        rows += '<div class="tt-row"><span class="tt-dot" style="background:'+h.d.color+'"></span>'+escH(h.d.label)+
           '<span class="tt-val">'+fmtNum(h.p.y)+'</span></div>';
       });
       tooltipEl.innerHTML = '<span class="tt-time">'+fmtAxisDateFull(anchor.x)+'</span>'+rows;
@@ -5139,7 +5113,7 @@
         d.points.forEach(function(p){ var diff = Math.abs(p.x - t); if(diff < best){ best = diff; nearest = p; } });
         var dot = dotEls[d.key||''];
         if(dot){ dot.setAttribute('cx', xPix(nearest.x)); dot.setAttribute('cy', yPix(nearest.y)); dot.setAttribute('opacity','1'); }
-        rows += '<div class="tt-row"><span class="tt-dot" style="background:'+d.color+'"></span>'+d.label+'<span class="tt-val">'+fmtNum(nearest.y)+'</span></div>';
+        rows += '<div class="tt-row"><span class="tt-dot" style="background:'+d.color+'"></span>'+escH(d.label)+'<span class="tt-val">'+fmtNum(nearest.y)+'</span></div>';
       });
       tooltipEl.innerHTML = '<span class="tt-time">'+fmtAxisDateFull(t)+'</span>'+rows;
       tooltipEl.classList.add('show');
@@ -5189,14 +5163,7 @@
     return order.map(function(name){ return {name:name, systems:map[name]}; });
   }
 
-  function goToWaterPanel(greenhouseName, systemId){
-    selectedGreenhouse = greenhouseName;
-    selectedSystemId = systemId;
-    $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='water'); });
-    $all('.panel').forEach(function(p){ p.classList.remove('active'); });
-    $('#panel-water').classList.add('active');
-    renderWaterPanel();
-  }
+  
 
   /* ---------- الطباعة الموحّدة لكل التقارير: A4 + هيدر بالشعار في كل صفحة + توقيع مدير الموقع الثابت ---------- */
   var PRINT_SIGNATURE = {title:'مدير الموقع', name:'Ahmed Hassan'};   // غيّره هنا مرة واحدة يتغيّر في كل التقارير الحالية والجاية
@@ -5267,7 +5234,7 @@
     var ghRows = ghGroups.map(function(g){
       var climEntries = flattenEntries('climate', g.name).filter(function(e){ return String(e.ts).slice(0,10) <= endStr; });
       var lastClim = climEntries.length ? climEntries[climEntries.length-1] : null;
-      return '<tr><td>'+g.name+'</td><td>'+g.systems.length+'</td>'+
+      return '<tr><td>'+escH(g.name)+'</td><td>'+g.systems.length+'</td>'+
         '<td>'+(lastClim ? (fmtNum(lastClim.temp)+'°C / '+fmtNum(lastClim.rh)+'%') : '—')+'</td></tr>';
     }).join('');
 
@@ -5276,7 +5243,7 @@
       (!isCurrent ? '' : overdueTasks.length||overdueReleases.length||overdueInstrPr.length ?
         '<table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+
           overdueTasks.map(function(t){ return '<tr><td>مهمة</td><td>'+escH(t.title)+(t.assignedTo?(' — '+escH(t.assignedTo)):'')+(t.greenhouse?(' — '+escH(t.greenhouse)):'')+'</td><td>'+t.ts.slice(0,10)+'</td></tr>'; }).join('')+
-          overdueReleases.map(function(x){ return '<tr><td>إطلاق حيوي</td><td>'+x.beneficialName+' — '+(x.greenhouse||'')+'</td><td>'+x.nextReleaseDate+'</td></tr>'; }).join('')+
+          overdueReleases.map(function(x){ return '<tr><td>إطلاق حيوي</td><td>'+escH(x.beneficialName)+' — '+(x.greenhouse||'')+'</td><td>'+x.nextReleaseDate+'</td></tr>'; }).join('')+
           overdueInstrPr.map(function(x){ return '<tr><td>معايرة جهاز</td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td>'+x.nextDueDate+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد تنبيهات متأخرة.</p>')+
 
@@ -5295,7 +5262,7 @@
       '<h2>الإصابات المسجلة في الفترة ('+weekPests.length+')</h2>'+
       (weekPests.length ?
         '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المرض/الآفة</th><th>الحالة</th></tr></thead><tbody>'+
-          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+x.problemName+'</td><td>'+(x.eradicated?'اتقضي عليها':(x.treated?'اتعالجت':'لسه'))+'</td></tr>'; }).join('')+
+          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+escH(x.problemName)+'</td><td>'+(x.eradicated?'اتقضي عليها':(x.treated?'اتعالجت':'لسه'))+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد إصابات مسجلة في الفترة دي.</p>')+
 
       '<h2>حالة الصوب</h2>'+
@@ -5318,7 +5285,7 @@
       rows.push('<tr><td><span class="status-pill alert">مهمة</span></td><td>'+escH(t.title)+(t.assignedTo?(' — '+escH(t.assignedTo)):'')+(t.greenhouse?(' — '+escH(t.greenhouse)):'')+'</td><td class="ltr num">'+t.ts.slice(0,10)+'</td></tr>');
     });
     overdueReleases.slice(0,6).forEach(function(x){
-      rows.push('<tr><td><span class="status-pill alert">إطلاق حيوي</span></td><td>'+x.beneficialName+' — '+(x.greenhouse||'')+'</td><td class="ltr num">'+x.nextReleaseDate+'</td></tr>');
+      rows.push('<tr><td><span class="status-pill alert">إطلاق حيوي</span></td><td>'+escH(x.beneficialName)+' — '+(x.greenhouse||'')+'</td><td class="ltr num">'+x.nextReleaseDate+'</td></tr>');
     });
     overdueInstr.slice(0,6).forEach(function(x){
       rows.push('<tr><td><span class="status-pill alert">معايرة جهاز</span></td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td class="ltr num">'+x.nextDueDate+'</td></tr>');
@@ -5522,13 +5489,13 @@
 
     el.innerHTML =
       '<div class="system-pills" id="overview-gh-pills">'+groups.map(function(g){
-        return '<button type="button" class="system-pill'+(g.name===overviewGreenhouse?' active':'')+'" data-gh="'+g.name+'">'+g.name+'</button>';
+        return '<button type="button" class="system-pill'+(g.name===overviewGreenhouse?' active':'')+'" data-gh="'+escH(g.name)+'">'+escH(g.name)+'</button>';
       }).join('')+'</div>'+
       '<div class="system-pills" id="overview-sys-pills" style="margin-top:8px;">'+curGroup.systems.map(function(sys){
         var st = combinedSystemStatus(sys.id);
         var dotColor = st==='good' ? 'var(--good)' : (st==='alert' ? 'var(--alert)' : 'var(--border)');
         return '<button type="button" class="system-pill'+(sys.id===overviewSystemId?' active':'')+'" data-sysid="'+sys.id+'">'+
-          '<span class="tab-dot" style="background:'+dotColor+';margin-inline-end:6px;"></span>'+sys.name+'</button>';
+          '<span class="tab-dot" style="background:'+dotColor+';margin-inline-end:6px;"></span>'+escH(sys.name)+'</button>';
       }).join('')+'</div>';
 
     $all('#overview-gh-pills .system-pill', el).forEach(function(btn){
@@ -5552,11 +5519,7 @@
     renderOverviewSavedNutrients();
   }
 
-  function ovMiniChart(elId, points, color, height){
-    var el = document.getElementById(elId);
-    if(!el) return;
-    renderSvgChart(el, [{label:'', color:color||'#2C7A8C', points:points}], {height:height||140});
-  }
+  
 
   function renderOverviewSystemDetail(){
     var el = $('#overview-system-detail');
@@ -5603,7 +5566,7 @@
     var recentPests = pestLog.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.ts.localeCompare(a.ts); }).slice(0,5);
     var pestsHtml = '<div class="chart-card"><h3>آخر إصابات الصوبة</h3>'+
       (recentPests.length ? '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الآفة/المرض</th><th>الشدة</th><th>الحالة</th></tr></thead><tbody>'+
-        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+x.problemName+'</td><td>'+(x.severity||'—')+'</td><td>'+(x.eradicated?'<span class=\'status-pill good\'>اتقضي عليها ✅</span>':x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
+        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+escH(x.problemName)+'</td><td>'+(x.severity||'—')+'</td><td>'+(x.eradicated?'<span class=\'status-pill good\'>اتقضي عليها ✅</span>':x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
       '</tbody></table></div>' : '<p class="empty-note">لا توجد إصابات مسجلة.</p>')+
     '</div>';
     var relForGh = bioReleases.filter(function(x){ return x.greenhouse===gh; });
@@ -5659,7 +5622,7 @@
     var grid = function(h){ return h ? '<div class="mini-charts" style="margin-top:12px;">'+h+'</div>' : ''; };
 
     el.innerHTML =
-      '<div class="system-header"><h2>'+systemLabel(sys)+' — نظرة تفصيلية (للقراءة فقط)</h2></div>'+
+      '<div class="system-header"><h2>'+escH(systemLabel(sys))+' — نظرة تفصيلية (للقراءة فقط)</h2></div>'+
       rangeHtml+
       '<h3 class="section-title">مياه الري والمعايرة</h3>'+
       '<div class="mini-charts">'+waterHtml+calibHtml+'</div>'+grid(waterCharts+calibCharts)+
@@ -5729,7 +5692,7 @@
     el.innerHTML = '<div class="table-wrap"><table><thead><tr><th>النوع</th><th>الاسم</th><th>المادة الفعالة</th><th>يستهدف</th><th>الجرعة</th><th>الكمية</th></tr></thead><tbody>'+
       list.map(function(x){
         return '<tr><td><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></td>'+
-          '<td>'+x.name+'</td><td>'+escH(x.activeIngredient||'—')+'</td><td>'+escH(x.targets||'—')+'</td><td class="ltr">'+escH(x.dose||'—')+'</td>'+
+          '<td>'+escH(x.name)+'</td><td>'+escH(x.activeIngredient||'—')+'</td><td>'+escH(x.targets||'—')+'</td><td class="ltr">'+escH(x.dose||'—')+'</td>'+
           '<td class="num ltr">'+(x.quantity!=null?(x.quantity+' '+(x.unit||'')):'—')+'</td></tr>';
       }).join('')+'</tbody></table></div>';
   }
@@ -5830,7 +5793,7 @@
       selectedGreenhouse = groups[0].name;
     }
     el.innerHTML = groups.map(function(g){
-      return '<button type="button" class="system-pill'+(g.name===selectedGreenhouse?' active':'')+'" data-gh="'+g.name+'">'+g.name+'</button>';
+      return '<button type="button" class="system-pill'+(g.name===selectedGreenhouse?' active':'')+'" data-gh="'+escH(g.name)+'">'+escH(g.name)+'</button>';
     }).join('');
     $all('.system-pill[data-gh]', el).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -5876,7 +5839,7 @@
     var activeGroup = groups.filter(function(g){ return g.name===selectedGreenhouse; })[0];
     var list = activeGroup ? activeGroup.systems : [];
     var html = list.map(function(sys){
-      return '<button type="button" class="system-pill'+(sys.id===selectedSystemId?' active':'')+'" data-sysid="'+sys.id+'">'+sys.name+'</button>';
+      return '<button type="button" class="system-pill'+(sys.id===selectedSystemId?' active':'')+'" data-sysid="'+sys.id+'">'+escH(sys.name)+'</button>';
     }).join('');
     html += '<button type="button" class="system-pill add-pill" data-role="add-pill">+ نظام جديد</button>';
     el.innerHTML = html;
@@ -5920,7 +5883,7 @@
     el.innerHTML = greenhouseGroups().map(function(g){
       var ty = ghTypeByName(g.name);
       return '<div class="systems-list-row" style="background:var(--surface-2);font-weight:700;"><span>🏠 '+escH(g.name)+' <span class="status-pill">'+GH_TYPES[ty].short+'</span></span><button class="btn-ghost btn-sm gh-type-btn" data-gh="'+escH(g.name)+'" style="border-radius:8px;">تغيير النوع</button></div>'+
-        g.systems.map(function(sys){ return '<div class="systems-list-row"><span>'+systemLabel(sys)+'</span><button class="del-btn" data-sysid="'+sys.id+'" title="حذف">✕</button></div>'; }).join('');
+        g.systems.map(function(sys){ return '<div class="systems-list-row"><span>'+escH(systemLabel(sys))+'</span><button class="del-btn" data-sysid="'+sys.id+'" title="حذف">✕</button></div>'; }).join('');
     }).join('');
     $all('.gh-type-btn', el).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -6175,7 +6138,7 @@
   function irrNum(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
   function irrMin(t){ var m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? parseInt(m[1],10)*60 + parseInt(m[2],10) : null; }
   function irrHM(min){ min = ((Math.round(min) % 1440) + 1440) % 1440; return pad(Math.floor(min/60))+':'+pad(min%60); }
-  function irrDur(on, off){ var a = irrMin(on), b = irrMin(off); if(a===null || b===null) return 0; var d = b - a; return d <= 0 ? d + 1440 : d; }
+  
   function irrL(l){ l = irrNum(l); return l >= 1000 ? (Math.round(l/10)/100)+' م³' : (Math.round(l*10)/10)+' لتر'; }
   function irrPlantedPipes(sysId){ return getPipeMap(sysId).groups.reduce(function(s, g){ return s + (pipeAgeDays(g, 0) >= 0 ? g.pipes : 0); }, 0); }
   /* ورقيات: برنامج = فترة (من/إلى) بيتكرر جواها "شغّل X دقيقة / اقفل Y دقيقة" */
@@ -6340,7 +6303,7 @@
     sysEl.innerHTML = fruit.filter(function(s){ return ghNameOf(s)===curGh; }).map(function(s){ return '<button type="button" class="system-pill'+(s.id===soilSystemId ? ' active' : '')+'" data-sysid="'+escH(s.id)+'">'+escH(s.name)+'</button>'; }).join('');
     $all('.system-pill[data-gh]', ghEl).forEach(function(b){ b.addEventListener('click', function(){ var f = fruit.filter(function(s){ return ghNameOf(s)===b.getAttribute('data-gh'); })[0]; if(f){ soilSystemId = f.id; renderSoilPanel(); } }); });
     $all('.system-pill[data-sysid]', sysEl).forEach(function(b){ b.addEventListener('click', function(){ soilSystemId = b.getAttribute('data-sysid'); renderSoilPanel(); }); });
-    body.innerHTML = '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(cur)+'</h2></div></div>'+
+    body.innerHTML = '<div data-sub="entry charts records"><div class="system-header"><h2>'+escH(systemLabel(cur))+'</h2></div></div>'+
       '<div data-sub="entry"><div id="soil-forms"></div></div><div data-sub="charts"><div id="soil-charts"></div></div><div data-sub="records"><div id="soil-tables"></div></div>';
     renderSoilSection({form: $('#soil-forms'), table: $('#soil-tables')}, soilSystemId);
     renderSoilCharts($('#soil-charts'), soilSystemId);
@@ -6537,7 +6500,7 @@
       : '<p class="empty-note">لسه مفيش حصاد مسجل للنظام ده.</p>';
 
     inner.innerHTML =
-      '<div data-sub="entry pipes charts records"><div class="system-header"><h2>'+systemLabel(sys)+' — سجل الحصاد</h2></div></div>'+
+      '<div data-sub="entry pipes charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — سجل الحصاد</h2></div></div>'+
       '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
@@ -6677,7 +6640,7 @@
         var tr = document.createElement('tr');
         tr.innerHTML =
           '<td class="ltr num">'+fmtTs(h.ts)+'</td>'+
-          '<td>'+h.cropName+'</td>'+
+          '<td>'+escH(h.cropName)+'</td>'+
           '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
           '<td class="num">'+(h.pipes>0 ? h.pipes : '—')+'</td>'+
           '<td>'+(h.by||'—')+'</td>'+
@@ -6715,7 +6678,7 @@
     if(!last) return msgs;
     METRICS.forEach(function(k){
       var v = parseFloat(d[k]), p = parseFloat(last[k]);
-      if(!isNaN(v) && !isNaN(p) && Math.abs(v-p) > QE_JUMP[k]) msgs.push(LBL[k]+' '+v+' (آخر قراءة '+p+')');
+      if(!isNaN(v) && !isNaN(p) && Math.abs(v-p) > QE_JUMP[k]) msgs.push(({ph:'pH', ec:'EC', temp:'الحرارة'})[k]+' '+v+' (آخر قراءة '+p+')');
     });
     return msgs;
   }
@@ -6818,7 +6781,7 @@
     var sys = getSystem(selectedSystemId);
 
     body.innerHTML =
-      '<div data-sub="entry charts records"><div class="system-header"><h2>'+systemLabel(sys)+' <span class="status-pill" style="font-size:.7rem;vertical-align:middle;">'+GH_TYPES[sysGType(sys)].short+'</span></h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
+      '<div data-sub="entry charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' <span class="status-pill" style="font-size:.7rem;vertical-align:middle;">'+GH_TYPES[sysGType(sys)].short+'</span></h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
       '<div data-sub="entry">'+
         '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div></div>'+
       '<div data-sub="schedule"><h2 class="section-title wt-group">🕒 جدول الري</h2><div id="water-schedule"></div></div>'+
@@ -6909,7 +6872,7 @@
     var dailyRangeHtml = rngHtml('cdaily');
 
     body.innerHTML =
-      '<div data-sub="entry summary charts records"><div class="system-header"><h2>'+gh+'</h2></div></div>'+
+      '<div data-sub="entry summary charts records"><div class="system-header"><h2>'+escH(gh)+'</h2></div></div>'+
       '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل قراءة مناخ جديدة</h2>'+
       '<form class="entry-form" id="climate-form">'+
         '<div class="form-grid">'+
@@ -7301,8 +7264,8 @@
     }
 
     var isAdminView = currentUserRole==='admin';
-    var greenhouseOptions = '<option value="">بدون تحديد</option>' + greenhouseGroups().map(function(g){ return '<option value="'+g.name+'">'+g.name+'</option>'; }).join('');
-    var sopOptions = '<option value="">بدون</option>' + sops.map(function(s){ return '<option value="'+s.id+'">'+s.title+'</option>'; }).join('');
+    var greenhouseOptions = '<option value="">بدون تحديد</option>' + greenhouseGroups().map(function(g){ return '<option value="'+escH(g.name)+'">'+escH(g.name)+'</option>'; }).join('');
+    var sopOptions = '<option value="">بدون</option>' + sops.map(function(s){ return '<option value="'+s.id+'">'+escH(s.title)+'</option>'; }).join('');
     var dnList = appUsers.filter(function(u){ return u.displayName; }).map(function(u){ return u.displayName; });
     var namesDatalist = dnList.concat(knownNames().filter(function(n){ return dnList.indexOf(n)<0 && n.indexOf('@')<0; }))
       .map(function(n){ return '<option value="'+escH(n)+'"></option>'; }).join('');
@@ -7359,7 +7322,7 @@
       var stepLines = (s.steps||'').split('\n').filter(function(l){ return l.trim(); });
       return '<div class="sop-card" data-sopid="'+s.id+'">'+
         '<div class="sop-card-head">'+
-          '<div><span class="sop-title">'+s.title+'</span>'+(s.category?(' <span class="sop-category">'+s.category+'</span>'):'')+'</div>'+
+          '<div><span class="sop-title">'+escH(s.title)+'</span>'+(s.category?(' <span class="sop-category">'+escH(s.category)+'</span>'):'')+'</div>'+
           '<div><button class="btn-ghost btn-sm sop-edit-btn" style="border-radius:8px;">تعديل</button> <button class="btn-danger-ghost btn-sm sop-delete-btn" style="border-radius:8px;">حذف</button></div>'+
         '</div>'+
         '<ol class="sop-steps">'+stepLines.map(function(l){ return '<li>'+l+'</li>'; }).join('')+'</ol>'+sopImagesHtml(s)+
@@ -7593,11 +7556,11 @@
 
     var fertCheckboxesHtml = ferts.map(function(f){
       var checked = currentSolveFerts[f.id] ? 'checked' : '';
-      return '<label class="fert-checkbox-row"><input type="checkbox" class="solve-fert-check" data-fertid="'+f.id+'" '+checked+'> '+f.name+' <span style="color:var(--muted);font-size:0.75rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</span></label>';
+      return '<label class="fert-checkbox-row"><input type="checkbox" class="solve-fert-check" data-fertid="'+f.id+'" '+checked+'> '+escH(f.name)+' <span style="color:var(--muted);font-size:0.75rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</span></label>';
     }).join('');
 
     var fertOptionsHtml = ferts.map(function(f){
-      return '<option value="'+f.id+'">'+f.name+' ('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</option>';
+      return '<option value="'+f.id+'">'+escH(f.name)+' ('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</option>';
     }).join('');
 
     var mixByTank = {A:[], B:[], '-':[]};
@@ -7637,13 +7600,13 @@
     }).join('');
 
     var recipeOptionsHtml = '<option value="">— اختر خلطة محفوظة —</option>'+nutrientRecipes.map(function(r){
-      return '<option value="'+r.id+'">'+r.name+'</option>';
+      return '<option value="'+r.id+'">'+escH(r.name)+'</option>';
     }).join('');
 
     var fertLibraryHtml = ferts.map(function(f){
       var compStr = NUTRIENT_ELEMENTS.filter(function(e){ return f.comp[e.key]; }).map(function(e){ return e.key+' '+f.comp[e.key]+'%'; }).join(' · ');
       var isCustom = f.id.indexOf('d-')!==0;
-      return '<div class="systems-list-row"><span><strong>'+f.name+'</strong><br><span style="color:var(--muted);font-size:0.76rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+') '+compStr+'</span></span>'+
+      return '<div class="systems-list-row"><span><strong>'+escH(f.name)+'</strong><br><span style="color:var(--muted);font-size:0.76rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+') '+compStr+'</span></span>'+
         (isCustom ? '<button class="del-btn fert-delete-btn" data-fertid="'+f.id+'" title="حذف">✕</button>' : '<span style="color:var(--muted);font-size:0.72rem;">افتراضي</span>')+
         '</div>';
     }).join('');
@@ -8941,7 +8904,7 @@
     var soon = relList.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate)>=0 && daysUntil(x.nextReleaseDate)<=3; }).length;
 
     var relRows = relList.length ? relList.map(function(x){
-      return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+x.beneficialName+'</td><td>'+(x.targetPest||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+escH(x.beneficialName)+'</td><td>'+(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.perM2||'—')+'</td><td>'+(x.nextReleaseDate?nextReleaseBadge(x.nextReleaseDate):'—')+'</td>'+
         '<td>'+escH(x.note||'—')+'</td><td><button type="button" class="btn btn-ghost btn-sm bio-photos-btn">📷 '+(x.photoCount||'+')+'</button></td><td><button class="del-btn bio-release-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد إطلاقات مسجلة لهذه الصوبة.</td></tr>';
@@ -8958,7 +8921,7 @@
 
     return '<div class="nut-card" style="margin-top:18px;">'+
       '<h2 class="section-title" style="margin-top:0;">برنامج المكافحة الحيوية للموسم</h2>'+
-      '<p class="hint help-note" style="margin-top:-4px;">سجّل إطلاقات الأعداء الحيوية والإضافات زي اللاصقات الملونة والمصائد الفيرمونية لصوبة «'+gh+'».</p>'+
+      '<p class="hint help-note" style="margin-top:-4px;">سجّل إطلاقات الأعداء الحيوية والإضافات زي اللاصقات الملونة والمصائد الفيرمونية لصوبة «'+escH(gh)+'».</p>'+
       (relList.length ? '<div class="climate-stats">'+
         climateStatChip('إجمالي الإطلاقات', relList.length, '')+
         (overdue ? climateStatChip('إطلاقات متأخرة', overdue, '') : '')+
@@ -9105,7 +9068,7 @@
     var list = group ? group.systems : [];
     if(!list.length) return '<option value="">لا توجد أنظمة في هذه الصوبة</option>';
     return '<option value="">—</option>'+list.map(function(s){
-      return '<option value="'+s.id+'"'+(s.id===selectedSystemId?' selected':'')+'>'+s.name+'</option>';
+      return '<option value="'+s.id+'"'+(s.id===selectedSystemId?' selected':'')+'>'+escH(s.name)+'</option>';
     }).join('');
   }
 
@@ -9115,7 +9078,7 @@
     var pf = !existingBatch ? nurseryPrefill : null; nurseryPrefill = null;
     var groups = greenhouseGroups();
     var ghOptions = '<option value="">لسه في المشتل (بدون صوبة)</option>'+groups.map(function(g){
-      return '<option value="'+g.name+'"'+((existingBatch && existingBatch.greenhouse===g.name) || (pf && pf.gh===g.name)?' selected':'')+'>'+g.name+'</option>';
+      return '<option value="'+escH(g.name)+'"'+((existingBatch && existingBatch.greenhouse===g.name) || (pf && pf.gh===g.name)?' selected':'')+'>'+escH(g.name)+'</option>';
     }).join('');
 
     holder.innerHTML =
@@ -9267,106 +9230,9 @@
     });
   }
 
-  function renderNurseryPlanSectionHtml(){
-    if(!systems.length){
-      return '<h2 class="section-title" style="margin-top:0;">خطة المشتل</h2>'+
-        '<p class="empty-note">ضيف نظام الأول (من "بيانات المياه" أو "الإعدادات") عشان تقدر تعمل خطة مشتل ليه.</p>';
-    }
-    var sysOptions = systems.map(function(s){
-      var gh = s.greenhouse ? (s.greenhouse+' — ') : '';
-      return '<option value="'+s.id+'"'+(s.id===nurseryPlanSystemId?' selected':'')+'>'+gh+s.name+'</option>';
-    }).join('');
+  
 
-    var plan = getNurseryPlan(nurseryPlanSystemId) || {};
-    var formHtml =
-      '<div class="form-grid" style="margin-bottom:6px;">'+
-        '<div class="field-sm full"><label>النظام</label><select id="plan-system-select">'+sysOptions+'</select></div>'+
-        '<div class="field-sm full"><label>اسم المحصول</label>'+cropFieldHtml('plan-crop', plan.cropName||'', false)+'</div>'+
-        '<div class="field-sm"><label>عدد الجتر (القنوات)</label><input type="number" step="1" min="0" class="ltr" id="plan-gutters" value="'+(plan.gutterCount!=null?plan.gutterCount:'')+'"></div>'+
-        '<div class="field-sm"><label>عدد النباتات في الجتر الواحد</label><input type="number" step="1" min="0" class="ltr" id="plan-plants-per-gutter" value="'+(plan.plantsPerGutter!=null?plan.plantsPerGutter:'')+'"></div>'+
-        '<div class="field-sm"><label>عدد النباتات في الصينية الواحدة</label><input type="number" step="1" min="1" class="ltr" id="plan-tray-size" value="'+(plan.traySize!=null?plan.traySize:TRAY_SIZE)+'"></div>'+
-        '<div class="field-sm"><label>نسبة الفاقد المتوقع (%)</label><input type="number" step="0.5" min="0" max="90" class="ltr" id="plan-loss" value="'+(plan.lossPercent!=null?plan.lossPercent:'')+'"></div>'+
-        '<div class="field-sm"><label>مدة موسم الحصاد (يوم)</label><input type="number" step="1" min="0" class="ltr" id="plan-harvest-days" value="'+(plan.harvestDays!=null?plan.harvestDays:'')+'"></div>'+
-        '<div class="field-sm"><label>عدد أيام التحضين بالمشتل</label><input type="number" step="1" min="0" class="ltr" id="plan-nursery-days" value="'+(plan.nurseryDays!=null?plan.nurseryDays:'')+'"></div>'+
-        '<div class="field-sm"><label>بداية الدورة (اختياري)</label><input type="date" class="ltr" id="plan-cycle-start" value="'+(plan.cycleStart||'')+'"></div>'+
-      '</div>'+
-      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="btn-calc-plan">احسب واحفظ الخطة</button></div>';
-
-    var resultsHtml = '';
-    if(plan.cropName){
-      var r = computeNurseryPlanResult(plan);
-      var shortageOk = r.shortageTrays<=0;
-      resultsHtml =
-        '<div class="climate-stats" style="margin-top:14px;">'+
-          climateStatChip('إجمالي النباتات المطلوبة', fmtNum(r.totalPlantsNeeded), 'نبتة')+
-          climateStatChip('المطلوب زراعته (بعد الفاقد)', fmtNum(r.plantsToSow), 'نبتة')+
-          climateStatChip('عدد الصواني المطلوبة', r.traysNeeded, '')+
-          climateStatChip('عندك فعليًا في المشتل', r.actualTrays, 'صينية ≈ '+fmtNum(r.actualPlants)+' نبتة')+
-        '</div>'+
-        '<div class="view-only-banner" style="background:'+(shortageOk?'var(--good-soft)':'var(--alert-soft)')+';color:'+(shortageOk?'var(--good)':'var(--alert)')+';">'+
-          (shortageOk ? '✅ عندك كفاية في المشتل لتغطية احتياج هذا النظام.' : '⚠️ ناقصك تقريبًا '+r.shortageTrays+' صينية (~'+fmtNum(r.shortagePlants)+' نبتة) عشان تغطي الاحتياج المتوقع.')+
-        '</div>';
-
-      var timingHtml;
-      if(!r.lastTransplant){
-        timingHtml = '<p class="hint">لسه مفيش نقلة مسجلة لهذا المحصول في هذا النظام — هنقدر نحسب توقيت الدفعة الجاية بعد أول نقلة فعلية.</p>';
-      } else if(r.alreadySownNext){
-        timingHtml = '<div class="view-only-banner" style="background:var(--good-soft);color:var(--good);">✅ خلاص زرعت الدفعة الجاية بعد آخر نقلة ('+r.lastTransplant+'). المفروض تكون جاهزة قبل ما المحصول الحالي يخلص (حوالين '+r.idealNextSowDate+' + '+plan.harvestDays+' يوم).</div>';
-      } else if(r.daysLate!=null && r.daysLate>0){
-        timingHtml = '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ خطتك متأخرة — كان المفروض تزرع الدفعة الجاية بحلول '+r.idealNextSowDate+' (يعني من '+r.daysLate+' يوم) عشان تجهز في ميعادها.</div>';
-      } else {
-        var daysLeft = r.daysLate!=null ? -r.daysLate : null;
-        timingHtml = '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">⏳ لسه معاك وقت — لازم تزرع الدفعة الجاية بحلول '+r.idealNextSowDate+(daysLeft!=null?(' (كمان حوالين '+daysLeft+' يوم)'):'')+'.</div>';
-      }
-      resultsHtml += timingHtml;
-    }
-
-    return '<h2 class="section-title" style="margin-top:0;">خطة المشتل — هل أنا مستمر صح؟</h2>'+
-      '<p class="hint help-note">اختار النظام واكتب أرقام دورة الزراعة بتاعتك، وهيوريك لو المشتل هيغطي احتياج النظام أو لأ، ولو معاد الدفعة الجاية قرّب.</p>'+
-      formHtml + resultsHtml + planProgressHtml(plan.cropName ? plan : null) + planLogHtml();
-  }
-
-  function wireNurseryPlanSection(){
-    var sel = $('#plan-system-select');
-    if(!sel) return;
-    sel.addEventListener('change', function(){
-      nurseryPlanSystemId = this.value;
-      renderNurseryPanel();
-    });
-    $('#btn-calc-plan').addEventListener('click', function(){
-      var cropName = $('#plan-crop').value.trim();
-      if(!cropName){ toast('اكتب اسم المحصول'); return; }
-      var plan = {
-        systemId: nurseryPlanSystemId,
-        cropName: cropName,
-        gutterCount: parseFloat($('#plan-gutters').value)||0,
-        plantsPerGutter: parseFloat($('#plan-plants-per-gutter').value)||0,
-        traySize: parseFloat($('#plan-tray-size').value)||0,
-        lossPercent: parseFloat($('#plan-loss').value)||0,
-        harvestDays: parseFloat($('#plan-harvest-days').value)||0,
-        nurseryDays: parseFloat($('#plan-nursery-days').value)||0,
-        cycleStart: $('#plan-cycle-start').value || '',
-        updatedAt: Date.now()
-      };
-      saveNurseryPlan(plan).then(function(){
-        toast('اتحفظت الخطة');
-        renderNurseryPanel();
-      });
-    });
-    $all('.plan-ov-row').forEach(function(tr){
-      tr.addEventListener('click', function(){ nurseryPlanSystemId = tr.getAttribute('data-sys'); renderNurseryPanel(); });
-    });
-    var snap = $('#btn-plan-snapshot');
-    if(snap) snap.addEventListener('click', function(){
-      var plan = getNurseryPlan(nurseryPlanSystemId);
-      if(!plan || !plan.cropName) return;
-      var rec = planLogRec(plan, 'snapshot', 0, computePlanProgress(plan));
-      saveNurseryPlanLogRec(rec).then(function(){ logAudit('add','nursery','لقطة لخطة المشتل — '+plan.cropName+' — نزل '+rec.transplanted+' من '+rec.target); toast('اتسجّل وضع الخطة'); });
-    });
-    $all('.planlog-del').forEach(function(b){ b.addEventListener('click', function(){ deleteNurseryPlanLog(b.closest('tr').getAttribute('data-id')); }); });
-    var pex = $('#btn-planlog-export'); if(pex) pex.addEventListener('click', exportPlanLogCSV);
-    lfWire('planlog');
-  }
+  
 
   /* ---------- خطة المشتل: مربع لكل نظام، بتدخل فيه (الصنف، عدد المواسير، نباتات الماسورة) والبرنامج يحسب الصواني ---------- */
   function saveNurseryTiles(){
@@ -9559,7 +9425,7 @@
       }
       return '<tr data-id="'+n.id+'"'+lfAttr('nursery', n.sowDate)+' data-crop="'+escH(cropKey(n.cropName))+'" data-trays="'+batchTrays(n)+'">'+
         '<td class="ltr">'+n.sowDate+'</td>'+
-        '<td>'+n.cropName+'</td>'+
+        '<td>'+escH(n.cropName)+'</td>'+
         '<td class="num">'+batchTrays(n)+' <span style="color:var(--muted);font-size:0.76rem;">('+batchPlants(n)+' نبات)</span></td>'+
         '<td>'+batchAgeLabel(n)+'</td>'+
         '<td>'+statusHtml+'</td>'+
@@ -9937,7 +9803,7 @@
     }
     return '';
   }
-  function saveOrderProductsList(list){ return saveOrderProducts(list); }
+  
   function renderOrderProductsSettings(){
     var box = $('#orderprod-box');
     if(!box) return;
@@ -12056,7 +11922,7 @@
       db.collection('trash').doc(id).delete().then(function(){ toast('اتمسح'); }).catch(function(){ toast('تعذر المسح'); });
     }); });
   }
-  function renderSettingsPanels(){ safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
+  function renderSettingsPanels(){ safe(renderReadStats); safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
   function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
   /* بيرسم التبويب المفتوح بس — باقي التبويبات بتترسم أول ما تفتحها (setupTabs) */
   /* ====================== المخططات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + مخططات مخصصة ====================== */
@@ -12632,7 +12498,7 @@
     var firstInLow = gs.slice(0, best).some(function(g){ return g.items.indexOf(series[0]) >= 0; });   // جنب أول عنصر بيفضل يسار
     gs.forEach(function(g, i){ var low = i < best; g.items.forEach(function(s){ s.axis = (low === firstInLow) ? 'L' : 'R'; }); });
   }
-  function ioWizUnit(ref, cm){ var m = cm[ref]; return m ? (m.unit || '') : ''; }
+  
   function ioWizAddRefs(refs){
     var w = ioWiz, d = w.draft, cm = ioCatMap(ioCatalog()), added = 0;
     refs.forEach(function(ref){
@@ -13183,7 +13049,7 @@
     if(!db){ try{ localStorage.setItem('oroots_customcharts', JSON.stringify(customCharts)); localStorage.setItem('oroots_ovprefs', JSON.stringify(ovPrefs)); }catch(e){} renderAllSoon(); return Promise.resolve(); }
     return db.doc('userData/'+myMail()).set({charts:ownCharts, ov:ownOv, updatedAt:Date.now()}, {merge:true});
   }
-  function ioSaveCharts(list){ return ioSaveAll(list, null); }
+  
   /* أول مرة بنعدّل: المخططات الجاهزة بتتحفظ كلها عشان ما تختفيش */
   function ioMaterialized(){ return customCharts.length ? customCharts.slice() : JSON.parse(JSON.stringify(ioDefaults())); }
   /* لما عرض الكارت يتغير (حجم / تدوير الشاشة) الرسم بيتعاد بالعرض الجديد عشان ما يتمطّش */
@@ -13342,7 +13208,7 @@
     m.style.left = Math.max(8, Math.min((window.innerWidth || 360) - mw - 8, r.left))+'px';
     $all('button', m).forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var a = b.getAttribute('data-a'), v = parseInt(b.getAttribute('data-v'), 10); ovCloseMenu(); ovAction(a, ctx, v); }); });
   }
-  function ovScrollToBuilder(){ setTimeout(function(){ var f = document.getElementById('io-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 80); }
+  
   function ovAction(a, ctx, v){
     if(ctx.kind==='builtin') ovBuiltinAction(a, ctx, v); else ovCustomAction(a, ctx, v);
   }
@@ -13650,7 +13516,7 @@
 
   function renderAll(){
     safe(applyTabVisibility);
-    if(panelOn('panel-settings')) renderSettingsPanels();
+    if(panelOn('panel-settings')){ lazyAdminSubs(); renderSettingsPanels(); }
     if(panelOn('panel-overview')) safe(renderSystemsOverview);
   if(panelOn('panel-overview')) safe(renderOvCustom);
   if(panelOn('panel-charts')) safe(renderChartsPanel);
@@ -14203,7 +14069,7 @@
     var renderMap = {
       overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, soil: renderSoilPanel, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
-      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, settings: renderSettingsPanels
+      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, settings: function(){ lazyAdminSubs(); renderSettingsPanels(); }
     };
     $all('.tab-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -14335,7 +14201,36 @@
     if(persist && db && currentUser) db.doc('userData/'+myMail()).set({palette:(p==='vivid' ? 'vivid' : 'calm')}, {merge:true}).catch(function(){});
     if(persist){ try{ renderAll(); }catch(e){} }
   }
+  /* معالج أخطاء عام: أي خطأ غير متوقع بيتسجل في سجل التدقيق (بحد أقصى 5 في الجلسة) ويظهر للمستخدم تنبيه، عشان الأخطاء الصامتة ما تستخبّاش */
+  function installErrorReporter(){
+    var seen = {}, count = 0;
+    function report(msg, where){
+      var key = String(msg).slice(0, 120); if(seen[key] || count >= 5) return; seen[key] = 1; count++;
+      try{ if(currentUser) logAudit('error', 'client', String(msg).slice(0, 300)+(where ? (' @ '+where) : '')); }catch(e){}
+      try{ toast('حصل خطأ غير متوقع واتسجّل — لو اتكرر كلّم المدير', 6000); }catch(e){}
+    }
+    window.addEventListener('error', function(ev){
+      if(!ev || !ev.message || /ResizeObserver|Script error/i.test(ev.message)) return;
+      report(ev.message, String(ev.filename || '').split('/').pop()+':'+(ev.lineno || 0));
+    });
+    window.addEventListener('unhandledrejection', function(ev){
+      var r = ev && ev.reason, m = r && (r.message || String(r));
+      if(!m || /permission|offline|network|Failed to fetch|unavailable|quota/i.test(m)) return;
+      report('وعد مرفوض: '+m);
+    });
+  }
+  /* لو توقيت الجهاز مش توقيت القاهرة، التواريخ والتقارير ممكن تتسجل في يوم غلط */
+  function checkDeviceClock(){
+    try{
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '', day = todayStr();
+      if(tz && tz !== 'Africa/Cairo' && localStorage.getItem('oroots_tzwarn') !== day){
+        localStorage.setItem('oroots_tzwarn', day);
+        setTimeout(function(){ toast('⚠️ توقيت جهازك ('+tz+') مختلف عن القاهرة — التواريخ والتقارير هتتسجل بتوقيته', 9000); }, 5000);
+      }
+    }catch(e){}
+  }
   function setupTheme(){
+    installErrorReporter(); checkDeviceClock();
     var pal = null; try{ pal = localStorage.getItem('oroots_palette'); }catch(e){}
     setPalette(pal==='vivid' ? 'vivid' : 'calm', false);
     $('#btn-palette').addEventListener('click', function(){ var next = document.documentElement.getAttribute('data-palette')==='vivid' ? 'calm' : 'vivid'; setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : 'اتفعّل المظهر الهادي'); });
@@ -14377,7 +14272,7 @@
         me = {id:'admin-'+genId(), username:email, role:'admin', permissions:{}};
         list = list.concat([me]);
         return db.doc('settings/users').set({list:list})
-          .then(function(){ return db.doc('roles/'+email).set({role:'admin'}); })
+          .then(function(){ return db.doc('roles/'+email).set({role:'admin', perms:{}}); })
           .then(function(){ return {list:list, me:me}; });
       }
       return {list:list, me:me};
@@ -14401,7 +14296,7 @@
       startLiveClock();
       initDeviceNotif();
       setTimeout(notifDailySummary, 4000);
-      if(currentUserRole==='admin'){ subscribeAudit(); subscribeTrash(); }
+      if(currentUserRole==='admin'){ setTimeout(syncRolesOnce, 3500); }
       applyTabVisibility();
       $all('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')==='overview'); });
       $all('.panel').forEach(function(p){ p.classList.remove('active'); });
@@ -14484,7 +14379,21 @@
   var bootActive = false, bootIdleTimer = null, bootMaxTimer = null, renderSoonTimer = null;
   var bootSeen = {}, BOOT_EXPECTED = 28, bootAllSeen = false, bootDoneAt = 0, renderSoonFirst = 0;
   var BOOT_NAMES = {"k1": "readings", "k2": "settings/config", "k3": "settings/systems", "k4": "settings/users", "k5": "sops", "k6": "fertilizers", "k7": "targetProfiles", "k8": "nutrientRecipes", "k9": "pestlog", "k10": "bioReleases", "k11": "stickyTraps", "k12": "pheromoneTraps", "k13": "nursery", "k14": "irrigCalib", "k15": "inventory", "k16": "harvest", "k17": "settings/nurseryPlans", "k18": "instrumentCalibrations", "k19": "notifications", "k20": "qualityOrders", "k21": "qualitySorting", "k22": "qualityComplaints", "k23": "sprayPlan", "k24": "settings/cropNames", "k25": "settings/customers", "k26": "settings/nurseryTiles", "k27": "settings/pipeMaps", "k28": "nurseryPlanLog"};
+  /* عدّاد قراءات Firestore الفعلية (من السيرفر) في الجلسة دي — بيظهر للمدير في الإعدادات */
+  var readStats = {};
+  function noteReads(name, snap){
+    try{ if(snap && snap.docChanges && !(snap.metadata && snap.metadata.fromCache)) readStats[name] = (readStats[name] || 0) + snap.docChanges().length; }catch(e){}
+  }
+  function lazyAdminSubs(){ if(currentUserRole==='admin'){ subscribeAudit(); subscribeTrash(); } }   // سجل التدقيق والسلة بيتحمّلوا لما المدير يفتح الإعدادات بس (توفير قراءات)
+  function renderReadStats(){
+    var box = document.getElementById('reads-box'); if(!box) return;
+    var rows = Object.keys(readStats).map(function(k){ return [k, readStats[k]]; }).sort(function(a, b){ return b[1]-a[1]; });
+    var tot = rows.reduce(function(s, r){ return s + r[1]; }, 0);
+    box.innerHTML = '<p class="hint" style="margin:0 0 8px;">'+(currentUserRole==='admin' ? '' : '')+'قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
+      (rows.length ? '<div class="table-wrap"><table><thead><tr><th>المجموعة</th><th>قراءات</th></tr></thead><tbody>'+rows.slice(0, 15).map(function(r){ return '<tr><td class="ltr">'+escH(r[0])+'</td><td class="num">'+r[1]+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="empty-note">لسه مفيش قراءات من السيرفر في الجلسة دي (البيانات جت من الذاكرة المحلية).</p>');
+  }
   function bootTick(key, snap){
+    noteReads(BOOT_NAMES[key] || key, snap);
     if(DBG && !bootLogged[key]){ bootLogged[key] = 1; dbg('data: '+(BOOT_NAMES[key]||key)+(snap && snap.metadata ? (snap.metadata.fromCache ? '  <- cache' : '  <- server') : '')+(snap && snap.size!=null ? ('  ('+snap.size+' docs)') : '')); }
     if(!bootActive) return;
     bootSeen[key] = 1;
@@ -14507,11 +14416,7 @@
     if(l && !appEntered) l.classList.remove('hidden');
     hideSplash();
   }
-  function ensureBootBar(){
-    var e = document.getElementById('boot-bar');
-    if(!e){ e = document.createElement('div'); e.id = 'boot-bar'; e.className = 'hidden'; e.innerHTML = '<div class="boot-strip"></div><div class="boot-label">بيحمّل البيانات…</div>'; document.body.appendChild(e); }
-    return e;
-  }
+  
   function showBootBar(){
     bootActive = true; bootSeen = {}; bootLogged = {}; bootAllSeen = false;
     clearTimeout(bootIdleTimer); clearTimeout(bootMaxTimer);
