@@ -913,6 +913,7 @@
   :root{--sb-w:224px;--sb-c:54px;--sb-cur:var(--sb-w);--hdr-h:58px;}
   body.sb-collapsed{--sb-cur:var(--sb-c);}
   .wx-strip{position:sticky;top:var(--hdr-h);z-index:19;}
+  #app > .wx-strip{margin-inline-start:calc(-1 * var(--sb-cur));transition:margin .2s ease;}
   nav.tabs#tabs{top:calc(var(--hdr-h) + var(--wx-h,0px));}
   #app{padding-inline-start:var(--sb-cur);transition:padding .2s ease;}
   #app > header{margin-inline-start:calc(-1 * var(--sb-cur));transition:margin .2s ease;}
@@ -927,7 +928,7 @@
   #sb-tip{position:fixed;z-index:60;background:var(--ink);color:var(--surface);padding:6px 12px;border-radius:10px;font-size:.8rem;font-weight:700;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;transform:translateY(-50%);white-space:nowrap;}
   #sb-tip.show{opacity:1;}
   @media(max-width:719px){
-    #app{padding-inline-start:var(--sb-c);} #app > header{margin-inline-start:calc(-1 * var(--sb-c));}
+    #app{padding-inline-start:var(--sb-c);} #app > header{margin-inline-start:calc(-1 * var(--sb-c));} #app > .wx-strip{margin-inline-start:calc(-1 * var(--sb-c));}
     body:not(.sb-collapsed) nav.tabs#tabs{box-shadow:0 0 30px rgba(0,0,0,.28);}
     main{padding-inline:10px;}
   }
