@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7b81tV5d51/fZAUjmtz7xaJ7RbofuR3GghD0VhaOP0A=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WP7cLVdGAeCS2VgWsIAA1YrwzMe6oVUiOUPfwLTAyLA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -6639,8 +6639,45 @@
       var mid = h + 0.5, src = (A.today.length && (mid <= nowH || !A.yest.length)) ? 'today' : 'yest', arr = A[src];
       hours.push({h:h, T:interp(arr, 'T', mid*60), RH:interp(arr, 'RH', mid*60), Rs:(sc !== null ? sc*shape(mid) : 0), src:src});
     }
-    return {hours:hours, nToday:A.today.length, nYest:A.yest.length, noRad:sc === null, radFrom:scT !== null ? 'today' : 'yest', sr:sr, ss:ss};
+    return {hours:hours, nToday:A.today.length, nYest:A.yest.length, noRad:sc === null, radFrom:scT !== null ? 'today' : 'yest', sr:sr, ss:ss, srSrc:(x && x.sunrise && x.sunset) ? 'weather' : 'default', sc:sc, used:A, shape:shape};
   }
+
+  /* تفاصيل الحساب: كل الأرقام اللي اتبنى عليها الاقتراح */
+  function irrAdvDetails(prof, res, a, e, fruit, plants, totalLpm, gh){
+    var f1 = function(v, d){ var m = Math.pow(10, d || 0); return (Math.round(v*m)/m).toLocaleString('en-US'); };
+    var auto = function(v, d){ return (v === '' || v === undefined || v === null) ? ' <span class="hint" style="margin:0;">(تلقائي للمحصول)</span>' : ' <span class="hint" style="margin:0;">(من إعداداتك)</span>'; };
+    var kv = function(k, v, note){ return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.86rem;"><div style="display:flex;justify-content:space-between;gap:10px;"><span>'+k+'</span><b dir="ltr">'+v+'</b></div>'+(note ? '<div class="hint" style="margin:2px 0 0;">'+note+'</div>' : '')+'</div>'; };
+    var t1 = '<div>'+
+      kv('المحصول / المرحلة', escH(a.crop)+' / '+IRR_STAGES[a.stage], 'من إعدادات المستشار')+
+      kv('معامل المحصول Kc', e.kc, auto(a.kc))+
+      kv('كثافة الزراعة (نبات/م²)', e.density, auto(a.density))+
+      kv('الغسيل / الصرف (٪)', e.leach, fruit ? auto(a.leach) : 'ورقيات NFT: بدون غسيل')+
+      kv('سرعة الهواء جوه الصوبة (م/ث)', e.wind, 'افتراضي 0.5 (هواء هادي جوه البيت المحمي)')+
+      (fruit ? kv('عدد نباتات النظام', plants || '—', 'من إعداداتك') + kv('حجم الريّة المستهدف (مل/نبتة)', e.eventMl, auto(a.eventMl)) + kv('التصرف الكلي للنظام (لتر/د)', totalLpm > 0 ? f1(totalLpm, 2) : '—', 'من جدول الري: النقاطات × تصرف النقطة') : kv('عدد النباتات', plants || '—', 'من الإنفوجراف'))+
+      kv('الشروق / الغروب', f1(prof.sr, 2).replace('.', ':')+' / '+f1(prof.ss, 2).replace('.', ':'), prof.srSrc === 'weather' ? 'من بيانات الطقس لموقعك' : 'افتراضي 6 → 18 (حدد موقع الطقس في الإعدادات لدقة أعلى)')+
+      '</div>';
+    var rd = function(arr){ return arr.length ? '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>°C</th><th>رطوبة ٪</th><th>لوكس</th><th>إشعاع W/م²</th></tr></thead><tbody>'+arr.map(function(r){ var m = r.m; return '<tr><td class="ltr num">'+pad(Math.floor(m/60))+':'+pad(m%60)+'</td><td class="num">'+f1(r.T, 1)+'</td><td class="num">'+f1(r.RH)+'</td><td class="num">'+(isFinite(r.lux) ? f1(r.lux) : '—')+'</td><td class="num">'+(isFinite(r.lux) ? f1(climateRadiationWm2(r.lux)) : '—')+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="hint" style="margin:2px 0;">مفيش قراءات.</p>'; };
+    var t2 = '<h4 style="margin:8px 0 2px;">اليوم ('+prof.nToday+' قراءة)</h4>'+rd(prof.used.today)+'<h4 style="margin:8px 0 2px;">إمبارح ('+prof.nYest+' قراءة)</h4>'+rd(prof.used.yest);
+    var src = {today:'اليوم', yest:'إمبارح'};
+    var t4 = '<div class="table-wrap"><table><thead><tr><th>الساعة</th><th>مصدر الحرارة/الرطوبة</th><th>°C</th><th>رطوبة ٪</th><th>VPD kPa</th><th>إشعاع W/م²</th><th>ET₀ ملم/س</th><th>ETc ملم/س</th><th>مل/نبتة</th></tr></thead><tbody>'+res.rows.map(function(r, i){
+      return '<tr'+(r.day ? '' : ' style="opacity:.6;"')+'><td class="ltr num">'+r.h+':00</td><td>'+src[prof.hours[i].src]+'</td><td class="num">'+f1(r.T, 1)+'</td><td class="num">'+f1(r.RH)+'</td><td class="num">'+f1(r.vpd, 2)+'</td><td class="num">'+f1(r.Rs)+'</td><td class="num">'+f1(r.et0, 3)+'</td><td class="num">'+f1(r.etc, 3)+'</td><td class="num"><b>'+f1(r.ml)+'</b></td></tr>'; }).join('')+'</tbody></table></div>';
+    var eqs = '<ul style="margin:4px 0;padding-inline-start:18px;line-height:1.9;">'+
+      '<li><b>الاحتياج المرجعي ET₀</b> (ملم/ساعة = لتر لكل م² في الساعة) بمعادلة FAO-56 Penman-Monteith بالساعة: ET₀ = [0.408·Δ·(Rn − G) + γ·(37/(T+273))·u₂·VPD] ÷ [Δ + γ·(1 + Cd·u₂)]</li>'+
+      '<li>VPD = es − ea، حيث es = 0.6108·e^(17.27·T/(T+237.3)) وea = es × الرطوبة؛ Δ ميل منحنى ضغط البخار؛ γ = 0.0674 kPa/°C (ضغط 101.3)</li>'+
+      '<li>Rn (صافي الإشعاع) = 75٪ من الإشعاع الداخلي (W/م² × 0.0036 → MJ/م²/س)؛ G = 10٪ من Rn بالنهار؛ Cd = 0.34 نهارًا و0.96 ليلًا؛ بالليل Rn = 0</li>'+
+      '<li><b>احتياج المحصول</b> ETc = ET₀ × Kc ('+e.kc+')</li>'+
+      '<li><b>مل لكل نبتة في الساعة</b> = ETc ÷ الكثافة ('+e.density+' نبات/م²) × 1000'+(e.leach ? ' ÷ (1 − الغسيل '+e.leach+'٪)' : '')+'</li>'+
+      '<li>الإشعاع الداخلي = اللوكس ÷ 126.7 (تحويل الضوء النهاري)؛ ولأن القراءات قليلة بيتوزّع على اليوم بشكل جيب الشمس: Rs(ساعة) = '+(prof.sc !== null ? f1(prof.sc) : '—')+' W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق))، والمعامل متوسط قراءات '+(prof.radFrom === 'today' ? 'اليوم' : 'إمبارح')+' اللي بعد الشروق بشوية</li>'+
+      '<li>الحرارة والرطوبة: بين قراءاتك بالتقريب الخطي (على الخط)، والساعات اللي بعد آخر قراءة النهارده بتتاخد من بروفايل إمبارح</li></ul>';
+    var evTxt = fruit ? ('الاحتياج اليومي <b>'+f1(res.dailyMl)+' مل/نبتة</b> ÷ حجم الريّة المستهدف <b>'+e.eventMl+' مل</b> = <b>'+res.n+' ريّة</b> (مقرّبة)، كل ريّة <b>'+f1(res.dailyMl/Math.max(1, res.n))+' مل/نبتة</b>'+(plants > 0 ? (' = '+f1(res.dailyMl/Math.max(1, res.n)*plants/1000, 1)+' لتر للنظام ('+plants+' نبتة)') : '')+(totalLpm > 0 && plants > 0 ? (' ÷ تصرف النظام '+f1(totalLpm, 2)+' لتر/د = <b>'+f1(res.dailyMl/Math.max(1, res.n)*plants/1000/totalLpm, 1)+' دقيقة تشغيل</b>') : '')+'. وأوقات الريات بتتوزّع بحيث كل ريّة تغطي نفس الحصة من احتياج النهار (فبتتزاحم وقت الذروة)، من ٥٪ لـ ٩٥٪ من احتياج ساعات النهار — يعني بعد الشروق بشوية وقبل الغروب بشوية. ساعات الليل (احتياجها قليل جدًا) بتتجمّع في إجمالي اليوم وبتتوزّع على ريات النهار.') : 'نظام ورقيات: مفيش جدول ريات من الاقتراح.';
+    return '<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:800;">📋 الأرقام اللي اتبنى عليها الحساب (تفاصيل)</summary>'+
+      '<h4 style="margin:10px 0 2px;">١) مدخلات المحصول والنظام</h4>'+t1+
+      '<h4 style="margin:10px 0 2px;">٢) قراءات المناخ المستخدمة — صوبة «'+escH(gh)+'»</h4>'+t2+
+      '<h4 style="margin:10px 0 2px;">٣) حساب كل ساعة</h4>'+t4+
+      '<h4 style="margin:10px 0 2px;">٤) المعادلات والثوابت</h4>'+eqs+
+      '<h4 style="margin:10px 0 2px;">٥) إزاي اتحدّدت الريات</h4><p style="margin:2px 0;line-height:1.9;">'+evTxt+'</p></details>';
+  }
+
   function renderIrrigAdvisor(box, sysId){
     if(!box) return;
     var sys = getSystem(sysId); if(!sys){ box.innerHTML = ''; return; }
@@ -6680,7 +6717,7 @@
       if(fruit){
         if(res.n){
           var nowMin = irrNowMin(), mm = function(t){ var q = t.split(':'); return parseInt(q[0],10)*60 + parseInt(q[1],10); };
-          sched = '<h3 style="margin:14px 0 4px;font-size:.95rem;">🗓️ جدول ري مقترح لليوم</h3><p class="hint" style="margin:0 0 6px;">ابدأ الري حوالي <strong>'+res.start+'</strong> وخلّص حوالي <strong>'+res.end+'</strong> — <strong>'+res.n+' ريّة</strong>، الريّة حوالي '+f1(res.events[0].ml)+' مل/نبتة'+(res.events[0].liters ? (' ('+f1(res.events[0].liters, 1)+' لتر للنظام)') : '')+(res.events[0].minutes ? (' = '+f1(res.events[0].minutes, 1)+' دقيقة تشغيل') : '')+'.</p>'+
+          sched = '<h3 style="margin:14px 0 4px;font-size:.95rem;">🗓️ جدول ري مقترح لليوم</h3><p class="hint" style="margin:0 0 6px;">الري بيتوزّع على ساعات <strong>النهار</strong> بس (من الشروق '+res.start+' لحد الغروب '+res.end+'): أول ريّة الساعة <strong>'+res.events[0].t+'</strong> وآخر ريّة الساعة <strong>'+res.events[res.n-1].t+'</strong> — <strong>'+res.n+' ريّة</strong>، الريّة حوالي '+f1(res.events[0].ml)+' مل/نبتة'+(res.events[0].liters ? (' ('+f1(res.events[0].liters, 1)+' لتر للنظام)') : '')+(res.events[0].minutes ? (' = '+f1(res.events[0].minutes, 1)+' دقيقة تشغيل') : '')+'.</p>'+
             '<div class="table-wrap"><table><thead><tr><th>#</th><th>الوقت</th><th>مل/نبتة</th><th>لتر للنظام</th><th>دقايق التشغيل</th></tr></thead><tbody>'+res.events.map(function(ev, i){
               return '<tr style="'+(mm(ev.t) < nowMin ? 'opacity:.5;' : '')+'"><td class="num">'+(i+1)+'</td><td class="ltr num"><b>'+ev.t+'</b></td><td class="num">'+f1(ev.ml)+'</td><td class="num">'+(ev.liters ? f1(ev.liters, 1) : '—')+'</td><td class="num">'+(ev.minutes ? f1(ev.minutes, 1) : '—')+'</td></tr>'; }).join('')+'</tbody></table></div>'+
             (plants <= 0 ? '<p class="hint">اكتب «عدد نباتات النظام» عشان تتحسب لترات النظام.</p>' : '')+(!(totalLpm > 0) ? '<p class="hint">دقايق التشغيل محتاجة «عدد النقاطات» و«تصرف النقطة» في جدول الري فوق.</p>' : '')+
@@ -6689,7 +6726,7 @@
       } else {
         sched = '<p class="hint help-note" style="margin-top:10px;">ده نظام ورقيات (NFT): المياه بتتدوّر في الأنابيب، فالأرقام فوق هي اللي النبات بيستهلكه (امتصاص + تبخّر) وبتتعوّض من الخزان. قارنها بالنقص اليومي في الخزان. برامج التشغيل (ON/OFF) بتفضل من «جدول الري» فوق.</p>';
       }
-      out += bars+sched+'<p class="hint help-note" style="margin-top:10px;">الحساب بمعادلة FAO-56 Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات '+(prof.nToday ? ('اليوم ('+prof.nToday+' قراءة)') : '')+(prof.nYest ? ((prof.nToday ? ' وإمبارح' : 'إمبارح')+' ('+prof.nYest+')') : '')+'، والباقي من بروفايل إمبارح) والإشعاع من اللوكس، × معامل المحصول Kc'+(e.leach ? ' ÷ (1 − الغسيل)' : '')+'. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.</p>';
+      out += bars+sched+(prof ? irrAdvDetails(prof, res, a, e, fruit, plants, totalLpm, gh) : '')+'<p class="hint help-note" style="margin-top:10px;">الحساب بمعادلة FAO-56 Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات '+(prof.nToday ? ('اليوم ('+prof.nToday+' قراءة)') : '')+(prof.nYest ? ((prof.nToday ? ' وإمبارح' : 'إمبارح')+' ('+prof.nYest+')') : '')+'، والباقي من بروفايل إمبارح) والإشعاع من اللوكس، × معامل المحصول Kc'+(e.leach ? ' ÷ (1 − الغسيل)' : '')+'. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.</p>';
     }
     box.innerHTML = '<p class="hint help-note">النظام بيحسب كام مل ماء النبتة الواحدة بتستهلكه في الساعة من الحرارة والرطوبة وشدة الإشعاع في الصوبة، واحتياجها اليومي، ويقترح ميعاد بداية الري وعدد الريات ووقت وكمية كل ريّة.</p>'+out+'<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:700;">⚙️ إعدادات المحصول والمستشار</summary>'+form+'</details>';
     if(edit){
@@ -14331,16 +14368,20 @@
      بيرجّع: rows بالساعة (مل/نبتة)، الإجمالي اليومي، الذروة، وبداية/نهاية الري وجدول ريات موزّع على قد الاحتياج (أكتر وقت الظهيرة) */
   function lgIrrigPlan(hours, o){
     var u2 = o.u2 > 0 ? o.u2 : 0.5, kc = o.kc > 0 ? o.kc : 1, dens = o.density > 0 ? o.density : 1, lf = Math.min(Math.max((o.leach || 0) / 100, 0), 0.6);
-    var rows = hours.map(function(x){ var et0 = lgEt0(x.T, x.RH, x.Rs, u2, x.Rs > 1), etc = et0 * kc; return {h:x.h, et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)}; });
+    var rows = hours.map(function(x){
+      var day = x.Rs > 1, et0 = lgEt0(x.T, x.RH, x.Rs, u2, day), etc = et0 * kc, es = 0.6108 * Math.exp(17.27 * x.T / (x.T + 237.3));
+      return {h:x.h, T:x.T, RH:x.RH, Rs:x.Rs, day:day, vpd:Math.max(es - es * Math.min(Math.max(x.RH, 1), 100) / 100, 0), et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)};
+    });
     var tot = rows.reduce(function(a, r){ return a + r.ml; }, 0), peak = rows.reduce(function(b, r){ return r.ml > b.ml ? r : b; }, rows[0]);
-    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [], start = null, end = null;
-    if(tot > 0){
-      var cum = [0]; rows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
-      var at = function(f){ var t = f * tot; for(var i = 0; i < rows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return rows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return 24; };
-      start = at(0.05); end = at(0.95);
+    var dayRows = rows.filter(function(r){ return r.day; }); if(!dayRows.length) dayRows = rows;       // الريات بتتوزّع على ساعات النهار بس (لو مفيش نهار بنستخدم كل الساعات)
+    var dayTot = dayRows.reduce(function(a, r){ return a + r.ml; }, 0), first = dayRows[0].h, last = dayRows[dayRows.length - 1].h + 1;
+    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [];
+    if(dayTot > 0 && n){
+      var cum = [0]; dayRows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
+      var at = function(f){ var t = f * dayTot; for(var i = 0; i < dayRows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return dayRows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return last; };
       for(var k = 0; k < n; k++){ var ml = tot / n, liters = ml * (o.plants || 0) / 1000; events.push({t:lgHHMM(at(0.05 + 0.9 * (k + 0.5) / n)), ml:ml, liters:liters, minutes:(o.totalLpm > 0 && liters > 0) ? liters / o.totalLpm : null}); }
     }
-    return {rows:rows, dailyMl:tot, peak:peak, n:n, start:start === null ? null : lgHHMM(start), end:end === null ? null : lgHHMM(end), events:events};
+    return {rows:rows, dailyMl:tot, dayMl:dayTot, peak:peak, n:n, start:lgHHMM(first), end:lgHHMM(last), events:events};
   }
 /*LOGIC-END*/
   function farmInsightLines(){

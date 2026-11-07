@@ -74,16 +74,20 @@
      بيرجّع: rows بالساعة (مل/نبتة)، الإجمالي اليومي، الذروة، وبداية/نهاية الري وجدول ريات موزّع على قد الاحتياج (أكتر وقت الظهيرة) */
   function lgIrrigPlan(hours, o){
     var u2 = o.u2 > 0 ? o.u2 : 0.5, kc = o.kc > 0 ? o.kc : 1, dens = o.density > 0 ? o.density : 1, lf = Math.min(Math.max((o.leach || 0) / 100, 0), 0.6);
-    var rows = hours.map(function(x){ var et0 = lgEt0(x.T, x.RH, x.Rs, u2, x.Rs > 1), etc = et0 * kc; return {h:x.h, et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)}; });
+    var rows = hours.map(function(x){
+      var day = x.Rs > 1, et0 = lgEt0(x.T, x.RH, x.Rs, u2, day), etc = et0 * kc, es = 0.6108 * Math.exp(17.27 * x.T / (x.T + 237.3));
+      return {h:x.h, T:x.T, RH:x.RH, Rs:x.Rs, day:day, vpd:Math.max(es - es * Math.min(Math.max(x.RH, 1), 100) / 100, 0), et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)};
+    });
     var tot = rows.reduce(function(a, r){ return a + r.ml; }, 0), peak = rows.reduce(function(b, r){ return r.ml > b.ml ? r : b; }, rows[0]);
-    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [], start = null, end = null;
-    if(tot > 0){
-      var cum = [0]; rows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
-      var at = function(f){ var t = f * tot; for(var i = 0; i < rows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return rows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return 24; };
-      start = at(0.05); end = at(0.95);
+    var dayRows = rows.filter(function(r){ return r.day; }); if(!dayRows.length) dayRows = rows;       // الريات بتتوزّع على ساعات النهار بس (لو مفيش نهار بنستخدم كل الساعات)
+    var dayTot = dayRows.reduce(function(a, r){ return a + r.ml; }, 0), first = dayRows[0].h, last = dayRows[dayRows.length - 1].h + 1;
+    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [];
+    if(dayTot > 0 && n){
+      var cum = [0]; dayRows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
+      var at = function(f){ var t = f * dayTot; for(var i = 0; i < dayRows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return dayRows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return last; };
       for(var k = 0; k < n; k++){ var ml = tot / n, liters = ml * (o.plants || 0) / 1000; events.push({t:lgHHMM(at(0.05 + 0.9 * (k + 0.5) / n)), ml:ml, liters:liters, minutes:(o.totalLpm > 0 && liters > 0) ? liters / o.totalLpm : null}); }
     }
-    return {rows:rows, dailyMl:tot, peak:peak, n:n, start:start === null ? null : lgHHMM(start), end:end === null ? null : lgHHMM(end), events:events};
+    return {rows:rows, dailyMl:tot, dayMl:dayTot, peak:peak, n:n, start:lgHHMM(first), end:lgHHMM(last), events:events};
   }
 /*LOGIC-END*/
 module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies, lgEt0: lgEt0, lgIrrigPlan: lgIrrigPlan, lgHHMM: lgHHMM}; })();
