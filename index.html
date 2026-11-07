@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-grr2jyVz2CoD/P+A8V5wK6+ylpRJLmFiexBelXFv7/c=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7b81tV5d51/fZAUjmtz7xaJ7RbofuR3GghD0VhaOP0A=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -2603,9 +2603,10 @@
     var dateKey = ts.slice(0,10);
     var entry = {
       id: genId(), ts: ts,
-      ph: parseFloat(data.ph), ec: parseFloat(data.ec), temp: parseFloat(data.temp),
+      ph: parseFloat(data.ph), ec: parseFloat(data.ec),
       note: data.note || '', by: currentUser || '', createdAt: Date.now()
     };
+    if(data.temp!==undefined && data.temp!=='' && isFinite(parseFloat(data.temp))) entry.temp = parseFloat(data.temp);
     if(data.moist!==undefined && data.moist!=='' && isFinite(parseFloat(data.moist))) entry.moist = parseFloat(data.moist);
     var existing = findDoc(sourceKey, dateKey, systemId);
     var entries = existing ? existing.entries.slice() : [];
@@ -6505,8 +6506,8 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var rows = flattenEntries('soil', systemId).filter(function(e){ return lfInRange('w-soil', e.ts); });
     if(!rows.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var lines = [['الوقت','pH','EC (mS/cm)','حرارة التربة (°C)','رطوبة التربة (%)','بواسطة','ملاحظة'].map(csvEscape).join(',')];
-    rows.forEach(function(e){ lines.push([e.ts, e.ph, e.ec, e.temp, e.moist, e.by, e.note].map(csvEscape).join(',')); });
+    var lines = [['الوقت','pH','EC (mS/cm)','رطوبة التربة (%)','بواسطة','ملاحظة'].map(csvEscape).join(',')];
+    rows.forEach(function(e){ lines.push([e.ts, e.ph, e.ec, e.moist, e.by, e.note].map(csvEscape).join(',')); });
     downloadsCap.save({filename:'oroots-soil-'+systemId+'-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); }).catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
   }
   function renderSoilSection(parts, systemId){
@@ -6517,19 +6518,18 @@
         '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-soil-ts')+'</div>'+
         '<div class="field-sm"><label>حموضة التربة pH</label><input type="number" step="any" min="0" max="14" class="ltr" id="ws-soil-ph" required></div>'+
         '<div class="field-sm"><label>EC التربة (mS/cm)</label><input type="number" step="any" min="0" max="20" class="ltr" id="ws-soil-ec" required></div>'+
-        '<div class="field-sm"><label>حرارة التربة (°C)</label><input type="number" step="any" min="0" max="60" class="ltr" id="ws-soil-temp" required></div>'+
         '<div class="field-sm"><label>رطوبة التربة (%)</label><input type="number" step="any" min="0" max="100" class="ltr" id="ws-soil-moist" required></div>'+
         '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-soil-note" placeholder="مثال: الصف 3، على بعد 20 سم من النقاط"></div>'+
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة التربة</button></div></form>';
     parts.table.innerHTML =
       '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc('#8D6E63')+'"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
       lfBarHtml('w-soil')+
-      '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الرطوبة %</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-soil-tbody"></tbody></table></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الرطوبة %</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-soil-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قياسات تربة. سجّل أول قياس من النموذج فوق.</p>');
     document.getElementById('ws-soil-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var v = function(k){ return document.getElementById('ws-soil-'+k).value; };
-      addReading('soil', {ts:nowLocalInputValue(), ph:v('ph'), ec:v('ec'), temp:v('temp'), moist:v('moist'), note:v('note')}, systemId).then(function(){
+      addReading('soil', {ts:nowLocalInputValue(), ph:v('ph'), ec:v('ec'), moist:v('moist'), note:v('note')}, systemId).then(function(){
         toast('تم حفظ قراءة التربة'); renderSoilPanel();
       }).catch(function(err){ console.error('soil save', err); toast('⛔ قراءة التربة ما اتحفظتش'+(err && err.code==='permission-denied' ? ': مفيش صلاحية كتابة (صلاحية التربة/المياه أو قواعد Firestore)' : (err && err.message ? (': '+err.message) : '')), 9000); });
     });
@@ -6538,7 +6538,7 @@
     entries.forEach(function(e){
       var dateKey = e.ts.slice(0,10), tr = document.createElement('tr');
       tr.setAttribute('data-lf', 'w-soil'); tr.setAttribute('data-d', dateKey);
-      tr.innerHTML = '<td class="ltr num">'+fmtTs(e.ts)+'</td><td class="num ltr">'+e.ph+'</td><td class="num ltr">'+e.ec+'</td><td class="num ltr">'+e.temp+'</td><td class="num ltr">'+(e.moist===undefined ? '—' : e.moist)+'</td><td>'+(e.by||'—')+'</td><td>'+escH(e.note||'—')+'</td><td><button class="del-btn" title="حذف">✕</button></td>';
+      tr.innerHTML = '<td class="ltr num">'+fmtTs(e.ts)+'</td><td class="num ltr">'+e.ph+'</td><td class="num ltr">'+e.ec+'</td><td class="num ltr">'+(e.moist===undefined ? '—' : e.moist)+'</td><td>'+(e.by||'—')+'</td><td>'+escH(e.note||'—')+'</td><td><button class="del-btn" title="حذف">✕</button></td>';
       tr.querySelector('.del-btn').addEventListener('click', function(){ if(confirm('تحذف القراءة دي؟')) deleteReading('soil', dateKey, e.id, systemId).then(function(){ toast('اتحذفت'); renderSoilPanel(); }); });
       tb.appendChild(tr);
     });
@@ -6594,6 +6594,123 @@
     if(everyMin > 0 && a !== null && b !== null){ if(b < a) b += 1440; for(var t = a; t <= b && times.length < 96; t += everyMin) times.push(t); }
     return {everyMin:everyMin, run:run, drippers:d, mlMin:mlMin, perPointLpm:perPointLpm, lph:mlMin*60/1000, totalLpm:totalLpm, perIrrL:perIrrL, times:times, dailyL:perIrrL*times.length};
   }
+
+  /* ---------- مستشار الري من المناخ: احتياج النبتة من الحرارة والرطوبة والإشعاع (Penman-Monteith × Kc) + جدول ريات مقترح ---------- */
+  /* قيم مرجعية عامة (FAO-56 ومراجع البيوت المحمية): كثافة نبات/م²، Kc لكل مرحلة، غسيل التربة ٪، وحجم الرية لكل نبتة بالمل. عدّلها حسب زراعتك */
+  var IRR_CROPS = {
+    'طماطم': {dens:2.5, kc:{early:0.6, mid:1.15, late:0.8}, leach:20, eventMl:150, fruit:true},
+    'خيار':  {dens:2,   kc:{early:0.6, mid:1.0,  late:0.75}, leach:20, eventMl:150, fruit:true},
+    'فلفل':  {dens:3,   kc:{early:0.6, mid:1.05, late:0.85}, leach:20, eventMl:120, fruit:true},
+    'خس':    {dens:25,  kc:{early:0.7, mid:1.0,  late:0.95}, leach:0, eventMl:0},
+    'ريحان': {dens:30,  kc:{early:0.6, mid:1.0,  late:0.9},  leach:0, eventMl:0},
+    'جرجير': {dens:60,  kc:{early:0.7, mid:1.0,  late:0.95}, leach:0, eventMl:0}
+  };
+  var IRR_STAGES = {early:'مبكر (نمو أول)', mid:'ذروة (إثمار/نمو كامل)', late:'نهاية الموسم'};
+  function irrAdvGet(plan, fruit){
+    var a = Object.assign({crop:fruit ? 'طماطم' : 'خس', stage:'mid', kc:'', density:'', leach:'', plants:'', eventMl:'', wind:0.5}, plan.advisor || {});
+    return a;
+  }
+  function irrAdvEff(a, fruit){
+    var c = IRR_CROPS[a.crop] || {dens:fruit ? 2.5 : 25, kc:{early:0.7, mid:1, late:0.85}, leach:fruit ? 20 : 0, eventMl:fruit ? 150 : 0};
+    var n = function(v, d){ var x = parseFloat(v); return isFinite(x) && x >= 0 && v !== '' ? x : d; };
+    return {kc:n(a.kc, c.kc[a.stage] || c.kc.mid), density:n(a.density, c.dens) || c.dens, leach:n(a.leach, c.leach), eventMl:fruit ? n(a.eventMl, c.eventMl) : 0, wind:n(a.wind, 0.5) || 0.5, plants:n(a.plants, 0), def:c};
+  }
+  /* بروفايل الساعات (24) لصوبة: حرارة ورطوبة من قراءات اليوم (والباقي من أمس)، والإشعاع من شكل شمس جيبي بمعامل من اللوكس المسجّل */
+  function irrHourlyProfile(gh){
+    var today = todayStr(), yest = planAddDays(today, -1), ents = flattenEntries('climate', gh);
+    function dayArr(d){
+      return ents.filter(function(e){ return String(e.ts).slice(0,10) === d; }).map(function(e){
+        return {m:parseInt(String(e.ts).slice(11,13),10)*60 + parseInt(String(e.ts).slice(14,16),10), T:parseFloat(e.temp), RH:parseFloat(e.rh), lux:parseFloat(e.lux)};
+      }).filter(function(x){ return isFinite(x.T) && isFinite(x.RH) && isFinite(x.m); }).sort(function(a, b){ return a.m - b.m; });
+    }
+    var A = {today:dayArr(today), yest:dayArr(yest)};
+    if(!A.today.length && !A.yest.length) return null;
+    function interp(arr, k, m){
+      if(m <= arr[0].m) return arr[0][k]; if(m >= arr[arr.length-1].m) return arr[arr.length-1][k];
+      for(var i = 1; i < arr.length; i++){ if(m <= arr[i].m){ var a = arr[i-1], b = arr[i], f = b.m === a.m ? 0 : (m - a.m)/(b.m - a.m); return a[k] + (b[k] - a[k])*f; } }
+      return arr[arr.length-1][k];
+    }
+    var sr = 6, ss = 18, x = wxSame(wxExtra) ? wxExtra : null;
+    if(x && x.sunrise && x.sunset){ sr = parseInt(String(x.sunrise).slice(11,13),10) + parseInt(String(x.sunrise).slice(14,16),10)/60; ss = parseInt(String(x.sunset).slice(11,13),10) + parseInt(String(x.sunset).slice(14,16),10)/60; }
+    function shape(hh){ return (hh > sr && hh < ss) ? Math.sin(Math.PI*(hh - sr)/(ss - sr)) : 0; }
+    function scale(arr){ var v = []; arr.forEach(function(e){ var sh = shape(e.m/60); if(sh >= 0.25 && isFinite(e.lux)) v.push(climateRadiationWm2(e.lux)/sh); }); return v.length ? v.reduce(function(a, b){ return a + b; }, 0)/v.length : null; }
+    var scT = scale(A.today), sc = scT !== null ? scT : scale(A.yest), nowH = new Date().getHours() + new Date().getMinutes()/60, hours = [];
+    for(var h = 0; h < 24; h++){
+      var mid = h + 0.5, src = (A.today.length && (mid <= nowH || !A.yest.length)) ? 'today' : 'yest', arr = A[src];
+      hours.push({h:h, T:interp(arr, 'T', mid*60), RH:interp(arr, 'RH', mid*60), Rs:(sc !== null ? sc*shape(mid) : 0), src:src});
+    }
+    return {hours:hours, nToday:A.today.length, nYest:A.yest.length, noRad:sc === null, radFrom:scT !== null ? 'today' : 'yest', sr:sr, ss:ss};
+  }
+  function renderIrrigAdvisor(box, sysId){
+    if(!box) return;
+    var sys = getSystem(sysId); if(!sys){ box.innerHTML = ''; return; }
+    var fruit = isFruitSys(sysId), plan = getIrrigPlan(sysId), edit = canEdit('water'), gh = ghNameOf(sys), dis = edit ? '' : ' disabled';
+    var a = irrAdvGet(plan, fruit), e = irrAdvEff(a, fruit);
+    var leafy = !fruit ? irrLeafyCalc(sysId, plan) : null, fr = fruit ? irrFruitCalc(plan) : null;
+    var plants = e.plants > 0 ? e.plants : (leafy ? leafy.plants : 0), totalLpm = fruit ? fr.totalLpm : leafy.totalLpm;
+    var prof = irrHourlyProfile(gh), res = prof ? lgIrrigPlan(prof.hours, {kc:e.kc, density:e.density, leach:e.leach, plants:plants, eventMl:e.eventMl, totalLpm:totalLpm, u2:e.wind}) : null;
+    var cropOpts = Object.keys(IRR_CROPS).concat(['أخرى']).map(function(c){ return '<option'+(c === a.crop ? ' selected' : '')+'>'+escH(c)+'</option>'; }).join('');
+    var stageOpts = Object.keys(IRR_STAGES).map(function(k){ return '<option value="'+k+'"'+(k === a.stage ? ' selected' : '')+'>'+IRR_STAGES[k]+'</option>'; }).join('');
+    var ph = function(v){ return ' placeholder="'+escH(v)+'"'; };
+    var form = '<form class="entry-form" id="adv-form"><div class="form-grid">'+
+      '<div class="field-sm"><label>المحصول</label><select id="adv-crop"'+dis+'>'+cropOpts+'</select></div>'+
+      '<div class="field-sm"><label>المرحلة</label><select id="adv-stage"'+dis+'>'+stageOpts+'</select></div>'+
+      '<div class="field-sm"><label>معامل المحصول Kc</label><input type="number" step="0.01" min="0.1" class="ltr" id="adv-kc" value="'+escH(a.kc)+'"'+ph('تلقائي '+e.def.kc[a.stage])+dis+'></div>'+
+      '<div class="field-sm"><label>الكثافة (نبات/م²)</label><input type="number" step="0.1" min="0.1" class="ltr" id="adv-dens" value="'+escH(a.density)+'"'+ph('تلقائي '+e.def.dens)+dis+'></div>'+
+      (fruit ? '<div class="field-sm"><label>الغسيل / الصرف (٪)</label><input type="number" step="1" min="0" max="60" class="ltr" id="adv-leach" value="'+escH(a.leach)+'"'+ph('تلقائي '+e.def.leach)+dis+'></div>'+
+        '<div class="field-sm"><label>عدد نباتات النظام</label><input type="number" step="1" min="1" class="ltr" id="adv-plants" value="'+escH(a.plants)+'"'+dis+'></div>'+
+        '<div class="field-sm"><label>حجم الريّة لكل نبتة (مل)</label><input type="number" step="10" min="20" class="ltr" id="adv-event" value="'+escH(a.eventMl)+'"'+ph('تلقائي '+e.def.eventMl)+dis+'></div>' : '')+
+      '<div class="field-sm"><label>سرعة الهواء جوه الصوبة (م/ث)</label><input type="number" step="0.1" min="0.1" class="ltr" id="adv-wind" value="'+escH(a.wind)+'"'+dis+'></div></div>'+
+      (edit ? '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الإعدادات</button></div>' : '')+'</form>';
+    var out = '';
+    if(!prof){
+      out = '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">محتاج قراءات مناخ (حرارة ورطوبة وإضاءة) للصوبة «'+escH(gh)+'» النهارده أو إمبارح عشان يتحسب الاحتياج.</div>';
+    } else {
+      var nowH = new Date().getHours(), cur = res.rows[nowH], f1 = function(v, d){ return (Math.round(v*Math.pow(10, d || 0))/Math.pow(10, d || 0)).toLocaleString('en-US'); };
+      var sofar = res.rows.slice(0, nowH + 1).reduce(function(t, r){ return t + r.ml; }, 0);
+      out = (prof.noRad ? '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ مفيش قراءات إضاءة (لوكس) كفاية — من غير الإشعاع الاحتياج هيطلع أقل من الحقيقي. سجّل قراءات مناخ بالنهار.</div>' : '')+
+        '<div class="climate-stats">'+
+        climateStatChip('استهلاك النبتة دلوقتي', f1(cur.ml), 'مل/ساعة')+
+        climateStatChip('الذروة', f1(res.peak.ml), 'مل/ساعة (الساعة '+res.peak.h+':00)')+
+        climateStatChip('احتياج النبتة اليوم', f1(res.dailyMl/1000, 2), 'لتر ('+f1(res.dailyMl)+' مل)')+
+        climateStatChip('اتستهلك لحد دلوقتي', f1(sofar/1000, 2), 'لتر/نبتة')+
+        (plants > 0 ? climateStatChip('للنظام كله اليوم', f1(res.dailyMl*plants/1000), 'لتر ('+f1(plants)+' نبتة)') : '')+'</div>';
+      var bars = '<div style="display:flex;align-items:flex-end;gap:2px;height:70px;margin:8px 0 2px;direction:ltr;">'+res.rows.map(function(r){ var hgt = res.peak.ml > 0 ? Math.max(2, Math.round(r.ml/res.peak.ml*64)) : 2; return '<div title="'+r.h+':00 — '+Math.round(r.ml)+' مل/ساعة" style="flex:1;height:'+hgt+'px;border-radius:3px 3px 0 0;background:'+(r.h === nowH ? 'var(--alert)' : 'var(--water)')+';opacity:'+(r.h === nowH ? 1 : 0.75)+';"></div>'; }).join('')+'</div><div style="display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted);direction:ltr;"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div>';
+      var sched = '';
+      if(fruit){
+        if(res.n){
+          var nowMin = irrNowMin(), mm = function(t){ var q = t.split(':'); return parseInt(q[0],10)*60 + parseInt(q[1],10); };
+          sched = '<h3 style="margin:14px 0 4px;font-size:.95rem;">🗓️ جدول ري مقترح لليوم</h3><p class="hint" style="margin:0 0 6px;">ابدأ الري حوالي <strong>'+res.start+'</strong> وخلّص حوالي <strong>'+res.end+'</strong> — <strong>'+res.n+' ريّة</strong>، الريّة حوالي '+f1(res.events[0].ml)+' مل/نبتة'+(res.events[0].liters ? (' ('+f1(res.events[0].liters, 1)+' لتر للنظام)') : '')+(res.events[0].minutes ? (' = '+f1(res.events[0].minutes, 1)+' دقيقة تشغيل') : '')+'.</p>'+
+            '<div class="table-wrap"><table><thead><tr><th>#</th><th>الوقت</th><th>مل/نبتة</th><th>لتر للنظام</th><th>دقايق التشغيل</th></tr></thead><tbody>'+res.events.map(function(ev, i){
+              return '<tr style="'+(mm(ev.t) < nowMin ? 'opacity:.5;' : '')+'"><td class="num">'+(i+1)+'</td><td class="ltr num"><b>'+ev.t+'</b></td><td class="num">'+f1(ev.ml)+'</td><td class="num">'+(ev.liters ? f1(ev.liters, 1) : '—')+'</td><td class="num">'+(ev.minutes ? f1(ev.minutes, 1) : '—')+'</td></tr>'; }).join('')+'</tbody></table></div>'+
+            (plants <= 0 ? '<p class="hint">اكتب «عدد نباتات النظام» عشان تتحسب لترات النظام.</p>' : '')+(!(totalLpm > 0) ? '<p class="hint">دقايق التشغيل محتاجة «عدد النقاطات» و«تصرف النقطة» في جدول الري فوق.</p>' : '')+
+            (edit ? '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="adv-apply">⇩ طبّق على جدول الري (ري كل فترة ثابتة)</button></div>' : '');
+        } else sched = '<p class="hint">اكتب «حجم الريّة لكل نبتة» عشان يتوزّع الاحتياج على ريّات.</p>';
+      } else {
+        sched = '<p class="hint help-note" style="margin-top:10px;">ده نظام ورقيات (NFT): المياه بتتدوّر في الأنابيب، فالأرقام فوق هي اللي النبات بيستهلكه (امتصاص + تبخّر) وبتتعوّض من الخزان. قارنها بالنقص اليومي في الخزان. برامج التشغيل (ON/OFF) بتفضل من «جدول الري» فوق.</p>';
+      }
+      out += bars+sched+'<p class="hint help-note" style="margin-top:10px;">الحساب بمعادلة FAO-56 Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات '+(prof.nToday ? ('اليوم ('+prof.nToday+' قراءة)') : '')+(prof.nYest ? ((prof.nToday ? ' وإمبارح' : 'إمبارح')+' ('+prof.nYest+')') : '')+'، والباقي من بروفايل إمبارح) والإشعاع من اللوكس، × معامل المحصول Kc'+(e.leach ? ' ÷ (1 − الغسيل)' : '')+'. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.</p>';
+    }
+    box.innerHTML = '<p class="hint help-note">النظام بيحسب كام مل ماء النبتة الواحدة بتستهلكه في الساعة من الحرارة والرطوبة وشدة الإشعاع في الصوبة، واحتياجها اليومي، ويقترح ميعاد بداية الري وعدد الريات ووقت وكمية كل ريّة.</p>'+out+'<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:700;">⚙️ إعدادات المحصول والمستشار</summary>'+form+'</details>';
+    if(edit){
+      $('#adv-form', box).addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var g = function(id){ var el = $('#'+id, box); return el ? el.value.trim() : ''; };
+        var adv = {crop:g('adv-crop'), stage:g('adv-stage'), kc:g('adv-kc'), density:g('adv-dens'), wind:g('adv-wind') || 0.5};
+        if(fruit){ adv.leach = g('adv-leach'); adv.plants = g('adv-plants'); adv.eventMl = g('adv-event'); }
+        saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {advisor:adv})).then(function(){ toast('اتحفظت إعدادات المستشار'); renderIrrigAdvisor(box, sysId); }).catch(function(){ toast('ما اتحفظش — تأكد من الصلاحيات وقواعد Firestore'); });
+      });
+      var ap = $('#adv-apply', box);
+      if(ap) ap.addEventListener('click', function(){
+        if(!res || !res.n) return;
+        var mm = function(t){ var q = t.split(':'); return parseInt(q[0],10)*60 + parseInt(q[1],10); }, t0 = mm(res.events[0].t), t1 = mm(res.events[res.n-1].t);
+        var every = res.n > 1 ? Math.max(1, Math.round((t1 - t0)/(res.n - 1))) : 60, run = res.events[0].minutes ? Math.max(0.5, Math.round(res.events[0].minutes*10)/10) : irrNum(plan.runMin);
+        if(!confirm('هيتغيّر جدول الري لـ: من '+res.events[0].t+' لحد '+res.events[res.n-1].t+'، كل '+every+' دقيقة، تشغيل '+run+' دقيقة. (الجدول الثابت بيقرّب الأوقات المقترحة). تكمّل؟')) return;
+        saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {unit:'m', every:every, runMin:run, from:res.events[0].t, to:irrHM(t1 + 2)})).then(function(){ toast('اتطبّق على جدول الري'); renderIrrigSchedule($('#water-schedule'), sysId); renderIrrigAdvisor(box, sysId); });
+      });
+    }
+  }
+
   function irrNowMin(){ var d = new Date(); return d.getHours()*60 + d.getMinutes(); }
   function renderIrrigSchedule(box, sysId){
     if(!box) return;
@@ -6696,12 +6813,12 @@
   var soilSystemId = null, soilRangeDays = 30;
   function renderSoilCharts(box, systemId){
     RNG.soil = {get:function(){ return soilRangeDays; }, set:function(v){ soilRangeDays = v; }, apply:function(){ renderSoilCharts(box, systemId); }, opts:RNG_OPTS, def:30};
-    var labels = {ph:['حموضة التربة pH', 'pH'], ec:['EC التربة (mS/cm)', 'EC'], temp:['حرارة التربة (°C)', 'الحرارة'], moist:['رطوبة التربة (%)', 'الرطوبة']};
-    box.innerHTML = rngHtml('soil')+'<div class="mini-charts">'+['ph','ec','temp','moist'].map(function(m){
+    var labels = {ph:['حموضة التربة pH', 'pH'], ec:['EC التربة (mS/cm)', 'EC'], moist:['رطوبة التربة (%)', 'الرطوبة']};
+    box.innerHTML = rngHtml('soil')+'<div class="mini-charts">'+['ph','ec','moist'].map(function(m){
       return '<div class="chart-card"><h3>'+labels[m][0]+'</h3><div class="chart-wrap"><div id="soil-chart-'+m+'" class="svg-chart-holder"></div></div></div>';
     }).join('')+'</div>';
     var entries = flattenEntries('soil', systemId);
-    ['ph','ec','temp','moist'].forEach(function(m){
+    ['ph','ec','moist'].forEach(function(m){
       var el = document.getElementById('soil-chart-'+m); if(!el) return;
       renderSvgChart(el, [{key:'soil-'+m, label:labels[m][1], color:SOIL_COLORS[m], points:filterPointsByRange(pointsFor(entries, m), soilRangeDays)}], {height:200});
     });
@@ -7231,7 +7348,7 @@
       '<div data-sub="entry charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' <span class="status-pill" style="font-size:.7rem;vertical-align:middle;">'+GH_TYPES[sysGType(sys)].short+'</span></h2><button class="btn-danger-ghost btn-sm" id="btn-delete-system" style="border-radius:8px;">حذف النظام</button></div></div>'+
       '<div data-sub="entry">'+
         '<h2 class="section-title wt-group">📝 إدخال القياسات</h2><div id="water-forms"></div></div>'+
-      '<div data-sub="schedule"><h2 class="section-title wt-group">🕒 جدول الري</h2><div id="water-schedule"></div></div>'+
+      '<div data-sub="schedule"><h2 class="section-title wt-group">🕒 جدول الري</h2><div id="water-schedule"></div><h2 class="section-title wt-group">🌦️ مستشار الري من المناخ</h2><div id="water-advisor"></div></div>'+
       '<div data-sub="charts"><h2 class="section-title wt-group">📈 المخططات</h2><div id="water-drift"></div><div id="water-compare"></div><div id="water-calib-charts"></div></div>'+
       '<div data-sub="records"><h2 class="section-title wt-group">📋 السجلات</h2><div id="water-tables"></div></div>';
 
@@ -7240,6 +7357,7 @@
     renderWaterDrift($('#water-drift'), selectedSystemId);
     renderSystemComparisonCharts($('#water-compare'), selectedSystemId);
     renderIrrigSchedule($('#water-schedule'), selectedSystemId);
+    safe(function(){ renderIrrigAdvisor($('#water-advisor'), selectedSystemId); });
 
     var formsEl = $('#water-forms'), tablesEl = $('#water-tables');
     function mkBlock(parent){ var d = document.createElement('div'); d.className = 'water-source-block'; parent.appendChild(d); return d; }
@@ -14198,6 +14316,32 @@
     });
     return out;
   }
+
+  /* ===== احتياج النبات للمياه من المناخ: FAO-56 Penman-Monteith بالساعة (ET0) × معامل المحصول Kc ===== */
+  /* T حرارة °C، RH رطوبة %، RsWm2 إشعاع W/m²، u2 سرعة الهواء م/ث. بيرجّع ملم/ساعة (= لتر لكل م² في الساعة) */
+  function lgEt0(T, RH, RsWm2, u2, day){
+    var es = 0.6108 * Math.exp(17.27 * T / (T + 237.3)), ea = es * Math.min(Math.max(RH, 1), 100) / 100, vpd = Math.max(es - ea, 0);
+    var delta = 4098 * es / Math.pow(T + 237.3, 2), gamma = 0.0674;
+    var rn = day ? 0.75 * RsWm2 * 0.0036 : 0, g = day ? 0.1 * rn : 0, cd = day ? 0.34 : 0.96;   // Rn بالـ MJ/m²/h (صافي الإشعاع ≈ 75٪ من الإشعاع الداخلي)
+    var num = 0.408 * delta * (rn - g) + gamma * (37 / (T + 273)) * u2 * vpd;
+    return Math.max(num / (delta + gamma * (1 + cd * u2)), 0);
+  }
+  function lgHHMM(hours){ var m = Math.round(hours * 12) * 5; m = ((m % 1440) + 1440) % 1440; return (m < 600 ? '0' : '') + Math.floor(m / 60) + ':' + (m % 60 < 10 ? '0' : '') + (m % 60); }
+  /* hours: 24 عنصر {h, T, RH, Rs}. o: {kc, density (نبات/م²), leach (٪ غسيل)، plants (عدد نباتات النظام)، eventMl (حجم الرية المستهدف لكل نبتة بالمل)، totalLpm (تصرف النظام لتر/دقيقة)، u2}
+     بيرجّع: rows بالساعة (مل/نبتة)، الإجمالي اليومي، الذروة، وبداية/نهاية الري وجدول ريات موزّع على قد الاحتياج (أكتر وقت الظهيرة) */
+  function lgIrrigPlan(hours, o){
+    var u2 = o.u2 > 0 ? o.u2 : 0.5, kc = o.kc > 0 ? o.kc : 1, dens = o.density > 0 ? o.density : 1, lf = Math.min(Math.max((o.leach || 0) / 100, 0), 0.6);
+    var rows = hours.map(function(x){ var et0 = lgEt0(x.T, x.RH, x.Rs, u2, x.Rs > 1), etc = et0 * kc; return {h:x.h, et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)}; });
+    var tot = rows.reduce(function(a, r){ return a + r.ml; }, 0), peak = rows.reduce(function(b, r){ return r.ml > b.ml ? r : b; }, rows[0]);
+    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [], start = null, end = null;
+    if(tot > 0){
+      var cum = [0]; rows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
+      var at = function(f){ var t = f * tot; for(var i = 0; i < rows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return rows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return 24; };
+      start = at(0.05); end = at(0.95);
+      for(var k = 0; k < n; k++){ var ml = tot / n, liters = ml * (o.plants || 0) / 1000; events.push({t:lgHHMM(at(0.05 + 0.9 * (k + 0.5) / n)), ml:ml, liters:liters, minutes:(o.totalLpm > 0 && liters > 0) ? liters / o.totalLpm : null}); }
+    }
+    return {rows:rows, dailyMl:tot, peak:peak, n:n, start:start === null ? null : lgHHMM(start), end:end === null ? null : lgHHMM(end), events:events};
+  }
 /*LOGIC-END*/
   function farmInsightLines(){
     var nowMs = lgTs(nowLocalInputValue()), out = [];
@@ -14208,7 +14352,7 @@
     });
     systems.forEach(function(sy){
       var label = systemLabel(sy);
-      if(sysGType(sy)==='fruit') lgAnomalies(flattenEntries('soil', sy.id), ['ph','ec','temp','moist'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+label+' (تربة): '+a.text}); });
+      if(sysGType(sy)==='fruit') lgAnomalies(flattenEntries('soil', sy.id), ['ph','ec','moist'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+label+' (تربة): '+a.text}); });
       else [['irrigation','ري'],['drainage','صرف']].forEach(function(sr){ lgAnomalies(flattenEntries(sr[0], sy.id), ['ph','ec','temp'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+label+' ('+sr[1]+'): '+a.text}); }); });
     });
     return out;

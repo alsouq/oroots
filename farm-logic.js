@@ -59,5 +59,31 @@
     });
     return out;
   }
+
+  /* ===== احتياج النبات للمياه من المناخ: FAO-56 Penman-Monteith بالساعة (ET0) × معامل المحصول Kc ===== */
+  /* T حرارة °C، RH رطوبة %، RsWm2 إشعاع W/m²، u2 سرعة الهواء م/ث. بيرجّع ملم/ساعة (= لتر لكل م² في الساعة) */
+  function lgEt0(T, RH, RsWm2, u2, day){
+    var es = 0.6108 * Math.exp(17.27 * T / (T + 237.3)), ea = es * Math.min(Math.max(RH, 1), 100) / 100, vpd = Math.max(es - ea, 0);
+    var delta = 4098 * es / Math.pow(T + 237.3, 2), gamma = 0.0674;
+    var rn = day ? 0.75 * RsWm2 * 0.0036 : 0, g = day ? 0.1 * rn : 0, cd = day ? 0.34 : 0.96;   // Rn بالـ MJ/m²/h (صافي الإشعاع ≈ 75٪ من الإشعاع الداخلي)
+    var num = 0.408 * delta * (rn - g) + gamma * (37 / (T + 273)) * u2 * vpd;
+    return Math.max(num / (delta + gamma * (1 + cd * u2)), 0);
+  }
+  function lgHHMM(hours){ var m = Math.round(hours * 12) * 5; m = ((m % 1440) + 1440) % 1440; return (m < 600 ? '0' : '') + Math.floor(m / 60) + ':' + (m % 60 < 10 ? '0' : '') + (m % 60); }
+  /* hours: 24 عنصر {h, T, RH, Rs}. o: {kc, density (نبات/م²), leach (٪ غسيل)، plants (عدد نباتات النظام)، eventMl (حجم الرية المستهدف لكل نبتة بالمل)، totalLpm (تصرف النظام لتر/دقيقة)، u2}
+     بيرجّع: rows بالساعة (مل/نبتة)، الإجمالي اليومي، الذروة، وبداية/نهاية الري وجدول ريات موزّع على قد الاحتياج (أكتر وقت الظهيرة) */
+  function lgIrrigPlan(hours, o){
+    var u2 = o.u2 > 0 ? o.u2 : 0.5, kc = o.kc > 0 ? o.kc : 1, dens = o.density > 0 ? o.density : 1, lf = Math.min(Math.max((o.leach || 0) / 100, 0), 0.6);
+    var rows = hours.map(function(x){ var et0 = lgEt0(x.T, x.RH, x.Rs, u2, x.Rs > 1), etc = et0 * kc; return {h:x.h, et0:et0, etc:etc, ml:etc / dens * 1000 / (1 - lf)}; });
+    var tot = rows.reduce(function(a, r){ return a + r.ml; }, 0), peak = rows.reduce(function(b, r){ return r.ml > b.ml ? r : b; }, rows[0]);
+    var n = o.eventMl > 0 && tot > 0 ? Math.max(1, Math.min(24, Math.round(tot / o.eventMl))) : 0, events = [], start = null, end = null;
+    if(tot > 0){
+      var cum = [0]; rows.forEach(function(r){ cum.push(cum[cum.length - 1] + r.ml); });
+      var at = function(f){ var t = f * tot; for(var i = 0; i < rows.length; i++){ if(cum[i + 1] >= t){ var sp = cum[i + 1] - cum[i]; return rows[i].h + (sp > 0 ? (t - cum[i]) / sp : 0); } } return 24; };
+      start = at(0.05); end = at(0.95);
+      for(var k = 0; k < n; k++){ var ml = tot / n, liters = ml * (o.plants || 0) / 1000; events.push({t:lgHHMM(at(0.05 + 0.9 * (k + 0.5) / n)), ml:ml, liters:liters, minutes:(o.totalLpm > 0 && liters > 0) ? liters / o.totalLpm : null}); }
+    }
+    return {rows:rows, dailyMl:tot, peak:peak, n:n, start:start === null ? null : lgHHMM(start), end:end === null ? null : lgHHMM(end), events:events};
+  }
 /*LOGIC-END*/
-module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies}; })();
+module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies, lgEt0: lgEt0, lgIrrigPlan: lgIrrigPlan, lgHHMM: lgHHMM}; })();
