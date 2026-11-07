@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zCIc8TD2DHRKo1fgPQlEVEC+ZZBHCKyb+YaeOdPTvmw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-grr2jyVz2CoD/P+A8V5wK6+ylpRJLmFiexBelXFv7/c=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1131,6 +1131,7 @@
       <h1 class="page-title">المعادلات السمادية</h1>
       <div id="nutrients-body"></div>
       <div id="sol-calc"></div>
+      <div id="tank-log"></div>
     </section>
 
     <section class="panel" id="panel-pests">
@@ -1680,6 +1681,7 @@
   var inventoryItems = [];
   var costsLog = [];
   var handoverLog = [];
+  var tankLog = [];
   var inventoryFilterType = '';
   var inventoryQuery = '';
   function invNorm(t){ return String(t==null?'':t).toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim(); }
@@ -8023,6 +8025,84 @@
   function fmtPpm(v){ return fmtNum(v); }
 
 
+
+  /* ---------- سجل تحضير الخزان: كل مرة بتتحضّر فيها خلطة تسميد (النظام، الحجم، الأسمدة بالجرام) ---------- */
+  var tlDraft = null, tlOpen = false;
+  function tlSysLabel(id){ return id ? auditSysName(id) : '—'; }
+  function tlNewDraft(){
+    var rows = (typeof currentMix !== 'undefined' ? currentMix : []).filter(function(m){ return m.grams > 0; }).map(function(m){ return {fertilizerId:m.fertilizerId, grams:Math.round(m.grams*100)/100}; });
+    return {systemId:'', ts:nowLocalInputValue(), volume:currentTankVolume || '', rows:rows.length ? rows : [{fertilizerId:'', grams:''}], deduct:true};
+  }
+  /* خصم الأسمدة من المخزن (بنفس منطق زرار الخصم في الحاسبة): الأصناف المتطابقة بالاسم ووحدة كجم/جم بس */
+  function tlDeduct(items){
+    var matched = [], unmatched = [];
+    items.forEach(function(it){
+      var f = getFertilizer(it.fertilizerId); if(!f) return;
+      var inv = inventoryItems.filter(function(x){ return x.type==='fertilizer' && String(x.name).trim().toLowerCase()===String(f.name).trim().toLowerCase(); })[0];
+      if(!inv || inv.quantity==null){ unmatched.push(f.name); return; }
+      var q = inv.unit==='كجم' ? +(it.grams/1000).toFixed(3) : (inv.unit==='جم' ? +(+it.grams).toFixed(2) : null);
+      if(q===null){ unmatched.push(f.name+' (وحدة '+inv.unit+')'); return; }
+      matched.push({id:inv.id, qty:q});
+    });
+    return Promise.all(matched.map(function(m){ return deductInventoryQty(m.id, m.qty); })).then(function(){ return {deducted:matched.length, unmatched:unmatched}; });
+  }
+  function renderTankLog(){
+    var host = $('#tank-log'); if(!host) return;
+    if(!$('#tl-details', host)){
+      host.innerHTML = '<details class="chart-card" id="tl-details" style="margin-top:14px;"><summary style="cursor:pointer;font-weight:800;">🧪 سجل تحضير الخزان</summary>'+
+        '<p class="hint help-note">سجّل كل مرة بتحضّر فيها خزان تسميد: النظام اللي هيروح له والأسمدة بالجرام. من السجل ده التطبيق بيحسب كمية الأسمدة اللي اتستهلكت على كل دفعة، ومنها «معامل تحويل الأسمدة» وتكلفة السماد لكل كجم في تبويب نمو النبات (لازم تختار نفس النظام في الوزنة). «من الخلطة الحالية» بيملّي الأسمدة من حاسبة الوصفات فوق.</p>'+
+        '<div id="tl-form"></div><div id="tl-list"></div></details>';
+      var det = $('#tl-details', host); det.addEventListener('toggle', function(){ tlOpen = det.open; }); if(tlOpen) det.open = true;
+      tlDraft = tlNewDraft(); tlDrawForm();
+    }
+    tlDrawList();
+  }
+  function tlDrawForm(){
+    var box = $('#tl-form'); if(!box || !tlDraft) return; var d = tlDraft;
+    var fertOpts = function(sel){ return '<option value="">— اختار سماد —</option>'+allFertilizers().map(function(f){ return '<option value="'+escH(f.id)+'"'+(f.id===sel?' selected':'')+'>'+escH(f.name)+'</option>'; }).join(''); };
+    box.innerHTML = '<form class="entry-form" id="tl-f"><div class="form-grid">'+
+      '<div class="field-sm"><label>النظام</label><select id="tl-sys" required><option value="">— اختار —</option>'+systems.map(function(sy){ return '<option value="'+escH(sy.id)+'"'+(sy.id===d.systemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field-sm"><label>الوقت</label><input type="datetime-local" class="ltr" id="tl-ts" value="'+escH(d.ts)+'" required></div>'+
+      '<div class="field-sm"><label>حجم الخزان (لتر)</label><input type="number" step="any" min="0" class="ltr" id="tl-vol" value="'+escH(d.volume)+'" required></div></div>'+
+      '<div id="tl-rows">'+d.rows.map(function(r, i){ return '<div class="form-grid" style="margin-top:6px;align-items:end;"><div class="field-sm"><label>السماد</label><select class="tl-fert" data-i="'+i+'">'+fertOpts(r.fertilizerId)+'</select></div><div class="field-sm" style="display:flex;gap:6px;align-items:end;"><div style="flex:1;min-width:0;"><label>الكمية (جم)</label><input type="number" step="any" min="0" class="ltr tl-g" data-i="'+i+'" value="'+escH(r.grams)+'"></div><button type="button" class="del-btn tl-rm" data-i="'+i+'" title="شيل">✕</button></div></div>'; }).join('')+'</div>'+
+      '<div class="form-actions" style="margin-top:8px;flex-wrap:wrap;"><button type="button" class="btn btn-ghost btn-sm" id="tl-add">+ سماد</button><button type="button" class="btn btn-ghost btn-sm" id="tl-fromcalc">⇩ من الخلطة الحالية</button></div>'+
+      '<label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:8px 0;"><input type="checkbox" id="tl-deduct" style="width:auto;"'+(d.deduct?' checked':'')+'> اخصم الكميات من المخزن (الأصناف المتطابقة بالاسم ووحدة كجم/جم)</label>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ التحضير</button></div></form>';
+    var sync = function(){ d.systemId = $('#tl-sys', box).value; d.ts = $('#tl-ts', box).value; d.volume = $('#tl-vol', box).value; d.deduct = $('#tl-deduct', box).checked; };
+    $all('.tl-fert', box).forEach(function(el){ el.addEventListener('change', function(){ d.rows[parseInt(el.getAttribute('data-i'),10)].fertilizerId = el.value; }); });
+    $all('.tl-g', box).forEach(function(el){ el.addEventListener('input', function(){ d.rows[parseInt(el.getAttribute('data-i'),10)].grams = el.value; }); });
+    $all('.tl-rm', box).forEach(function(el){ el.addEventListener('click', function(){ sync(); d.rows.splice(parseInt(el.getAttribute('data-i'),10), 1); if(!d.rows.length) d.rows.push({fertilizerId:'', grams:''}); tlDrawForm(); }); });
+    $('#tl-add', box).addEventListener('click', function(){ sync(); d.rows.push({fertilizerId:'', grams:''}); tlDrawForm(); });
+    $('#tl-fromcalc', box).addEventListener('click', function(){ sync(); var n = tlNewDraft(); d.rows = n.rows; if(!d.volume) d.volume = n.volume; tlDrawForm(); });
+    $('#tl-f', box).addEventListener('submit', function(ev){
+      ev.preventDefault(); sync();
+      var items = d.rows.map(function(r){ var f = getFertilizer(r.fertilizerId), g = parseFloat(r.grams); return (f && g > 0) ? {fertilizerId:f.id, name:f.name, grams:Math.round(g*100)/100} : null; }).filter(Boolean);
+      var vol = parseFloat(d.volume);
+      if(!d.systemId){ toast('اختار النظام'); return; }
+      if(!items.length){ toast('اكتب سماد واحد على الأقل بكميته'); return; }
+      if(!(vol > 0)){ toast('اكتب حجم الخزان'); return; }
+      if(!db){ toast('محتاج اتصال'); return; }
+      var rec = {id:genId(), ts:d.ts || nowLocalInputValue(), systemId:d.systemId, volume:vol, items:items, totalGrams:Math.round(items.reduce(function(a, x){ return a + x.grams; }, 0)*100)/100, deducted:!!d.deduct, by:currentUser||'', createdAt:Date.now()};
+      db.collection('tankLog').doc(rec.id).set(rec).then(function(){
+        logAudit('add', 'nutrients', 'تحضير خزان: '+tlSysLabel(rec.systemId)+' — '+rec.volume+' لتر — '+rec.totalGrams+' جم أسمدة');
+        var after = rec.deducted ? tlDeduct(items) : Promise.resolve(null);
+        return after.then(function(r){ toast('اتسجّل التحضير'+(r ? (r.deducted ? (' واتخصم من المخزن ('+r.deducted+' صنف)') : ' (ما اتخصمش من المخزن — مفيش أصناف متطابقة)') : '')+((r && r.unmatched.length) ? ' — من غير خصم: '+r.unmatched.join('، ') : ''), 7000); });
+      }).then(function(){ tlOpen = true; tlDraft = tlNewDraft(); tlDrawForm(); }).catch(function(err){ toast('⛔ التحضير ما اتحفظش'+(err && err.code==='permission-denied' ? ': مفيش صلاحية (تعديل المعادلات السمادية، وقواعد Firestore لازم تتحدّث)' : ''), 8000); });
+    });
+  }
+  function tlDrawList(){
+    var box = $('#tl-list'); if(!box) return;
+    var rows = tankLog.slice().sort(function(a, b){ return String(b.ts).localeCompare(String(a.ts)); }).slice(0, 20).map(function(t){
+      return '<tr data-id="'+escH(t.id)+'"><td class="ltr num">'+escH(fmtTs(t.ts))+'</td><td>'+escH(tlSysLabel(t.systemId))+'</td><td class="num">'+escH(t.volume)+'</td><td>'+escH((t.items||[]).map(function(x){ return x.name+' '+x.grams+'جم'; }).join('، '))+'</td><td class="num"><b>'+escH(t.totalGrams)+'</b></td><td><button class="del-btn tl-del" title="حذف">✕</button></td></tr>';
+    }).join('');
+    box.innerHTML = rows ? '<h3 style="margin:14px 0 6px;font-size:.92rem;">آخر التحضيرات</h3><div class="table-wrap"><table><thead><tr><th>الوقت</th><th>النظام</th><th>لتر</th><th>الأسمدة</th><th>جم</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '<p class="empty-note">لسه ما سجلتش تحضير خزان.</p>';
+    $all('.tl-del', box).forEach(function(b){ b.addEventListener('click', function(){
+      if(!requireAdminForDelete()) return; var id = b.closest('tr').getAttribute('data-id'); if(!confirm('تحذف التحضير ده؟ (مش هيرجّع الكمية للمخزن)')) return;
+      if(db) trashDelete('tankLog', id).then(function(){ toast('اتحذف'); });
+    }); });
+    applyPermissionLock(box, 'nutrients');
+  }
+
   /* ---------- حاسبة تعديل المحلول (pH / EC) ---------- */
   function solFactorGet(t){ var v = null; try{ v = parseFloat(localStorage.getItem('oroots_solf_'+t)); }catch(e){} return v > 0 ? v : 0; }
   function solFactorSet(t, v){ try{ localStorage.setItem('oroots_solf_'+t, String(v)); }catch(e){} }
@@ -8076,6 +8156,7 @@
     var body = $('#nutrients-body');
     if(!body) return;
     if($('#sol-calc') && !$('#sol-calc').firstChild) safe(renderSolCalc);
+    safe(renderTankLog);
 
     var ferts = allFertilizers();
     var stockPpm = computeStockPpm(currentMix, currentTankVolume);
@@ -12473,8 +12554,8 @@
   function panelOn(id){ var p = document.getElementById(id); return !!(p && p.classList.contains('active')); }
   /* ---------- سلة المحذوفات (المدير): أي حذف بيتحفظ منه نسخة ٣٠ يوم ---------- */
   var trashItems = [], trashSubbed = false;
-  var TRASH_LABELS = {costs:'تكلفة', harvest:'حصاد', inventory:'مخزن', nursery:'مشتل — صينية', pestlog:'مكافحة', bioReleases:'إطلاق حيوي', stickyTraps:'مصيدة لاصقة', pheromoneTraps:'مصيدة فيرمونية', sops:'إجراء SOP', fertilizers:'سماد', targetProfiles:'هدف غذائي', nutrientRecipes:'وصفة سمادية', irrigCalib:'معايرة ري', instrumentCalibrations:'معايرة جهاز', plantGrowth:'وزنة نمو', nurseryPlanLog:'سجل خطة المشتل'};
-  function trashLabel(d){ return d.name || d.title || (d.category ? (d.category+' '+(d.amount||'')) : '') || d.problemName || d.cropName || (d.crop ? (d.crop+' '+(d.date||'')) : '') || d.instrumentName || d.beneficialName || d.note || ''; }
+  var TRASH_LABELS = {tankLog:'تحضير خزان', costs:'تكلفة', harvest:'حصاد', inventory:'مخزن', nursery:'مشتل — صينية', pestlog:'مكافحة', bioReleases:'إطلاق حيوي', stickyTraps:'مصيدة لاصقة', pheromoneTraps:'مصيدة فيرمونية', sops:'إجراء SOP', fertilizers:'سماد', targetProfiles:'هدف غذائي', nutrientRecipes:'وصفة سمادية', irrigCalib:'معايرة ري', instrumentCalibrations:'معايرة جهاز', plantGrowth:'وزنة نمو', nurseryPlanLog:'سجل خطة المشتل'};
+  function trashLabel(d){ return d.name || d.title || (d.items && d.volume ? ('خزان '+d.volume+' لتر — '+(d.totalGrams||'')+' جم') : '') || (d.category ? (d.category+' '+(d.amount||'')) : '') || d.problemName || d.cropName || (d.crop ? (d.crop+' '+(d.date||'')) : '') || d.instrumentName || d.beneficialName || d.note || ''; }
   function trashDelete(coll, id){
     var ref = db.collection(coll).doc(id);
     return ref.get().then(function(snap){
@@ -14316,8 +14397,30 @@
     return lpm > 0 ? {lpm:lpm, ts:pick.ts, est:est, viaPlants:viaPlants} : null;
   }
   /* الإحصائيات الكاملة لدفعة: فترات + معاملات تحويل ضوء/مياه + RGR */
-  function growthStats(series, dliMap, calibFn){
-    var rows = [], i, lueN = 0, lueD = 0, wueN = 0, wueD = 0, waterTotal = 0, last = series[series.length-1], meta = last ? last.rec : {};
+  /* سعر الجرام من المخزن (سماد بنفس الاسم، وحدة كجم أو جم، وله سعر) أو null */
+  function fertPricePerG(fertilizerId, name){
+    var f = getFertilizer(fertilizerId), nm = String((f && f.name) || name || '').trim().toLowerCase();
+    var inv = inventoryItems.filter(function(x){ return x.type==='fertilizer' && String(x.name).trim().toLowerCase()===nm && parseFloat(x.price) > 0; })[0];
+    if(!inv) return null;
+    return inv.unit==='كجم' ? parseFloat(inv.price)/1000 : (inv.unit==='جم' ? parseFloat(inv.price) : null);
+  }
+  /* أسمدة تحضيرات الخزان بين تاريخين (من بعد fromDate لحد toDate) للنظام (أو لكل أنظمة الصوبة لو النظام فاضي)، مضروبة في نسبة الدفعة */
+  function growthFertBetween(systemId, greenhouse, fromDate, toDate, sharePct){
+    var ids = systemId ? [systemId] : systems.filter(function(sy){ return ghNameOf(sy) === greenhouse; }).map(function(sy){ return sy.id; });
+    var out = {g:0, cost:0, preps:0, unpriced:{}}, k = (parseFloat(sharePct) > 0 ? parseFloat(sharePct) : 100)/100;
+    tankLog.forEach(function(t){
+      var d = String(t.ts||'').slice(0,10);
+      if(ids.indexOf(t.systemId) < 0 || d <= fromDate || d > toDate) return;
+      out.preps++;
+      (t.items||[]).forEach(function(it){
+        var g = (parseFloat(it.grams)||0)*k, pr = fertPricePerG(it.fertilizerId, it.name);
+        out.g += g; if(pr !== null) out.cost += g*pr; else out.unpriced[it.name || it.fertilizerId] = 1;
+      });
+    });
+    return out;
+  }
+  function growthStats(series, dliMap, calibFn, fertFn){
+    var rows = [], i, lueN = 0, lueD = 0, wueN = 0, wueD = 0, waterTotal = 0, fertTotal = 0, fertCost = 0, fcrN = 0, fcrD = 0, unpriced = {}, anyTank = false, last = series[series.length-1], meta = last ? last.rec : {};
     var plants = parseFloat(meta.plants) || 0, dens = parseFloat(meta.density) || 0;
     for(i=0;i<series.length;i++){
       var p = series[i], prev = series[i-1], row = {p:p, gain:null, dli:null, lue:null, wue:null};
@@ -14335,6 +14438,13 @@
           }
           if(wl > 0){ row.water = wl; waterTotal += wl; }
           if(wl > 0 && plants > 0){ row.wue = (p.w - prev.w)*plants/wl; if(p.w > prev.w){ wueN += (p.w - prev.w)*plants; wueD += wl; } }
+          if(fertFn){
+            var fr = fertFn(p.rec.systemId || prev.rec.systemId, p.rec.greenhouse, prev.date, p.date, parseFloat(p.rec.fertShare) || parseFloat(prev.rec.fertShare) || 100);
+            if(fr && fr.preps > 0){
+              anyTank = true; row.fert = fr.g; fertTotal += fr.g; fertCost += fr.cost; Object.keys(fr.unpriced).forEach(function(k){ unpriced[k] = 1; });
+              if(fr.g > 0 && plants > 0){ row.fcr = (p.w - prev.w)*plants/fr.g; if(p.w > prev.w){ fcrN += (p.w - prev.w)*plants; fcrD += fr.g; } }
+            }
+          }
         }
       }
       rows.push(row);
@@ -14347,6 +14457,8 @@
       gainLast: rows.length > 1 && rows[rows.length-1].gain !== null ? rows[rows.length-1].gain : null,
       lue: lueD > 0 ? lueN/lueD : null, wue: wueD > 0 ? wueN/wueD : null,
       waterTotal: waterTotal, waterPerPlant: (waterTotal > 0 && plants > 0) ? waterTotal/plants : null,
+      fcr: fcrD > 0 ? fcrN/fcrD : null, fertTotal: fertTotal, fertCost: fertCost, fertUnpriced: Object.keys(unpriced), anyTank: anyTank,
+      fertCostPerKg: (fertCost > 0 && plants > 0 && last && last.w > 0 && Object.keys(unpriced).length === 0) ? fertCost/(plants*last.w/1000) : null,
       lueUnit: dens ? 'جم/mol' : 'جم/نبات لكل mol/m²'
     };
   }
@@ -14479,7 +14591,7 @@
     var series = cur ? growthSeries(cur.recs) : [], lastRec = series.length ? series[series.length-1].rec : null;
     var ref = growthRefFor(crop);
     var targetW = lastRec && parseFloat(lastRec.targetWeight) > 0 ? parseFloat(lastRec.targetWeight) : (ref && ref.wt ? Math.round((ref.wt[0]+ref.wt[1])/2) : 0);
-    var fit = growthFit(series, targetW), dliMap = growthDliMap(gh), st = series.length ? growthStats(series, dliMap, growthCalibLpm) : null;
+    var fit = growthFit(series, targetW), dliMap = growthDliMap(gh), st = series.length ? growthStats(series, dliMap, growthCalibLpm, growthFertBetween) : null;
     var f1 = function(v, d){ return v===null || v===undefined || !isFinite(v) ? '—' : (+v).toFixed(d===undefined ? 1 : d); };
     var chip = climateStatChip;
 
@@ -14501,6 +14613,7 @@
         '<div class="field-sm"><label>نظام الري (لحساب المياه من المعايرة)</label><select id="gr-sys"><option value="">— بدون —</option>'+systems.filter(function(x){ return ((x.greenhouse && x.greenhouse.trim()) ? x.greenhouse.trim() : 'بدون صوبة')===gh; }).map(function(x){ return '<option value="'+escH(x.id)+'"'+(lastRec && lastRec.systemId===x.id ? ' selected' : '')+'>'+escH(x.name)+'</option>'; }).join('')+'</select></div>'+
         '<div class="field-sm"><label>دقائق الري اليومية (إجمالي)</label><input type="number" step="1" min="0" class="ltr" id="gr-irmin" value="'+(lastRec && lastRec.irrigMin ? escH(lastRec.irrigMin) : '')+'" placeholder="مثلًا 90"></div>'+
         '<div class="field-sm"><label>مياه مستهلكة (لتر) — يدوي</label><input type="number" step="0.1" min="0" class="ltr" id="gr-water" placeholder="سيبه فاضي لو الحساب من المعايرة"></div>'+
+        '<div class="field-sm"><label>نسبة الدفعة من تحضيرات النظام (٪)</label><input type="number" step="1" min="1" max="100" class="ltr" id="gr-share" value="'+(lastRec && lastRec.fertShare ? escH(lastRec.fertShare) : 100)+'" title="لو النظام بيخدم أكتر من دفعة، اكتب نصيب الدفعة دي من الأسمدة"></div>'+
         '<div class="field-sm"><label>عدد نباتات الدفعة</label><input type="number" step="1" min="1" class="ltr" id="gr-plants" value="'+(lastRec && lastRec.plants ? escH(lastRec.plants) : '')+'" placeholder="لحساب كفاءة المياه"></div>'+
         '<div class="field-sm"><label>الكثافة (نبات/م²)</label><input type="number" step="0.1" min="0.1" class="ltr" id="gr-dens" value="'+(lastRec && lastRec.density ? escH(lastRec.density) : '')+'" placeholder="لحساب كفاءة الضوء"></div>'+
         '<div class="field-sm"><label>وزن الحصاد المستهدف (جم/نبات)</label><input type="number" step="1" min="1" class="ltr" id="gr-target" value="'+(targetW || '')+'" placeholder="لتنبؤ أدق"></div>'+
@@ -14517,10 +14630,14 @@
           chip('نمو يومي (آخر فترة)', f1(st.gainLast), 'جم/يوم')+chip('نمو يومي (متوسط)', f1(st.gainAvg), 'جم/يوم')+
           chip('معدل النمو النسبي RGR', f1(st.rgr), '%/يوم')+
           chip('معامل تحويل الضوء', f1(st.lue, 2), st.lueUnit)+chip('معامل تحويل المياه', f1(st.wue, 1), 'جم/لتر')+
-          (st.waterTotal > 0 ? chip('مياه الدفعة', f1(st.waterTotal, 0), 'لتر') : '')+(st.waterPerPlant !== null ? chip('مياه لكل نبات', f1(st.waterPerPlant, 2), 'لتر') : '')) : '')+
+          (st.waterTotal > 0 ? chip('مياه الدفعة', f1(st.waterTotal, 0), 'لتر') : '')+(st.waterPerPlant !== null ? chip('مياه لكل نبات', f1(st.waterPerPlant, 2), 'لتر') : '')+
+          (st.anyTank ? (chip('أسمدة الدفعة', st.fertTotal >= 1000 ? f1(st.fertTotal/1000, 2) : f1(st.fertTotal, 0), st.fertTotal >= 1000 ? 'كجم' : 'جم')+chip('معامل تحويل الأسمدة', f1(st.fcr, 1), 'جم نبات/جم سماد')+(st.fertCostPerKg !== null ? chip('تكلفة السماد لكل كجم نبات', f1(st.fertCostPerKg, 2), 'ج.م/كجم') : '')) : '')) : '')+
         '</div>'+
         (series.length < 2 ? '<p class="hint">سجّل وزنة تانية عشان يتحسب النمو والتنبؤ.</p>' : '')+
         (series.length > 1 && st.lue === null ? '<p class="hint">معامل الضوء محتاج بيانات DLI للصوبة دي في الفترة (من قراءات المناخ في النهار).</p>' : '')+
+        (series.length > 1 && !st.anyTank ? '<p class="hint">معامل تحويل الأسمدة محتاج تحضيرات خزان مسجّلة للنظام في الفترة (المعادلات السمادية ← سجل تحضير الخزان) وتختار نفس النظام في الوزنة.</p>' : '')+
+        (series.length > 1 && st.anyTank && st.fcr === null ? '<p class="hint">معامل الأسمدة محتاج عدد نباتات الدفعة (في نموذج الوزنة).</p>' : '')+
+        (st.anyTank && st.fertUnpriced.length ? '<p class="hint">💰 تكلفة السماد ما اتحسبتش لأن مفيش سعر في المخزن لـ: '+escH(st.fertUnpriced.join('، '))+' (اكتب «سعر الوحدة» للصنف بنفس الاسم، بوحدة كجم أو جم).</p>' : '')+
         (series.length > 1 && st.wue === null ? '<p class="hint">معامل المياه محتاج عدد نباتات الدفعة + مياه (يدوي، أو نظام ري ودقائق ري يومية عشان تتحسب من معايرة الري).</p>' : '')+
         (function(){ var a = st.rows.filter(function(r){ return r.waterSrc==='auto'; }); if(!a.length) return ''; var c = a[a.length-1].calib;
           return '<p class="hint help-note">💧 المياه المعلّمة (~) محسوبة من معايرة الري: '+f1(c.lpm, 2)+' لتر/دقيقة (معايرة '+escH(String(c.ts).slice(0,10))+(c.est ? ' — أقدم معايرة متاحة، بعد تاريخ الوزنة' : '')+(c.viaPlants ? ' — تقدير من تصرف النقطة × عدد النباتات' : '')+') × '+f1(a[a.length-1].irrigMin, 0)+' دقيقة/يوم × عدد الأيام.</p>'; })();
@@ -14544,11 +14661,11 @@
       }
       chartHtml = '<div class="chart-card" style="margin-top:14px;"><h3>منحنى نمو '+escH(crop)+' (جم/نبات)</h3><div class="chart-wrap"><div id="gr-chart" class="svg-chart-holder"></div></div></div>';
       body.__grDs = ds;
-      tblHtml = '<h2 class="section-title">سجل الوزنات</h2><div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الوزن (جم)</th><th>نمو/يوم</th><th>DLI</th><th>ضوء (جم/mol)</th><th>مياه (لتر)</th><th>مياه (جم/لتر)</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+
+      tblHtml = '<h2 class="section-title">سجل الوزنات</h2><div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الوزن (جم)</th><th>نمو/يوم</th><th>DLI</th><th>ضوء (جم/mol)</th><th>مياه (لتر)</th><th>مياه (جم/لتر)</th><th>سماد (جم)</th><th>جم/جم سماد</th><th>ملاحظة</th><th></th></tr></thead><tbody>'+
         series.slice().reverse().map(function(p){
           var row = st.rows[series.indexOf(p)];
           return '<tr data-id="'+escH(p.rec.id)+'"><td class="ltr num">'+escH(p.date)+'</td><td class="num">'+p.day+'</td><td class="num"><b>'+f1(p.w)+'</b></td><td class="num">'+f1(row.gain)+'</td>'+
-            '<td class="num">'+(row.dli ? f1(row.dli.sum)+(row.dli.est?'*':'') : '—')+'</td><td class="num">'+f1(row.lue, 2)+'</td><td class="num">'+(row.water > 0 ? ((row.waterSrc==='auto' ? '~' : '')+Math.round(row.water*10)/10) : '—')+'</td><td class="num">'+f1(row.wue)+'</td>'+
+            '<td class="num">'+(row.dli ? f1(row.dli.sum)+(row.dli.est?'*':'') : '—')+'</td><td class="num">'+f1(row.lue, 2)+'</td><td class="num">'+(row.water > 0 ? ((row.waterSrc==='auto' ? '~' : '')+Math.round(row.water*10)/10) : '—')+'</td><td class="num">'+f1(row.wue)+'</td><td class="num">'+(row.fert > 0 ? Math.round(row.fert*10)/10 : '—')+'</td><td class="num">'+f1(row.fcr)+'</td>'+
             '<td>'+escH(p.rec.note||'—')+'</td><td>'+(currentUserRole==='admin' ? '<button class="del-btn gr-del" title="حذف">✕</button>' : '')+'</td></tr>';
         }).join('')+'</tbody></table></div><p class="hint help-note">* DLI تقديري (فيه أيام من الفترة مفيهاش قراءات إضاءة كفاية).</p>';
     }
@@ -14599,7 +14716,7 @@
       if(!(w > 0)){ toast('اكتب وزن صحيح'); return; }
       if(!batch || !date){ toast('التاريخ ناقص'); return; }
       if(date < batch){ toast('تاريخ الوزنة قبل تاريخ بداية الدفعة'); return; }
-      var rec = {id:genId(), greenhouse:gh, crop:crop, batch:batch, date:date, avgWeight:w, sampleN:num('gr-n'), waterL:num('gr-water'), systemId:($('#gr-sys') ? $('#gr-sys').value : ''), irrigMin:num('gr-irmin'), plants:num('gr-plants'), density:num('gr-dens'), targetWeight:num('gr-target'), note:$('#gr-note').value.trim(), by:currentUser||'', createdAt:Date.now()};
+      var rec = {id:genId(), greenhouse:gh, crop:crop, batch:batch, date:date, avgWeight:w, sampleN:num('gr-n'), waterL:num('gr-water'), systemId:($('#gr-sys') ? $('#gr-sys').value : ''), irrigMin:num('gr-irmin'), fertShare:num('gr-share'), plants:num('gr-plants'), density:num('gr-dens'), targetWeight:num('gr-target'), note:$('#gr-note').value.trim(), by:currentUser||'', createdAt:Date.now()};
       saveGrowthRaw(rec).then(function(){
         logAudit('add', 'growth', 'وزنة '+crop+' — '+gh+' — '+date+' — '+w+' جم');
         growthSel.batch = batch; toast('اتسجّلت الوزنة'); renderGrowthPanel();
@@ -14653,6 +14770,8 @@
     'معدل النمو النسبي RGR': 'النسبة المئوية اللي بيزيدها وزن النبات كل يوم. بتقارن النمو بين فترات وأعمار مختلفة.',
     'RGR': 'معدل النمو النسبي: النسبة المئوية اللي بيزيدها وزن النبات كل يوم.',
     'معامل تحويل الضوء': 'كام جرام وزن طازج بيكبّرهم النبات لكل 1 mol من الضوء (DLI). كل ما زاد = استفادة أحسن من الضوء.',
+    'معامل تحويل الأسمدة': 'كام جرام وزن طازج بيكبّرهم النبات لكل 1 جرام أسمدة اتحضّرت للنظام (من سجل تحضير الخزان). كل ما زاد = استفادة أحسن من السماد.',
+    'أسمدة الدفعة': 'إجمالي الأسمدة (جم) من تحضيرات الخزان للنظام بين وزنات الدفعة، مضروبة في نسبة الدفعة من الخزان.',
     'معامل تحويل المياه': 'كام جرام بيكبّرهم النبات لكل لتر مياه مستهلك. كل ما زاد = استفادة أحسن من المياه.',
     'مياه الدفعة': 'إجمالي المياه المستهلكة للدفعة (يدوي أو محسوبة من معايرة الري).',
     'مياه لكل نبات': 'إجمالي مياه الدفعة ÷ عدد النباتات.',
@@ -15606,6 +15725,11 @@
       handoverLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       noteReads('handover', snap); renderAllSoon();
     }, function(err){ console.error('handover snapshot error', err); });
+
+    histQ('tankLog','createdAt').limit(3000).onSnapshot(function(snap){
+      tankLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      noteReads('tankLog', snap); renderAllSoon();
+    }, function(err){ console.error('tankLog snapshot error', err); });
 
     histQ('costs','date').limit(3000).onSnapshot(function(snap){
       costsLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
