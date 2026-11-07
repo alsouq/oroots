@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WP7cLVdGAeCS2VgWsIAA1YrwzMe6oVUiOUPfwLTAyLA=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJYAL5Klc+CD24pd5+kQlboQjN+vFDUXOKt02E1hnPI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -344,6 +344,7 @@
     padding:2px 9px;font-size:0.68rem;font-weight:700;
   }
   .status-pill.good{background:var(--good-soft);color:var(--good);}
+  #nutrients-body .table-wrap th,#nutrients-body .table-wrap td{text-align:center;} #nutrients-body .table-wrap th:first-child,#nutrients-body .table-wrap td:first-child{text-align:right;}
   .nut-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 14px 8px;margin-bottom:14px;}
   .nut-details{margin:10px 0;border:1px dashed var(--border);border-radius:10px;padding:8px 12px;}
   .nut-details summary{cursor:pointer;font-weight:700;font-size:0.85rem;margin-bottom:6px;}
@@ -961,21 +962,6 @@
   :root[data-palette="vivid"] .stat-card,:root[data-palette="vivid"] .chart-card,:root[data-palette="vivid"] .settings-card{border-color:color-mix(in srgb,var(--brand) 22%,var(--border));}
   :root[data-palette="vivid"] .range-pill.active,:root[data-palette="vivid"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
 
-  /* ===== مظهر CMYK: سماوي (C) + ماجنتا (M) + أصفر (Y) + أسود (K) ===== */
-  :root[data-palette="cmyk"]{--ink:#1D1D1B;--paper:#F6F7F5;--surface:#FFFFFF;--surface-2:#EAF3F7;--border:#D5DFE4;--muted:#566066;--brand:#00AEEF;--brand-strong:#0079AD;--brand-soft:#D3F1FD;--on-brand:#0B1F2A;--water:#00AEEF;--water-soft:#D3F1FD;--tank:#F2B600;--tank-soft:#FFF1BD;--alert:#EC008C;--alert-soft:#FFD3EC;--good:#0094CC;--good-soft:#D3F1FD;--shadow-card:0 1px 2px rgba(29,29,27,.07),0 12px 28px -14px rgba(0,120,175,.30);--shadow-raised:0 18px 44px -12px rgba(0,80,120,.34);}
-  @media (prefers-color-scheme: dark){:root[data-palette="cmyk"]:not([data-theme="light"]){--ink:#F1F3F4;--paper:#0D0E0F;--surface:#161819;--surface-2:#1E2326;--border:#2C3438;--muted:#9AA5AB;--brand:#00B9FF;--brand-strong:#5DD3FF;--brand-soft:#06344A;--on-brand:#06141C;--water:#00B9FF;--water-soft:#06344A;--tank:#FFD21F;--tank-soft:#3D3205;--alert:#FF2DA6;--alert-soft:#4A0A32;--good:#2FC6FF;--good-soft:#06344A;}}
-  :root[data-palette="cmyk"][data-theme="dark"]{--ink:#F1F3F4;--paper:#0D0E0F;--surface:#161819;--surface-2:#1E2326;--border:#2C3438;--muted:#9AA5AB;--brand:#00B9FF;--brand-strong:#5DD3FF;--brand-soft:#06344A;--on-brand:#06141C;--water:#00B9FF;--water-soft:#06344A;--tank:#FFD21F;--tank-soft:#3D3205;--alert:#FF2DA6;--alert-soft:#4A0A32;--good:#2FC6FF;--good-soft:#06344A;}
-  :root[data-palette="cmyk"] body{background:radial-gradient(900px 420px at 100% -8%,color-mix(in srgb,#00AEEF 14%,transparent),transparent 70%),radial-gradient(700px 360px at 0% 100%,color-mix(in srgb,#EC008C 8%,transparent),transparent 70%),radial-gradient(600px 300px at 50% 120%,color-mix(in srgb,#FFD400 9%,transparent),transparent 70%),var(--paper);background-attachment:fixed;}
-  :root[data-palette="cmyk"] #app > header{background:var(--surface);border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#00AEEF 0 25%,#EC008C 25% 50%,#FFD400 50% 75%,#1D1D1B 75% 100%) 1;}
-  :root[data-palette="cmyk"][data-theme="dark"] #app > header{border-image:linear-gradient(90deg,#00B9FF 0 25%,#FF2DA6 25% 50%,#FFD21F 50% 75%,#ECECEC 75% 100%) 1;}
-  :root[data-palette="cmyk"] .wx-strip{background:color-mix(in srgb,#00AEEF 7%,var(--surface));border-bottom-color:color-mix(in srgb,#00AEEF 25%,var(--border));}
-  :root[data-palette="cmyk"] nav.tabs#tabs{background:var(--surface);border-inline-end-color:color-mix(in srgb,#00AEEF 30%,var(--border));}
-  :root[data-palette="cmyk"] nav.tabs#tabs .tab-btn.active{background:color-mix(in srgb,var(--brand) 16%,var(--surface));color:var(--ink);box-shadow:inset 4px 0 0 var(--brand);}
-  :root[data-palette="cmyk"] nav.tabs#tabs .tab-btn:not(.active) .ic{color:var(--ink);}
-  :root[data-palette="cmyk"] h1.page-title{color:var(--ink);border-bottom:3px solid #EC008C;display:inline-block;padding-bottom:2px;}
-  :root[data-palette="cmyk"] .stat-card,:root[data-palette="cmyk"] .chart-card,:root[data-palette="cmyk"] .settings-card{border-color:color-mix(in srgb,#00AEEF 24%,var(--border));}
-  :root[data-palette="cmyk"] .sync-dot{background:var(--brand);} :root[data-palette="cmyk"] .sync-dot.off{background:var(--tank);}
-  :root[data-palette="cmyk"] .range-pill.active,:root[data-palette="cmyk"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
 </style>
 </head>
 <body>
@@ -1012,7 +998,7 @@
     <div class="header-actions">
       <span class="hello" id="hello-user"></span>
       <button class="icon-btn notif-bell" id="btn-notif" title="التنبيهات" aria-label="التنبيهات">🔔<span id="notif-badge" class="notif-badge hidden">0</span></button>
-      <button class="icon-btn" id="btn-palette" title="ألوان التطبيق: هادي / زاهي / CMYK" aria-label="ألوان التطبيق">🎨</button>
+      <button class="icon-btn" id="btn-palette" title="ألوان التطبيق: هادي / زاهي" aria-label="ألوان التطبيق">🎨</button>
       <button class="icon-btn" id="btn-theme" title="تبديل المظهر">◐</button>
       <button class="icon-btn" id="btn-logout" title="تسجيل الخروج">⎋</button>
     </div>
@@ -1177,8 +1163,8 @@
 
       <div class="settings-card" id="palette-card">
         <h3>🎨 ألوان التطبيق</h3>
-        <p class="hint help-note">«هادي» هو الشكل المعتاد، و«زاهي» ألوان أنضر، و«CMYK» ألوان الطباعة: سماوي (C) وماجنتا (M) وأصفر (Y) وأسود (K) في الواجهة وكل الشارتس (الماجنتا للتنبيه والأصفر للتحذير والسماوي للمياه). الاختيار خاص بحسابك ويتزامن بين أجهزتك، وتقدر تبدّل منه أو من زرار 🎨 اللي فوق.</p>
-        <div class="range-filter"><button type="button" class="range-pill pal-opt" data-pal="calm">هادي</button><button type="button" class="range-pill pal-opt" data-pal="vivid">زاهي</button><button type="button" class="range-pill pal-opt" data-pal="cmyk">CMYK</button></div>
+        <p class="hint help-note">«هادي» هو الشكل المعتاد، و«زاهي» ألوان أنضر (أخضر وأزرق وكهرماني وأحمر أوضح). الاختيار خاص بحسابك ويتزامن بين أجهزتك، وتقدر تبدّل منه أو من زرار 🎨 اللي فوق.</p>
+        <div class="range-filter"><button type="button" class="range-pill pal-opt" data-pal="calm">هادي</button><button type="button" class="range-pill pal-opt" data-pal="vivid">زاهي</button></div>
       </div>
 
       <div class="settings-card">
@@ -1654,6 +1640,261 @@
     {id:'d-namoo4', name:'موليبدات الصوديوم Sodium Molybdate (2H2O)', tank:'B', comp:{Mo:39.66}}
   ];
 
+  /* ---- محرك المرجع + مكتبته (hb-engine.js / hb-data.js) ---- */
+/*HB-BEGIN*/
+var HB_EL = [
+  {k:'N_NO3', n:'N (NO3-)', mw:14.007, eq:1, zi:1, lmc:71.46, emp:0.403791},
+  {k:'N_NH4', n:'N (NH4+)', mw:14.007, eq:1, zi:1, lmc:73.5, emp:-0.308967},
+  {k:'P',  n:'P',  mw:30.974, eq:3, zi:1, lmc:57, emp:0.142525},
+  {k:'K',  n:'K',  mw:39.098, eq:1, zi:1, lmc:73, emp:-0.110791},
+  {k:'Mg', n:'Mg', mw:24.305, eq:2, zi:2, lmc:106, emp:-0.358782},
+  {k:'Ca', n:'Ca', mw:40.078, eq:2, zi:2, lmc:119, emp:-0.283549},
+  {k:'S',  n:'S',  mw:32.066, eq:2, zi:2, lmc:160, emp:0.276118},
+  {k:'Fe', n:'Fe', mw:55.845, eq:2, zi:2, lmc:108, emp:0},
+  {k:'Mn', n:'Mn', mw:54.938, eq:2, zi:2, lmc:0, emp:0},
+  {k:'Zn', n:'Zn', mw:65.409, eq:2, zi:2, lmc:0, emp:0},
+  {k:'B',  n:'B',  mw:10.811, eq:1, zi:1, lmc:0, emp:0},
+  {k:'Cu', n:'Cu', mw:63.546, eq:2, zi:2, lmc:0, emp:0},
+  {k:'Si', n:'Si', mw:28.086, eq:2, zi:2, lmc:0, emp:0},
+  {k:'Mo', n:'Mo', mw:95.94,  eq:2, zi:2, lmc:76.35, emp:0},
+  {k:'Na', n:'Na', mw:22.990, eq:1, zi:1, lmc:50.01, emp:0},
+  {k:'Cl', n:'Cl', mw:35.453, eq:1, zi:1, lmc:0, emp:0}
+];
+var HB_SIO2 = 0.4684, HB_P2O5 = 2.2915, HB_K2O = 1.2047, HB_P2O5_MIX = 2.290;
+/* تقريب زي round() بتاع المرجع (Pascal بدقة extended): الأنصاف بتتقرّب لفوق، مع تعويض خطأ الـ double الصغير */
+function hbRound(v, p){
+  var t = Math.pow(10, p), x = Math.abs(v * t);
+  return (v < 0 ? -1 : 1) * Math.round(x * (1 + 1e-12)) / t + 0;
+}
+/* معامل تحويل ppm ← الوحدة المختارة (ppm | M | mM | mN) لعنصر رقم i */
+function hbUnitFactor(unit, i){
+  var e = HB_EL[i];
+  if(unit === 'M') return 1000 * e.mw;
+  if(unit === 'mM') return e.mw;
+  if(unit === 'mN') return e.mw / e.eq;
+  return 1;
+}
+/* أقل-معيار least squares بالـ SVD (نفس RMatrixSolveLS في ALGLIB بحد ١٠٠٠·eps):
+   A (m×n) ، b (m) ← x (n). One-sided Jacobi على Aᵀ. */
+function hbLeastSquares(A, b){
+  var m = A.length, n = m ? A[0].length : 0, x = [], i, j, p, q, k;
+  for(i=0;i<n;i++) x.push(0);
+  if(!m || !n) return x;
+  var cols = A.map(function(r){ return r.slice(); });
+  var V = []; for(j=0;j<m;j++){ var e = []; for(k=0;k<m;k++) e.push(j===k?1:0); V.push(e); }
+  for(var sweep=0; sweep<100; sweep++){
+    var rotated = false;
+    for(p=0;p<m-1;p++) for(q=p+1;q<m;q++){
+      var a=0, bb=0, g=0, cp=cols[p], cq=cols[q];
+      for(i=0;i<n;i++){ a += cp[i]*cp[i]; bb += cq[i]*cq[i]; g += cp[i]*cq[i]; }
+      if(a === 0 || bb === 0 || Math.abs(g) <= 1e-15 * Math.sqrt(a*bb)) continue;
+      rotated = true;
+      var zeta = (bb - a) / (2*g), t = (zeta >= 0 ? 1 : -1) / (Math.abs(zeta) + Math.sqrt(1 + zeta*zeta));
+      var c = 1 / Math.sqrt(1 + t*t), s = c * t;
+      for(i=0;i<n;i++){ var u = cp[i], w = cq[i]; cp[i] = c*u - s*w; cq[i] = s*u + c*w; }
+      var vp = V[p], vq = V[q];
+      for(k=0;k<m;k++){ var u2 = vp[k], w2 = vq[k]; vp[k] = c*u2 - s*w2; vq[k] = s*u2 + c*w2; }
+    }
+    if(!rotated) break;
+  }
+  var sv = cols.map(function(cl){ var s2 = 0; for(var ii=0;ii<n;ii++) s2 += cl[ii]*cl[ii]; return Math.sqrt(s2); });
+  var smax = 0; sv.forEach(function(s){ if(s > smax) smax = s; });
+  var thr = 1000 * 2.220446049250313e-16 * smax;
+  for(j=0;j<m;j++){
+    if(!(sv[j] > thr)) continue;
+    var proj = 0; for(k=0;k<m;k++) proj += V[j][k] * b[k];
+    var f = proj / (sv[j]*sv[j]);
+    for(i=0;i<n;i++) x[i] += f * cols[j][i];
+  }
+  return x;
+}
+/* الحساب الكامل.
+   in: {
+     subs:[{name, formula, comp:{key:%}, purity(0-1), liquid, cost(لكل ١٠٠٠ وحدة), conc:'A'|'B'|'C'|'0'|'', amount(وزن الستوك الحالي), fixed(وزن مثبّت)}],
+     solve:true|false, targets:{key:ppm}, water:{key:ppm}, volumeL, factor(معامل التركيز ≥١), ab:true|false,
+     dof:'S'|…, siMode:'Si'|'SiO2', ec:'lmc'|'emp', weightErr:0.01, volumeErr:0.1 }
+   out: {error?, warnings[], amounts[], cost[], totalCost, ppm[16] (نهائي بعد الماء)، net[16] (من الأسمدة بس)، ge[16], ie[16],
+         ec, ratios[], perSub[], stock:{A[],B[]}|null, mix:{pct[16],solids}|null, used[] } */
+function hbCompute(inp){
+  var subs = inp.subs || [], n = subs.length, i, j;
+  var out = {warnings:[], amounts:[], cost:[], used:[], perSub:[], ratios:[], stock:null, mix:null, ppm:[], net:[], ge:[], ie:[]};
+  var V = (inp.volumeL > 0 ? inp.volumeL : 1) / 1000;           // م³
+  var ab = !!inp.ab, factor = ab ? (inp.factor > 0 ? inp.factor : 1) : 1;
+  var siSio2 = inp.siMode === 'SiO2';
+  var water = [], target = [], contrib = [];
+  for(j=0;j<16;j++){
+    var key = HB_EL[j].k;
+    water.push(+(inp.water && inp.water[key]) || 0);
+    var tv = +(inp.targets && inp.targets[key]) || 0;
+    target.push(j === 12 && siSio2 ? tv * HB_SIO2 : tv);
+    var row = [];
+    for(i=0;i<n;i++) row.push(0.01 * (+(subs[i].comp && subs[i].comp[key]) || 0) * (subs[i].purity > 0 ? subs[i].purity : 1) / V);
+    contrib.push(row);
+  }
+  var pre = subs.map(function(s){ return Math.max(0, +(inp.solve ? s.fixed : s.amount) || 0) / factor; });
+  var sol = [];
+  for(i=0;i<n;i++) sol.push(0);
+  if(inp.solve){
+    if(ab){
+      for(i=0;i<n;i++) if(String(subs[i].conc) === '0'){ out.error = {code:'incompatible', name:subs[i].name}; return out; }
+    }
+    var dofIdx = -1;
+    HB_EL.forEach(function(e, idx){ if(e.n === inp.dof || e.k === inp.dof) dofIdx = idx; });
+    var rows = [], rhs = [];
+    for(j=0;j<16;j++){
+      if(!(target[j] > 0) || j === dofIdx) continue;
+      var sum = 0, fixedPpm = 0;
+      for(i=0;i<n;i++){ sum += contrib[j][i]; fixedPpm += pre[i] * contrib[j][i]; }
+      if(sum === 0){ out.error = {code:'noSource', element:HB_EL[j].n}; return out; }
+      rows.push(contrib[j].slice());
+      rhs.push(target[j] - water[j] - fixedPpm);
+    }
+    if(!rows.length){ out.error = {code:'noTargets'}; return out; }
+    sol = hbLeastSquares(rows, rhs);
+  }
+  var net = [], ge = [], ie = [];
+  var vErr = (+inp.volumeErr >= 0 ? +inp.volumeErr : 0.1) * 0.001, wErr = +inp.weightErr >= 0 ? +inp.weightErr : 0.01;
+  var tot = [];
+  for(i=0;i<n;i++) tot.push((sol[i] > 0 ? sol[i] : 0) + pre[i]);
+  for(j=0;j<16;j++){
+    var test = 0, upper = 0, lower = 0;
+    for(i=0;i<n;i++){
+      var used = (sol[i] > 0) || pre[i] > 0;
+      if(!used) continue;
+      test += tot[i] * contrib[j][i];
+      upper += (tot[i] + wErr) * contrib[j][i] * V / (V - vErr);
+      lower += (tot[i] - wErr) * contrib[j][i] * V / (V + vErr);
+    }
+    net.push(test);
+    if(target[j] !== 0){
+      ge.push((test + water[j]) * 100 / target[j] - 100);
+      ie.push(((upper - lower) * (100 / target[j])) / (2 * factor));
+    } else { ge.push(0); ie.push(0); }
+  }
+  out.net = net; out.ge = ge; out.ie = ie;
+  for(j=0;j<16;j++){
+    var v = net[j] + water[j];
+    if(j === 12 && siSio2) v = v / HB_SIO2;
+    out.ppm.push(hbRound(v, 3));
+  }
+  /* الكميات والتكلفة */
+  var totalCost = 0;
+  for(i=0;i<n;i++){
+    var amt = tot[i] * factor;
+    out.amounts.push(amt);
+    out.used.push(tot[i] > 0);
+    var c = hbRound(0.001 * tot[i] * (+subs[i].cost || 0) * factor, 1);
+    out.cost.push(c); totalCost += c;
+    if(inp.solve && !(sol[i] > 0) && !(pre[i] > 0)) out.warnings.push({code:'unused', name:subs[i].name});
+  }
+  out.totalCost = hbRound(totalCost, 1);
+  out.dispAmounts = out.amounts.map(function(a){ return hbRound(a, 3); });
+  /* تحذيرات الأخطاء */
+  for(j=0;j<16;j++){
+    if(ie[j] > 100) out.warnings.push({code:'ie', element:HB_EL[j].n});
+    if(ge[j] > 100) out.warnings.push({code:'ge', element:HB_EL[j].n});
+  }
+  /* EC */
+  var R = out.ppm, ec = 0, I = 0;
+  if(inp.ec === 'emp'){
+    for(j=0;j<16;j++) ec += R[j] * HB_EL[j].emp;
+    ec = hbRound(ec + 0.39661671, 3);
+  } else {
+    for(j=0;j<16;j++) I += HB_EL[j].zi * HB_EL[j].zi * (R[j] / (1000 * HB_EL[j].mw));
+    for(j=0;j<16;j++) ec += (R[j] / (1000 * HB_EL[j].mw)) * HB_EL[j].lmc * Math.exp(-0.7025187 * Math.sqrt(I) * Math.pow(HB_EL[j].zi, 1.5));
+    ec = hbRound(ec, 3);
+  }
+  out.ec = ec;
+  /* تحليل كل سماد على حدة (ppm) */
+  for(i=0;i<n;i++){
+    if(!(tot[i] > 0)) continue;
+    for(j=0;j<16;j++) if(contrib[j][i] > 0) out.perSub.push({name:subs[i].name, element:HB_EL[j].n, ppm:hbRound(tot[i] * contrib[j][i], 3), sub:i, el:j});
+  }
+  /* النسب */
+  out.ratios = hbRatios(R);
+  /* تحليل المحاليل المركّزة A / B */
+  if(ab){
+    var st = {A:[], B:[]};
+    ['A','B'].forEach(function(side){
+      for(j=0;j<16;j++){
+        var t2 = 0;
+        for(i=0;i<n;i++) if(tot[i] > 0 && String(subs[i].conc) === side) t2 += tot[i] * contrib[j][i] * V;
+        t2 = t2 * factor * 100 / (V * 1000000);
+        var nm = HB_EL[j].n, val;
+        if(nm === 'P'){ nm = 'P2O5'; val = hbRound(t2 * HB_P2O5, 3); }
+        else if(nm === 'K'){ nm = 'K2O'; val = hbRound(t2 * HB_K2O, 3); }
+        else val = hbRound(t2, 5);
+        st[side].push({name:nm, v:val});
+      }
+    });
+    out.stock = st;
+    ['A','B'].forEach(function(side){
+      if(st[side][5].v > 0 && st[side][6].v > 0) out.warnings.push({code:'caSulfate', side:side});
+      var s = 0; st[side].forEach(function(r){ s += r.v; });
+      if(s > 30) out.warnings.push({code:'tooConc', side:side});
+    });
+  }
+  /* تحليل الخلطة الجافة % (وزن/وزن) — لو كل المواد صلبة */
+  var allSolids = subs.every(function(s){ return !s.liquid; }), totW = 0, mixC = [];
+  for(j=0;j<16;j++) mixC.push(0);
+  for(i=0;i<n;i++){
+    var a3 = out.dispAmounts[i]; totW += a3;
+    for(j=0;j<16;j++) mixC[j] += a3 * contrib[j][i] * V;
+  }
+  if(allSolids && totW > 0){
+    out.mix = {solids:true, pct:HB_EL.map(function(e, jj){
+      var nm = e.n, v = hbRound(100 * mixC[jj] / totW, 3);
+      if(nm === 'K') v = hbRound(HB_K2O * 100 * mixC[jj] / totW, 3);
+      if(nm === 'P') v = hbRound(HB_P2O5_MIX * 100 * mixC[jj] / totW, 3);
+      return {name:nm === 'K' ? 'K2O' : nm === 'P' ? 'P2O5' : nm, v:v};
+    })};
+  }
+  out.sol = sol;
+  return out;
+}
+/* النسب بين العناصر (getratio) — بتتحسب من النتيجة النهائية ppm */
+function hbRatios(R){
+  function g(name){ for(var j=0;j<16;j++) if(HB_EL[j].n === name) return R[j]; return 0; }
+  function ratio(a, b, c, items, nSpecial){
+    var names = [a, b, c, ''], special = [-1, -1, -1], i;
+    for(i=0;i<3;i++){
+      if(names[i] === 'N'){ names[i] = 'N (NO3-)'; names[3] = 'N (NH4+)'; special[0] = i; }
+      if(names[i] === 'P2O5'){ names[i] = 'P'; special[1] = i; }
+      if(names[i] === 'K2O'){ names[i] = 'K'; special[2] = i; }
+    }
+    var t = [g(names[0]), g(names[1]), g(names[2]), names[3] ? g(names[3]) : 0];
+    if(!(t[0] > 0 && t[1] > 0 && t[2] > 0)) return '';
+    if(special[0] !== -1 && names[special[0]] === 'N (NO3-)') t[special[0]] = t[3] + t[special[0]];
+    if(special[1] !== -1 && names[special[1]] === 'P') t[special[1]] = t[special[1]] * HB_P2O5;
+    if(special[2] !== -1 && names[special[2]] === 'K') t[special[2]] = t[special[2]] * HB_K2O;
+    var r1 = hbRound(t[1] / t[0], 2), r2 = hbRound(t[2] / t[0], 2);
+    return items === 2 ? '1: ' + r1 : '1: ' + r1 + ': ' + r2;
+  }
+  return [
+    {label:'N: P: K', v:ratio('N', 'P', 'K', 3)},
+    {label:'N: P2O5: K2O', v:ratio('N', 'P2O5', 'K2O', 3)},
+    {label:'N: K', v:ratio('N', 'K', 'K', 2)},
+    {label:'N (NO3-): N (NH4+)', v:ratio('N (NO3-)', 'N (NH4+)', 'K', 2)},
+    {label:'Ca: Mg', v:ratio('Ca', 'Mg', 'K', 2)},
+    {label:'K: Ca', v:ratio('K', 'Ca', 'Ca', 2)}
+  ];
+}
+/*HB-END*/
+/*HBDATA-BEGIN*/
+var HB_SUBS=[{"n":"Potassium Nitrate","f":"KNO3","p":1.0,"l":0,"d":0,"c":22.0462,"t":"A","m":{"N_NO3":13.856,"K":38.67}},{"n":"Magnesium Sulfate (Heptahydrate)","f":"MgSO4.7H2O","p":1.0,"l":0,"d":0,"c":2.0723,"t":"B","m":{"Mg":9.86,"S":13.01}},{"n":"Calcium Sulfate (Dihydrate)","f":"CaSO4.2H2O","p":1.0,"l":0,"d":0,"c":7.6941,"t":"0","m":{"Ca":23.28,"S":18.62}},{"n":"Boric Acid","f":"H3BO3","p":1.0,"l":0,"d":0,"c":24.1406,"t":"B","m":{"B":17.482}},{"n":"Iron II Sulfate (Hepahydrate)","f":"FeSO4.7H2O","p":1.0,"l":0,"d":0,"c":3.198,"t":"0","m":{"S":11.53,"Fe":20.09}},{"n":"Zinc Sulfate (Monohydrate)","f":"ZnSO4.H2O","p":1.0,"l":0,"d":0,"c":40.7635,"t":"B","m":{"S":17.86,"Zn":36.44}},{"n":"Copper Sulfate (pentahydrate)","f":"CuSO4.5H2O","p":1.0,"l":0,"d":0,"c":4.198,"t":"B","m":{"S":12.84,"Cu":25.45}},{"n":"Calcium Monobasic Phosphate","f":"Ca(H2PO4)2.H2O","p":1.0,"l":0,"d":0,"c":81.5491,"t":"0","m":{"P":24.779,"Ca":16.029}},{"n":"Sodium Molybdate (Dihydrate)","f":"Na2MoO4.2H2O","p":1.0,"l":0,"d":0,"c":44.0704,"t":"B","m":{"Mo":39.65,"Na":19.0}},{"n":"Potassium Monobasic Phosphate(MKP)","f":"KH2PO4","p":0.98,"l":0,"d":0,"c":83.0,"t":"B","m":{"P":22.758,"K":28.732}},{"n":"Iron EDTA","f":"Fe(EDTA)","p":1.0,"l":0,"d":0,"c":55.0936,"t":"A","m":{"Fe":13.0}},{"n":"Potassium Dibasic Phosphate","f":"K2HPO4","p":1.0,"l":0,"d":0,"c":58.7753,"t":"B","m":{"P":17.781,"K":44.897}},{"n":"Ammonium Sulfate","f":"(NH4)2SO4","p":1.0,"l":0,"d":0,"c":35.2519,"t":"B","m":{"N_NH4":21.203,"S":24.267}},{"n":"Ammonium Monobasic Phosphate","f":"(NH4)H2PO4","p":1.0,"l":0,"d":0,"c":77.1398,"t":"B","m":{"N_NH4":12.18,"P":26.924}},{"n":"Ammonium Dibasic Phosphate","f":"(NH4)2HPO4","p":1.0,"l":0,"d":0,"c":77.1398,"t":"B","m":{"N_NH4":21.217,"P":23.451}},{"n":"Magnesium Carbonate","f":"MgCO3","p":1.0,"l":0,"d":0,"c":31.92,"t":"0","m":{"Mg":28.831}},{"n":"Calcium Carbonate","f":"CaCO3","p":0.99,"l":0,"d":0,"c":15.16,"t":"0","m":{"Ca":40.078}},{"n":"Potassium Carbonate","f":"K2CO3","p":1.0,"l":0,"d":0,"c":24.3611,"t":"0","m":{"K":56.581}},{"n":"Iron EDDHA","f":"FeEDDHA","p":1.0,"l":0,"d":0,"c":59.613,"t":"A","m":{"Fe":6.0}},{"n":"Iron DTPA","f":"FeDTPA","p":1.0,"l":0,"d":0,"c":59.5028,"t":"A","m":{"Fe":11.0}},{"n":"Sodium Nitrate","f":"NaNO3","p":1.0,"l":0,"d":0,"c":9.2638,"t":"A","m":{"N_NO3":16.482,"Fe":7.0,"Na":27.047}},{"n":"Copper Nitrate (Hexahydrate)","f":"Cu(NO3)2.6H2O","p":1.0,"l":0,"d":0,"c":19.8416,"t":"B","m":{"N_NO3":9.48,"Cu":21.49}},{"n":"Sodium Borate (Decahydrate) (borax)","f":"Na2B4O7.10H2O","p":1.0,"l":0,"d":0,"c":15.9615,"t":"B","m":{"B":11.34,"Na":12.06}},{"n":"Potassium Chloride","f":"KCl","p":1.0,"l":0,"d":0,"c":16.96,"t":"A","m":{"K":52.448,"Cl":47.552}},{"n":"Ammonium Chloride","f":"NH4Cl","p":1.0,"l":0,"d":0,"c":18.7172,"t":"A","m":{"N_NH4":26.191,"Cl":66.272}},{"n":"Zinc Nitrate (Hexahydrate)","f":"Zn(NO3)2.6H2O","p":1.0,"l":0,"d":0,"c":39.8,"t":"B","m":{"N_NO3":9.42,"Zn":21.98}},{"n":"Phosphoric Acid (75%)","f":"H3PO4","p":0.75,"l":1,"d":1.579,"c":8.8654,"t":"B","m":{"P":31.61}},{"n":"Calcium Nitrate (ag grade)","f":"5Ca(NO3)2.NH4NO3.10H2O","p":1.0,"l":0,"d":0,"c":7.9322,"t":"A","m":{"N_NO3":14.4,"N_NH4":1.1,"Ca":19.0}},{"n":"Potassium Sulfate","f":"K2SO4","p":1.0,"l":0,"d":0,"c":19.8196,"t":"B","m":{"K":44.873,"S":18.402}},{"n":"Potassium Citrate","f":"C6H5K3O7","p":1.0,"l":0,"d":0,"c":19.96,"t":"0","m":{"K":38.28}},{"n":"Copper EDTA","f":"CuEDTA","p":1.0,"l":0,"d":0,"c":44.0815,"t":"B","m":{"Cu":14.0}},{"n":"Mn EDTA","f":"MnEDTA","p":1.0,"l":0,"d":0,"c":55.0936,"t":"B","m":{"Mn":13.0}},{"n":"Zn EDTA","f":"ZnEDTA","p":1.0,"l":0,"d":0,"c":55.0936,"t":"B","m":{"Zn":14.0}},{"n":"Magnesium Nitrate (Hexahydrate)","f":"Mg(NO3)2.6H2O","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"A","m":{"N_NO3":11.0,"Mg":9.63}},{"n":"MKP(Mono Potassium Phosphate)","f":"KH2PO4","p":0.98,"l":0,"d":1.0,"c":120.0,"t":"B","m":{"P":22.693236,"K":28.224}},{"n":"YaraLia(CALCINIT) Cacium nitrate","f":"Ca(NO3)2","p":0.9,"l":0,"d":1.0,"c":60.0,"t":"A","m":{"N_NO3":14.4,"N_NH4":1.1,"Ca":19.0}},{"n":"Solucros (Potassium Sulphate)","f":"K2SO4","p":0.9,"l":0,"d":1.0,"c":55.0,"t":"B","m":{"K":42.3351,"S":46.0}},{"n":"YaraTera(KRISTA SOP)","f":"K2SO4","p":0.9,"l":0,"d":1.0,"c":55.0,"t":"B","m":{"K":42.3351,"S":18.0}},{"n":"Yara KRISTALON (SPECIAL)","f":"18:18:18+3MgO+Micro","p":0.99,"l":0,"d":1.0,"c":75.0,"t":"C","m":{"N_NO3":4.9,"N_NH4":3.3,"P":7.8552,"K":14.9418,"Mg":1.8,"S":3.2,"B":0.0025,"Fe":0.07,"Zn":0.025,"Mn":0.04,"Cu":0.01,"Mo":0.004}},{"n":"Yara KRISTALON","f":"19-19-19","p":0.99,"l":0,"d":1.0,"c":90.0,"t":"B","m":{"N_NO3":10.3,"N_NH4":8.7,"P":8.2916,"K":15.7719,"Mg":0.54,"S":2.0,"B":0.0025,"Fe":0.07,"Zn":0.025,"Mn":0.04,"Cu":0.01,"Mo":0.004}},{"n":"Yara KRISTA k (Plus)","f":"6-6-42+8S","p":0.95,"l":0,"d":1.0,"c":86.0,"t":"B","m":{"N_NO3":4.1,"N_NH4":1.9,"P":2.6184,"K":34.8642,"S":8.0}},{"n":"EPSO Top (Magnesium Sulfate)","f":"MgSO4⋅7H2O","p":0.99,"l":0,"d":1.0,"c":5.0,"t":"B","m":{"Mg":9.5,"S":13.0}},{"n":"YaraVita (Tenso Cocktail)","f":"Chelated trace element","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"Ca":2.57,"B":0.52,"Fe":3.84,"Zn":0.53,"Mn":2.57,"Cu":0.53,"Mo":0.13}},{"n":"YaraVita(Rexolin Q15)","f":"Fe EDDHA","p":1.0,"l":0,"d":1.0,"c":400.0,"t":"A","m":{"Fe":7.0}},{"n":"YaraVita(Rexolin Zn15)","f":"Zn EDTA","p":1.0,"l":0,"d":1.0,"c":290.0,"t":"B","m":{"Zn":14.8}},{"n":"YaraVita(Rexolin Mn 13)","f":"Mn EDTA","p":1.0,"l":0,"d":1.0,"c":450.0,"t":"B","m":{"Mn":12.8}},{"n":"MEP (Star)","f":"16B-8Mo","p":0.95,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"B":16.0,"Mo":8.0}},{"n":"YaraVita(Rexolin Cu9)","f":"Cu EDTA","p":0.99,"l":0,"d":1.0,"c":400.0,"t":"B","m":{"Ca":9.0}},{"n":"PowerGrow(Evergrow)","f":"19-19-19+Mg+TE","p":0.95,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":19.0,"P":8.2916,"K":15.7719,"Mg":0.6}},{"n":"YaraLiva(TROPICOTE)","f":"Ca(NO3)2","p":0.9,"l":0,"d":1.0,"c":20.0,"t":"A","m":{"N_NO3":14.4,"N_NH4":1.1,"Ca":19.0}},{"n":"Hyper Green","f":"NPK","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":20.0,"P":8.728,"K":16.602}},{"n":"Agrowmore","f":"19/19/19 +2MgO","p":0.99,"l":0,"d":1.0,"c":120.0,"t":"B","m":{"N_NO3":19.0,"P":8.2916,"K":15.7719,"Mg":1.206,"S":1.9}},{"n":"MKP Wengfu","f":"0/52/34","p":0.98,"l":0,"d":1.0,"c":60.0,"t":"B","m":{"P":22.6928,"K":28.2234}},{"n":"SoluPotasse (Potassium sulfate)","f":"0/0/51 (K2SO4)","p":0.9,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"K":42.3351,"S":18.0}},{"n":"Sanhory (Magnesium sulfate)","f":"(MgSO4⋅7H2O)","p":0.99,"l":0,"d":1.0,"c":17.0,"t":"B","m":{"Mg":9.6,"S":12.5}},{"n":"DiSPER (CU) Max","f":"CU 14%","p":1.0,"l":0,"d":1.0,"c":650.0,"t":"B","m":{"Cu":14.0}},{"n":"Dissolvine Q15","f":"Iron (Fe)","p":1.0,"l":0,"d":1.0,"c":500.0,"t":"A","m":{"Fe":7.0}},{"n":"Dissolvine Zn15","f":"Zn","p":1.0,"l":0,"d":1.0,"c":650.0,"t":"B","m":{"Zn":14.8}},{"n":"Dissolvine Mn13","f":"Mn","p":1.0,"l":0,"d":1.0,"c":650.0,"t":"B","m":{"Mn":12.8}},{"n":"boron 10%","f":"B","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"B":10.0}},{"n":"11.25 B","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":650.0,"t":"B","m":{"B":11.25,"Mo":0.15}},{"n":"Phosphoric Acid (85%)","f":"H3PO4","p":0.85,"l":0,"d":1.0,"c":34.0,"t":"","m":{"P":31.61}},{"n":"DCM Micro-Mix","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":2.0,"N_NH4":0.5,"P":0.4364,"K":1.6602,"B":0.3,"Fe":1.0,"Zn":0.4,"Mn":0.5,"Cu":0.25,"Mo":0.02,"Na":3.0}},{"n":"PG-Mix","f":"12-12-17(+2+TE)","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":5.0,"N_NH4":7.0,"P":5.2368,"K":14.1117,"Mg":1.6,"S":8.0,"B":0.02,"Fe":0.06,"Zn":0.01}},{"n":"Nitric Acid (48%)","f":"HNO3","p":0.48,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":22.232}},{"n":"Boro Fast","f":"B,Mo","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"B","m":{"B":15.0,"Mo":1.2}},{"n":"Fortune Green","f":"B ,Mo","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"","m":{"B":11.7,"Mo":1.3}},{"n":"Cido Silica","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"K":12.0,"Si":25.0}},{"n":"Magnesium Nitrate","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":10.7,"Mg":15.4}},{"n":"Mo Pure","f":"Mo","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"B","m":{"N_NO3":3.5,"Mo":4.2,"Na":4.5}},{"n":"Boron Pure","f":"B","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"B","m":{"B":10.8,"Mo":0.28}},{"n":"Mo","f":"Mo","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"","m":{"Mo":4.2}},{"n":"Magnisim Sulfate","f":"Input Formula Here","p":0.98,"l":0,"d":1.0,"c":100.0,"t":"","m":{"Mg":16.3,"S":22.2}},{"n":"Yara Tera (Krista K Plus)","f":"13.5-0-45.5","p":0.95,"l":0,"d":1.0,"c":10.0,"t":"","m":{"N_NO3":13.5,"K":37.76955}},{"n":"Boron","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"K":10.0,"B":10.0,"Zn":0.8,"Mo":0.1}},{"n":"Dissolven ABC","f":"TE","p":1.0,"l":0,"d":1.0,"c":69.0,"t":"","m":{"Mg":1.7,"B":0.51,"Fe":4.0,"Zn":1.5,"Mn":4.0,"Cu":1.4,"Mo":0.1}},{"n":"Dolphin Boron","f":"B-Mo","p":1.0,"l":0,"d":1.0,"c":60.0,"t":"","m":{"K":8.301,"B":10.0,"Zn":0.8,"Mo":0.1}},{"n":"Dolphin Cu","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"Cu":12.0}},{"n":"Bavaria NPK","f":"12-12-36 (+1)Mg + TE","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":10.1,"N_NH4":1.9,"P":5.2368,"K":29.8836,"Mg":0.4,"B":0.01,"Fe":0.05,"Zn":0.01,"Mn":0.03,"Cu":0.01,"Mo":0.001}},{"n":"Rexene VSP Micro","f":"Micro","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"Mg":1.0,"B":0.5,"Fe":4.0,"Zn":2.5,"Mn":3.0,"Cu":2.5,"Mo":1.0}},{"n":"Sengral NPK + TE","f":"12-12-36+TE","p":0.99,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"N_NO3":9.0,"N_NH4":3.0,"P":5.2368,"K":29.8836,"B":0.01,"Fe":0.02,"Zn":0.002,"Mn":0.01,"Cu":0.002,"Mo":0.001}},{"n":"SQM Solo SOP","f":"0-0-51","p":0.9,"l":0,"d":1.0,"c":15.0,"t":"B","m":{"K":42.3351,"S":18.0}},{"n":"Dolphine Zn 14%","f":"","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"Zn":14.0}},{"n":"Mainstay Calcio","f":"CaO","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"A","m":{"Ca":32.16}},{"n":"Bavaria npk","f":"Input Formula Here","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"","m":{"N_NO3":10.0,"N_NH4":2.0,"P":5.2368,"K":29.8836,"Mg":0.603,"B":0.01,"Fe":0.05,"Zn":0.01,"Mn":0.3,"Cu":0.01,"Mo":0.001}},{"n":"IN Blancer","f":"B-Mo","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"B","m":{"B":11.7,"Mo":0.05}},{"n":"Cuper Amin","f":"Cu - S","p":1.0,"l":1,"d":1.0,"c":100.0,"t":"B","m":{"S":4.8,"Cu":10.0}},{"n":"YaraVita(Rexolin Q32)","f":"Fe","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"A","m":{"Fe":6.0}},{"n":"YaraTera MAG","f":"N-Mg","p":1.0,"l":0,"d":1.0,"c":100.0,"t":"B","m":{"N_NO3":11.0,"Mg":9.0}}];
+var HB_FORMS=[{"n":"Lettuce General (Howard Resh)","t":{"N_NO3":165.0,"N_NH4":15.0,"P":50.0,"K":210.0,"Mg":45.0,"Ca":190.0,"S":65.0,"B":0.5,"Fe":4.0,"Zn":0.1,"Mn":0.5,"Cu":0.1,"Mo":0.05}},{"n":"Generic Dry Season (Howard Resh)","t":{"N_NO3":177.0,"N_NH4":53.0,"P":60.0,"K":200.0,"Mg":36.0,"Ca":250.0,"S":129.0,"B":0.5,"Fe":5.0,"Zn":0.05,"Mn":0.5,"Cu":0.03,"Mo":0.02}},{"n":"Generic Wet Season (Howard Resh)","t":{"N_NO3":115.0,"N_NH4":32.0,"P":50.0,"K":150.0,"Mg":50.0,"Ca":150.0,"S":50.0,"B":0.5,"Fe":5.0,"Zn":0.05,"Mn":0.5,"Cu":0.03,"Mo":0.02}},{"n":"Pepper (Howard Resh)","t":{"N_NO3":190.0,"N_NH4":18.0,"P":40.0,"K":340.0,"Mg":50.0,"Ca":170.0,"S":360.0,"B":0.33,"Fe":5.0,"Zn":0.33,"Mn":0.55,"Cu":0.05,"Mo":0.05}},{"n":"Tomato (Howard Resh)","t":{"N_NO3":140.0,"P":50.0,"K":352.0,"Mg":50.0,"Ca":180.0,"S":168.0,"B":0.3,"Fe":5.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Cucumber (Howard Resh)","t":{"N_NO3":140.0,"P":50.0,"K":350.0,"Mg":50.0,"Ca":200.0,"S":150.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Lettuce 2 (Howard Resh)","t":{"N_NO3":165.0,"N_NH4":15.0,"P":50.0,"K":210.0,"Mg":45.0,"Ca":190.0,"S":113.0,"B":0.5,"Fe":4.0,"Zn":0.1,"Mn":0.5,"Cu":0.1,"Mo":0.05}},{"n":"Generic Grow (maximumyield)","t":{"N_NO3":160.0,"P":30.0,"K":230.0,"Mg":30.0,"Ca":100.0,"S":60.0,"B":0.5,"Fe":2.0,"Zn":0.1,"Mn":0.5,"Cu":0.05,"Mo":0.05}},{"n":"Generic Bloom (maximumyield)","t":{"N_NO3":130.0,"P":60.0,"K":300.0,"Mg":30.0,"Ca":100.0,"S":60.0,"B":0.5,"Fe":2.0,"Zn":0.1,"Mn":0.5,"Cu":0.05,"Mo":0.05}},{"n":"Tomato Stage.1 - 10-14 days (Howard Resh)","t":{"N_NO3":100.0,"P":40.0,"K":200.0,"Mg":20.0,"Ca":100.0,"S":53.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Tomato Stage.2 - first cluster (Howard Resh)","t":{"N_NO3":130.0,"P":55.0,"K":300.0,"Mg":33.0,"Ca":150.0,"S":109.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Tomato Stage.3 - to plant maturity (Howard Resh)","t":{"N_NO3":180.0,"P":65.0,"K":400.0,"Mg":45.0,"Ca":400.0,"S":144.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Rice (Douglas Peckenpaugh)","t":{"N_NO3":249.0,"P":58.0,"K":80.0,"Mg":65.0,"Ca":317.0,"S":87.0,"B":0.7,"Fe":5.0,"Zn":0.4,"Mn":0.8,"Cu":0.07,"Mo":0.05,"Si":100.0}},{"n":"Melons (Douglas Peckenpaugh)","t":{"N_NO3":215.0,"P":86.0,"K":343.0,"Mg":85.0,"Ca":175.0,"S":113.0,"B":0.7,"Fe":6.8,"Zn":0.25,"Mn":1.97,"Cu":0.07,"Mo":0.05}},{"n":"Tropical Lettuce (Douglas Peckenpaugh)","t":{"N_NO3":190.0,"P":25.0,"K":98.0,"Mg":25.0,"Ca":216.0,"S":33.0,"B":0.7,"Fe":4.9,"Zn":0.25,"Mn":1.97,"Cu":0.07,"Mo":0.05}},{"n":"Chilli (maximumyield)","t":{"N_NO3":320.0,"P":103.0,"K":364.0,"Mg":96.0,"Ca":330.0,"S":174.0,"B":0.7,"Fe":4.9,"Zn":0.25,"Mn":1.97,"Cu":0.07,"Mo":0.05}},{"n":"Tomatoes - till First Cluster (U of Florida)","t":{"N_NO3":70.0,"P":50.0,"K":120.0,"Mg":40.0,"Ca":150.0,"S":50.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - Second Cluster (U of Florida)","t":{"N_NO3":80.0,"P":50.0,"K":120.0,"Mg":40.0,"Ca":150.0,"S":50.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - Third Cluster (U of Florida)","t":{"N_NO3":100.0,"P":50.0,"K":150.0,"Mg":40.0,"Ca":150.0,"S":50.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - Fourth Cluster (U of Florida)","t":{"N_NO3":120.0,"P":50.0,"K":150.0,"Mg":50.0,"Ca":150.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - to termination (U of Florida)","t":{"N_NO3":150.0,"P":50.0,"K":200.0,"Mg":50.0,"Ca":150.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Generic for Berries (Growing Edge)","t":{"N_NO3":207.0,"P":55.0,"K":289.0,"Mg":38.0,"Ca":155.0,"S":51.0,"B":0.7,"Fe":6.8,"Zn":0.25,"Mn":1.97,"Cu":0.07,"Mo":0.05}},{"n":"Hoagland solution","t":{"N_NO3":210.0,"P":31.0,"K":235.0,"Mg":49.0,"Ca":200.0,"S":64.0,"B":0.5,"Fe":2.9,"Zn":0.05,"Mn":0.5,"Cu":0.02,"Mo":0.05}},{"n":"Tomatoes - to termination (U of Florida)","t":{"N_NO3":150.0,"P":50.0,"K":200.0,"Mg":50.0,"Ca":150.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - to termination (U of Florida)","t":{"N_NO3":150.0,"P":50.0,"K":200.0,"Mg":50.0,"Ca":150.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomatoes - to termination (U of Florida)","t":{"N_NO3":150.0,"P":50.0,"K":200.0,"Mg":50.0,"Ca":150.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomato (Howard Resh)","t":{"N_NO3":140.0,"P":50.0,"K":352.0,"Mg":50.0,"Ca":180.0,"S":168.0,"B":0.3,"Fe":5.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Fish Farm","t":{"N_NO3":100.0,"P":17.0,"K":106.0,"Mg":44.0,"Ca":180.0,"S":50.0,"B":0.3,"Fe":5.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Aregula (2)","t":{"N_NO3":80.0,"P":22.5,"K":100.0,"Mg":25.0,"Ca":100.0,"S":60.0,"B":0.16,"Fe":1.5,"Zn":0.06,"Mn":0.4,"Cu":0.03,"Mo":0.07}},{"n":"Aregula (3)","t":{"N_NO3":150.0,"P":39.0,"K":205.0,"Mg":48.0,"Ca":176.0,"S":60.0,"B":0.48,"Fe":3.0,"Zn":0.14,"Mn":0.48,"Cu":0.14,"Mo":0.1}},{"n":"Aregula (4)","t":{"N_NO3":150.0,"P":31.0,"K":210.0,"Mg":24.0,"Ca":90.0,"S":32.0,"B":0.16,"Fe":1.0,"Zn":0.13,"Mn":0.25,"Cu":0.023,"Mo":0.024}},{"n":"Tomatoes - S1 (U of Arizona)","t":{"N_NO3":90.0,"P":47.0,"K":144.0,"Mg":60.0,"Ca":144.0,"S":60.0,"B":0.4,"Fe":2.0,"Zn":0.33,"Mn":0.55,"Cu":0.05,"Mo":0.05}},{"n":"Tomatoes - S2 (U of Arizona)","t":{"N_NO3":120.0,"P":47.0,"K":350.0,"Mg":60.0,"Ca":160.0,"S":60.0,"B":0.4,"Fe":2.0,"Zn":0.33,"Mn":0.55,"Cu":0.05,"Mo":0.05}},{"n":"Tomatoes - S3 (U of Arizona)","t":{"N_NO3":190.0,"P":47.0,"K":350.0,"Mg":60.0,"Ca":200.0,"S":60.0,"B":0.4,"Fe":2.0,"Zn":0.33,"Mn":0.55,"Cu":0.05,"Mo":0.05}},{"n":"Tomatoes +1","t":{"N_NO3":150.0,"P":50.0,"K":190.0,"Mg":50.0,"Ca":200.0,"S":64.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.01}},{"n":"Tim Recipe (1)","t":{"N_NO3":246.96,"N_NH4":13.72,"P":59.21,"K":429.78,"Mg":20.64,"Ca":194.8,"S":40.96,"B":0.29,"Fe":200.48,"Zn":0.24,"Mn":0.25,"Cu":0.064,"Mo":0.07}},{"n":"Lettuce (Tim Recipe)","t":{"N_NO3":246.96,"N_NH4":13.72,"P":59.21,"K":429.78,"Mg":20.64,"Ca":194.8,"S":40.96,"B":0.29,"Fe":200.48,"Zn":0.24,"Mn":0.25,"Cu":0.1,"Mo":0.07,"Cl":47.57}},{"n":"Tim Recipe (1) 27/4/2023","t":{"N_NO3":694.51,"N_NH4":6.02,"P":41.29,"K":247.63,"Mg":24.31,"Ca":173.68,"S":48.09,"B":0.36,"Fe":1.49,"Zn":0.22,"Mn":0.18,"Cu":0.04,"Mo":0.03,"Si":25.36,"Cl":35.45}},{"n":"Lettuce Cornell","t":{"N_NO3":125.0,"P":31.0,"K":215.0,"Mg":24.0,"Ca":84.0,"S":35.0,"B":0.16,"Fe":0.94,"Zn":0.13,"Mn":0.14,"Cu":0.03,"Mo":0.03}},{"n":"Tomato M2 (Howard Resh)","t":{"N_NO3":170.0,"N_NH4":5.0,"P":60.0,"K":300.0,"Mg":50.0,"Ca":167.0,"S":60.0,"B":0.7,"Fe":2.8,"Zn":0.3,"Mn":0.8,"Cu":0.2,"Mo":0.05}},{"n":"Tomato Stage.1 - 10-14 days (Howard Resh)","t":{"N_NO3":100.0,"P":40.0,"K":200.0,"Mg":20.0,"Ca":100.0,"S":53.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Strawberry Fruiting (growing edge)","t":{"N_NO3":614.0,"P":58.0,"K":642.0,"Mg":10.0,"Ca":10.0,"S":350.0,"B":0.7,"Fe":5.0,"Zn":0.25,"Mn":2.0,"Cu":0.07,"Mo":0.05,"Na":4380.0,"Cl":3030.0}},{"n":"Strawberry Drip Irrigation (schundler.com)","t":{"N_NO3":120.0,"N_NH4":14.0,"P":46.0,"K":250.0,"Mg":30.0,"Ca":125.0,"S":180.0,"B":0.15,"Fe":1.5,"Zn":0.5,"Mn":0.8,"Cu":0.05,"Mo":0.05}},{"n":"Strawberry Drip Irrigation (schundler.com)","t":{"N_NO3":120.0,"N_NH4":14.0,"P":46.0,"K":250.0,"Mg":20.0,"Ca":125.0,"S":180.0,"B":0.15,"Fe":1.5,"Zn":0.5,"Mn":0.8,"Cu":0.05,"Mo":0.05}},{"n":"Aregula","t":{"N_NO3":50.0,"P":25.0,"K":60.0,"Mg":45.0,"Ca":50.0,"S":64.0,"B":0.6,"Fe":2.8,"Zn":0.2,"Mn":0.4,"Cu":0.1,"Mo":0.03}},{"n":"Strawberry (1)","t":{"N_NO3":50.0,"P":25.0,"K":60.0,"Mg":45.0,"Ca":50.0,"S":64.0,"B":0.6,"Fe":2.8,"Zn":0.2,"Mn":0.4,"Cu":0.1,"Mo":0.03}},{"n":"Strawberry (2)","t":{"N_NO3":85.0,"P":25.0,"K":80.0,"Mg":45.0,"Ca":90.0,"S":64.0,"B":0.6,"Fe":2.8,"Zn":0.2,"Mn":0.4,"Cu":0.1,"Mo":0.03}},{"n":"Strawberry (3)","t":{"N_NO3":60.0,"P":25.0,"K":60.0,"Mg":45.0,"Ca":80.0,"S":64.0,"B":0.6,"Fe":2.8,"Zn":0.2,"Mn":0.4,"Cu":0.1,"Mo":0.03}},{"n":"Strawberry Starter","t":{"N_NO3":100.0,"P":46.0,"K":175.0,"Mg":20.0,"Ca":140.0,"S":64.0,"B":0.15,"Fe":1.5,"Zn":0.5,"Mn":0.8,"Cu":0.05,"Mo":0.05}},{"n":"Strawberry Fruting","t":{"N_NO3":120.0,"N_NH4":14.0,"P":46.0,"K":250.0,"Mg":30.0,"Ca":125.0,"S":64.0,"B":0.15,"Fe":1.5,"Zn":0.5,"Mn":0.8,"Cu":0.05,"Mo":0.05}},{"n":"Strawberry Korea","t":{"N_NO3":118.0,"N_NH4":2.0,"P":12.0,"K":27.0,"Mg":15.0,"Ca":36.0,"S":48.0,"B":0.25,"Fe":0.32,"Zn":0.02,"Mn":0.04,"Cu":0.01,"Mo":0.02,"Na":18.0,"Si":8.0,"Cl":7.0}},{"n":"Cucumber (Howard Resh)","t":{"N_NO3":140.0,"P":50.0,"K":280.0,"Mg":60.0,"Ca":180.0,"S":70.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"Cucumber m2 (Howard Resh)","t":{"N_NO3":140.0,"P":50.0,"K":280.0,"Mg":60.0,"Ca":180.0,"S":70.0,"B":0.3,"Fe":3.0,"Zn":0.1,"Mn":0.8,"Cu":0.07,"Mo":0.03}},{"n":"خيار","t":{"N_NO3":165.0,"N_NH4":10.0,"P":40.0,"K":250.0,"Mg":45.0,"Ca":160.0,"S":60.0,"B":0.3,"Fe":2.0,"Zn":0.05,"Mn":0.5,"Cu":0.05,"Mo":0.05}},{"n":"🥒 cucumber","t":{"N_NO3":65.0}},{"n":"koko","t":{"N_NO3":165.0,"N_NH4":10.0,"P":40.0,"K":250.0,"Mg":45.0,"Ca":160.0,"S":60.0,"B":0.3,"Fe":2.0,"Zn":0.05,"Mn":0.5,"Cu":0.05,"Mo":0.05}},{"n":"Strawberry Drip Irrigation (schundler.com)","t":{"N_NO3":120.0,"N_NH4":5.0,"P":45.0,"K":210.0,"Mg":55.0,"Ca":140.0,"S":75.0,"B":0.55,"Fe":3.0,"Zn":0.12,"Mn":0.9,"Cu":0.05,"Mo":0.06}},{"n":"Strawberry s2","t":{"N_NO3":120.0,"N_NH4":5.0,"P":45.0,"K":210.0,"Mg":55.0,"Ca":140.0,"S":75.0,"B":0.55,"Fe":3.0,"Zn":0.12,"Mn":0.9,"Cu":0.05,"Mo":0.06}},{"n":"Pepper (Howard Resh)2","t":{"N_NO3":170.0,"N_NH4":7.0,"P":55.0,"K":260.0,"Mg":60.0,"Ca":180.0,"S":85.0,"B":0.7,"Fe":3.5,"Zn":0.18,"Mn":0.7,"Cu":0.05,"Mo":0.1}},{"n":"Tomatoes - S3 (U of Arizona)","t":{"N_NO3":190.0,"P":47.0,"K":350.0,"Mg":60.0,"Ca":200.0,"S":60.0,"B":0.4,"Fe":2.0,"Zn":0.33,"Mn":0.55,"Cu":0.05,"Mo":0.05}}];
+var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2,"Mg":134.4,"Ca":67.2,"S":18.0,"B":0.01,"Fe":0.47,"Zn":0.04,"Mn":0.09,"Cu":0.01,"Mo":0.01,"Na":39.1,"Si":4.3,"Cl":18.0}},{"n":"Alghanim RO","w":{"N_NO3":0.5,"N_NH4":0.01,"P":0.0326,"K":1.1,"Mg":5.09,"Ca":3.56,"S":3.4,"Fe":0.04,"Zn":0.02,"Mn":0.02,"Cu":0.01,"Na":11.8,"Si":0.01,"Cl":16.1}},{"n":"RO Qutuf-Al Reef","w":{"N_NO3":0.5,"N_NH4":0.01,"K":0.14,"Mg":4.8,"Ca":4.0,"S":10.0,"B":0.16,"Fe":0.03,"Zn":0.05,"Mn":0.04,"Cu":0.01,"Na":12.0,"Si":1.2,"Cl":25.0}},{"n":"Well Water","w":{"N_NO3":9.1,"N_NH4":0.05,"K":4.79,"Mg":45.6,"Ca":204.0,"S":113.0,"B":0.39,"Fe":0.05,"Zn":0.09,"Mn":0.11,"Cu":0.05,"Na":190.0,"Si":20.5,"Cl":435.0}}];
+/*HBDATA-END*/
+  var HB_FERTS = HB_SUBS.map(function(x, i){
+    return {id:'hb-'+i, hb:true, name:x.n, formula:x.f, tank:(x.t === 'A' || x.t === 'B') ? x.t : '-', conc:x.t, comp:x.m, purity:x.p > 0 ? x.p : 1, liquid:!!x.l, ml:!!x.l, density:x.d || 1, cost:x.c};
+  });
+  var hbCfg = (function(){
+    var d = {mode:'direct', unit:'ppm', dof:'S', siMode:'Si', ec:'lmc', wErr:0.01, vErr:0.1};
+    try{ var sv = JSON.parse(localStorage.getItem('oroots_hb_cfg') || 'null'); if(sv && typeof sv === 'object') Object.keys(d).forEach(function(k){ if(sv[k] != null) d[k] = sv[k]; }); }catch(e){}
+    return d;
+  })();
+  var hbNote = [], hbWaterOpen = false;
+
   var db = null, downloadsCap = null, assetsCap = null;
   var FIREBASE_CONFIG = {
     apiKey: "AIzaSyANc8PnWrzoFPLLcEHR1Yuigx4lZ2R7J_k",
@@ -1757,12 +1998,12 @@
   var VOL_TO_L = {L:1, gal:3.785411784, m3:1000};
   var G_PER_UNIT = {g:1, oz:28.349523125};
   var currentPrecision = 0.01, currentLiquidMl = false;
-  var PRESETS = [{name:'Hoagland (زي صورة HydroBuddy)', t:{N_NO3:260,P:31,K:235,Mg:48,Ca:200,S:64,Fe:2.5,Zn:0.05,B:0.5,Mn:0.5,Cu:0.02,Mo:0.01}}];
+  var PRESETS = [{name:'Hoagland', t:{N_NO3:260,P:31,K:235,Mg:48,Ca:200,S:64,Fe:2.5,Zn:0.05,B:0.5,Mn:0.5,Cu:0.02,Mo:0.01}}];
   var targetProfiles = [];
-  function isMl(f){ return currentLiquidMl && f && f.liquid; }
-  function dispQty(item){ var f = getFertilizer(item.fertilizerId); return isMl(f) ? +(item.grams/(f.density||1)).toFixed(3) : fmtMass(item.grams); }
-  function qtyUnit(f){ return isMl(f) ? 'مل' : (currentMassUnit==='oz'?'oz':'جم'); }
-  function gFromQty(f, v){ return isMl(f) ? v*(f.density||1) : v*G_PER_UNIT[currentMassUnit]; }
+  function isMl(f){ return currentLiquidMl && f && f.liquid && !f.ml; }
+  function dispQty(item){ var f = getFertilizer(item.fertilizerId); if(f && f.ml) return +(+item.grams).toFixed(3); return isMl(f) ? +(item.grams/(f.density||1)).toFixed(3) : fmtMass(item.grams); }
+  function qtyUnit(f){ return (f && f.ml) || isMl(f) ? 'مل' : (currentMassUnit==='oz'?'oz':'جم'); }
+  function gFromQty(f, v){ if(f && f.ml) return v; return isMl(f) ? v*(f.density||1) : v*G_PER_UNIT[currentMassUnit]; }
   function fmtMass(g){ return +(g/G_PER_UNIT[currentMassUnit]).toFixed(currentMassUnit==='oz'?4:3); }
   var currentDilutionRatio = 1;
   var currentSolveFerts = {};
@@ -1784,7 +2025,7 @@
   var overviewSystemId = null;
   var ovdRangeDays = null;
   var ovdVis = {};
-  var PALETTE = ['#6FA22E','#2C7A8C','#C9932F','#8C6FA2','#D8543A','#2C8C6F','#A24E8C','#4E7AA2','#B08C2E','#5A8C4E'];
+  var PALETTE = ['#2DBE6C','#3B82F6','#F5A623','#9B59F0','#FF5A4D','#00C2A8','#E0457B','#2979FF','#E6A800','#7ED321'];
   function paletteColor(idx){ return PALETTE[idx % PALETTE.length]; }
   var climateSelectedDay = null;
   var climateDailyRangeDays = 90;
@@ -3055,7 +3296,7 @@
     try{ localStorage.setItem('oroots_local_fertilizers', JSON.stringify(customFertilizers)); }catch(e){}
   }
   function allFertilizers(){
-    return DEFAULT_FERTILIZERS.concat(customFertilizers);
+    return HB_FERTS.concat(DEFAULT_FERTILIZERS, customFertilizers);
   }
   function getFertilizer(id){
     var list = allFertilizers();
@@ -3140,7 +3381,8 @@
     var recipe = {
       id:genId(), name:name, tankVolume:currentTankVolume, dilutionRatio:currentDilutionRatio,
       targets: Object.assign({}, currentTargets),
-      mix: currentMix.map(function(m){ return {fertilizerId:m.fertilizerId, grams:m.grams}; }),
+      mix: currentMix.map(function(m){ var o = {fertilizerId:m.fertilizerId, grams:m.grams}; if(m.fixed){ o.fixed = true; o.fixedAmt = m.fixedAmt != null ? m.fixedAmt : m.grams; } return o; }),
+      water: Object.assign({}, currentWater), cfg: Object.assign({}, hbCfg),
       solveFerts: Object.keys(currentSolveFerts).filter(function(id){ return currentSolveFerts[id]; }),
       createdBy:currentUser||'', createdAt:Date.now()
     };
@@ -3158,7 +3400,11 @@
     currentTankVolume = r.tankVolume;
     currentDilutionRatio = r.dilutionRatio||1;
     currentTargets = Object.assign({}, r.targets);
-    currentMix = r.mix.slice();
+    currentMix = r.mix.map(function(m){ return Object.assign({}, m); });
+    if(r.water) currentWater = Object.assign({}, r.water);
+    if(r.cfg){ Object.keys(r.cfg).forEach(function(k){ if(r.cfg[k] != null) hbCfg[k] = r.cfg[k]; }); hbSaveCfg(); }
+    else if((r.dilutionRatio||1) > 1) hbCfg.mode = 'ab';
+    hbNote = [];
     currentSolveFerts = {};
     (r.solveFerts||[]).forEach(function(id2){ currentSolveFerts[id2]=true; });
     renderNutrientsPanel();
@@ -4488,7 +4734,7 @@
       if(!fert) return;
       NUTRIENT_ELEMENTS.forEach(function(e){
         var pct = fert.comp[e.key];
-        if(pct) totals[e.key] += ppmFromGrams(item.grams, pct, volumeL);
+        if(pct) totals[e.key] += ppmFromGrams(item.grams, pct * (fert.purity > 0 ? fert.purity : 1), volumeL);
       });
     });
     return totals;
@@ -5225,39 +5471,16 @@
 
   var PRIVA_COLORS = {'#2C7A8C':'#3B82F6','#C9932F':'#F5A623','#6FA22E':'#2DBE6C','#D8543A':'#EF7B5B','#2C8C6F':'#2DBE6C','#8C6FA2':'#7B4FB0','#D08A1E':'#F5A623'};
   function priColor(c){ return PRIVA_COLORS[c] || c; }
-  /* ===== ألوان CMYK للشارتس: كل لون بيتحوّل لأقرب حبر (C/M/Y/K) ومفيش لونين متطابقين في نفس الشارت ===== */
-  function cmykOn(){ return document.documentElement.getAttribute('data-palette')==='cmyk'; }
-  function cmykDark(){ var r = document.documentElement, t = r.getAttribute('data-theme'); return t==='dark' || (t!=='light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
-  function cmykKeyOf(hex){
-    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex||'')); if(!m) return null;
-    var n = parseInt(m[1],16), r = n>>16&255, g = n>>8&255, b = n&255, mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx-mn;
-    if(d < 28) return null;
-    var h; if(mx===r) h = ((g-b)/d + 6) % 6; else if(mx===g) h = (b-r)/d + 2; else h = (r-g)/d + 4; h *= 60;
-    if(h < 18 || h >= 330) return 'M';
-    if(h < 75) return 'Y';
-    if(h < 165) return 'C';
-    if(h < 255) return 'C2';
-    if(h < 290) return 'K';
-    return 'M';
-  }
-  function cmykVal(k){
-    var dk = cmykDark();
-    return ({C: dk ? '#00B9FF' : '#00AEEF', M: dk ? '#FF2DA6' : '#EC008C', Y: dk ? '#FFD21F' : '#F2B600', K: dk ? '#ECECEC' : '#1D1D1B',
-             C2: dk ? '#4F8DFF' : '#0067B1', M2: dk ? '#FF8AD0' : '#B0006B', Y2: dk ? '#FF9F1C' : '#C97A00', K2: dk ? '#8E9AA0' : '#6B7378'})[k];
-  }
-  function dc(c){ if(!cmykOn() || !c || /^var\(/.test(c)) return c; var k = cmykKeyOf(c); return k ? cmykVal(k) : c; }
-  var CMYK_CYCLE = ['C','M','Y','K','C2','M2','Y2','K2'];
-  function cmykAssign(list){
-    if(!cmykOn() || !list) return list;
-    var used = {};
-    list.forEach(function(d){
-      var k = cmykKeyOf(d.color); if(!k) return;
-      var kk = k; if(used[kk]){ var base = kk.charAt(0), alt = base+'2'; kk = used[alt] ? null : alt; }
-      if(!kk){ for(var i=0;i<CMYK_CYCLE.length;i++){ if(!used[CMYK_CYCLE[i]]){ kk = CMYK_CYCLE[i]; break; } } }
-      if(!kk) kk = k;
-      used[kk] = 1; d.color = cmykVal(kk);
-    });
-    return list;
+  function isDarkTheme(){ var r = document.documentElement, t = r.getAttribute('data-theme'); return t==='dark' || (t!=='light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+  /* بيرفع زهاوة لون الخط (الإشباع والسطوع) مع الحفاظ على درجته؛ الرمادي بيفضل رمادي. بيتطبق على خطوط كل الشارتس */
+  function vividLine(c){
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(c || '')); if(!m) return c;
+    var n = parseInt(m[1], 16), r = (n >> 16 & 255)/255, g = (n >> 8 & 255)/255, b = (n & 255)/255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn)/2, d = mx - mn;
+    if(d < 0.06) return '#' + m[1];
+    var sat = d/(1 - Math.abs(2*l - 1)), h = mx === r ? ((g - b)/d + 6) % 6 : (mx === g ? (b - r)/d + 2 : (r - g)/d + 4); h *= 60;
+    var dk = isDarkTheme(), yel = h >= 38 && h < 75, grn = h >= 75 && h < 200, L = dk ? 0.64 : (yel ? 0.46 : (grn ? 0.4 : 0.5)), S = Math.min(0.95, Math.max(sat, 0.85));
+    var C = (1 - Math.abs(2*L - 1))*S, X = C*(1 - Math.abs((h/60) % 2 - 1)), mm = L - C/2, rgb = h < 60 ? [C, X, 0] : (h < 120 ? [X, C, 0] : (h < 180 ? [0, C, X] : (h < 240 ? [0, X, C] : (h < 300 ? [X, 0, C] : [C, 0, X]))));
+    return '#' + rgb.map(function(v){ var x = Math.round((v + mm)*255); return (x < 16 ? '0' : '') + x.toString(16); }).join('');
   }
   var svgDetailsOpen = {}, svgHiddenSeries = {};
   /* أول مرة: خط واحد بس ظاهر (أول واحد عنده بيانات)، وانت بتضيف باقي الخطوط للمقارنة. الاختيار بيتشارك بين المخططات اللي ليها نفس الخطوط. */
@@ -5295,7 +5518,7 @@
     if(container.id && !opts.__full) svgChartArgs[container.id] = {ds:datasets, opts:opts};
     var srcDatasets = datasets;
     datasets = datasets.map(function(d, di){ var c = {}; for(var k in d){ c[k] = d[k]; } c.color = priColor(d.color); if(!opts.onToggle && container.id && svgHiddenSeries[container.id+'|'+(d.key || di)]) c.hidden = true; return c; });
-    cmykAssign(datasets);
+    datasets.forEach(function(d){ d.color = vividLine(d.color); });
     var szId = container.id && ovPrefs && ovPrefs.sizes && ovPrefs.sizes[container.id], H = (szId && szId.h && SZ_SVGH[szId.h]) || opts.height || 200;
     var visible = datasets.filter(function(d){ return !d.hidden; });
     var totalPoints = visible.reduce(function(n,d){ return n+d.points.length; }, 0);
@@ -5956,7 +6179,7 @@
       var chips = last
         ? climateStatChip('pH', last.ph, '') + climateStatChip('EC', last.ec, 'mS/cm') + climateStatChip('حرارة', last.temp, '°C') + climateStatChip('آخر قراءة', fmtTs(last.ts), '')
         : '<p class="empty-note">لا توجد قراءات.</p>';
-      return '<div class="chart-card"><h3 style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc(s.colorHex)+'"></span>'+s.title+'</h3>'+
+      return '<div class="chart-card"><h3 style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+s.colorHex+'"></span>'+s.title+'</h3>'+
         '<div class="climate-stats">'+chips+'</div>'+
       '</div>';
     }).join('');
@@ -6442,7 +6665,7 @@
     var entries = flattenEntries(key, systemId).slice().reverse();
     parts.form.innerHTML =
       '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;">'+
-        '<span class="tab-dot" style="background:'+dc(sourceObj.colorHex)+'"></span>'+sourceObj.title+
+        '<span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>'+sourceObj.title+
       '</h3>'+
       '<form class="entry-form" id="ws-'+key+'-form">'+
         '<div class="form-grid">'+
@@ -6455,7 +6678,7 @@
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة '+sourceObj.label+'</button></div>'+
       '</form>';
     parts.table.innerHTML =
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc(sourceObj.colorHex)+'"></span>سجل '+sourceObj.title+'</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+sourceObj.colorHex+'"></span>سجل '+sourceObj.title+'</h3><button class="btn btn-ghost btn-sm" id="ws-'+key+'-export">تصدير CSV</button></div>'+
       lfBarHtml('w-'+key)+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الحرارة</th><th>الحالة</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-'+key+'-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قراءات مسجلة. سجّل أول قراءة من النموذج فوق.</p>');
@@ -6513,7 +6736,7 @@
   function renderSoilSection(parts, systemId){
     var entries = flattenEntries('soil', systemId).slice().reverse();
     parts.form.innerHTML =
-      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc('#8D6E63')+'"></span>قياسات التربة</h3>'+
+      '<h3 class="section-title" style="display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+'#8D6E63'+'"></span>قياسات التربة</h3>'+
       '<form class="entry-form" id="ws-soil-form"><div class="form-grid">'+
         '<div class="field-sm full"><label>الوقت (تلقائي لحظة الحفظ)</label>'+liveClockHtml('ws-soil-ts')+'</div>'+
         '<div class="field-sm"><label>حموضة التربة pH</label><input type="number" step="any" min="0" max="14" class="ltr" id="ws-soil-ph" required></div>'+
@@ -6522,7 +6745,7 @@
         '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="ws-soil-note" placeholder="مثال: الصف 3، على بعد 20 سم من النقاط"></div>'+
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ قراءة التربة</button></div></form>';
     parts.table.innerHTML =
-      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+dc('#8D6E63')+'"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
+      '<div class="table-toolbar"><h3 style="margin:0;font-size:0.9rem;display:flex;align-items:center;gap:8px;"><span class="tab-dot" style="background:'+'#8D6E63'+'"></span>سجل قياسات التربة</h3><button class="btn btn-ghost btn-sm" id="ws-soil-export">تصدير CSV</button></div>'+
       lfBarHtml('w-soil')+
       '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>pH</th><th>EC</th><th>الرطوبة %</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="ws-soil-tbody"></tbody></table></div>'+
       (entries.length ? '' : '<p class="empty-note">لسه مفيش قياسات تربة. سجّل أول قياس من النموذج فوق.</p>');
@@ -6615,31 +6838,123 @@
     var n = function(v, d){ var x = parseFloat(v); return isFinite(x) && x >= 0 && v !== '' ? x : d; };
     return {kc:n(a.kc, c.kc[a.stage] || c.kc.mid), density:n(a.density, c.dens) || c.dens, leach:n(a.leach, c.leach), eventMl:fruit ? n(a.eventMl, c.eventMl) : 0, wind:n(a.wind, 0.5) || 0.5, plants:n(a.plants, 0), def:c};
   }
-  /* بروفايل الساعات (24) لصوبة: حرارة ورطوبة من قراءات اليوم (والباقي من أمس)، والإشعاع من شكل شمس جيبي بمعامل من اللوكس المسجّل */
-  function irrHourlyProfile(gh){
-    var today = todayStr(), yest = planAddDays(today, -1), ents = flattenEntries('climate', gh);
+  /* ---------- طقس برّه الصوبة بالساعة (آخر 7 أيام + بكرة) من Open-Meteo: لمقارنة جوه/برّه وحساب نفاذية الغطاء ---------- */
+  var wxHist = null, wxHistBusy = false, wxHistFailAt = 0;
+  function wxHistKey(){ return parseFloat(settings.weatherLat)+','+parseFloat(settings.weatherLon); }
+  function wxHistReady(){
+    if(!wxConfigured()) return false;
+    if(!wxHist){ try{ var o = JSON.parse(localStorage.getItem('oroots_wxhist') || 'null'); if(o && o.map) wxHist = o; }catch(e){} }
+    return !!wxHist && wxHist.key === wxHistKey();
+  }
+  function wxHistFresh(){ return wxHistReady() && Date.now() - wxHist.t < 45*60000; }
+  function wxHistFetch(){
+    if(!wxConfigured() || wxHistBusy || Date.now() - wxHistFailAt < 5*60000) return Promise.resolve(false);
+    wxHistBusy = true;
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude='+parseFloat(settings.weatherLat)+'&longitude='+parseFloat(settings.weatherLon)+'&timezone=auto&wind_speed_unit=ms&past_days=7&forecast_days=2&hourly=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m';
+    return fetch(url).then(function(r){ if(!r.ok) throw new Error('weather '+r.status); return r.json(); }).then(function(j){
+      var h = j.hourly || {}, map = {};
+      (h.time || []).forEach(function(tm, i){ var d = String(tm).slice(0,10), hh = parseInt(String(tm).slice(11,13),10); (map[d] = map[d] || [])[hh] = {T:wxNum((h.temperature_2m||[])[i]), RH:wxNum((h.relative_humidity_2m||[])[i]), Rs:wxNum((h.shortwave_radiation||[])[i]), Ws:wxNum((h.wind_speed_10m||[])[i])}; });
+      wxHist = {key:wxHistKey(), t:Date.now(), map:map}; try{ localStorage.setItem('oroots_wxhist', JSON.stringify(wxHist)); }catch(e){}
+      wxHistBusy = false; return true;
+    }).catch(function(e){ wxHistBusy = false; wxHistFailAt = Date.now(); console.warn('طقس برّه (تاريخ):', e && e.message); return false; });
+  }
+  /* قيمة برّه عند وقت معيّن (ساعات عشرية). الإشعاع في Open-Meteo = متوسط الساعة اللي فاتت (تسمية الساعة h = متوسط من h-1 لـ h) فبنزيحه نص ساعة */
+  function wxOutAt(date, hh, key){
+    var arr = wxHist && wxHist.map && wxHist.map[date]; if(!arr) return null;
+    var off = key === 'Rs' ? 0.5 : 0, x = hh + off - 0, i = Math.floor(x), f = x - i;
+    function val(k){ var o = arr[k]; return (o && o[key] !== null && o[key] !== undefined && isFinite(o[key])) ? o[key] : null; }
+    var a = val(Math.min(23, Math.max(0, i))), b = val(Math.min(23, Math.max(0, i+1)));
+    if(a === null && b === null) return null; if(a === null) return b; if(b === null) return a;
+    return a + (b - a)*f;
+  }
+  /* بروفايل الساعات (24) لصوبة ليوم (الافتراضي النهارده): حرارة ورطوبة من قراءات اليوم (والباقي من اليوم اللي قبله)،
+     والإشعاع = نفاذية الغطاء τ × إشعاع برّه في نفس الساعة لو بيانات برّه متاحة، وإلا شكل جيب الشمس بمعامل من اللوكس المسجّل */
+  function irrHourlyProfile(gh, forDate){
+    var today = todayStr(), D = forDate || today, isToday = D === today, prevD = planAddDays(D, -1), ents = flattenEntries('climate', gh);
     function dayArr(d){
       return ents.filter(function(e){ return String(e.ts).slice(0,10) === d; }).map(function(e){
         return {m:parseInt(String(e.ts).slice(11,13),10)*60 + parseInt(String(e.ts).slice(14,16),10), T:parseFloat(e.temp), RH:parseFloat(e.rh), lux:parseFloat(e.lux)};
       }).filter(function(x){ return isFinite(x.T) && isFinite(x.RH) && isFinite(x.m); }).sort(function(a, b){ return a.m - b.m; });
     }
-    var A = {today:dayArr(today), yest:dayArr(yest)};
-    if(!A.today.length && !A.yest.length) return null;
+    var A = {today:dayArr(D), yest:dayArr(prevD)};
+    if(!A.today.length && !(isToday && A.yest.length)) return null;
     function interp(arr, k, m){
       if(m <= arr[0].m) return arr[0][k]; if(m >= arr[arr.length-1].m) return arr[arr.length-1][k];
       for(var i = 1; i < arr.length; i++){ if(m <= arr[i].m){ var a = arr[i-1], b = arr[i], f = b.m === a.m ? 0 : (m - a.m)/(b.m - a.m); return a[k] + (b[k] - a[k])*f; } }
       return arr[arr.length-1][k];
     }
-    var sr = 6, ss = 18, x = wxSame(wxExtra) ? wxExtra : null;
+    var sr = 6, ss = 18, x = (isToday && wxSame(wxExtra)) ? wxExtra : null;
     if(x && x.sunrise && x.sunset){ sr = parseInt(String(x.sunrise).slice(11,13),10) + parseInt(String(x.sunrise).slice(14,16),10)/60; ss = parseInt(String(x.sunset).slice(11,13),10) + parseInt(String(x.sunset).slice(14,16),10)/60; }
     function shape(hh){ return (hh > sr && hh < ss) ? Math.sin(Math.PI*(hh - sr)/(ss - sr)) : 0; }
     function scale(arr){ var v = []; arr.forEach(function(e){ var sh = shape(e.m/60); if(sh >= 0.25 && isFinite(e.lux)) v.push(climateRadiationWm2(e.lux)/sh); }); return v.length ? v.reduce(function(a, b){ return a + b; }, 0)/v.length : null; }
-    var scT = scale(A.today), sc = scT !== null ? scT : scale(A.yest), nowH = new Date().getHours() + new Date().getMinutes()/60, hours = [];
+    var scT = scale(A.today), sc = scT !== null ? scT : scale(A.yest);
+    /* نفاذية الغطاء من قراءات اليوم (أو اليوم اللي قبله) مقابل إشعاع برّه */
+    var haveOut = wxHistReady() && !!wxHist.map[D];
+    function tauOf(d, arr){ var pairs = []; arr.forEach(function(e){ if(isFinite(e.lux)){ var out = wxOutAt(d, e.m/60, 'Rs'); if(out !== null) pairs.push({rsIn:climateRadiationWm2(e.lux), rsOut:out}); } }); return lgTau(pairs); }
+    var tT = haveOut ? tauOf(D, A.today) : null, tY = (haveOut && wxHist.map[prevD]) ? tauOf(prevD, A.yest) : null, tau = tT ? tT : tY;
+    var useOut = !!(tau && haveOut), nowH = isToday ? (new Date().getHours() + new Date().getMinutes()/60) : 24, hours = [];
     for(var h = 0; h < 24; h++){
-      var mid = h + 0.5, src = (A.today.length && (mid <= nowH || !A.yest.length)) ? 'today' : 'yest', arr = A[src];
-      hours.push({h:h, T:interp(arr, 'T', mid*60), RH:interp(arr, 'RH', mid*60), Rs:(sc !== null ? sc*shape(mid) : 0), src:src});
+      var mid = h + 0.5, src = (A.today.length && (mid <= nowH || !A.yest.length)) ? 'today' : 'yest', arr = A[src], rs = 0;
+      if(useOut){ var ro = wxOutAt(D, mid, 'Rs'); rs = (ro !== null && ro > 0) ? tau.tau*ro : 0; }
+      else rs = sc !== null ? sc*shape(mid) : 0;
+      hours.push({h:h, T:interp(arr, 'T', mid*60), RH:interp(arr, 'RH', mid*60), Rs:rs, src:src});
     }
-    return {hours:hours, nToday:A.today.length, nYest:A.yest.length, noRad:sc === null, radFrom:scT !== null ? 'today' : 'yest', sr:sr, ss:ss, srSrc:(x && x.sunrise && x.sunset) ? 'weather' : 'default', sc:sc, used:A, shape:shape};
+    return {hours:hours, date:D, nToday:A.today.length, nYest:A.yest.length, noRad:(!useOut && sc === null), radFrom:scT !== null ? 'today' : 'yest', sr:sr, ss:ss, srSrc:(x && x.sunrise && x.sunset) ? 'weather' : 'default', sc:sc, used:A, shape:shape,
+      outdoor:useOut, tau:useOut ? tau.tau : null, tauN:useOut ? tau.n : 0, tauFrom:useOut ? (tT ? 'today' : 'yest') : null, haveOut:haveOut};
+  }
+  /* مقارنة قراءات الصوبة بالطقس برّه في نفس الوقت */
+  function irrCompareRows(prof, D){
+    if(!prof || !prof.haveOut) return [];
+    var rows = [];
+    [[D, prof.used.today], [planAddDays(D, -1), prof.used.yest]].forEach(function(pair){
+      pair[1].forEach(function(e){
+        var hh = e.m/60, t = wxOutAt(pair[0], hh, 'T'), r = wxOutAt(pair[0], hh, 'RH'), rs = wxOutAt(pair[0], hh, 'Rs');
+        rows.push({date:pair[0], m:e.m, T:e.T, RH:e.RH, Rs:isFinite(e.lux) ? climateRadiationWm2(e.lux) : null, oT:t, oRH:r, oRs:rs});
+      });
+    });
+    return rows;
+  }
+  function irrCompareHtml(prof, D){
+    var rows = irrCompareRows(prof, D), f1 = function(v, d){ if(v === null || v === undefined || !isFinite(v)) return '—'; var m = Math.pow(10, d || 0); return (Math.round(v*m)/m).toLocaleString('en-US'); };
+    if(!wxConfigured()) return '<p class="hint help-note">حدد موقع الطقس من الإعدادات عشان تظهر مقارنة جوه وبرّه الصوبة (حرارة، رطوبة، إشعاع ونفاذية الغطاء).</p>';
+    if(!prof.haveOut) return '<p class="hint help-note">'+(wxHistBusy ? 'جاري تحميل طقس برّه الصوبة…' : 'مقدرتش أجيب طقس برّه الصوبة دلوقتي (الإنترنت أو الخدمة). الحساب شغّال بشكل جيب الشمس لحد ما يتحمّل.')+'</p>';
+    var noon = rows.filter(function(r){ return r.m >= 600 && r.m <= 15*60 && r.oT !== null; }), mean = function(a){ return a.length ? a.reduce(function(x, y){ return x + y; }, 0)/a.length : null; };
+    var dT = mean(noon.map(function(r){ return r.T - r.oT; })), dRH = mean(noon.filter(function(r){ return r.oRH !== null; }).map(function(r){ return r.RH - r.oRH; }));
+    var notes = [];
+    if(prof.tau !== null){
+      var tp = Math.round(prof.tau*100);
+      notes.push('☀️ <b>نفاذية الغطاء ≈ '+tp+'٪</b> ('+prof.tauN+' قراءة'+(prof.tauFrom === 'yest' ? ' من إمبارح' : '')+'): إشعاع الصوبة ÷ إشعاع برّه.'+(prof.tau < 0.55 ? ' <span style="color:var(--alert);">منخفضة — عادة 60–85٪ للغطاء النضيف. اتأكد من نضافة الغطاء وإن مفيش تظليل/شبك زيادة.</span>' : (prof.tau > 0.9 ? ' عالية جدًا (ممكن لوكس الحساس قريب من مصدر ضوء أو بيتأثر باتجاه الشمس).' : ' في المعدّل المعتاد.')));
+    } else notes.push('☀️ مقدرتش أحسب النفاذية: محتاج قراءات لوكس وقت الظهيرة (برّه فوق 150 W/م²).');
+    if(dT !== null) notes.push('🌡️ فرق الحرارة وقت الظهيرة (جوه − برّه): <b>'+(dT > 0 ? '+' : '')+f1(dT, 1)+'°م</b>.'+(dT > 8 ? ' <span style="color:var(--alert);">كبير — زوّد التهوية أو التظليل.</span>' : (dT < 0 ? ' جوه أبرد من برّه (غالبًا تبريد/رطوبة).' : '')));
+    if(dRH !== null) notes.push('💧 فرق الرطوبة (جوه − برّه): <b>'+(dRH > 0 ? '+' : '')+f1(dRH)+'٪</b>.');
+    var tbl = rows.length ? '<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>°م جوه</th><th>°م برّه</th><th>رطوبة جوه</th><th>رطوبة برّه</th><th>إشعاع جوه</th><th>إشعاع برّه</th></tr></thead><tbody>'+rows.map(function(r){ return '<tr><td class="ltr num">'+r.date.slice(5)+' '+pad(Math.floor(r.m/60))+':'+pad(r.m%60)+'</td><td class="num">'+f1(r.T, 1)+'</td><td class="num">'+f1(r.oT, 1)+'</td><td class="num">'+f1(r.RH)+'</td><td class="num">'+f1(r.oRH)+'</td><td class="num">'+f1(r.Rs)+'</td><td class="num">'+f1(r.oRs)+'</td></tr>'; }).join('')+'</tbody></table></div>' : '';
+    return '<div style="line-height:1.9;">'+notes.map(function(n){ return '<div>'+n+'</div>'; }).join('')+'</div>'+tbl;
+  }
+  /* ---------- معايرة Kc من استهلاك فعلي: سجل يومي (مياه الري اللي اتدّت − الصرف) ---------- */
+  function irrCalibRows(sysId, gh, e, plants, fruit, plan){
+    var log = Array.isArray(plan.waterLog) ? plan.waterLog.slice().sort(function(a, b){ return String(b.date).localeCompare(String(a.date)); }) : [];
+    var items = log.map(function(w){
+      var prof = irrHourlyProfile(gh, w.date), meas = plants > 0 ? Math.max(0, (parseFloat(w.appliedL)||0) - (parseFloat(w.drainL)||0))*1000/plants : 0;
+      var base = prof ? lgIrrigPlan(prof.hours, {kc:1, density:e.density, leach:0, u2:e.wind}).dailyMl : 0;
+      return {w:w, prof:prof, measuredMl:meas, baseMl:base, outdoor:!!(prof && prof.outdoor)};
+    });
+    return {items:items, cal:lgKcCalibrate(items.map(function(x){ return {measuredMl:x.measuredMl, baseMl:x.baseMl}; }))};
+  }
+  function irrCalibHtml(sysId, gh, e, a, plants, fruit, plan, edit){
+    var cr = irrCalibRows(sysId, gh, e, plants, fruit, plan), f1 = function(v, d){ if(v === null || v === undefined || !isFinite(v)) return '—'; var m = Math.pow(10, d || 0); return (Math.round(v*m)/m).toLocaleString('en-US'); };
+    var lbl1 = fruit ? 'مياه الري اللي اتدّت (لتر للنظام)' : 'ماء التعويض اللي اتضاف للخزان (لتر)', rowsHtml = cr.items.map(function(x, i){
+      var kcd = cr.cal.rows[i].kc;
+      return '<tr data-i="'+i+'"><td class="ltr num">'+escH(x.w.date)+'</td><td class="num">'+f1(x.w.appliedL, 1)+'</td>'+(fruit ? '<td class="num">'+f1(x.w.drainL, 1)+'</td>' : '')+'<td class="num">'+(plants > 0 ? f1(x.measuredMl) : '—')+'</td><td class="num">'+(x.prof ? f1(x.baseMl) : '<span class="hint" style="margin:0;">مفيش قراءات مناخ</span>')+'</td><td class="num"><b>'+(kcd !== null ? f1(kcd, 2) : '—')+'</b></td><td>'+(edit ? '<button class="del-btn adv-wl-del" title="حذف">✕</button>' : '')+'</td></tr>';
+    }).join('');
+    var summary = cr.cal.kc !== null
+      ? '<div class="view-only-banner" style="background:var(--good-soft);color:var(--good);display:block;">🎯 Kc المعايَر من '+cr.cal.n+' يوم (الوسيط): <b>'+f1(cr.cal.kc, 2)+'</b> — المستخدم حاليًا: <b>'+f1(e.kc, 2)+'</b>'+(cr.cal.spread > 0.6 ? ' <span class="hint" style="margin:0;">(الأيام متفاوتة، سجّل أيام أكتر وأدق)</span>' : '')+(edit && Math.abs(cr.cal.kc - e.kc) > 0.02 ? ' <button type="button" class="btn btn-primary btn-sm" id="adv-kc-apply" data-kc="'+f1(cr.cal.kc, 2)+'" style="margin-inline-start:8px;">اعتمد Kc ده</button>' : '')+'</div>'
+      : '<p class="hint">سجّل <b>3 أيام على الأقل</b> (مياه الري'+(fruit ? ' والصرف' : '')+' ليوم فيه قراءات مناخ) عشان يتحسب Kc من استهلاك نباتك الفعلي. دلوقتي: '+cr.cal.n+' يوم صالح.</p>';
+    var form = edit ? '<form class="entry-form" id="adv-wl-form" style="margin-top:8px;"><div class="form-grid"><div class="field-sm"><label>اليوم</label><input type="date" class="ltr" id="adv-wl-date" value="'+planAddDays(todayStr(), -1)+'" required></div>'+
+      '<div class="field-sm"><label>'+lbl1+'</label><input type="number" step="any" min="0" class="ltr" id="adv-wl-app" required></div>'+(fruit ? '<div class="field-sm"><label>الصرف اللي نزل (لتر للنظام)</label><input type="number" step="any" min="0" class="ltr" id="adv-wl-drain" value="0"></div>' : '')+'</div>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">إضافة يوم</button></div></form>' : '';
+    return '<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:800;">🎯 معايرة Kc من استهلاكك الفعلي</summary>'+
+      '<p class="hint help-note">Kc هو معامل المحصول في معادلة الاحتياج. القيمة الافتراضية مرجعية عامة، لكن نباتك الفعلي ممكن يستهلك أكتر أو أقل. سجّل كل يوم كام لتر ميّه '+(fruit ? 'اتدّت للنظام وكام نزل صرف (المستهلك الفعلي = الري − الصرف)' : 'اتضاف للخزان تعويضًا')+'، والنظام بيقارنه بالاحتياج المحسوب (بـ Kc = 1) ويطلّع Kc لكل يوم، والوسيط هو المقترح. محتاج «عدد النباتات» في الإعدادات، وقراءات مناخ لنفس اليوم. الأيام الشاذة (عطل في الري، مطر...) ما بتأثرش كتير لأننا بنستخدم الوسيط.</p>'+
+      summary+(rowsHtml ? '<div class="table-wrap"><table><thead><tr><th>اليوم</th><th>'+(fruit ? 'ري (لتر)' : 'تعويض (لتر)')+'</th>'+(fruit ? '<th>صرف (لتر)</th>' : '')+'<th>مستهلك فعلي (مل/نبتة)</th><th>محسوب بـ Kc=1 (مل/نبتة)</th><th>Kc اليوم</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>' : '')+form+'</details>';
   }
 
   /* تفاصيل الحساب: كل الأرقام اللي اتبنى عليها الاقتراح */
@@ -6667,7 +6982,7 @@
       '<li>Rn (صافي الإشعاع) = 75٪ من الإشعاع الداخلي (W/م² × 0.0036 → MJ/م²/س)؛ G = 10٪ من Rn بالنهار؛ Cd = 0.34 نهارًا و0.96 ليلًا؛ بالليل Rn = 0</li>'+
       '<li><b>احتياج المحصول</b> ETc = ET₀ × Kc ('+e.kc+')</li>'+
       '<li><b>مل لكل نبتة في الساعة</b> = ETc ÷ الكثافة ('+e.density+' نبات/م²) × 1000'+(e.leach ? ' ÷ (1 − الغسيل '+e.leach+'٪)' : '')+'</li>'+
-      '<li>الإشعاع الداخلي = اللوكس ÷ 126.7 (تحويل الضوء النهاري)؛ ولأن القراءات قليلة بيتوزّع على اليوم بشكل جيب الشمس: Rs(ساعة) = '+(prof.sc !== null ? f1(prof.sc) : '—')+' W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق))، والمعامل متوسط قراءات '+(prof.radFrom === 'today' ? 'اليوم' : 'إمبارح')+' اللي بعد الشروق بشوية</li>'+
+      (prof.outdoor ? '<li>الإشعاع الداخلي في كل ساعة = <b>نفاذية الغطاء τ = '+f1(prof.tau, 2)+'</b> × إشعاع برّه الصوبة في نفس الساعة (من Open-Meteo). τ = متوسط (إشعاع الصوبة ÷ إشعاع برّه) من '+prof.tauN+' قراءة لوكس (اللوكس ÷ 126.7 → W/م²) وقت ما برّه فوق 150 W/م²'+(prof.tauFrom === 'yest' ? ' (من إمبارح)' : '')+'</li>' : '<li>الإشعاع الداخلي = اللوكس ÷ 126.7 (تحويل الضوء النهاري)؛ ولأن القراءات قليلة بيتوزّع على اليوم بشكل جيب الشمس: Rs(ساعة) = '+(prof.sc !== null ? f1(prof.sc) : '—')+' W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق))، والمعامل متوسط قراءات '+(prof.radFrom === 'today' ? 'اليوم' : 'إمبارح')+' اللي بعد الشروق بشوية</li>')+
       '<li>الحرارة والرطوبة: بين قراءاتك بالتقريب الخطي (على الخط)، والساعات اللي بعد آخر قراءة النهارده بتتاخد من بروفايل إمبارح</li></ul>';
     var evTxt = fruit ? ('الاحتياج اليومي <b>'+f1(res.dailyMl)+' مل/نبتة</b> ÷ حجم الريّة المستهدف <b>'+e.eventMl+' مل</b> = <b>'+res.n+' ريّة</b> (مقرّبة)، كل ريّة <b>'+f1(res.dailyMl/Math.max(1, res.n))+' مل/نبتة</b>'+(plants > 0 ? (' = '+f1(res.dailyMl/Math.max(1, res.n)*plants/1000, 1)+' لتر للنظام ('+plants+' نبتة)') : '')+(totalLpm > 0 && plants > 0 ? (' ÷ تصرف النظام '+f1(totalLpm, 2)+' لتر/د = <b>'+f1(res.dailyMl/Math.max(1, res.n)*plants/1000/totalLpm, 1)+' دقيقة تشغيل</b>') : '')+'. وأوقات الريات بتتوزّع بحيث كل ريّة تغطي نفس الحصة من احتياج النهار (فبتتزاحم وقت الذروة)، من ٥٪ لـ ٩٥٪ من احتياج ساعات النهار — يعني بعد الشروق بشوية وقبل الغروب بشوية. ساعات الليل (احتياجها قليل جدًا) بتتجمّع في إجمالي اليوم وبتتوزّع على ريات النهار.') : 'نظام ورقيات: مفيش جدول ريات من الاقتراح.';
     return '<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:800;">📋 الأرقام اللي اتبنى عليها الحساب (تفاصيل)</summary>'+
@@ -6685,6 +7000,7 @@
     var a = irrAdvGet(plan, fruit), e = irrAdvEff(a, fruit);
     var leafy = !fruit ? irrLeafyCalc(sysId, plan) : null, fr = fruit ? irrFruitCalc(plan) : null;
     var plants = e.plants > 0 ? e.plants : (leafy ? leafy.plants : 0), totalLpm = fruit ? fr.totalLpm : leafy.totalLpm;
+    if(wxConfigured() && !wxHistFresh() && !wxHistBusy){ wxHistFetch().then(function(ok){ if(ok && document.body.contains(box)) renderIrrigAdvisor(box, sysId); }); }
     var prof = irrHourlyProfile(gh), res = prof ? lgIrrigPlan(prof.hours, {kc:e.kc, density:e.density, leach:e.leach, plants:plants, eventMl:e.eventMl, totalLpm:totalLpm, u2:e.wind}) : null;
     var cropOpts = Object.keys(IRR_CROPS).concat(['أخرى']).map(function(c){ return '<option'+(c === a.crop ? ' selected' : '')+'>'+escH(c)+'</option>'; }).join('');
     var stageOpts = Object.keys(IRR_STAGES).map(function(k){ return '<option value="'+k+'"'+(k === a.stage ? ' selected' : '')+'>'+IRR_STAGES[k]+'</option>'; }).join('');
@@ -6726,8 +7042,9 @@
       } else {
         sched = '<p class="hint help-note" style="margin-top:10px;">ده نظام ورقيات (NFT): المياه بتتدوّر في الأنابيب، فالأرقام فوق هي اللي النبات بيستهلكه (امتصاص + تبخّر) وبتتعوّض من الخزان. قارنها بالنقص اليومي في الخزان. برامج التشغيل (ON/OFF) بتفضل من «جدول الري» فوق.</p>';
       }
-      out += bars+sched+(prof ? irrAdvDetails(prof, res, a, e, fruit, plants, totalLpm, gh) : '')+'<p class="hint help-note" style="margin-top:10px;">الحساب بمعادلة FAO-56 Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات '+(prof.nToday ? ('اليوم ('+prof.nToday+' قراءة)') : '')+(prof.nYest ? ((prof.nToday ? ' وإمبارح' : 'إمبارح')+' ('+prof.nYest+')') : '')+'، والباقي من بروفايل إمبارح) والإشعاع من اللوكس، × معامل المحصول Kc'+(e.leach ? ' ÷ (1 − الغسيل)' : '')+'. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.</p>';
+      out += bars+sched+'<details class="chart-card" style="margin-top:10px;"'+((prof.haveOut && prof.tau !== null && prof.tau < 0.55) ? ' open' : '')+'><summary style="cursor:pointer;font-weight:800;">🌤️ مقارنة جوه وبرّه الصوبة (نفاذية الغطاء)</summary>'+irrCompareHtml(prof, todayStr())+'</details>'+(prof ? irrAdvDetails(prof, res, a, e, fruit, plants, totalLpm, gh) : '')+'<p class="hint help-note" style="margin-top:10px;">الحساب بمعادلة FAO-56 Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات '+(prof.nToday ? ('اليوم ('+prof.nToday+' قراءة)') : '')+(prof.nYest ? ((prof.nToday ? ' وإمبارح' : 'إمبارح')+' ('+prof.nYest+')') : '')+'، والباقي من بروفايل إمبارح) والإشعاع '+(prof.outdoor ? ('= نفاذية الغطاء ('+Math.round(prof.tau*100)+'٪) × إشعاع برّه الصوبة بالساعة') : 'من اللوكس بشكل جيب الشمس')+'، × معامل المحصول Kc'+(e.leach ? ' ÷ (1 − الغسيل)' : '')+'. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.</p>';
     }
+    out += irrCalibHtml(sysId, gh, e, a, plants, fruit, plan, edit);
     box.innerHTML = '<p class="hint help-note">النظام بيحسب كام مل ماء النبتة الواحدة بتستهلكه في الساعة من الحرارة والرطوبة وشدة الإشعاع في الصوبة، واحتياجها اليومي، ويقترح ميعاد بداية الري وعدد الريات ووقت وكمية كل ريّة.</p>'+out+'<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:700;">⚙️ إعدادات المحصول والمستشار</summary>'+form+'</details>';
     if(edit){
       $('#adv-form', box).addEventListener('submit', function(ev){
@@ -6736,6 +7053,25 @@
         var adv = {crop:g('adv-crop'), stage:g('adv-stage'), kc:g('adv-kc'), density:g('adv-dens'), wind:g('adv-wind') || 0.5};
         if(fruit){ adv.leach = g('adv-leach'); adv.plants = g('adv-plants'); adv.eventMl = g('adv-event'); }
         saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {advisor:adv})).then(function(){ toast('اتحفظت إعدادات المستشار'); renderIrrigAdvisor(box, sysId); }).catch(function(){ toast('ما اتحفظش — تأكد من الصلاحيات وقواعد Firestore'); });
+      });
+      var wl = $('#adv-wl-form', box);
+      if(wl) wl.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var d = $('#adv-wl-date', box).value, ap2 = parseFloat($('#adv-wl-app', box).value), dr = fruit ? (parseFloat($('#adv-wl-drain', box).value) || 0) : 0;
+        if(!d || !(ap2 >= 0)){ toast('اكتب اليوم وكمية الميّه'); return; }
+        if(dr > ap2){ toast('الصرف أكبر من الري — راجع الأرقام'); return; }
+        var log = (Array.isArray(plan.waterLog) ? plan.waterLog : []).filter(function(w){ return w.date !== d; }).concat([{date:d, appliedL:ap2, drainL:dr, by:currentUser||''}]).sort(function(x, y){ return String(y.date).localeCompare(String(x.date)); }).slice(0, 60);
+        saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {waterLog:log})).then(function(){ toast('اتسجّل اليوم'); renderIrrigAdvisor(box, sysId); }).catch(function(){ toast('ما اتحفظش — تأكد من الصلاحيات'); });
+      });
+      $all('.adv-wl-del', box).forEach(function(b){ b.addEventListener('click', function(){
+        var i = parseInt(b.closest('tr').getAttribute('data-i'), 10), log = (Array.isArray(plan.waterLog) ? plan.waterLog.slice() : []).sort(function(x, y){ return String(y.date).localeCompare(String(x.date)); });
+        if(!confirm('تحذف اليوم ده من سجل المعايرة؟')) return; log.splice(i, 1);
+        saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {waterLog:log})).then(function(){ renderIrrigAdvisor(box, sysId); });
+      }); });
+      var kcb = $('#adv-kc-apply', box);
+      if(kcb) kcb.addEventListener('click', function(){
+        var k = kcb.getAttribute('data-kc'); if(!confirm('تعتمد Kc = '+k+' لنظام ده؟ (تقدر ترجّعه فاضي من الإعدادات عشان يبقى تلقائي)')) return;
+        saveIrrigPlan(Object.assign({}, getIrrigPlan(sysId), {advisor:Object.assign({}, irrAdvGet(getIrrigPlan(sysId), fruit), {kc:k})})).then(function(){ toast('اتعتمد Kc'); renderIrrigAdvisor(box, sysId); });
       });
       var ap = $('#adv-apply', box);
       if(ap) ap.addEventListener('click', function(){
@@ -8195,7 +8531,7 @@
       var f = getFertilizer(it.fertilizerId); if(!f) return;
       var inv = inventoryItems.filter(function(x){ return x.type==='fertilizer' && String(x.name).trim().toLowerCase()===String(f.name).trim().toLowerCase(); })[0];
       if(!inv || inv.quantity==null){ unmatched.push(f.name); return; }
-      var q = inv.unit==='كجم' ? +(it.grams/1000).toFixed(3) : (inv.unit==='جم' ? +(+it.grams).toFixed(2) : null);
+      var q = invQtyOf(f, it.grams, inv.unit);
       if(q===null){ unmatched.push(f.name+' (وحدة '+inv.unit+')'); return; }
       matched.push({id:inv.id, qty:q});
     });
@@ -8307,98 +8643,194 @@
     });
   }
 
+  /* ================= تاب المعادلات السمادية ================= */
+  var HB_UNITS = {ppm:'ppm (مجم/لتر)', mM:'mM (مللي مول/لتر)', mN:'meq/L (مللي مكافئ/لتر)', M:'M (مول/لتر)'};
+  function hbSaveCfg(){ try{ localStorage.setItem('oroots_hb_cfg', JSON.stringify(hbCfg)); }catch(e){} }
+  function hbFactor(){ return hbCfg.mode === 'ab' ? Math.max(1, parseFloat(currentDilutionRatio)||1) : 1; }
+  function hbSubOf(f, amount, fixed){
+    return {name:f.name, formula:f.formula||'', comp:f.comp||{}, purity:f.purity > 0 ? f.purity : 1, liquid:!!f.liquid, cost:parseFloat(f.cost)||0,
+      conc:f.conc != null ? f.conc : (f.tank === 'A' || f.tank === 'B' ? f.tank : ''), amount:amount||0, fixed:fixed||0};
+  }
+  function hbBase(){
+    return {targets:currentTargets, water:currentWater, volumeL:currentTankVolume, factor:hbFactor(), ab:hbCfg.mode === 'ab',
+      dof:hbCfg.dof, siMode:hbCfg.siMode, ec:hbCfg.ec, weightErr:hbCfg.wErr, volumeErr:hbCfg.vErr};
+  }
+  function hbEval(){
+    var items = currentMix.filter(function(m){ return getFertilizer(m.fertilizerId); });
+    var inp = hbBase(); inp.solve = false;
+    inp.subs = items.map(function(m){ return hbSubOf(getFertilizer(m.fertilizerId), m.grams); });
+    var r = hbCompute(inp); r.items = items; return r;
+  }
+  function hbErrText(er){
+    if(er.code === 'noSource') return 'لازم تختار سماد واحد على الأقل فيه العنصر '+er.element+' (الهدف مكتوب أكبر من صفر).';
+    if(er.code === 'incompatible') return 'السماد «'+er.name+'» مش مناسب للمحاليل المركّزة (A+B) — شيله أو اشتغل بوضع الإضافة المباشرة.';
+    if(er.code === 'noTargets') return 'اكتب هدف أكبر من صفر لعنصر واحد على الأقل.';
+    return 'تعذّر الحساب';
+  }
+  function hbWarnText(w){
+    var side = w.side ? ' '+w.side : '';
+    if(w.code === 'unused') return '«'+w.name+'» مش مستخدم في الحل النهائي — شيله من الاختيار تحصل على حل أحسن.';
+    if(w.code === 'ge') return 'الخطأ الإجمالي في '+w.element+' عالي (فوق ١٠٠٪) — غالبًا مفيش مجموعة أسمدة مناسبة، جرّب أسمدة تانية.';
+    if(w.code === 'ie') return 'خطأ دقة الأجهزة في '+w.element+' عالي (فوق ١٠٠٪) — حضّر حجم أكبر أو محلول أكثر تركيزًا.';
+    if(w.code === 'caSulfate') return 'المحلول'+side+' فيه كالسيوم وكبريت مع بعض (مشكلة كبيرة — ترسيب جبس). متحضّرش كده.';
+    if(w.code === 'tooConc') return 'المحلول'+side+' ممكن يكون مركّز زيادة — اعمل اختبار ذوبان قبل أي دفعة كبيرة.';
+    return '';
+  }
+  function hbU(v, i){
+    var x = (+v||0) / hbUnitFactor(hbCfg.unit, i);
+    return hbCfg.unit === 'ppm' ? String(+x.toFixed(6)) : (x === 0 ? '0' : String(Number(x.toPrecision(4))));
+  }
+  function hbNum(x){ return x == null || isNaN(x) ? '' : String(+(+x).toFixed(3)); }
+  function hbElLabel(i){
+    var e = HB_EL[i], lb = (NUTRIENT_ELEMENTS.filter(function(x){ return x.key === e.k; })[0] || {}).label || e.n;
+    return e.k === 'Si' && hbCfg.siMode === 'SiO2' ? 'سيليكون كـ SiO2' : lb;
+  }
+  function invQtyOf(f, amt, unit){
+    if(f && f.ml) return unit === 'لتر' ? +(amt/1000).toFixed(3) : (unit === 'مل' ? +(+amt).toFixed(2) : null);
+    return unit === 'كجم' ? +(amt/1000).toFixed(3) : (unit === 'جم' ? +(+amt).toFixed(2) : null);
+  }
+  function hbSolveNow(){
+    var sel = Object.keys(currentSolveFerts).filter(function(id){ return currentSolveFerts[id] && getFertilizer(id); });
+    var fixedItems = currentMix.filter(function(m){ return m.fixed && getFertilizer(m.fertilizerId); });
+    var ids = sel.slice();
+    fixedItems.forEach(function(m){ if(ids.indexOf(m.fertilizerId) < 0) ids.push(m.fertilizerId); });
+    if(!ids.length){ toast('اختار سماد واحد على الأقل'); return; }
+    var inp = hbBase(); inp.solve = true;
+    inp.subs = ids.map(function(id){
+      var it = fixedItems.filter(function(m){ return m.fertilizerId === id; })[0];
+      return hbSubOf(getFertilizer(id), 0, it ? (it.fixedAmt != null ? it.fixedAmt : it.grams) : 0);
+    });
+    var r = hbCompute(inp);
+    if(r.error){ hbNote = [hbErrText(r.error)]; renderNutrientsPanel(); toast('⚠️ '+hbErrText(r.error)); return; }
+    var next = [];
+    ids.forEach(function(id, i){
+      if(!(r.amounts[i] > 0)) return;
+      var old = fixedItems.filter(function(m){ return m.fertilizerId === id; })[0], o = {fertilizerId:id, grams:r.amounts[i]};
+      if(old){ o.fixed = true; o.fixedAmt = old.fixedAmt != null ? old.fixedAmt : old.grams; }
+      next.push(o);
+    });
+    currentMix = next;
+    hbNote = r.warnings.filter(function(w){ return w.code === 'unused'; }).map(hbWarnText);
+    renderNutrientsPanel();
+    toast('اتحسبت الخلطة');
+  }
+
   function renderNutrientsPanel(){
     var body = $('#nutrients-body');
     if(!body) return;
     if($('#sol-calc') && !$('#sol-calc').firstChild) safe(renderSolCalc);
     safe(renderTankLog);
 
-    var ferts = allFertilizers();
-    var stockPpm = computeStockPpm(currentMix, currentTankVolume);
-    var achieved = computeAchieved(currentMix, currentTankVolume, currentDilutionRatio);
+    var ferts = allFertilizers(), ab = hbCfg.mode === 'ab', factor = hbFactor();
+    var R = hbEval();
+    var achieved = {}; HB_EL.forEach(function(e, j){ achieved[e.k] = R.ppm[j]; });
     var balance = computeChargeBalance(achieved);
-    var ecEstimate = estimateEC(achieved);
     var balanceDiffPct = balance.anions ? Math.abs(balance.diff)/balance.anions*100 : (balance.cations?100:0);
-    var balanceStatus = balanceDiffPct<=10 ? 'good' : 'alert';
+    var balanceStatus = balanceDiffPct <= 10 ? 'good' : 'alert';
+    var unitLbl = HB_UNITS[hbCfg.unit].split(' ')[0];
 
-    var targetInputsHtml = NUTRIENT_ELEMENTS.map(function(e){
-      return '<div class="field-sm"><label>'+e.label+' (ppm)</label>'+
-        '<input type="number" step="0.01" min="0" class="ltr nutrient-target-input" data-el="'+e.key+'" value="'+(currentTargets[e.key]||0)+'"></div>';
+    var targetInputsHtml = HB_EL.map(function(e, j){
+      return '<div class="field-sm"><label>'+hbElLabel(j)+' ('+unitLbl+')</label>'+
+        '<input type="number" step="any" min="0" class="ltr nutrient-target-input" data-el="'+e.k+'" data-i="'+j+'" value="'+hbU(currentTargets[e.k]||0, j)+'"></div>';
     }).join('');
 
     var fertCheckboxesHtml = ferts.map(function(f){
       var checked = currentSolveFerts[f.id] ? 'checked' : '';
-      return '<label class="fert-checkbox-row"><input type="checkbox" class="solve-fert-check" data-fertid="'+f.id+'" '+checked+'> '+escH(f.name)+' <span style="color:var(--muted);font-size:0.75rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</span></label>';
+      var tk = f.tank === '-' ? '' : ' <span style="color:var(--muted);font-size:0.75rem;">(خزان '+f.tank+')</span>';
+      return '<label class="fert-checkbox-row" data-s="'+escH((f.name+' '+(f.formula||'')).toLowerCase())+'"><input type="checkbox" class="solve-fert-check" data-fertid="'+escH(f.id)+'" '+checked+'> '+escH(f.name)+tk+
+        (f.formula ? ' <span class="ltr" style="color:var(--muted);font-size:0.72rem;">'+escH(f.formula)+'</span>' : '')+'</label>';
     }).join('');
+    var nSel = Object.keys(currentSolveFerts).filter(function(id){ return currentSolveFerts[id]; }).length;
 
-    var fertOptionsHtml = ferts.map(function(f){
-      return '<option value="'+f.id+'">'+escH(f.name)+' ('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+')</option>';
-    }).join('');
+    var fertOptionsHtml = ferts.map(function(f){ return '<option value="'+escH(f.id)+'">'+escH(f.name)+'</option>'; }).join('');
 
-    var mixByTank = {A:[], B:[], '-':[]};
-    currentMix.forEach(function(item){
-      var f = getFertilizer(item.fertilizerId);
-      var tank = f ? f.tank : '-';
-      (mixByTank[tank]||mixByTank['-']).push(item);
-    });
-
-    function mixRowsHtml(items){
-      if(!items.length) return '<p class="empty-note" style="padding:8px 0;">لا يوجد</p>';
-      return '<div class="table-wrap"><table><thead><tr><th>السماد</th><th>الكمية</th><th>تثبيت</th><th></th></tr></thead><tbody>'+
-        items.map(function(item){
-          var f = getFertilizer(item.fertilizerId);
-          return '<tr data-fertid="'+item.fertilizerId+'">'+
-            '<td>'+(f?f.name:item.fertilizerId)+'</td>'+
-            '<td><input type="number" step="0.01" min="0" class="ltr mix-grams-input" style="width:90px;padding:6px 8px;border-radius:7px;border:1px solid var(--border);background:var(--paper);color:var(--ink);" value="'+dispQty(item)+'"> <span class="hint" style="margin:0 4px;">'+qtyUnit(f)+'</span></td>'+
-            '<td><input type="checkbox" class="mix-fixed-chk" '+(item.fixed?'checked':'')+'></td>'+
+    var rowsOf = function(filter){
+      var rows = R.items.map(function(m, i){ return {m:m, i:i, f:getFertilizer(m.fertilizerId)}; }).filter(filter);
+      if(!rows.length) return '<p class="empty-note" style="padding:8px 0;">لا يوجد</p>';
+      return '<div class="table-wrap"><table><thead><tr><th>السماد</th><th>الكمية</th><th>التكلفة</th><th>تثبيت</th><th></th></tr></thead><tbody>'+
+        rows.map(function(x){
+          var bad = ab && String(x.f.conc) === '0';
+          return '<tr data-fertid="'+escH(x.m.fertilizerId)+'">'+
+            '<td>'+(bad ? '⚠️ ' : '')+escH(x.f.name)+(x.f.formula ? '<br><span class="ltr" style="color:var(--muted);font-size:0.74rem;">'+escH(x.f.formula)+'</span>' : '')+'</td>'+
+            '<td><input type="number" step="any" min="0" class="ltr mix-grams-input" style="width:100px;padding:6px 8px;border-radius:7px;border:1px solid var(--border);background:var(--paper);color:var(--ink);" value="'+dispQty(x.m)+'"> <span class="hint" style="margin:0 4px;">'+qtyUnit(x.f)+'</span></td>'+
+            '<td class="num ltr">'+hbNum(R.cost[x.i])+'</td>'+
+            '<td><input type="checkbox" class="mix-fixed-chk" '+(x.m.fixed?'checked':'')+'></td>'+
             '<td><button class="del-btn mix-remove-btn" title="حذف">✕</button></td>'+
           '</tr>';
-        }).join('')+
-        '</tbody></table></div>';
-    }
+        }).join('')+'</tbody></table></div>';
+    };
+    var concOf = function(x){ var f = x.f; return String(f.conc != null ? f.conc : (f.tank === 'A' || f.tank === 'B' ? f.tank : '')); };
+    var mixHtml = ab
+      ? '<h3 style="font-size:0.85rem;margin:0 0 6px;color:var(--brand-strong);">محلول A (فيه نترات الكالسيوم)</h3>'+rowsOf(function(x){ return concOf(x) === 'A'; })+
+        '<h3 style="font-size:0.85rem;margin:14px 0 6px;color:var(--water);">محلول B (كبريتات وفوسفات وعناصر صغرى)</h3>'+rowsOf(function(x){ return concOf(x) === 'B'; })+
+        '<h3 style="font-size:0.85rem;margin:14px 0 6px;color:var(--muted);">بدون تصنيف</h3>'+rowsOf(function(x){ var c = concOf(x); return c !== 'A' && c !== 'B'; })
+      : rowsOf(function(){ return true; });
 
-    var resultsRowsHtml = NUTRIENT_ELEMENTS.map(function(e){
-      var target = currentTargets[e.key]||0;
-      var got = achieved[e.key]||0;
-      var diff = got-target;
-      var pctOff = target ? Math.abs(diff)/target : (got?1:0);
-      var statusClass = pctOff<=0.1 ? 'good' : 'alert';
-      return '<tr>'+
-        '<td>'+e.label+'</td>'+
-        '<td class="num ltr">'+fmtPpm(target)+'</td>'+
-        '<td class="num ltr" style="'+(statusClass==='alert'?'color:var(--alert)':'color:var(--good)')+'">'+fmtPpm(got)+'</td>'+
-        '<td class="num ltr" style="'+(statusClass==='alert'?'color:var(--alert)':'color:var(--muted)')+'">'+(diff>=0?'+':'')+fmtPpm(diff)+'</td>'+
-      '</tr>';
+    var resultsRowsHtml = HB_EL.map(function(e, j){
+      var tgt = +currentTargets[e.k]||0, w = +currentWater[e.k]||0, hasT = tgt > 0;
+      var ge = hasT ? R.ge[j] : null, ie = hasT ? R.ie[j] : null;
+      var bad = hasT && Math.abs(ge) > 5;
+      return '<tr><td>'+hbElLabel(j)+'</td>'+
+        '<td class="num ltr">'+(hasT ? hbU(tgt, j) : '—')+'</td>'+
+        '<td class="num ltr" style="color:var(--muted);">'+hbU(w, j)+'</td>'+
+        '<td class="num ltr" style="font-weight:700;'+(hasT ? (bad ? 'color:var(--alert)' : 'color:var(--good)') : '')+'">'+hbU(R.ppm[j], j)+'</td>'+
+        '<td class="num ltr" style="'+(bad ? 'color:var(--alert)' : 'color:var(--muted)')+'">'+(hasT ? (ge >= 0 ? '+' : '')+hbNum(hbRound(ge, 1))+'%' : '—')+'</td>'+
+        '<td class="num ltr" style="color:var(--muted);">'+(hasT ? '±'+hbNum(hbRound(ie, 1))+'%' : '—')+'</td></tr>';
     }).join('');
+
+    var warns = (hbNote||[]).concat(R.warnings.filter(function(w){ return w.code !== 'unused'; }).map(hbWarnText)).filter(Boolean);
+    var warnHtml = warns.length ? '<div class="hint" style="border:1px solid var(--alert);border-radius:10px;padding:8px 12px;margin:10px 0;color:var(--alert);">'+warns.map(function(t){ return '<div>⚠️ '+escH(t)+'</div>'; }).join('')+'</div>' : '';
+
+    var ratiosHtml = '<div class="table-wrap"><table><thead><tr><th>النسبة</th><th>القيمة (ppm:ppm)</th></tr></thead><tbody>'+
+      R.ratios.map(function(r){ return '<tr><td class="ltr">'+escH(r.label)+'</td><td class="num ltr">'+escH(r.v || '—')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+    var perSubHtml = R.perSub.length ? '<div class="table-wrap"><table><thead><tr><th>السماد</th><th>العنصر</th><th>المساهمة ('+unitLbl+')</th></tr></thead><tbody>'+
+      R.perSub.map(function(p){ return '<tr><td>'+escH(p.name)+'</td><td class="ltr">'+escH(HB_EL[p.el].n)+'</td><td class="num ltr">'+hbU(p.ppm, p.el)+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="empty-note">لا يوجد</p>';
+    var stockHtml = '';
+    if(ab && R.stock){
+      stockHtml = '<details class="nut-details"><summary>تحليل المحلولين المركّزين A / B (% وزن/حجم)</summary><div class="table-wrap"><table><thead><tr><th>العنصر/الأكسيد</th><th>A</th><th>B</th></tr></thead><tbody>'+
+        R.stock.A.map(function(r, k){ return '<tr><td class="ltr">'+escH(r.name)+'</td><td class="num ltr">'+r.v+'</td><td class="num ltr">'+R.stock.B[k].v+'</td></tr>'; }).join('')+'</tbody></table></div></details>';
+    }
+    var mixAnHtml = R.mix ? '<details class="nut-details"><summary>تحليل الخلطة الجافة (% وزن/وزن) — زي كيس السماد المخلوط</summary><div class="table-wrap"><table><thead><tr><th>العنصر/الأكسيد</th><th>%</th></tr></thead><tbody>'+
+      R.mix.pct.map(function(r){ return '<tr><td class="ltr">'+escH(r.name)+'</td><td class="num ltr">'+r.v+'</td></tr>'; }).join('')+'</tbody></table></div></details>' : '';
 
     var recipeOptionsHtml = '<option value="">— اختر خلطة محفوظة —</option>'+nutrientRecipes.map(function(r){
       return '<option value="'+r.id+'">'+escH(r.name)+'</option>';
     }).join('');
 
     var fertLibraryHtml = ferts.map(function(f){
-      var compStr = NUTRIENT_ELEMENTS.filter(function(e){ return f.comp[e.key]; }).map(function(e){ return e.key+' '+f.comp[e.key]+'%'; }).join(' · ');
-      var isCustom = f.id.indexOf('d-')!==0;
-      return '<div class="systems-list-row"><span><strong>'+escH(f.name)+'</strong><br><span style="color:var(--muted);font-size:0.76rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+') '+compStr+'</span></span>'+
-        (isCustom ? '<button class="del-btn fert-delete-btn" data-fertid="'+f.id+'" title="حذف">✕</button>' : '<span style="color:var(--muted);font-size:0.72rem;">افتراضي</span>')+
+      var fc = f.comp || {}, compStr = NUTRIENT_ELEMENTS.filter(function(e){ return fc[e.key]; }).map(function(e){ return e.key+' '+fc[e.key]+'%'; }).join(' · ');
+      var isCustom = f.id.indexOf('d-') !== 0 && f.id.indexOf('hb-') !== 0;
+      var extra = [(f.purity && f.purity < 1) ? 'نقاوة '+Math.round(f.purity*100)+'%' : '', f.liquid ? 'سائل' : '', f.cost ? 'سعر '+f.cost+'/كجم' : ''].filter(Boolean).join(' · ');
+      return '<div class="systems-list-row" data-s="'+escH((f.name+' '+(f.formula||'')).toLowerCase())+'"><span><strong>'+escH(f.name)+'</strong>'+(f.formula ? ' <span class="ltr" style="color:var(--muted);">'+escH(f.formula)+'</span>' : '')+'<br><span style="color:var(--muted);font-size:0.76rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+') '+compStr+(extra ? ' — '+extra : '')+'</span></span>'+
+        (isCustom ? '<button class="del-btn fert-delete-btn" data-fertid="'+escH(f.id)+'" title="حذف">✕</button>' : '<span style="color:var(--muted);font-size:0.72rem;">'+(f.hb ? 'جاهز' : 'افتراضي')+'</span>')+
         '</div>';
     }).join('');
 
-    body.innerHTML =
-      '<p class="hint help-note">حدد الأسمدة المتاحة عندك، اكتب الهدف بـ ppm لكل عنصر، واضغط "احسب تلقائي" — هيحسب جرامات كل سماد تلقائيًا بأفضل توازن ممكن بين أنيونات وكاتيونات، ويقدّرلك الـ EC الناتج.</p>'+
+    var sel = function(id, opts, cur){ return '<select id="'+id+'">'+opts.map(function(o){ return '<option value="'+o[0]+'"'+(String(o[0]) === String(cur) ? ' selected' : '')+'>'+o[1]+'</option>'; }).join('')+'</select>'; };
+    var dofOpts = HB_EL.filter(function(e){ return e.k !== 'N_NH4'; }).map(function(e){ return [e.n, e.n]; });
 
-      '<div class="nut-card"><h2 class="section-title" style="margin-top:0;">١) الإعدادات: الحجم والوحدات والدقة</h2>'+
+    body.innerHTML =
+      '<p class="hint help-note">الحساب هنا بخوارزمية حسابية دقيقة: كل عنصر هدفه أكبر من صفر معادلة، وبيتحل النظام بأقل-معيار SVD (نفس ALGLIB)، وبنحسب الخطأ الإجمالي GE وخطأ دقة الأجهزة IE والـ EC ونسب العناصر وتحليل المحلولين A/B.</p>'+
+
+      '<div class="nut-card"><h2 class="section-title" style="margin-top:0;">١) الإعدادات: الحجم والوحدات والنموذج</h2>'+
       '<div class="form-grid" style="margin-bottom:10px;">'+
-        '<div class="field-sm"><label>حجم خزان المحلول المركّز</label><input type="number" step="any" min="0.001" class="ltr" id="nutrient-volume" value="'+(+(currentTankVolume/VOL_TO_L[currentVolUnit]).toFixed(3))+'"></div>'+
+        '<div class="field-sm"><label>طريقة التحضير</label>'+sel('hb-mode', [['direct','إضافة مباشرة للخزان النهائي'],['ab','محلولين مركّزين A + B']], hbCfg.mode)+'</div>'+
+        '<div class="field-sm"><label>'+(ab ? 'حجم كل محلول مركّز' : 'حجم المحلول النهائي')+'</label><input type="number" step="any" min="0.001" class="ltr" id="nutrient-volume" value="'+(+(currentTankVolume/VOL_TO_L[currentVolUnit]).toFixed(3))+'"></div>'+
         '<div class="field-sm"><label>وحدة الحجم</label><select id="nutrient-vol-unit"><option value="L">لتر</option><option value="gal">جالون</option><option value="m3">متر مكعب</option></select></div>'+
         '<div class="field-sm"><label>وحدة الوزن</label><select id="nutrient-mass-unit"><option value="g">جرام</option><option value="oz">أونصة</option></select></div>'+
-        '<div class="field-sm"><label>نسبة التخفيف عند الحقن (١:كام)</label><input type="number" step="1" min="1" class="ltr" id="nutrient-dilution" value="'+currentDilutionRatio+'"></div>'+
-        '<div class="field-sm"><label>دقة الميزان (جرام)</label><select id="nutrient-precision"><option value="0.001">0.001</option><option value="0.01">0.01</option><option value="0.1">0.1</option><option value="1">1</option></select></div>'+
-        '<div class="field-sm"><label>السوائل بالمل</label><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="nutrient-liquid-ml"> احسب السوائل بالمل</label></div>'+
+        (ab ? '<div class="field-sm"><label>معامل التركيز (١ : كام)</label><input type="number" step="any" min="1" class="ltr" id="nutrient-dilution" value="'+currentDilutionRatio+'"></div>' : '')+
+        '<div class="field-sm"><label>وحدة التركيزات</label>'+sel('hb-unit', Object.keys(HB_UNITS).map(function(k){ return [k, HB_UNITS[k]]; }), hbCfg.unit)+'</div>'+
+        '<div class="field-sm"><label>العنصر "درجة الحرية" (مش بنعمل له معادلة)</label>'+sel('hb-dof', dofOpts, hbCfg.dof)+'</div>'+
+        '<div class="field-sm"><label>السيليكون مُدخل كـ</label>'+sel('hb-si', [['Si','Si'],['SiO2','SiO2']], hbCfg.siMode)+'</div>'+
+        '<div class="field-sm"><label>نموذج الـ EC</label>'+sel('hb-ec', [['lmc','LMCv2 (توصيلية مولية)'],['emp','Empirical (تجريبي)']], hbCfg.ec)+'</div>'+
+        '<div class="field-sm"><label>دقة الميزان (جرام)</label><input type="number" step="any" min="0" class="ltr" id="hb-werr" value="'+hbCfg.wErr+'"></div>'+
+        '<div class="field-sm"><label>دقة قياس الحجم (لتر)</label><input type="number" step="any" min="0" class="ltr" id="hb-verr" value="'+hbCfg.vErr+'"></div>'+
       '</div>'+
-      '<p class="hint help-note" style="margin-top:-4px;">لو بتخلط على قوة الري مباشرة من غير حقن، سيب نسبة التخفيف = ١.</p>'+
+      '<p class="hint help-note" style="margin-top:-4px;">'+(ab ? 'الأوزان بتطلع للمحلولين المركّزين. استخدم '+hbNum(1000/factor)+' مل من A ومن B لكل لتر محلول نهائي.' : 'الأوزان بتطلع للمحلول النهائي مباشرة.')+' السوائل بتتحسب دايمًا بالمل. درجة الحرية الافتراضية S (الكبريت) الافتراضي: بيتحسب كناتج مش كهدف.</p>'+
       '<div class="form-actions" style="flex-wrap:wrap;">'+
-        '<select id="nutrient-preset" style="padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);">'+
+        '<select id="nutrient-preset" style="padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);max-width:100%;">'+
           '<optgroup label="جاهزة">'+PRESETS.map(function(x,i){ return '<option value="b'+i+'">'+escH(x.name)+'</option>'; }).join('')+'</optgroup>'+
+          '<optgroup label="تركيبات جاهزة ('+HB_FORMS.length+')">'+HB_FORMS.map(function(x,i){ return '<option value="h'+i+'">'+escH(x.n)+'</option>'; }).join('')+'</optgroup>'+
           (targetProfiles.length ? '<optgroup label="أهدافي المحفوظة">'+targetProfiles.map(function(x){ return '<option value="c'+x.id+'">'+escH(x.name)+'</option>'; }).join('')+'</optgroup>' : '')+
         '</select>'+
         '<button type="button" class="btn btn-ghost btn-sm" id="btn-apply-preset">تحميل للأهداف</button>'+
@@ -8406,47 +8838,49 @@
         '<button type="button" class="btn-danger-ghost btn-sm" id="btn-delete-target-profile" style="border-radius:8px;">حذف المحفوظ المختار</button>'+
       '</div>'+
 
-      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٢) الهدف الغذائي (ppm في ماء الري النهائي)</h2>'+
+      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٢) الهدف الغذائي ('+unitLbl+' في المحلول النهائي)</h2>'+
       '<div class="form-grid">'+targetInputsHtml+'</div>'+
       '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="btn-zero-targets">تصفير كل الأهداف</button></div>'+
-      '<details class="nut-details"><summary>جودة مياه المصدر (ppm)</summary>'+
-      '<p class="hint help-note" style="margin-top:-4px;">لو مياه الري فيها عناصر أصلًا (من تحليل المياه)، اكتبها هنا. الحساب التلقائي بيخصمها من الهدف، والنتيجة النهائية بتضيفها.</p>'+
-      '<div class="form-grid">'+NUTRIENT_ELEMENTS.map(function(e){ return '<div class="field-sm"><label>'+e.label+'</label><input type="number" step="0.01" min="0" class="ltr nutrient-water-input" data-el="'+e.key+'" value="'+(currentWater[e.key]||0)+'"></div>'; }).join('')+'</div>'+
+      '<details class="nut-details" id="hb-water-det"'+(hbWaterOpen?' open':'')+'><summary>جودة مياه المصدر (ppm)</summary>'+
+      '<p class="hint help-note" style="margin-top:-4px;">لو مياه الري فيها عناصر أصلًا (من تحليل المياه)، اكتبها هنا. الحساب بيخصمها من الهدف، والنتيجة النهائية بتضيفها.</p>'+
+      '<div class="form-actions" style="flex-wrap:wrap;margin:0 0 8px;"><select id="hb-water-sel" style="padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);"><option value="">— ملف مياه جاهز —</option>'+HB_WATERS.map(function(w, i){ return '<option value="'+i+'">'+escH(w.n)+'</option>'; }).join('')+'</select><button type="button" class="btn btn-ghost btn-sm" id="btn-load-water">تحميل</button></div>'+
+      '<div class="form-grid">'+HB_EL.map(function(e, j){ return '<div class="field-sm"><label>'+hbElLabel(j)+'</label><input type="number" step="any" min="0" class="ltr nutrient-water-input" data-el="'+e.k+'" value="'+(currentWater[e.k]||0)+'"></div>'; }).join('')+'</div>'+
       '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="btn-zero-water">تصفير مياه المصدر</button></div></details>'+
 
-      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٣) اختار الأسمدة واحسب تلقائي</h2>'+
+      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٣) اختار الأسمدة واحسب</h2>'+
+      '<div class="form-actions" style="flex-wrap:wrap;margin:0 0 8px;"><input type="search" id="fert-search" placeholder="🔍 ابحث عن سماد أو صيغة…" style="flex:1;min-width:160px;padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);">'+
+        '<button type="button" class="btn btn-ghost btn-sm" id="btn-sel-clear">مسح الاختيار</button><span class="hint" id="fert-sel-count" style="margin:0;">المختار: '+nSel+'</span></div>'+
       '<div class="fert-checkbox-list">'+fertCheckboxesHtml+'</div>'+
-      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="btn-auto-solve">احسب تلقائي ⚙️</button></div>'+
+      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="btn-auto-solve">احسب ⚙️</button></div>'+
 
-      '<details class="nut-details"><summary>إضافة يدوية لسماد</summary>'+
+      '<details class="nut-details"><summary>إضافة يدوية لسماد بوزن معيّن</summary>'+
       '<div class="form-grid">'+
         '<div class="field-sm full"><label>السماد</label><select id="nutrient-fert-select">'+fertOptionsHtml+'</select></div>'+
-        '<div class="field-sm"><label>الكمية ('+(currentMassUnit==='oz'?'أونصة':'جرام')+') لخزان المحلول المركّز</label><input type="number" step="0.01" min="0" class="ltr" id="nutrient-fert-grams" value="10"></div>'+
+        '<div class="field-sm"><label>الكمية (جرام/أونصة أو مل للسوائل)</label><input type="number" step="any" min="0" class="ltr" id="nutrient-fert-grams" value="10"></div>'+
       '</div>'+
       '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="btn-add-to-mix">إضافة للخلطة</button></div></details>'+
 
-      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٤) الخلطة الحالية (علّم «تثبيت» على أي وزن عايزه ثابت وأعد الحساب)</h2>'+
+      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٤) الخلطة الحالية <span class="hint" style="font-weight:400;">(علّم «تثبيت» على وزن عايزه ثابت وأعد الحساب — أو عدّل أي وزن وشوف النتيجة)</span></h2>'+
       '<div class="form-actions" style="margin:0 0 8px;flex-wrap:wrap;"><button type="button" class="btn-danger-ghost btn-sm" id="btn-reset-weights" style="border-radius:8px;">إعادة ضبط الأوزان</button>'+
         (currentMix.length ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-deduct-inventory">خصم الكميات دي من المخزون</button>' : '')+'</div>'+
       (currentMix.length ? '<p class="hint" id="deduct-inventory-report" style="margin:0 0 8px;"></p>' : '')+
-      '<h3 style="font-size:0.85rem;margin:0 0 6px;color:var(--brand-strong);">خزان A (مع نترات الكالسيوم)</h3>'+
-      mixRowsHtml(mixByTank.A)+
-      '<h3 style="font-size:0.85rem;margin:14px 0 6px;color:var(--water);">خزان B (كبريتات وفوسفات)</h3>'+
-      mixRowsHtml(mixByTank.B)+
-      '<h3 style="font-size:0.85rem;margin:14px 0 6px;color:var(--muted);">أي خزان</h3>'+
-      mixRowsHtml(mixByTank['-'])+
+      mixHtml+
+      (currentMix.length ? '<p class="hint" style="margin:10px 0 0;font-weight:700;">التكلفة الإجمالية: <span class="ltr num">'+hbNum(R.totalCost)+'</span></p>' : '')+
 
-      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٥) النتيجة المحققة (بعد التخفيف) مقابل الهدف</h2>'+
-      '<div class="table-wrap"><table><thead><tr><th>العنصر</th><th>الهدف ppm</th><th>المحقق ppm</th><th>الفرق</th></tr></thead><tbody>'+resultsRowsHtml+'</tbody></table></div>'+
-
-      '<h2 class="section-title">توازن الأيونات وتقدير EC</h2>'+
+      '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٥) النتيجة مقابل الهدف</h2>'+
+      warnHtml+
+      '<div class="table-wrap"><table><thead><tr><th>العنصر</th><th>الهدف</th><th>الماء</th><th>النتيجة ('+unitLbl+')</th><th title="الخطأ الإجمالي: بُعد النتيجة عن الهدف">GE</th><th title="خطأ دقة الميزان والحجم">IE</th></tr></thead><tbody>'+resultsRowsHtml+'</tbody></table></div>'+
+      '<h2 class="section-title">EC وتوازن الأيونات</h2>'+
       '<div class="climate-stats">'+
+        climateStatChip('EC متوقع', fmtNum(R.ec), 'mS/cm')+
         climateStatChip('كاتيونات (+)', fmtNum(balance.cations), 'meq/L')+
         climateStatChip('أنيونات (-)', fmtNum(balance.anions), 'meq/L')+
         '<div class="climate-chip" style="border-color:'+(balanceStatus==='alert'?'var(--alert)':'var(--good)')+';"><span class="cc-label">نسبة الفرق</span><span class="cc-val ltr num" style="'+(balanceStatus==='alert'?'color:var(--alert)':'color:var(--good)')+'">'+fmtNum(balanceDiffPct)+' <span class="cc-unit">%</span></span></div>'+
-        climateStatChip('EC تقديري', fmtNum(ecEstimate), 'mS/cm')+
       '</div>'+
-      '<p class="hint help-note">EC مبني على قانون Kohlrausch للتوصيلية المولية للأيونات الرئيسية (بدون العناصر الصغرى، تأثيرها مهمل عمليًا)، مع تصحيح تقريبي ٩٠٪ للتفاعل الأيوني عند تركيزات الري الفعلية. ده تقدير للتخطيط — أكّده دايمًا بجهاز EC حقيقي، خصوصًا إن مياه المصدر عندك ممكن يكون لها EC أساسي قبل ما تضيف السماد أصلاً. توازن الأيونات لو فرقه أكتر من ١٠٪ يبقى الخلطة محتاجة مصدر نيتروجين/كبريت إضافي يظبط التوازن.</p>'+
+      '<p class="hint help-note">EC محسوب بنموذج ('+(hbCfg.ec === 'lmc' ? 'LMCv2' : 'Empirical')+'). تقدير للتخطيط — أكّده دايمًا بجهاز EC حقيقي. GE = بُعد النتيجة عن الهدف، IE = أثر دقة الميزان والحجم.</p>'+
+      '<details class="nut-details" open><summary>نسب العناصر</summary>'+ratiosHtml+'</details>'+
+      '<details class="nut-details"><summary>مساهمة كل سماد في كل عنصر</summary>'+perSubHtml+'</details>'+
+      stockHtml+mixAnHtml+
 
       '</div><div class="nut-card"><h2 class="section-title" style="margin-top:0;">٦) حفظ وتحميل الخلطات</h2>'+
       '<div class="form-actions" style="margin-top:6px;flex-wrap:wrap;">'+
@@ -8457,10 +8891,11 @@
         '<button type="button" class="btn btn-ghost btn-sm" id="btn-export-mix">تصدير CSV</button>'+
       '</div>'+
 
-      '</div><div class="nut-card"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">٧) مكتبة الأسمدة</h2><button class="btn btn-ghost btn-sm" id="btn-new-fert">+ سماد مخصّص</button></div>'+
+      '</div><div class="nut-card"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">٧) مكتبة الأسمدة ('+ferts.length+')</h2><button class="btn btn-ghost btn-sm" id="btn-new-fert">+ سماد مخصّص</button></div>'+
       '<div id="fert-form-holder"></div>'+
-      '<div id="fert-library-list">'+fertLibraryHtml+'</div>'+
-      '<p class="hint help-note" style="margin-top:10px;">النسب الافتراضية مبنية على التحليل التجاري القياسي أو الوزن الجزيئي الدقيق للمركبات البسيطة. لو عندك سماد من مورد بنسبة مختلفة، ضيفه كسماد مخصّص بالنسبة المطبوعة فعليًا على عبوتك.</p></div>';
+      '<input type="search" id="fert-lib-search" placeholder="🔍 ابحث في المكتبة…" style="width:100%;margin:8px 0;padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);">'+
+      '<div id="fert-library-list" style="max-height:420px;overflow-y:auto;">'+fertLibraryHtml+'</div>'+
+      '<p class="hint help-note" style="margin-top:10px;">مكتبة الأسمدة الجاهزة ('+HB_SUBS.length+' سماد بنسبها ونقاوتها وأسعارها المرجعية) + الأسمدة الافتراضية القديمة + اللي تضيفه. لو عندك سماد من مورد بنسبة مختلفة، ضيفه كسماد مخصّص بالنسبة المطبوعة على عبوتك.</p></div>';
 
     $('#nutrient-volume').addEventListener('change', function(){
       currentTankVolume = (parseFloat(this.value)||1)*VOL_TO_L[currentVolUnit];
@@ -8470,15 +8905,25 @@
     $('#nutrient-vol-unit').addEventListener('change', function(){ currentVolUnit = this.value; renderNutrientsPanel(); });
     $('#nutrient-mass-unit').value = currentMassUnit;
     $('#nutrient-mass-unit').addEventListener('change', function(){ currentMassUnit = this.value; renderNutrientsPanel(); });
+    [['hb-mode','mode'],['hb-unit','unit'],['hb-dof','dof'],['hb-si','siMode'],['hb-ec','ec']].forEach(function(p){
+      $('#'+p[0]).addEventListener('change', function(){ hbCfg[p[1]] = this.value; hbSaveCfg(); hbNote = []; renderNutrientsPanel(); });
+    });
+    [['hb-werr','wErr',0.01],['hb-verr','vErr',0.1]].forEach(function(p){
+      $('#'+p[0]).addEventListener('change', function(){ var v = parseFloat(this.value); hbCfg[p[1]] = v >= 0 ? v : p[2]; hbSaveCfg(); renderNutrientsPanel(); });
+    });
+    var dilEl = $('#nutrient-dilution');
+    if(dilEl) dilEl.addEventListener('change', function(){ currentDilutionRatio = Math.max(1, parseFloat(this.value)||1); renderNutrientsPanel(); });
+    $('#hb-water-det').addEventListener('toggle', function(){ hbWaterOpen = this.open; });
     $('#btn-zero-targets').addEventListener('click', function(){ currentTargets = {}; renderNutrientsPanel(); });
     $('#btn-zero-water').addEventListener('click', function(){ currentWater = {}; renderNutrientsPanel(); });
-    $('#nutrient-precision').value = String(currentPrecision);
-    $('#nutrient-precision').addEventListener('change', function(){ currentPrecision = parseFloat(this.value)||0.01; });
-    $('#nutrient-liquid-ml').checked = currentLiquidMl;
-    $('#nutrient-liquid-ml').addEventListener('change', function(){ currentLiquidMl = this.checked; renderNutrientsPanel(); });
+    $('#btn-load-water').addEventListener('click', function(){
+      var v = $('#hb-water-sel').value; if(v === '') return;
+      currentWater = Object.assign({}, HB_WATERS[parseInt(v,10)].w); renderNutrientsPanel(); toast('اتحمّل ملف المياه');
+    });
     $('#btn-apply-preset').addEventListener('click', function(){
       var v = $('#nutrient-preset').value || 'b0';
       if(v[0]==='b'){ currentTargets = Object.assign({}, PRESETS[parseInt(v.slice(1),10)||0].t); renderNutrientsPanel(); toast('اتنسخت التركيبة للأهداف'); }
+      else if(v[0]==='h'){ currentTargets = Object.assign({}, HB_FORMS[parseInt(v.slice(1),10)||0].t); renderNutrientsPanel(); toast('اتنسخت التركيبة للأهداف'); }
       else { loadTargetProfile(v.slice(1)); }
     });
     $('#btn-save-target-profile').addEventListener('click', function(){
@@ -8490,7 +8935,7 @@
       if(v[0]!=='c'){ toast('اختار هدف من "أهدافي المحفوظة" الأول'); return; }
       deleteTargetProfile(v.slice(1));
     });
-    $('#btn-reset-weights').addEventListener('click', function(){ if(!currentMix.length) return; if(!confirm('تمسح الخلطة الحالية وكل الأوزان المثبتة؟')) return; currentMix = []; renderNutrientsPanel(); });
+    $('#btn-reset-weights').addEventListener('click', function(){ if(!currentMix.length) return; if(!confirm('تمسح الخلطة الحالية وكل الأوزان المثبتة؟')) return; currentMix = []; hbNote = []; renderNutrientsPanel(); });
     var deductBtn = $('#btn-deduct-inventory');
     if(deductBtn){
       deductBtn.addEventListener('click', function(){
@@ -8500,14 +8945,12 @@
           if(!f) return;
           var invItem = inventoryItems.filter(function(x){ return x.type==='fertilizer' && x.name.trim().toLowerCase()===f.name.trim().toLowerCase(); })[0];
           if(!invItem || invItem.quantity==null){ unmatched.push(f.name); return; }
-          var qty = null;
-          if(invItem.unit==='كجم') qty = +(item.grams/1000).toFixed(3);
-          else if(invItem.unit==='جم') qty = +item.grams.toFixed(2);
+          var qty = invQtyOf(f, item.grams, invItem.unit);
           if(qty===null){ unmatched.push(f.name+' (وحدة المخزون '+invItem.unit+' — يحتاج تحويل يدوي)'); return; }
           matched.push({id:invItem.id, name:f.name, qty:qty, unit:invItem.unit});
         });
         if(!matched.length){
-          $('#deduct-inventory-report').textContent = 'مفيش أصناف متطابقة بالاسم في المخزون (وحدة كجم/جم) لخصمها. تأكد إن اسم السماد هنا مطابق لاسمه في تبويب المخازن.';
+          $('#deduct-inventory-report').textContent = 'مفيش أصناف متطابقة بالاسم في المخزون (بوحدة تناسب الصنف) لخصمها. تأكد إن اسم السماد هنا مطابق لاسمه في تبويب المخازن.';
           return;
         }
         if(!confirm('هيتم خصم:\n'+matched.map(function(m){ return '- '+m.name+': '+m.qty+' '+m.unit; }).join('\n')+'\n\nمتأكد؟')) return;
@@ -8523,47 +8966,43 @@
     $all('.mix-fixed-chk', body).forEach(function(c){
       c.addEventListener('change', function(){
         var it = currentMix.filter(function(m){ return m.fertilizerId===c.closest('tr').getAttribute('data-fertid'); })[0];
-        if(it) it.fixed = c.checked;
+        if(it){ it.fixed = c.checked; if(c.checked) it.fixedAmt = it.grams; else delete it.fixedAmt; }
       });
     });
     $all('.nutrient-water-input', body).forEach(function(inp){
       inp.addEventListener('change', function(){ currentWater[this.getAttribute('data-el')] = parseFloat(this.value)||0; renderNutrientsPanel(); });
     });
-    $('#nutrient-dilution').addEventListener('change', function(){
-      currentDilutionRatio = parseFloat(this.value)||1;
-      renderNutrientsPanel();
-    });
     $all('.nutrient-target-input', body).forEach(function(inp){
       inp.addEventListener('change', function(){
-        currentTargets[this.getAttribute('data-el')] = parseFloat(this.value)||0;
+        var j = parseInt(this.getAttribute('data-i'), 10);
+        currentTargets[this.getAttribute('data-el')] = (parseFloat(this.value)||0) * hbUnitFactor(hbCfg.unit, j);
         renderNutrientsPanel();
       });
     });
+    var updCount = function(){ var c = $('#fert-sel-count'); if(c) c.textContent = 'المختار: '+Object.keys(currentSolveFerts).filter(function(id){ return currentSolveFerts[id]; }).length; };
     $all('.solve-fert-check', body).forEach(function(chk){
       chk.addEventListener('change', function(){
-        currentSolveFerts[this.getAttribute('data-fertid')] = this.checked;
+        currentSolveFerts[this.getAttribute('data-fertid')] = this.checked; updCount();
       });
     });
-
-    $('#btn-auto-solve').addEventListener('click', function(){
-      var selectedIds = Object.keys(currentSolveFerts).filter(function(id){ return currentSolveFerts[id]; });
-      if(!selectedIds.length){ toast('اختار سماد واحد على الأقل'); return; }
-      var fixed = currentMix.filter(function(m){ return m.fixed; });
-      var fixedPpm = computeStockPpm(fixed, currentTankVolume);
-      var effTargets = {};
-      NUTRIENT_ELEMENTS.forEach(function(e){ effTargets[e.key] = Math.max(0,(currentTargets[e.key]||0)-(currentWater[e.key]||0)-(fixedPpm[e.key]||0)/(currentDilutionRatio||1)); });
-      var ids = selectedIds.filter(function(id){ return !fixed.some(function(m){ return m.fertilizerId===id; }); });
-      var solved = ids.length ? autoSolveMix(ids, effTargets, currentTankVolume, currentDilutionRatio) : [];
-      solved = solved.map(function(m){ return {fertilizerId:m.fertilizerId, grams:+(Math.round(m.grams/currentPrecision)*currentPrecision).toFixed(3)}; }).filter(function(m){ return m.grams>0; });
-      currentMix = fixed.concat(solved);
-      renderNutrientsPanel();
-      toast('اتحسبت الخلطة تلقائيًا');
+    var filterRows = function(inputSel, rowSel){
+      var inp = $(inputSel); if(!inp) return;
+      inp.addEventListener('input', function(){
+        var q = this.value.trim().toLowerCase();
+        $all(rowSel, body).forEach(function(r){ r.style.display = (!q || (r.getAttribute('data-s')||'').indexOf(q) >= 0) ? '' : 'none'; });
+      });
+    };
+    filterRows('#fert-search', '.fert-checkbox-row');
+    filterRows('#fert-lib-search', '#fert-library-list .systems-list-row');
+    $('#btn-sel-clear').addEventListener('click', function(){
+      currentSolveFerts = {}; $all('.solve-fert-check', body).forEach(function(c){ c.checked = false; }); updCount();
     });
+    $('#btn-auto-solve').addEventListener('click', hbSolveNow);
 
     $('#btn-add-to-mix').addEventListener('click', function(){
       var fid = $('#nutrient-fert-select').value;
       var grams = gFromQty(getFertilizer($('#nutrient-fert-select').value), parseFloat($('#nutrient-fert-grams').value)||0);
-      if(!fid || grams<=0){ toast('اختار سماد واكتب جرامات أكبر من صفر'); return; }
+      if(!fid || grams<=0){ toast('اختار سماد واكتب كمية أكبر من صفر'); return; }
       var existing = currentMix.filter(function(m){ return m.fertilizerId===fid; })[0];
       if(existing) existing.grams = +(existing.grams+grams).toFixed(3);
       else currentMix.push({fertilizerId:fid, grams:grams});
@@ -8575,7 +9014,7 @@
         var tr = this.closest('tr');
         var fid = tr.getAttribute('data-fertid');
         var item = currentMix.filter(function(m){ return m.fertilizerId===fid; })[0];
-        if(item){ item.grams = gFromQty(getFertilizer(fid), parseFloat(this.value)||0); renderNutrientsPanel(); }
+        if(item){ item.grams = gFromQty(getFertilizer(fid), parseFloat(this.value)||0); if(item.fixed) item.fixedAmt = item.grams; hbNote = []; renderNutrientsPanel(); }
       });
     });
     $all('.mix-remove-btn', body).forEach(function(btn){
@@ -8629,6 +9068,8 @@
           '<div class="field-sm"><label>النقاوة Purity (%)</label><input type="number" step="0.1" min="1" max="100" class="ltr" id="fert-purity" value="100"></div>'+
           '<div class="field-sm"><label>سائل؟</label><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="fert-liquid"> سماد سائل</label></div>'+
           '<div class="field-sm"><label>الكثافة (جم/مل)</label><input type="number" step="0.001" min="0.1" class="ltr" id="fert-density" value="1"></div>'+
+          '<div class="field-sm"><label>السعر (للكجم أو للتر)</label><input type="number" step="any" min="0" class="ltr" id="fert-cost" value="0"></div>'+
+          '<div class="field-sm"><label>نوع المحلول المركّز</label><select id="fert-conc"><option value="">حسب الخزان</option><option value="A">A</option><option value="B">B</option><option value="0">مش مناسب للمركّزات</option></select></div>'+
         '</div>'+
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ السماد</button> <button type="button" class="btn btn-ghost btn-sm" id="fert-cancel-btn">إلغاء</button></div>'+
       '</form>';
@@ -8646,7 +9087,10 @@
         var purity = Math.min(100, Math.max(1, parseFloat($('#fert-purity').value)||100));
         if(v) comp[k] = +(v*purity/100).toFixed(4);
       });
-      addCustomFertilizer(name, $('#fert-tank').value, comp, $('#fert-liquid').checked ? {liquid:true, density:parseFloat($('#fert-density').value)||1} : null).then(function(){
+      var extra = {cost:parseFloat($('#fert-cost').value)||0};
+      if($('#fert-conc').value) extra.conc = $('#fert-conc').value;
+      if($('#fert-liquid').checked){ extra.liquid = true; extra.density = parseFloat($('#fert-density').value)||1; }
+      addCustomFertilizer(name, $('#fert-tank').value, comp, extra).then(function(){
         toast('اتحفظ السماد');
         holder.innerHTML='';
         renderNutrientsPanel();
@@ -8657,23 +9101,32 @@
   function exportNutrientMixCSV(){
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     if(!currentMix.length){ toast('لا توجد خلطة للتصدير'); return; }
-    var lines = [['السماد','الخزان','الجرامات (للخزان المركّز)'].map(csvEscape).join(',')];
-    currentMix.forEach(function(item){
-      var f = getFertilizer(item.fertilizerId);
-      lines.push([f?f.name:item.fertilizerId, f?(f.tank==='-'?'أي خزان':f.tank):'', item.grams].map(csvEscape).join(','));
+    var R = hbEval(), ab = hbCfg.mode === 'ab', unitLbl = HB_UNITS[hbCfg.unit].split(' ')[0];
+    var row = function(a){ return a.map(csvEscape).join(','); }, lines = [];
+    lines.push(row(['السماد','الصيغة','الكمية','الوحدة','التكلفة']));
+    R.items.forEach(function(m, i){
+      var f = getFertilizer(m.fertilizerId);
+      lines.push(row([(ab && f.conc ? f.conc+' - ' : '')+f.name, f.formula||'', dispQty(m), qtyUnit(f), R.cost[i]]));
+    });
+    lines.push(row(['التكلفة الإجمالية','','','',R.totalCost]));
+    lines.push('');
+    lines.push(row(['العنصر','الهدف ('+unitLbl+')','الماء ppm','النتيجة ('+unitLbl+')','GE %','IE %']));
+    HB_EL.forEach(function(e, j){
+      var t = +currentTargets[e.k]||0;
+      lines.push(row([e.n, hbU(t, j), currentWater[e.k]||0, hbU(R.ppm[j], j), t > 0 ? hbRound(R.ge[j], 1) : 0, t > 0 ? hbRound(R.ie[j], 1) : 0]));
     });
     lines.push('');
-    lines.push(['العنصر','الهدف ppm','المحقق ppm (بعد التخفيف)'].map(csvEscape).join(','));
-    var achieved = computeAchieved(currentMix, currentTankVolume, currentDilutionRatio);
-    NUTRIENT_ELEMENTS.forEach(function(e){
-      lines.push([e.label, currentTargets[e.key]||0, fmtNum(achieved[e.key]||0)].map(csvEscape).join(','));
-    });
-    var balance = computeChargeBalance(achieved);
+    lines.push(row(['EC متوقع mS/cm', R.ec]));
+    R.ratios.forEach(function(r){ lines.push(row([r.label, r.v])); });
     lines.push('');
-    lines.push(['كاتيونات meq/L', fmtNum(balance.cations)].map(csvEscape).join(','));
-    lines.push(['أنيونات meq/L', fmtNum(balance.anions)].map(csvEscape).join(','));
-    lines.push(['EC تقديري mS/cm', fmtNum(estimateEC(achieved))].map(csvEscape).join(','));
-    var csv = '\uFEFF' + lines.join('\r\n');
+    lines.push(row(['السماد','العنصر','المساهمة ('+unitLbl+')']));
+    R.perSub.forEach(function(p2){ lines.push(row([p2.name, HB_EL[p2.el].n, hbU(p2.ppm, p2.el)])); });
+    if(ab && R.stock){
+      lines.push('');
+      lines.push(row(['العنصر/الأكسيد','محلول A %','محلول B %']));
+      R.stock.A.forEach(function(r, k){ lines.push(row([r.name, r.v, R.stock.B[k].v])); });
+    }
+    var csv = '﻿' + lines.join('\r\n');
     downloadsCap.save({filename:'oroots-nutrient-mix-'+todayStr()+'.csv', data:csv}).then(function(){
       toast('تم حفظ الملف');
     }).catch(function(err){
@@ -12765,7 +13218,7 @@
   var customCharts = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_customcharts') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
   var ovPrefs = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_ovprefs') || 'null'); if(o && typeof o==='object') return {hidden:o.hidden || {}, titles:o.titles || {}, sizes:o.sizes || {}}; }catch(e){} return {hidden:{}, titles:{}, sizes:{}}; })();
   var ioState = {}, ioBuilder = null, IO_MAX_SERIES = 12;
-  var IO_COLORS = ['#2C8C6F','#D8543A','#2C7A8C','#C9932F','#8C6FA2','#3B82F6','#6FA22E','#E0457B','#7A5C2E','#0F766E'];
+  var IO_COLORS = ['#00C2A8','#FF5A4D','#3B82F6','#F5A623','#9B59F0','#2979FF','#2DBE6C','#E0457B','#FF8A00','#00B8D4'];
   var CL_METRICS = [
     {k:'temp', n:'الحرارة', u:'°C', f:function(e){ return parseFloat(e.temp); }},
     {k:'rh', n:'الرطوبة النسبية', u:'%', f:function(e){ return parseFloat(e.rh); }},
@@ -12924,13 +13377,13 @@
   }
   function ioBuildSeries(chart, st, catMap){
     var w = ioWin(st), end = w.to, from = w.from;
-    return cmykAssign((chart.series || []).map(function(d){
+    return ((chart.series || []).map(function(d){
       var meta = catMap[d.ref] || {name:String(d.ref), group:'(غير متاح)', unit:''};
       var scale = parseFloat(d.scale); if(!isFinite(scale) || scale===0) scale = 1;
       var win = ioData(d.ref).filter(function(p){ return p.x >= from && p.x <= end; });
       var mn = null, mx = null, sum = 0;
       win.forEach(function(p){ if(mn===null || p.y<mn) mn = p.y; if(mx===null || p.y>mx) mx = p.y; sum += p.y; });
-      return {def:d, meta:meta, scale:scale, axis:(d.axis==='R' ? 'R' : 'L'), color:d.color || '#2C8C6F', visible:!st.hidden[d.id], win:win, min:mn, max:mx, avg:win.length ? sum/win.length : null, gap:ioGap(win)};
+      return {def:d, meta:meta, scale:scale, axis:(d.axis==='R' ? 'R' : 'L'), color:vividLine(d.color || '#2C8C6F'), visible:!st.hidden[d.id], win:win, min:mn, max:mx, avg:win.length ? sum/win.length : null, gap:ioGap(win)};
     }));
   }
 
@@ -14383,6 +14836,19 @@
     }
     return {rows:rows, dailyMl:tot, dayMl:dayTot, peak:peak, n:n, start:lgHHMM(first), end:lgHHMM(last), events:events};
   }
+
+  /* ===== نفاذية الغطاء τ = إشعاع جوه ÷ إشعاع برّه (بس لما برّه فوق 150 W/م² عشان الصبح والعصر ما يبوّظوش النسبة) ===== */
+  function lgTau(pairs){
+    var v = (pairs || []).filter(function(p){ return p.rsOut > 150 && p.rsIn >= 0; }).map(function(p){ return Math.min(1.2, p.rsIn / p.rsOut); });
+    return v.length ? {tau:v.reduce(function(a, b){ return a + b; }, 0) / v.length, n:v.length} : null;
+  }
+  /* ===== معايرة Kc من استهلاك فعلي: Kc اليوم = المستهلك الفعلي (مل/نبتة) ÷ الاحتياج المرجعي بـ Kc = 1؛ المعتمد = الوسيط (مقاوم للقيم الشاذة) ===== */
+  function lgKcCalibrate(items){
+    var rows = (items || []).map(function(x){ return {measuredMl:x.measuredMl, baseMl:x.baseMl, kc:(x.baseMl >= 50 && x.measuredMl > 0) ? x.measuredMl / x.baseMl : null}; });
+    var ks = rows.map(function(r){ return r.kc; }).filter(function(k){ return k !== null; }).sort(function(a, b){ return a - b; });
+    var med = ks.length ? (ks.length % 2 ? ks[(ks.length - 1) / 2] : (ks[ks.length / 2 - 1] + ks[ks.length / 2]) / 2) : null;
+    return {rows:rows, n:ks.length, kc:(med === null || ks.length < 3) ? null : Math.min(1.8, Math.max(0.2, med)), median:med, spread:ks.length ? ks[ks.length - 1] - ks[0] : null};
+  }
 /*LOGIC-END*/
   function farmInsightLines(){
     var nowMs = lgTs(nowLocalInputValue()), out = [];
@@ -15307,7 +15773,7 @@
   /* ---------- theme ---------- */
   function setPalette(p, persist){
     var root = document.documentElement;
-    p = (p==='vivid' || p==='cmyk') ? p : 'calm';
+    p = (p==='vivid') ? 'vivid' : 'calm';
     if(p==='calm') root.removeAttribute('data-palette'); else root.setAttribute('data-palette', p);
     try{ localStorage.setItem('oroots_palette', p); }catch(e){}
     Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.classList.toggle('active', b.getAttribute('data-pal')===p); });
@@ -15353,8 +15819,8 @@
   function setupTheme(){
     installErrorReporter(); checkDeviceClock();
     var pal = null; try{ pal = localStorage.getItem('oroots_palette'); }catch(e){}
-    setPalette((pal==='vivid' || pal==='calm' || pal==='cmyk') ? pal : 'cmyk', false);
-    $('#btn-palette').addEventListener('click', function(){ var cur = document.documentElement.getAttribute('data-palette') || 'calm', next = cur==='calm' ? 'vivid' : (cur==='vivid' ? 'cmyk' : 'calm'); setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : (next==='cmyk' ? 'اتفعّل مظهر CMYK' : 'اتفعّل المظهر الهادي')); });
+    setPalette(pal==='vivid' ? 'vivid' : 'calm', false);
+    $('#btn-palette').addEventListener('click', function(){ var next = document.documentElement.getAttribute('data-palette')==='vivid' ? 'calm' : 'vivid'; setPalette(next, true); toast(next==='vivid' ? 'اتفعّل المظهر الزاهي' : 'اتفعّل المظهر الهادي'); });
     Array.prototype.forEach.call(document.querySelectorAll('.pal-opt'), function(b){ b.addEventListener('click', function(){ setPalette(b.getAttribute('data-pal'), true); }); });
     Array.prototype.forEach.call(document.querySelectorAll('.hist-opt'), function(b){
       b.classList.toggle('active', parseInt(b.getAttribute('data-days'),10) === histDays());
@@ -15805,7 +16271,7 @@
     db.doc('userData/'+myMail()).onSnapshot(function(snap){
       var ud = snap.exists ? snap.data() : {};
       dashMine = Array.isArray(ud.pages) ? ud.pages : [];
-      if(ud.palette==='vivid' || ud.palette==='calm' || ud.palette==='cmyk') setPalette(ud.palette, false);
+      if(ud.palette==='vivid' || ud.palette==='calm' || ud.palette==='cmyk') setPalette(ud.palette==='vivid' ? 'vivid' : 'calm', false);
       ownCharts = Array.isArray(ud.charts) ? ud.charts : null; ownOv = (ud.ov && typeof ud.ov === 'object') ? ud.ov : null; ioMergeCharts();
       if(ud.tabNames && typeof ud.tabNames === 'object' && !Array.isArray(ud.tabNames)){ tabNames = ud.tabNames; try{ localStorage.setItem('oroots_tabnames', JSON.stringify(tabNames)); }catch(e){} }
       if(Array.isArray(ud.tabOrder)){ tabOrder = ud.tabOrder; try{ localStorage.setItem('oroots_taborder', JSON.stringify(tabOrder)); }catch(e){} }
