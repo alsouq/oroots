@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ckDONiUlR6wRhhqGnPKx2IwjOnVBAVrAkMi2Tc/+rFE=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1puWga92TgxSfdOdjkVYzX5rycxoZW0XJvc22/A92SQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -580,6 +580,16 @@
   }
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .form-grid .full{grid-column:1 / -1;}
+  /* منع خروج الحقول عن عرض الشاشة (مشكلة الموبايل في المكافحة الحيوية والجودة): العناصر جوه الشبكة تقدر تضيق، والحقول ما تعدّيش عرض خانتها */
+  .form-grid > *,.field-sm{min-width:0;}
+  .field-sm input,.field-sm select,.field-sm textarea{min-width:0;max-width:100%;box-sizing:border-box;}
+  .field-sm input[type=date],.field-sm input[type=datetime-local],.field-sm input[type=time]{min-width:0;width:100%;}
+  .table-wrap{max-width:100%;}
+  @media(max-width:520px){
+    #panel-pests .form-grid,#panel-quality .form-grid{grid-template-columns:1fr;}
+    #panel-pests .chart-card,#panel-quality .chart-card,#panel-pests .settings-card,#panel-quality .settings-card{padding-inline:12px;}
+    #panel-pests details,#panel-quality details{min-width:0;max-width:100%;}
+  }
   @media(max-width:420px){.form-grid{grid-template-columns:1fr 1fr;}}
   .field-sm label{display:block;font-size:0.78rem;color:var(--muted);margin-bottom:5px;}
   .field-sm input,.field-sm textarea{
@@ -632,6 +642,12 @@
   .range-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .range-row .metric-name{width:150px;font-size:0.85rem;flex-shrink:0;}
   .range-row input{width:90px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--paper);color:var(--ink);}
+  /* صفوف النطاقات والإعدادات: تلف على سطر جديد بدل ما تعدّي عرض الشاشة على الموبايل */
+  .range-row{flex-wrap:wrap;min-width:0;} .range-row .metric-name{width:auto;flex:1 1 140px;min-width:0;} .range-row input:not([type=checkbox]){flex:0 1 90px;min-width:0;width:90px;max-width:100%;box-sizing:border-box;} .range-row select{min-width:0;max-width:100%;}
+  @media(max-width:520px){
+    .range-row .metric-name{flex-basis:100%;} .range-row input:not([type=checkbox]){flex:1 1 70px;width:auto;max-width:none;}
+    .range-row input[style*="max-width"]{flex:0 1 110px;}
+  }
 
   .system-picker{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .system-picker::-webkit-scrollbar{display:none;}
@@ -1033,6 +1049,7 @@
       </div>
       <div id="overview-kpis"></div>
       <div id="wx-alerts"></div>
+      <div id="risk-alerts"></div>
       <div id="overview-alerts"></div>
       <div id="overview-crop-refs"></div>
 
@@ -1320,7 +1337,7 @@
       </div>
 
       <div class="settings-card" id="reads-card">
-        <h3>📊 قراءات قاعدة البيانات</h3>
+        <h3>📊 استهلاك قاعدة البيانات (Firebase)</h3>
         <p class="hint help-note">عدد المستندات اللي اتقرت من Firestore في الجلسة دي، لمتابعة استهلاك الحصة اليومية. سجل التدقيق والسلة بيتحمّلوا لما تفتح الإعدادات بس.</p>
         <div id="reads-box"></div>
       </div>
@@ -5857,6 +5874,7 @@
     renderCropRefs();
     renderOverviewAlerts();
     safe(renderWxAlerts);
+    safe(renderFarmInsights);
     safe(renderOverviewKpis);
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
@@ -14030,6 +14048,83 @@
     el.innerHTML = list.length ? '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--ink);display:block;"><strong>⛅ تنبيهات الطقس القريب</strong>'+list.map(function(a){ return '<div style="margin:3px 0;">'+escH(a.t)+'</div>'; }).join('')+'</div>' : '';
   }
 
+
+  /* ---------- مخاطر الأمراض من المناخ + القراءات الشاذة ---------- */
+/*LOGIC-BEGIN*/
+  /* ts = 'YYYY-MM-DDTHH:MM' بتوقيت المزرعة؛ بنقارنهم كأنهم UTC عشان الفروق تفضل بالساعات الصح */
+  function lgTs(ts){ return Date.parse(String(ts).slice(0, 16) + ':00Z'); }
+  function lgNum(v){ v = parseFloat(v); return isFinite(v) ? v : null; }
+  /* ساعات (آخر 24 ساعة) اللي الحرارة والرطوبة فيها اتحققوا بشرط معيّن؛ كل قراءة بتمثّل الفترة لحد القراءة اللي بعدها (بحد أقصى 3 ساعات) */
+  function lgRiskHours(entries, nowMs, test){
+    var from = nowMs - 24*3600000, cap = 3*3600000, h = 0, e = (entries || []).slice().sort(function(a, b){ return String(a.ts).localeCompare(String(b.ts)); });
+    for(var i = 0; i < e.length; i++){
+      var t = lgTs(e[i].ts), temp = lgNum(e[i].temp), rh = lgNum(e[i].rh);
+      if(!(t <= nowMs) || temp === null || rh === null) continue;
+      var next = i + 1 < e.length ? lgTs(e[i+1].ts) : nowMs, start = Math.max(t, from), span = Math.min(Math.max(next - start, 0), cap);
+      if(test(temp, rh)) h += span / 3600000;
+    }
+    return Math.round(h * 10) / 10;
+  }
+  var LG_DISEASES = [
+    {id:'botrytis', name:'العفن الرمادي (بوترايتس)', test:function(t, r){ return t >= 15 && t <= 23 && r >= 90; }, med:3, high:6, tip:'قلّل الرطوبة بالتهوية والتسخين الخفيف قبل الفجر، وتجنّب الرش المسائي.'},
+    {id:'downy', name:'البياض الزغبي', test:function(t, r){ return t >= 10 && t <= 24 && r >= 85; }, med:4, high:8, tip:'زوّد حركة الهواء وقلّل الرطوبة الليلية وراجع الأوراق السفلية.'},
+    {id:'powdery', name:'البياض الدقيقي (تقدير استرشادي)', test:function(t, r){ return t >= 22 && t <= 28 && r >= 70 && r <= 90; }, med:10, high:16, tip:'راجع الأوراق القديمة وظلّل الإصابات المبكرة، وفكّر في وقاية بالكبريت أو بديل حيوي.'}
+  ];
+  /* مخاطر الأمراض لصوبة واحدة من قراءات مناخها: [{id, name, level:'medium'|'high', hours, tip}] (تقدير استرشادي مش تشخيص) */
+  function lgDiseaseRisks(entries, nowMs){
+    var out = [];
+    LG_DISEASES.forEach(function(d){
+      var h = lgRiskHours(entries, nowMs, d.test);
+      if(h >= d.high) out.push({id:d.id, name:d.name, level:'high', hours:h, tip:d.tip});
+      else if(h >= d.med) out.push({id:d.id, name:d.name, level:'medium', hours:h, tip:d.tip});
+    });
+    return out;
+  }
+  /* قراءات شاذة: قيمة ثابتة 6 قراءات فأكتر في آخر 48 ساعة، أو انجراف في اتجاه واحد على 4 أيام فأكتر */
+  var LG_DRIFT_MIN = {ph:0.6, ec:0.6, temp:4, moist:15, rh:15};
+  var LG_LABEL = {ph:'pH', ec:'EC', temp:'الحرارة', moist:'رطوبة التربة', rh:'الرطوبة النسبية', lux:'الإضاءة'};
+  function lgAnomalies(entries, keys, nowMs){
+    var out = [], e = (entries || []).slice().sort(function(a, b){ return String(a.ts).localeCompare(String(b.ts)); });
+    var recent = e.filter(function(x){ var t = lgTs(x.ts); return t >= nowMs - 48*3600000 && t <= nowMs; });
+    keys.forEach(function(k){
+      var vals = recent.map(function(x){ return lgNum(x[k]); }).filter(function(v){ return v !== null; });
+      if(vals.length >= 6 && vals.every(function(v){ return v === vals[0]; })) out.push({k:k, type:'flat', text:LG_LABEL[k] + ' ثابتة على ' + vals[0] + ' في آخر ' + vals.length + ' قراءات — اتأكد من الحساس أو إن القراءة مش بتتنسخ'});
+      var byDay = {}; e.forEach(function(x){ var v = lgNum(x[k]); if(v !== null) byDay[String(x.ts).slice(0, 10)] = v; });
+      var days = Object.keys(byDay).sort().slice(-5), dv = days.map(function(d){ return byDay[d]; });
+      if(dv.length >= 4){
+        var up = true, down = true;
+        for(var i = 1; i < dv.length; i++){ if(!(dv[i] > dv[i-1])) up = false; if(!(dv[i] < dv[i-1])) down = false; }
+        var total = dv[dv.length-1] - dv[0], min = LG_DRIFT_MIN[k];
+        if((up || down) && min && Math.abs(total) >= min) out.push({k:k, type:'drift', text:LG_LABEL[k] + ' بتتحرك في اتجاه واحد ' + (up ? 'لفوق' : 'لتحت') + ' ' + dv.length + ' أيام (من ' + (Math.round(dv[0]*100)/100) + ' لـ ' + (Math.round(dv[dv.length-1]*100)/100) + ')'});
+      }
+    });
+    return out;
+  }
+/*LOGIC-END*/
+  function farmInsightLines(){
+    var nowMs = lgTs(nowLocalInputValue()), out = [];
+    greenhouseGroups().forEach(function(g){
+      var ce = flattenEntries('climate', g.name);
+      lgDiseaseRisks(ce, nowMs).forEach(function(r){ out.push({lv:r.level==='high' ? 'alert' : 'warn', t:'🍄 '+g.name+': خطر '+r.name+' ('+(r.level==='high' ? 'عالي' : 'متوسط')+' — '+r.hours+' ساعة ظروف مناسبة في آخر 24 ساعة). '+r.tip}); });
+      lgAnomalies(ce, ['temp','rh'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+g.name+' (مناخ): '+a.text}); });
+    });
+    systems.forEach(function(sy){
+      var label = systemLabel(sy);
+      if(sysGType(sy)==='fruit') lgAnomalies(flattenEntries('soil', sy.id), ['ph','ec','temp','moist'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+label+' (تربة): '+a.text}); });
+      else [['irrigation','ري'],['drainage','صرف']].forEach(function(sr){ lgAnomalies(flattenEntries(sr[0], sy.id), ['ph','ec','temp'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+label+' ('+sr[1]+'): '+a.text}); }); });
+    });
+    return out;
+  }
+  function renderFarmInsights(){
+    var el = $('#risk-alerts'); if(!el) return;
+    var list = farmInsightLines();
+    if(!list.length){ el.innerHTML = ''; return; }
+    var hasHigh = list.some(function(x){ return x.lv==='alert'; });
+    el.innerHTML = '<div class="view-only-banner" style="background:'+(hasHigh ? 'var(--alert-soft)' : 'var(--tank-soft)')+';color:var(--ink);display:block;"><strong>🔬 مخاطر وقراءات تستاهل المراجعة</strong>'+
+      list.slice(0, 8).map(function(x){ return '<div style="margin:3px 0;">'+escH(x.t)+'</div>'; }).join('')+(list.length > 8 ? '<div class="hint" style="margin:3px 0;">+'+(list.length-8)+' تانية</div>' : '')+
+      '<div class="hint" style="margin:6px 0 0;">تقدير استرشادي من قراءاتك المسجّلة (مش تشخيص): الخطر بيتحسب من ساعات الرطوبة والحرارة آخر 24 ساعة، والقراءات الشاذة من الثبات أو الانجراف.</div></div>';
+  }
+
   function wxRenderDetail(){
     safe(renderWxAlerts);
     var el = document.getElementById('wx-detail'); if(!el) return;
@@ -14883,6 +14978,10 @@
     });
     window.addEventListener('unhandledrejection', function(ev){
       var r = ev && ev.reason, m = r && (r.message || String(r));
+      if(m && ((r && r.code === 'resource-exhausted') || /quota exceeded|resource-exhausted/i.test(m))){
+        if(!permWarned || Date.now() - permWarned > 8000){ permWarned = Date.now(); try{ toast(quotaMsg(), 10000); }catch(e){} }
+        return;
+      }
       if(m && ((r && r.code === 'permission-denied') || /Missing or insufficient permissions|permission-denied/i.test(m))){
         if(!permWarned || Date.now() - permWarned > 8000){ permWarned = Date.now(); try{ toast('⛔ ما اتحفظش: مفيش صلاحية كتابة على السيرفر. اتأكد من صلاحياتك عند المدير، ومن إن قواعد Firestore الأخيرة اتنشرت (وإن المدير فتح التطبيق مرة بعد التحديث).', 9000); }catch(e){} }
         return;
@@ -15072,14 +15171,58 @@
   /* عدّاد قراءات Firestore الفعلية (من السيرفر) في الجلسة دي — بيظهر للمدير في الإعدادات */
   var readStats = {};
   function noteReads(name, snap){
-    try{ if(snap && snap.docChanges && !(snap.metadata && snap.metadata.fromCache)) readStats[name] = (readStats[name] || 0) + snap.docChanges().length; }catch(e){}
+    try{ if(snap && snap.docChanges && !(snap.metadata && snap.metadata.fromCache)){ var n = snap.docChanges().length; readStats[name] = (readStats[name] || 0) + n; if(n > 0) usageAdd('r', n); } }catch(e){}
   }
+  /* ---------- عداد استهلاك Firebase اليومي (للجهاز ده): القراءات والكتابات مقابل الحصة المجانية ---------- */
+  var USAGE_LIM = {r:50000, w:20000};
+  function pacificDay(d){ try{ return new Intl.DateTimeFormat('en-CA', {timeZone:'America/Los_Angeles'}).format(d || new Date()); }catch(e){ return (d || new Date()).toISOString().slice(0,10); } }
+  var usage = (function(){
+    var u = null; try{ u = JSON.parse(localStorage.getItem('oroots_usage') || 'null'); }catch(e){}
+    var day = pacificDay();
+    return (u && u.d === day) ? {d:u.d, r:u.r||0, w:u.w||0} : {d:day, r:0, w:0};
+  })();
+  var usageTimer = null;
+  function usageSave(){ clearTimeout(usageTimer); usageTimer = setTimeout(function(){ try{ localStorage.setItem('oroots_usage', JSON.stringify(usage)); }catch(e){} }, 1500); }
+  function usageAdd(k, n){
+    var day = pacificDay(); if(usage.d !== day){ usage = {d:day, r:0, w:0}; }
+    usage[k] += (n > 0 ? n : 1); usageSave();
+    var pct = usage[k] / USAGE_LIM[k], flag = 'oroots_usage_warn_'+k+'_'+usage.d, seen = null;
+    if(pct >= 0.8){ try{ seen = localStorage.getItem(flag); }catch(e){}
+      if(!seen){ try{ localStorage.setItem(flag, '1'); }catch(e){} try{ toast('⚠️ جهازك استهلك '+Math.round(pct*100)+'٪ من حصة '+(k==='r' ? 'القراءات' : 'الكتابات')+' المجانية اليومية. لو الحصة خلصت التسجيل هيقف لحد التجديد.', 9000); }catch(e){} }
+    }
+  }
+  function quotaResetText(){
+    try{
+      var t0 = Date.now(), day0 = pacificDay(new Date(t0)), t = t0;
+      for(var i = 0; i < 1500; i++){ t += 60000; if(pacificDay(new Date(t)) !== day0) break; }
+      return new Intl.DateTimeFormat('ar-EG', {timeZone:'Africa/Cairo', hour:'numeric', minute:'2-digit'}).format(new Date(t));
+    }catch(e){ return '10:00 ص تقريبًا'; }
+  }
+  function installUsageMeter(){
+    try{
+      var F = firebase.firestore;
+      var wrap = function(proto, name, fn){ if(!proto || !proto[name] || proto[name].__um) return; var o = proto[name]; proto[name] = function(){ try{ fn(); }catch(e){} return o.apply(this, arguments); }; proto[name].__um = 1; };
+      var wrapGet = function(proto){ if(!proto || !proto.get || proto.get.__um) return; var o = proto.get; proto.get = function(){ var p = o.apply(this, arguments); try{ p.then(function(sn){ usageAdd('r', sn && sn.size != null ? Math.max(1, sn.size) : 1); }, function(){}); }catch(e){} return p; }; proto.get.__um = 1; };
+      var W = function(){ usageAdd('w', 1); };
+      if(F.DocumentReference){ ['set','update','delete'].forEach(function(n){ wrap(F.DocumentReference.prototype, n, W); }); wrapGet(F.DocumentReference.prototype); }
+      if(F.WriteBatch) ['set','update','delete'].forEach(function(n){ wrap(F.WriteBatch.prototype, n, W); });
+      if(F.Transaction){ ['set','update','delete'].forEach(function(n){ wrap(F.Transaction.prototype, n, W); }); wrap(F.Transaction.prototype, 'get', function(){ usageAdd('r', 1); }); }
+      if(F.Query) wrapGet(F.Query.prototype);
+    }catch(e){ console.warn('usage meter', e); }
+  }
+  function usageBarHtml(label, v, lim){
+    var pct = Math.min(100, Math.round(v/lim*100)), col = pct >= 80 ? 'var(--alert)' : (pct >= 50 ? 'var(--tank)' : 'var(--brand)');
+    return '<div style="margin:6px 0;"><div style="display:flex;justify-content:space-between;font-size:.82rem;"><span>'+label+'</span><span class="ltr" dir="ltr"><strong>'+v.toLocaleString('en-US')+'</strong> / '+lim.toLocaleString('en-US')+' ('+pct+'٪)</span></div>'+
+      '<div style="height:9px;border-radius:6px;background:var(--surface-2);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+col+';"></div></div></div>';
+  }
+  function quotaMsg(){ return '⛔ حصة Firebase اليومية المجانية خلصت (Quota exceeded). التسجيل هيشتغل تاني لما الحصة تتجدد (حوالي '+quotaResetText()+' بتوقيت القاهرة)، أو بترقية الخطة. اللي حاولت تسجّله دلوقتي ما اتحفظش.'; }
+
   function lazyAdminSubs(){ if(currentUserRole==='admin'){ subscribeAudit(); subscribeTrash(); } }   // سجل التدقيق والسلة بيتحمّلوا لما المدير يفتح الإعدادات بس (توفير قراءات)
   function renderReadStats(){
     var box = document.getElementById('reads-box'); if(!box) return;
     var rows = Object.keys(readStats).map(function(k){ return [k, readStats[k]]; }).sort(function(a, b){ return b[1]-a[1]; });
     var tot = rows.reduce(function(s, r){ return s + r[1]; }, 0);
-    box.innerHTML = '<p class="hint" style="margin:0 0 8px;">'+(currentUserRole==='admin' ? '' : '')+'قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
+    box.innerHTML = '<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الجهاز ده النهارده (من الحصة المجانية)</h4>'+usageBarHtml('قراءات', usage.r, USAGE_LIM.r)+usageBarHtml('كتابات', usage.w, USAGE_LIM.w)+'<p class="hint" style="margin:4px 0 10px;">الحصة بتتجدد الساعة '+quotaResetText()+' بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.</p>'+'<p class="hint" style="margin:0 0 8px;">قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
       (rows.length ? '<div class="table-wrap"><table><thead><tr><th>المجموعة</th><th>قراءات</th></tr></thead><tbody>'+rows.slice(0, 15).map(function(r){ return '<tr><td class="ltr">'+escH(r[0])+'</td><td class="num">'+r[1]+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="empty-note">لسه مفيش قراءات من السيرفر في الجلسة دي (البيانات جت من الذاكرة المحلية).</p>');
   }
   function bootTick(key, snap){
@@ -15462,6 +15605,7 @@
     fs.settings({ignoreUndefinedProperties:true});
     try{ fs.enablePersistence({synchronizeTabs:true}).catch(function(e){ console.warn('التخزين المؤقت مش شغال على الصفحة دي (غالباً بتتفتح كملف محلي):', e && e.code); }); }catch(e){}
     db = fs;
+    installUsageMeter();
     updateSyncBadge();
 
     downloadsCap = { save: function(o){

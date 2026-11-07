@@ -7,6 +7,7 @@ const TZ = 'Africa/Cairo';
 const DEFAULT_FROM = Number(process.env.REMIND_FROM || 7);
 const DEFAULT_TO = Number(process.env.REMIND_TO || 19);
 const LOOKBACK = 14;                                    // أيام المهام المتأخرة اللي بتتفكّر
+const FL = require('./farm-logic.js');
 const APP_URL = process.env.APP_URL || 'https://alsouq.github.io/oroots/';
 
 function resolveWindow(cfg){
@@ -17,9 +18,9 @@ function resolveWindow(cfg){
 }
 function cairoNow(d){
   const p = {};
-  new Intl.DateTimeFormat('en-CA', {timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', hourCycle:'h23'})
+  new Intl.DateTimeFormat('en-CA', {timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'})
     .formatToParts(d).forEach(x => { p[x.type] = x.value; });
-  return {date: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour)};
+  return {date: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour), ts: `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`};
 }
 function lastDates(today, n){
   const base = new Date(today + 'T12:00:00Z'), out = [];
@@ -134,6 +135,25 @@ async function fetchWeather(cfg, fetchJson){
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto&wind_speed_unit=ms&forecast_days=3&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_sum,precipitation_probability_max`;
   try{ return (await fetchJson(url)).daily || null; }catch(e){ console.error('الطقس:', e.message); return null; }
 }
+/* مخاطر الأمراض + القراءات الشاذة من قراءات آخر 5 أيام. docs: Map(id → data). بيرجّع [{tab, text}] */
+function farmInsights(systems, docs, today, nowTs){
+  const out = [], nowMs = FL.lgTs(nowTs), days = [0, 1, 2, 3, 4].map(i => { let d = today; for(let k = 0; k < i; k++) d = dayBefore(d); return d; });
+  const entriesOf = (src, id) => { const all = []; days.forEach(d => { const x = docs.get(rid(src, id, d)); if(x && Array.isArray(x.entries)) all.push(...x.entries); }); return all; };
+  const ghs = new Set();
+  (systems || []).forEach(sy => {
+    if(!sy || !sy.id) return;
+    const label = (sy.greenhouse ? sy.greenhouse + ' — ' : '') + (sy.name || sy.id);
+    if(sy.greenhouse) ghs.add(sy.greenhouse);
+    if(isFruit(sy)) FL.lgAnomalies(entriesOf('soil', sy.id), ['ph', 'ec', 'temp', 'moist'], nowMs).forEach(a => out.push({tab: 'soil', text: `🔎 ${label} (تربة): ${a.text}`}));
+    else [['irrigation', 'ري'], ['drainage', 'صرف']].forEach(([src, nm]) => FL.lgAnomalies(entriesOf(src, sy.id), ['ph', 'ec', 'temp'], nowMs).forEach(a => out.push({tab: 'water', text: `🔎 ${label} (${nm}): ${a.text}`})));
+  });
+  ghs.forEach(g => {
+    const ce = entriesOf('climate', g);
+    FL.lgDiseaseRisks(ce, nowMs).forEach(r => out.push({tab: 'climate', text: `🍄 ${g}: خطر ${r.name} (${r.level === 'high' ? 'عالي' : 'متوسط'} — ${r.hours} ساعة)`}));
+    FL.lgAnomalies(ce, ['temp', 'rh'], nowMs).forEach(a => out.push({tab: 'climate', text: `🔎 ${g} (مناخ): ${a.text}`}));
+  });
+  return out;
+}
 function lowStock(items){
   return (items || []).filter(i => i && i.minQty !== undefined && i.minQty !== null && i.minQty !== '' && i.quantity !== undefined && i.quantity !== null && i.quantity !== '' && parseFloat(i.quantity) <= parseFloat(i.minQty))
     .map(i => `${i.name || 'صنف'} (${i.quantity}${i.unit ? ' ' + i.unit : ''} ≤ ${i.minQty})`);
@@ -141,6 +161,7 @@ function lowStock(items){
 function digestFor(email, user, ctx){
   const lines = [], isAdmin = user && user.role === 'admin';
   (ctx.weather || []).slice(0, 3).forEach(l => lines.push(l));
+  (ctx.insights || []).filter(x => isAdmin || canEditTab(user, x.tab)).slice(0, 4).forEach(x => lines.push(x.text));
   if(isAdmin || canEditTab(user, 'water')) ctx.water.slice(0, 4).forEach(l => lines.push('💧 ' + l));
   if(isAdmin || canEditTab(user, 'inventory')) ctx.stock.slice(0, 3).forEach(l => lines.push('📦 مخزون منخفض: ' + l));
   const t = (ctx.tasks.get(email) || []), late = t.filter(x => x.date < ctx.today).length;
@@ -170,7 +191,12 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
   const yest = dayBefore(now.date), targets = expectedTargets(systems);
   const ids = new Set();
   targets.forEach(t => ids.add(rid(t.source, t.id, now.date)));
-  if(wantDigest) systems.forEach(sy => { if(sy && sy.id && !isFruit(sy)) ['irrigation', 'drainage'].forEach(src => { ids.add(rid(src, sy.id, now.date)); ids.add(rid(src, sy.id, yest)); }); });
+  if(wantDigest){
+    const ds = [now.date]; for(let i = 1; i < 5; i++) ds.push(dayBefore(ds[ds.length - 1]));
+    const ghs = new Set();
+    systems.forEach(sy => { if(!sy || !sy.id) return; if(sy.greenhouse) ghs.add(sy.greenhouse); (isFruit(sy) ? ['soil'] : ['irrigation', 'drainage']).forEach(src => ds.forEach(d => ids.add(rid(src, sy.id, d)))); });
+    ghs.forEach(g => ds.forEach(d => ids.add(rid('climate', g, d))));
+  }
   const refs = [...ids].map(i => db.collection('readings').doc(i));
   const snaps = refs.length ? await db.getAll(...refs) : [];
   const docs = new Map(); snaps.forEach(s => docs.set(s.id, s.exists ? s.data() : null));
@@ -187,15 +213,15 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
   if(wantDigest){
     const invSnap = await db.collection('inventory').get();
     const weather = weatherAlerts(await fetchWeather(cfg, fetchJson), cfg);
-    const ctxBase = {today: now.date, weather, water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
+    const ctxBase = {today: now.date, weather, insights: farmInsights(systems, docs, now.date, now.ts || (now.date + 'T' + String(now.hour).padStart(2, '0') + ':00')), water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
     const tdocs = (await db.getAll(...lastDates(now.date, LOOKBACK).map(d => db.collection('readings').doc('tasks_' + d)))).filter(s => s.exists).map(s => ({id: s.id, data: s.data()}));
     const tasks = groupPending(tdocs, users);
     for(const u of users){
       if(!u || !u.username) continue;
       const email = String(u.username).toLowerCase(), lines = digestFor(email, u, {...ctxBase, tasks});
       if(!lines.length) continue;
-      const extra = lines.length > 6 ? `\n+${lines.length - 6} تانية` : '';
-      out.digest += await pushTo({db, messaging, email, title: '☀️ ملخص الصبح', body: lines.slice(0, 6).join('\n') + extra, tag: 'oroots-digest'});
+      const extra = lines.length > 8 ? `\n+${lines.length - 8} تانية` : '';
+      out.digest += await pushTo({db, messaging, email, title: '☀️ ملخص الصبح', body: lines.slice(0, 8).join('\n') + extra, tag: 'oroots-digest'});
     }
     write.digestDate = now.date;
   }
@@ -239,5 +265,5 @@ async function main(){
   }
 }
 
-module.exports = {resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
+module.exports = {farmInsights, resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });
