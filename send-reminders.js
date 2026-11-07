@@ -113,12 +113,34 @@ function waterIssues(systems, docs, cfg, today){
   });
   return out;
 }
+/* تنبيهات الطقس (نفس منطق التطبيق): daily = {time[], temperature_2m_max[], temperature_2m_min[], wind_speed_10m_max[], precipitation_sum[], precipitation_probability_max[]} */
+function weatherAlerts(daily, cfg){
+  if(!daily || !Array.isArray(daily.time)) return [];
+  const num = (v, d) => { v = parseFloat(v); return isFinite(v) ? v : d; };
+  const heat = num(cfg && cfg.wxHeat, 38), cold = num(cfg && cfg.wxCold, 6), wind = num(cfg && cfg.wxWind, 14), out = [];
+  daily.time.slice(0, 3).forEach((date, i) => {
+    const when = i === 0 ? 'النهارده' : (i === 1 ? 'بكرة' : date), g = k => (daily[k] || [])[i];
+    if(g('temperature_2m_max') >= heat) out.push(`🔥 ${when}: موجة حر (عظمى ${Math.round(g('temperature_2m_max'))}°C)`);
+    if(g('temperature_2m_min') <= cold) out.push(`🥶 ${when}: برد (صغرى ${Math.round(g('temperature_2m_min'))}°C)`);
+    if(g('wind_speed_10m_max') >= wind) out.push(`💨 ${when}: رياح شديدة (${Math.round(g('wind_speed_10m_max') * 3.6)} كم/س)`);
+    const rain = g('precipitation_sum'), pp = g('precipitation_probability_max');
+    if(rain >= 3 && (pp == null || pp >= 60)) out.push(`🌧️ ${when}: مطر متوقع (${Math.round(rain * 10) / 10} مم)`);
+  });
+  return out;
+}
+async function fetchWeather(cfg, fetchJson){
+  const lat = parseFloat(cfg.weatherLat), lon = parseFloat(cfg.weatherLon);
+  if(!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) || cfg.weatherLat === '' || cfg.weatherLon === '') return null;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto&wind_speed_unit=ms&forecast_days=3&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_sum,precipitation_probability_max`;
+  try{ return (await fetchJson(url)).daily || null; }catch(e){ console.error('الطقس:', e.message); return null; }
+}
 function lowStock(items){
   return (items || []).filter(i => i && i.minQty !== undefined && i.minQty !== null && i.minQty !== '' && i.quantity !== undefined && i.quantity !== null && i.quantity !== '' && parseFloat(i.quantity) <= parseFloat(i.minQty))
     .map(i => `${i.name || 'صنف'} (${i.quantity}${i.unit ? ' ' + i.unit : ''} ≤ ${i.minQty})`);
 }
 function digestFor(email, user, ctx){
   const lines = [], isAdmin = user && user.role === 'admin';
+  (ctx.weather || []).slice(0, 3).forEach(l => lines.push(l));
   if(isAdmin || canEditTab(user, 'water')) ctx.water.slice(0, 4).forEach(l => lines.push('💧 ' + l));
   if(isAdmin || canEditTab(user, 'inventory')) ctx.stock.slice(0, 3).forEach(l => lines.push('📦 مخزون منخفض: ' + l));
   const t = (ctx.tasks.get(email) || []), late = t.filter(x => x.date < ctx.today).length;
@@ -137,7 +159,7 @@ async function pushTo({db, messaging, email, title, body, tag, url}){
   return res.successCount;
 }
 /* بيشتغل كل ساعة: لو جه ميعاد الملخص أو فحص القراءات ولسه ما اتعملش النهارده، بينفّذه مرة واحدة */
-async function runDaily({db, messaging, now, cfg}){
+async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await fetch(u)).json()}){
   const out = {digest: 0, missing: 0};
   const stDoc = await db.doc('settings/reminderState').get(), st = stDoc.exists ? stDoc.data() : {};
   const wantDigest = cfg.digestOn !== false && now.hour >= hourOr(cfg.digestHour, DEFAULT_DIGEST_HOUR) && st.digestDate !== now.date;
@@ -164,7 +186,8 @@ async function runDaily({db, messaging, now, cfg}){
   }
   if(wantDigest){
     const invSnap = await db.collection('inventory').get();
-    const ctxBase = {today: now.date, water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
+    const weather = weatherAlerts(await fetchWeather(cfg, fetchJson), cfg);
+    const ctxBase = {today: now.date, weather, water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
     const tdocs = (await db.getAll(...lastDates(now.date, LOOKBACK).map(d => db.collection('readings').doc('tasks_' + d)))).filter(s => s.exists).map(s => ({id: s.id, data: s.data()}));
     const tasks = groupPending(tdocs, users);
     for(const u of users){
@@ -216,5 +239,5 @@ async function main(){
   }
 }
 
-module.exports = {resolveWindow, cairoNow, lastDates, groupPending, buildMessage, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
+module.exports = {resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });

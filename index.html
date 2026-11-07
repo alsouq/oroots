@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3iptA+gxZKvLXJpwLTfMZNabs8eVA4ogAIQ7PPPcsOo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ckDONiUlR6wRhhqGnPKx2IwjOnVBAVrAkMi2Tc/+rFE=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1032,6 +1032,7 @@
         <button type="button" class="btn btn-ghost btn-sm" id="btn-print-weekly">🖨️ طباعة تقرير (اختار الفترة)</button>
       </div>
       <div id="overview-kpis"></div>
+      <div id="wx-alerts"></div>
       <div id="overview-alerts"></div>
       <div id="overview-crop-refs"></div>
 
@@ -1106,11 +1107,13 @@
     <section class="panel" id="panel-tasks">
       <h1 class="page-title">المهام والإجراءات</h1>
       <div id="tasks-body"></div>
+      <div id="handover-body"></div>
     </section>
 
     <section class="panel" id="panel-nutrients">
       <h1 class="page-title">المعادلات السمادية</h1>
       <div id="nutrients-body"></div>
+      <div id="sol-calc"></div>
     </section>
 
     <section class="panel" id="panel-pests">
@@ -1227,6 +1230,10 @@
           <select id="da-digest-hour" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font:inherit;"></select></div>
         <div class="range-row"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="da-check-on" style="width:auto;"> فحص القراءات الناقصة</label>
           <select id="da-check-hour" style="padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font:inherit;"></select></div>
+        <div class="range-row"><span class="metric-name">حد تنبيه اللاصقات (عدد الحشرات)</span><input type="number" step="1" min="1" class="ltr" id="da-trap-thr" style="max-width:110px;"></div>
+        <div class="range-row"><span class="metric-name">إنذار الحر: عظمى من (°C)</span><input type="number" step="1" class="ltr" id="da-wx-heat" style="max-width:110px;"></div>
+        <div class="range-row"><span class="metric-name">إنذار البرد: صغرى أقل من (°C)</span><input type="number" step="1" class="ltr" id="da-wx-cold" style="max-width:110px;"></div>
+        <div class="range-row"><span class="metric-name">إنذار الرياح: من (متر/ثانية)</span><input type="number" step="1" min="1" class="ltr" id="da-wx-wind" style="max-width:110px;"></div>
         <div class="range-row"><span class="metric-name">حد انحراف EC (الصرف − الري)</span><input type="number" step="0.1" min="0.1" class="ltr" id="da-ec-drift" style="max-width:110px;"></div>
         <div class="range-row"><span class="metric-name">حد انحراف pH (الصرف − الري)</span><input type="number" step="0.1" min="0.1" class="ltr" id="da-ph-drift" style="max-width:110px;"></div>
         <div class="form-actions"><button class="btn btn-primary btn-sm" id="btn-save-daily">حفظ</button> <span class="save-msg hidden" id="msg-daily">تم الحفظ</span></div>
@@ -1648,6 +1655,7 @@
   var harvestLog = [];
   var inventoryItems = [];
   var costsLog = [];
+  var handoverLog = [];
   var inventoryFilterType = '';
   var inventoryQuery = '';
   function invNorm(t){ return String(t==null?'':t).toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim(); }
@@ -2025,7 +2033,7 @@
     var old = Object.assign({}, settings);
     return saveSettingsRaw(patch).then(function(r){
       try{
-        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)', weatherName:'منطقة الطقس', weatherLat:'خط عرض الطقس', weatherLon:'خط طول الطقس', digestOn:'ملخص الصبح', digestHour:'ساعة ملخص الصبح', checkOn:'فحص القراءات الناقصة', checkHour:'ساعة فحص القراءات', ecDrift:'حد انحراف EC الصرف', phDrift:'حد انحراف pH الصرف'};
+        var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)', weatherName:'منطقة الطقس', weatherLat:'خط عرض الطقس', weatherLon:'خط طول الطقس', digestOn:'ملخص الصبح', digestHour:'ساعة ملخص الصبح', checkOn:'فحص القراءات الناقصة', checkHour:'ساعة فحص القراءات', ecDrift:'حد انحراف EC الصرف', trapThr:'حد تنبيه اللاصقات', wxHeat:'إنذار الحر', wxCold:'إنذار البرد', wxWind:'إنذار الرياح', phDrift:'حد انحراف pH الصرف'};
         Object.keys(patch||{}).forEach(function(k){
           if(k==='accessCode'){ if(old.accessCode!==patch.accessCode) logAudit('edit', 'admin', 'غيّر كود الدخول'); return; }
           if(JSON.stringify(old[k])!==JSON.stringify(patch[k])){
@@ -2223,6 +2231,7 @@
           '<div class="field-sm"><label>امتى يُستخدم (اختياري)</label><input type="text" id="inv-timing" maxlength="150" placeholder="مثال: صباحًا بعيد عن الإزهار" value="'+(existing?(existing.timing||''):'')+'"></div>'+
           '<div class="field-sm"><label>الكمية المتاحة بالمخزن (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="inv-qty" value="'+(existing&&existing.quantity!=null?existing.quantity:'')+'"></div>'+
           '<div class="field-sm"><label>الوحدة</label><select id="inv-unit"><option value="لتر"'+(existing&&existing.unit==='لتر'?' selected':'')+'>لتر</option><option value="مل"'+(existing&&existing.unit==='مل'?' selected':'')+'>مل</option><option value="كجم"'+(existing&&existing.unit==='كجم'?' selected':'')+'>كجم</option><option value="جم"'+(existing&&existing.unit==='جم'?' selected':'')+'>جم</option><option value="عبوة"'+(existing&&existing.unit==='عبوة'?' selected':'')+'>عبوة</option></select></div>'+
+          '<div class="field-sm" id="inv-phi-wrap" style="'+(type==='pesticide'?'':'display:none;')+'"><label>مدة الأمان قبل الحصاد PHI (أيام)</label><input type="number" step="1" min="0" class="ltr" id="inv-phi" placeholder="لو كتبتها بيحذّرك عند الحصاد بعد الرش" value="'+(existing&&existing.phiDays!=null?existing.phiDays:'')+'"></div>'+
           '<div class="field-sm"><label>الحد الأدنى للتنبيه (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="inv-min" placeholder="تنبيه لما الكمية توصل له" value="'+(existing&&existing.minQty!=null?existing.minQty:'')+'"></div>'+
           '<div class="field-sm"><label>سعر الوحدة (ج.م) (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="inv-price" placeholder="لحساب تكلفة الكيلو" value="'+(existing&&existing.price!=null?existing.price:'')+'"></div>'+
           '<div class="field-sm full" id="inv-stages-wrap" style="'+(type==='pesticide'?'':'display:none;')+'"><label>يشتغل على أي طور من أطوار الحشرة</label><div style="display:flex;gap:14px;flex-wrap:wrap;">'+
@@ -2234,6 +2243,7 @@
       '</form>';
     $('#inv-type').addEventListener('change', function(){
       $('#inv-stages-wrap').style.display = this.value==='pesticide' ? '' : 'none';
+      $('#inv-phi-wrap').style.display = this.value==='pesticide' ? '' : 'none';
     });
     $('#inv-cancel-btn').addEventListener('click', function(){ holder.innerHTML=''; });
     $('#inventory-form').addEventListener('submit', function(ev){
@@ -2247,7 +2257,7 @@
         activeIngredient: $('#inv-active').value.trim(), targets: $('#inv-targets').value.trim(),
         dose: $('#inv-dose').value.trim(), timing: $('#inv-timing').value.trim(),
         stages: chkStages, quantity: $('#inv-qty').value===''?null:parseFloat($('#inv-qty').value),
-        unit: $('#inv-unit').value, minQty: $('#inv-min').value===''?null:parseFloat($('#inv-min').value), price: $('#inv-price').value===''?null:parseFloat($('#inv-price').value), note: $('#inv-note').value.trim(),
+        unit: $('#inv-unit').value, minQty: $('#inv-min').value===''?null:parseFloat($('#inv-min').value), phiDays: (selType==='pesticide' && $('#inv-phi').value!=='') ? parseFloat($('#inv-phi').value) : null, price: $('#inv-price').value===''?null:parseFloat($('#inv-price').value), note: $('#inv-note').value.trim(),
         by: currentUser||'', createdAt: existing?existing.createdAt:Date.now()
       };
       saveInventoryItem(item, !existing).then(function(){
@@ -2271,7 +2281,7 @@
     var rows = list.length ? list.map(function(x){
       return '<tr data-id="'+x.id+'" data-q="'+escH(invNorm([x.name, x.activeIngredient, x.targets].join(' ')))+'">'+
         '<td><strong>'+escH(x.name)+'</strong><div><span class="status-pill '+(x.type==='pesticide'?'alert':'good')+'">'+(x.type==='pesticide'?'مبيد':'سماد')+'</span></div></td>'+
-        '<td>'+escH(x.activeIngredient||'—')+'<div class="hint" dir="rtl" style="margin:2px 0 0;">يستهدف: '+escH(x.targets||'—')+'</div></td>'+
+        '<td>'+escH(x.activeIngredient||'—')+'<div class="hint" dir="rtl" style="margin:2px 0 0;">يستهدف: '+escH(x.targets||'—')+'</div>'+((x.type==='pesticide' && x.phiDays>0) ? '<div class="hint" dir="rtl" style="margin:2px 0 0;">⏳ مدة الأمان: '+escH(x.phiDays)+' يوم</div>' : '')+'</td>'+
         '<td>'+escH(x.dose||'—')+(x.type==='pesticide' ? '<div class="hint" dir="rtl" style="margin:2px 0 0;">الطور: '+pestStageLabels(x.stages)+'</div>' : '')+'</td>'+
         '<td class="num ltr">'+(x.quantity!=null?(x.quantity+' '+(x.unit||'')):'—')+(invIsLow(x)?' <span class="status-pill alert" title="أقل من أو يساوي الحد الأدنى ('+escH(x.minQty)+')">⚠️ منخفض</span>':'')+'</td>'+
         '<td><button class="del-btn inv-edit-btn" title="تعديل">✎</button> <button class="del-btn inv-delete-btn" title="حذف">✕</button></td>'+
@@ -2377,6 +2387,65 @@
     applyPermissionLock(host, 'inventory');
   }
 
+
+  /* ---------- مدة الأمان PHI + رقم الدفعة (Lot) + تتبّع المصدر ---------- */
+  function phiOfProduct(name){
+    var k = invNorm(name), it = inventoryItems.filter(function(x){ return x.type==='pesticide' && invNorm(x.name)===k; })[0], d = it ? parseFloat(it.phiDays) : NaN;
+    return (isFinite(d) && d > 0) ? d : 0;
+  }
+  /* معاملات المبيدات اللي اتعملت على صوبة النظام قبل يوم الحصاد وماقدرش تعدّي مدة أمانها */
+  function phiRisks(systemId, dateStr){
+    var sys = getSystem(systemId); if(!sys) return [];
+    var gh = ghNameOf(sys), day = String(dateStr || todayStr()).slice(0,10), out = [], seen = {};
+    function add(name, applied){
+      var phi = phiOfProduct(name), a = String(applied || '').slice(0,10); if(!phi || !a) return;
+      var safe = planAddDays(a, phi), key = invNorm(name)+'|'+a;
+      if(a <= day && day < safe && !seen[key]){ seen[key] = 1; out.push({product:name, applied:a, phi:phi, safe:safe}); }
+    }
+    sprayPlan.forEach(function(e){ if(e.kind==='foliar' && e.product && (e.halls||[]).indexOf(gh) >= 0) add(e.product, e.date); });
+    pestLog.forEach(function(p){
+      if(p.greenhouse !== gh) return;
+      if(p.treated && p.pesticideName) add(p.pesticideName, p.ts);
+      pestTreatmentsOf(p).forEach(function(t){ if(t.pesticideName) add(t.pesticideName, t.ts || t.date); });
+    });
+    return out.sort(function(a, b){ return b.safe.localeCompare(a.safe); });
+  }
+  function phiWarnHtml(risks){
+    if(!risks.length) return '';
+    return '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ <strong>مدة الأمان (PHI) لسه ما خلصتش:</strong> '+risks.map(function(r){
+      return escH(r.product)+' اتعمل '+escH(r.applied)+' (مدة الأمان '+r.phi+' يوم) ← آمن للحصاد من '+escH(r.safe);
+    }).join('، ')+'</div>';
+  }
+  /* رقم الدفعة: H + تاريخ الحصاد + اسم النظام + رقم تسلسلي في اليوم لنفس النظام. مثال: H251106-S1-02 */
+  function harvestLotFor(systemId, ts){
+    var d = String(ts || nowLocalInputValue()).slice(0,10), n = harvestLog.filter(function(h){ return (h.systemId||'')===(systemId||'') && String(h.ts||'').slice(0,10)===d; }).length + 1;
+    var sys = getSystem(systemId), nm = sys ? String(sys.name || sys.id).replace(/[^A-Za-z0-9؀-ۿ]/g, '') : 'X';
+    return 'H'+d.slice(2,4)+d.slice(5,7)+d.slice(8,10)+'-'+nm.slice(0,8)+'-'+(n < 10 ? '0' : '')+n;
+  }
+  /* تتبّع المصدر: كل اللي اتعمل على صوبة الحصاد قبله بـ 21 يوم */
+  function harvestTraceOpen(h){
+    var sys = getSystem(h.systemId), gh = sys ? ghNameOf(sys) : '', day = String(h.ts||'').slice(0,10), from = planAddDays(day, -21), L = [];
+    var inRange = function(d){ d = String(d||'').slice(0,10); return d >= from && d <= day; };
+    var sprays = sprayPlan.filter(function(e){ return inRange(e.date) && (!gh || (e.halls||[]).indexOf(gh) >= 0); }).sort(function(a, b){ return a.date.localeCompare(b.date); });
+    var treats = [];
+    pestLog.forEach(function(p){ if(gh && p.greenhouse !== gh) return;
+      if(p.treated && p.pesticideName && inRange(p.ts)) treats.push({ts:p.ts, name:p.pesticideName, dose:p.dose, why:p.problemName});
+      pestTreatmentsOf(p).forEach(function(t){ if(t.pesticideName && inRange(t.ts)) treats.push({ts:t.ts, name:t.pesticideName, dose:t.dose, why:p.problemName}); }); });
+    var wi = flattenEntries('irrigation', h.systemId).filter(function(e){ return String(e.ts).slice(0,10) === day; }).slice(-1)[0];
+    var risks = phiRisks(h.systemId, day);
+    var li = function(a){ return a.length ? '<ul style="margin:4px 0 8px;padding-inline-start:18px;">'+a.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ul>' : '<p class="hint" style="margin:2px 0 8px;">لا يوجد في الـ 21 يوم قبل الحصاد.</p>'; };
+    var html = '<div class="hp-body"><p><strong>'+escH(h.lot || '(بدون رقم دفعة)')+'</strong> — '+escH(h.cropName)+' — '+escH(h.quantity)+' '+escH(HARVEST_UNIT_LABELS[h.unit]||h.unit)+'<br>'+escH(sys ? systemLabel(sys) : '—')+' — '+escH(fmtTs(h.ts))+' — بواسطة '+escH(h.by||'—')+'</p>'+
+      (risks.length ? phiWarnHtml(risks) : '<p class="hint" style="margin:0 0 6px;">✅ مفيش مبيد كانت مدة أمانه سارية يوم الحصاد.</p>')+
+      '<h4 style="margin:6px 0 2px;">🍃 رش وتسميد على الصوبة</h4>'+li(sprays.map(function(e){ return escH(e.date)+' — '+escH((SPRAY_KINDS[e.kind]||SPRAY_KINDS.foliar).label)+': '+escH(e.product)+(e.dose?(' ('+escH(e.dose)+')'):''); }))+
+      '<h4 style="margin:6px 0 2px;">🧪 معاملات مكافحة</h4>'+li(treats.sort(function(a, b){ return String(a.ts).localeCompare(String(b.ts)); }).map(function(t){ return escH(fmtTs(t.ts))+' — '+escH(t.name)+(t.dose?(' ('+escH(t.dose)+')'):'')+(t.why?(' — '+escH(t.why)):''); }))+
+      '<h4 style="margin:6px 0 2px;">💧 مياه الري يوم الحصاد</h4>'+(wi ? ('<p style="margin:2px 0;">pH '+escH(wi.ph)+' — EC '+escH(wi.ec)+' — '+escH(wi.temp)+'°C</p>') : '<p class="hint" style="margin:2px 0;">مفيش قراءة ري مسجّلة في اليوم ده.</p>')+'</div>';
+    helpClose();
+    var pop = document.createElement('div'); pop.id = 'help-pop'; pop.className = 'help-pop'; pop.setAttribute('role', 'dialog');
+    pop.innerHTML = '<div class="hp-card"><div class="hp-head"><strong>🔎 تتبّع المصدر</strong><button type="button" class="hp-close" aria-label="إغلاق">✕</button></div>'+html+'</div>';
+    document.body.appendChild(pop);
+    pop.addEventListener('click', function(ev){ if(ev.target===pop || ev.target.closest('.hp-close')) helpClose(); });
+  }
+
   /* ---------- الحصاد ---------- */
   function persistLocalHarvest(){
     try{ localStorage.setItem('oroots_local_harvest', JSON.stringify(harvestLog)); }catch(e){}
@@ -2393,6 +2462,7 @@
   }
   function saveHarvest(rec){
     var isNew = !harvestLog.some(function(h){ return h.id===rec.id; });
+    if(isNew && !rec.lot){ try{ rec.lot = harvestLotFor(rec.systemId, rec.ts); }catch(e){} }
     return saveHarvestRaw(rec).then(function(r){
       logAudit(isNew?'add':'edit', 'harvest', 'حصاد: '+rec.cropName+' — '+rec.quantity+' '+HARVEST_UNIT_LABELS[rec.unit]+(rec.pipes?(' — '+rec.pipes+' ماسورة'):'')+' — '+auditSysName(rec.systemId));
       return r;
@@ -2424,10 +2494,10 @@
     if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
     var list = harvestShown(harvestForSystem(systemId));
     if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var header = ['التاريخ','الصنف','الكمية','الوحدة','عدد المواسير','بواسطة','ملاحظة'];
+    var header = ['التاريخ','رقم الدفعة','الصنف','الكمية','الوحدة','عدد المواسير','بواسطة','ملاحظة'];
     var lines = [header.map(csvEscape).join(',')];
     list.forEach(function(h){
-      lines.push([h.ts, h.cropName, h.quantity, HARVEST_UNIT_LABELS[h.unit], h.pipes||'', h.by||'', h.note||''].map(csvEscape).join(','));
+      lines.push([h.ts, h.lot||'', h.cropName, h.quantity, HARVEST_UNIT_LABELS[h.unit], h.pipes||'', h.by||'', h.note||''].map(csvEscape).join(','));
     });
     var csv = '\uFEFF' + lines.join('\r\n');
     downloadsCap.save({filename:'oroots-harvest-'+safeDocIdPart(systemId)+'-'+todayStr()+'.csv', data:csv}).then(function(){
@@ -3199,8 +3269,24 @@
     if(db) return db.collection('stickyTraps').doc(rec.id).set(rec);
     stickyTraps.push(rec); persistLocalSticky(); renderAll(); return Promise.resolve();
   }
+  function trapThr(){ var v = parseFloat(settings.trapThr); return v > 0 ? v : 30; }
+  var SCOUT_CHECKLIST = ['فحص السطح السفلي للأوراق (حشرات / بيض / نسيج)', 'عدّ الحشرات على اللاصقات وتسجيلها في المكافحة', 'فحص المصايد الفرمونية', 'ملاحظة أي أعراض مرضية (بقع / عفن / ذبول / تجعّد)', 'تصوير أي إصابة وتسجيلها مع الصوبة والماسورة'];
+  function startScoutRound(){
+    var me = String(currentUser||'').toLowerCase(), u = appUsers.filter(function(x){ return String(x.username).toLowerCase()===me; })[0], ghs = greenhouseGroups();
+    if(!ghs.length){ toast('مفيش صوب'); return; }
+    if(!confirm('هيتعمل مهمة «جولة كشف آفات» لكل صوبة ('+ghs.length+') ليك النهارده بقايمة فحص. تكمل؟')) return;
+    Promise.all(ghs.map(function(g){ return addTask(todayStr(), {title:'🚶 جولة كشف آفات — '+g.name, greenhouse:g.name, assignedTo:(u && u.displayName) || currentUser, assignedEmail:me, note:'جولة أسبوعية', checklist:SCOUT_CHECKLIST, silent:true}); })).then(function(){ toast('اتعملت مهام الجولة في «المهام والإجراءات»'); });
+  }
   function addStickyTrap(data){
     return addStickyTrapRaw(data).then(function(r){
+      try{
+        var cnt = parseFloat(data.count);
+        if(isFinite(cnt) && cnt >= trapThr()){
+          var adm = appUsers.filter(function(x){ return x.role==='admin'; })[0] || appUsers.filter(function(x){ return String(x.username).toLowerCase()===String(currentUser||'').toLowerCase(); })[0];
+          toast('⚠️ عدد اللاصقة '+cnt+' (الحد '+trapThr()+') — اتعملت مهمة معالجة', 6000);
+          addTask(todayStr(), {title:'⚠️ ضغط آفات — لاصقات '+(data.greenhouse||'')+' عدد '+cnt, greenhouse:data.greenhouse||'', assignedTo:adm ? (adm.displayName||adm.username) : '', assignedEmail:adm ? adm.username : '', note:'أعلى من حد التنبيه ('+trapThr()+'). افحص الصوبة وقرّر المعالجة.', checklist:['فحص الصوبة وتحديد الآفة','تسجيل الإصابة في المكافحة','قرار المعالجة (مبيد / إطلاق حيوي)']});
+        }
+      }catch(e){ console.error(e); }
       logAudit('add', 'pests', 'لاصقة '+data.color+' — عدد '+data.count+' — '+(data.greenhouse||''));
       return r;
     });
@@ -4690,6 +4776,7 @@
       greenhouse:data.greenhouse||'', assignedTo:data.assignedTo||'', assignedEmail:data.assignedEmail||'', title:data.title||'', note:data.note||'',
       sopId:data.sopId||'', sopTitle:data.sopTitle||'',
       recur: data.recur || null, coverFor:data.coverFor||'', coverForName:data.coverForName||'',
+      checklist: Array.isArray(data.checklist) ? data.checklist.slice(0, 40).map(function(x){ return {t:String(x && x.t != null ? x.t : x).slice(0, 200), done:false}; }) : [],
       status:'pending', createdBy:currentUser||'', createdAt:Date.now(), completedAt:null
     };
   }
@@ -4712,6 +4799,21 @@
     pr.taskId = entry.id;
     return pr;
   }
+  function setTaskChecklistItem(dateKey, taskId, idx, done){
+    var existing = findDoc('tasks', dateKey); if(!existing) return Promise.resolve();
+    var entries = existing.entries.map(function(t){
+      if(t.id !== taskId || !Array.isArray(t.checklist) || !t.checklist[idx]) return t;
+      return Object.assign({}, t, {checklist: t.checklist.map(function(x, i){ return i === idx ? {t:x.t, done:!!done} : x; })});
+    });
+    return saveDoc('tasks', dateKey, entries);
+  }
+  function parseChecklist(text){ return String(text || '').split(/\r?\n/).map(function(x){ return x.replace(/^\s*(?:[-*•\d]+[.)]?\s*)/, '').trim(); }).filter(Boolean).slice(0, 40).map(function(x){ return {t:x, done:false}; }); }
+  function checklistHtml(t){
+    if(!Array.isArray(t.checklist) || !t.checklist.length) return '';
+    return '<div class="task-checklist" style="margin:6px 0;">'+t.checklist.map(function(x, i){
+      return '<label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;margin:3px 0;"><input type="checkbox" class="task-chk" data-i="'+i+'" style="width:auto;margin-top:3px;"'+(x.done ? ' checked' : '')+'> <span'+(x.done ? ' style="text-decoration:line-through;color:var(--muted);"' : '')+'>'+escH(x.t)+'</span></label>';
+    }).join('')+'</div>';
+  }
   function setTaskStatus(dateKey, taskId, status){
     var existing = findDoc('tasks', dateKey);
     if(!existing) return Promise.resolve();
@@ -4726,7 +4828,8 @@
         if(nextDate){
           addTask(nextDate, {
             greenhouse: original.greenhouse, assignedTo: original.assignedTo, assignedEmail: original.assignedEmail||'', title: original.title, note: original.note,
-            sopId: original.sopId, sopTitle: original.sopTitle, recur: original.recur
+            sopId: original.sopId, sopTitle: original.sopTitle, recur: original.recur,
+            checklist: (original.checklist || []).map(function(x){ return {t:x.t, done:false}; })
           });
         }
       }
@@ -5717,6 +5820,21 @@
     // كجم لكل ماسورة (من المواسير المسجّلة في تبويب الحصاد)
     var pipes = pipeMaps.reduce(function(s,m){ return s + (parseFloat(m.totalPipes)||0); }, 0);
     if(pipes>0 && hCur>0) cards.push(kpiCard('إنتاج الماسورة', fmt(hCur/pipes), 'كجم/ماسورة', hCur/pipes, hPrev/pipes, false, ''));
+    // تكلفة الكيلو (من التكاليف المسجّلة ÷ كيلوهات الحصاد في نفس الفترة)
+    var cC = 0, cP = 0; costsLog.forEach(function(c){ var t = new Date(String(c.date)+'T12:00:00').getTime(), a = parseFloat(c.amount)||0; if(isNaN(t)) return; if(t >= now-30*D) cC += a; else if(t >= now-60*D) cP += a; });
+    if(cC > 0 && hCur > 0) cards.push(kpiCard('تكلفة الكيلو', fmt(cC/hCur), 'ج.م/كجم', cC/hCur, (cP > 0 && hPrev > 0) ? cP/hPrev : 0, true, ''));
+    // فاقد الفرز (٪ من اللي جه، بالكيلو)
+    try{
+      var inSort = function(o, a, b){ var t = new Date(String(o.date)+'T12:00:00').getTime(); return !isNaN(t) && t >= now-a*D && t < now-b*D; };
+      var aC = qAggregate(qSorts.filter(function(o){ return inSort(o, 30, 0); })).byUnit.kg, aP = qAggregate(qSorts.filter(function(o){ return inSort(o, 60, 30); })).byUnit.kg;
+      if(aC && aC.rec > 0) cards.push(kpiCard('فاقد الفرز', fmt(aC.waste/aC.rec*100), '٪', aC.waste/aC.rec, (aP && aP.rec > 0) ? aP.waste/aP.rec : 0, true, ''));
+    }catch(e){}
+    // التزام تسجيل القراءات: كام يوم من آخر 7 فيه قراءة لكل (نظام/صوبة) مطلوب
+    try{
+      var tg = [], gh = {}; systems.forEach(function(sy){ tg.push([sysGType(sy)==='fruit' ? 'soil' : 'irrigation', sy.id]); gh[ghNameOf(sy)] = 1; }); Object.keys(gh).forEach(function(g){ tg.push(['climate', g]); });
+      var have = 0, want = 0; for(var dd = 0; dd < 7; dd++){ var dk = planAddDays(todayStr(), -dd); tg.forEach(function(t){ want++; var d = findDoc(t[0], dk, t[1]); if(d && d.entries && d.entries.length) have++; }); }
+      if(want) cards.push('<div class="stat-card kpi-card"><div class="hint" style="margin:0;">التزام تسجيل القراءات</div><div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;">'+Math.round(have/want*100)+'<small style="font-size:.8rem;margin-inline-start:4px;">٪ (آخر 7 أيام)</small></div><div class="hint" style="margin:4px 0;">'+have+' من '+want+' قراءة يومية مطلوبة</div></div>');
+    }catch(e){}
     // إنجاز المهام
     var today = todayStr(), tasks = flattenTasks(), tc = {a:0,d:0}, tp = {a:0,d:0};
     tasks.forEach(function(t){
@@ -5738,6 +5856,7 @@
   function renderSystemsOverview(){
     renderCropRefs();
     renderOverviewAlerts();
+    safe(renderWxAlerts);
     safe(renderOverviewKpis);
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
@@ -6776,6 +6895,7 @@
       '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
+          '<div class="field-sm full" id="hv-phi"></div>'+
           '<div class="field-sm full"><label>التاريخ والوقت</label><input type="datetime-local" class="ltr" id="hv-ts" required></div>'+
           '<div class="field-sm"><label>الصنف / المحصول</label>'+cropFieldHtml('hv-crop','',true)+'</div>'+
           '<div class="field-sm"><label>الكمية</label><input type="number" step="any" min="0.001" class="ltr" id="hv-qty" required></div>'+
@@ -6801,7 +6921,7 @@
       (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>' : '')+
       lfBarHtml('harvest')+
       '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
-      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الدفعة</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
       '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p></div>';
 
     $('#hv-ts', inner).value = nowLocalInputValue();
@@ -6822,6 +6942,8 @@
       });
       hint.textContent = tot ? ('في مخطط النظام: '+tot+' ماسورة '+crop+' ('+ready+' جاهزة للحصاد).') : ('مفيش مواسير '+crop+' في مخطط النظام.');
     }
+    function updateHvPhi(){ var box = $('#hv-phi', inner); if(box) box.innerHTML = phiWarnHtml(phiRisks(selectedSystemId, String($('#hv-ts', inner).value||'').slice(0,10) || todayStr())); }
+    $('#hv-ts', inner).addEventListener('change', updateHvPhi); updateHvPhi();
     $('#hv-crop', inner).addEventListener('input', updateHvPipesHint);
     $('#hv-crop', inner).addEventListener('change', updateHvPipesHint);
     updateHvPipesHint();
@@ -6837,8 +6959,10 @@
       if(!(qty>0)){ toast('اكتب كمية صحيحة'); return; }
       if(pipesRaw!=='' && !(pipes>=1 && Math.floor(pipes)===pipes)){ toast('عدد المواسير لازم يكون رقم صحيح من 1 فوق'); return; }
       var pipeRes = null;
+      var hvTs = $('#hv-ts', inner).value || nowLocalInputValue(), phiR = phiRisks(selectedSystemId, hvTs.slice(0,10));
+      if(phiR.length && !confirm('⚠️ تحذير مدة الأمان (PHI):\n'+phiR.map(function(r){ return '• '+r.product+' اتعمل '+r.applied+' ← آمن من '+r.safe; }).join('\n')+'\n\nمتأكد إنك عايز تسجّل الحصاد ده؟')) return;
       saveHarvest({
-        id: genId(), systemId: selectedSystemId, ts: $('#hv-ts', inner).value || nowLocalInputValue(),
+        id: genId(), systemId: selectedSystemId, ts: hvTs, lot: harvestLotFor(selectedSystemId, hvTs),
         cropName: crop, quantity: qty, unit: $('#hv-unit', inner).value, pipes: pipes||0,
         note: $('#hv-note', inner).value||'', by: currentUser||'', createdAt: Date.now()
       }).then(function(){
@@ -6912,13 +7036,15 @@
         var tr = document.createElement('tr');
         tr.innerHTML =
           '<td class="ltr num">'+fmtTs(h.ts)+'</td>'+
+          '<td class="ltr num" style="font-size:.74rem;">'+escH(h.lot||'—')+'</td>'+
           '<td>'+escH(h.cropName)+'</td>'+
           '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
           '<td class="num">'+(h.pipes>0 ? h.pipes : '—')+'</td>'+
           '<td>'+(h.by||'—')+'</td>'+
           '<td>'+escH(h.note||'—')+'</td>'+
-          '<td><button class="del-btn" title="حذف">✕</button></td>';
-        tr.querySelector('.del-btn').addEventListener('click', function(){ deleteHarvest(h.id); });
+          '<td><button class="del-btn hv-trace" title="تتبّع المصدر">🔎</button> <button class="del-btn hv-del" title="حذف">✕</button></td>';
+        tr.querySelector('.hv-trace').addEventListener('click', function(){ harvestTraceOpen(h); });
+        tr.querySelector('.hv-del').addEventListener('click', function(){ deleteHarvest(h.id); });
         tbody.appendChild(tr);
       });
       var emp = $('#harvest-empty', inner); if(emp) emp.style.display = shown.length ? 'none' : '';
@@ -7532,6 +7658,39 @@
       else if(t.id==='voice-clear'){ voiceState.parsed = null; voiceState.err = ''; voiceRender(); }
     });
   }
+
+  /* ---------- ملاحظات تسليم الوردية ---------- */
+  var handoverOpen = false;
+  function renderHandover(){
+    var host = $('#handover-body'); if(!host) return;
+    var me = String(currentUser||'').toLowerCase(), now = Date.now();
+    var fresh = handoverLog.filter(function(h){ return now - (h.createdAt||0) < 48*3600000 && (h.ackBy||[]).indexOf(me) < 0 && String(h.by||'').toLowerCase() !== me; }).length;
+    var rows = handoverLog.slice(0, 15).map(function(h){
+      var acked = (h.ackBy||[]).indexOf(me) >= 0, mine = String(h.by||'').toLowerCase() === me;
+      return '<div class="task-card" data-id="'+escH(h.id)+'"><div class="task-card-head"><span class="task-date-badge">'+escH(fmtTs(new Date(h.createdAt||0).toISOString().slice(0,16)))+'</span>'+(h.greenhouse ? '<span class="task-gh">'+escH(h.greenhouse)+'</span>' : '')+'<span class="hint" style="margin:0;">👤 '+escH(h.byName||h.by||'')+'</span></div>'+
+        '<div class="task-note" style="white-space:pre-wrap;">'+escH(h.text)+'</div>'+
+        '<div class="hint" style="margin:4px 0;">'+((h.ackBy||[]).length ? ('✓ استلمها: '+escH((h.ackBy||[]).map(function(e){ var u = appUsers.filter(function(x){ return String(x.username).toLowerCase()===e; })[0]; return u ? (u.displayName||u.username) : e; }).join('، '))) : 'لسه ما حدش علّم إنه استلمها')+'</div>'+
+        ((!acked && !mine) ? '<button class="btn btn-ghost btn-sm hv-ack">✓ استلمت</button>' : '')+'</div>';
+    }).join('');
+    host.innerHTML = '<details class="chart-card" id="ho-details"'+(handoverOpen?' open':'')+' style="margin-top:14px;"><summary style="cursor:pointer;font-weight:800;">📝 ملاحظات تسليم الوردية'+(fresh ? ' <span class="status-pill alert">'+fresh+' جديدة</span>' : '')+'</summary>'+
+      '<p class="hint help-note">اكتب للوردية اللي جاية اللي لازم تعرفه (عطل، حاجة ناقصة، شغل لسه ما خلصش). اللي بيقراها بيعلّم «استلمت».</p>'+
+      '<form class="entry-form" id="ho-form"><div class="form-grid"><div class="field-sm"><label>الصوبة (اختياري)</label><select id="ho-gh"><option value="">—</option>'+greenhouseGroups().map(function(g){ return '<option>'+escH(g.name)+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field-sm full"><label>الملاحظة</label><textarea id="ho-text" rows="3" maxlength="1000" required style="width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font:inherit;"></textarea></div></div>'+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الملاحظة</button></div></form>'+
+      (rows || '<p class="empty-note">مفيش ملاحظات تسليم لسه.</p>')+'</details>';
+    var det = $('#ho-details', host); det.addEventListener('toggle', function(){ handoverOpen = det.open; });
+    $('#ho-form', host).addEventListener('submit', function(ev){
+      ev.preventDefault(); var text = $('#ho-text', host).value.trim(); if(!text) return;
+      var u = appUsers.filter(function(x){ return String(x.username).toLowerCase()===me; })[0], rec = {id:genId(), text:text, greenhouse:$('#ho-gh', host).value, by:me, byName:(u && u.displayName) || currentUser || '', ackBy:[], createdAt:Date.now()};
+      if(!db){ toast('محتاج اتصال'); return; }
+      db.collection('handover').doc(rec.id).set(rec).then(function(){ handoverOpen = true; toast('اتسجّلت الملاحظة'); }).catch(function(err){ toast('⛔ الملاحظة ما اتحفظتش'+(err && err.code==='permission-denied' ? ': قواعد Firestore لازم تتحدّث' : ''), 8000); });
+    });
+    $all('.hv-ack', host).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.closest('.task-card').getAttribute('data-id'), h = handoverLog.filter(function(x){ return x.id===id; })[0]; if(!h || !db) return;
+      db.collection('handover').doc(id).update({ackBy: (h.ackBy||[]).concat([me])}).then(function(){ handoverOpen = true; });
+    }); });
+  }
+
   function renderTasksPanel(){
     var body = $('#tasks-body');
     if(!body) return;
@@ -7552,6 +7711,7 @@
           '<div class="task-title">'+escH(t.title)+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' <span class="hint" style="font-weight:400;">🔁 '+recurDaysLabel(t.recur)+'</span>':'')+'</div>'+
           (t.note ? '<div class="task-note">'+escH(t.note)+'</div>' : '')+
           (t.sopTitle ? '<div class="task-sop-link">📋 الإجراء المرجعي: '+t.sopTitle+'</div>' : '')+
+          checklistHtml(t)+
           '<button class="btn btn-primary btn-sm task-done-btn">تم ✓</button>'+
           '</div>';
       }).join('');
@@ -7579,6 +7739,7 @@
             '<div class="field-sm"><label>ربط بإجراء (اختياري)</label><select id="task-sop">'+sopOptions+'</select></div>'+
             '<div class="field-sm full"><label>المهمة</label><input type="text" id="task-title" maxlength="200" required placeholder="وصف المهمة المطلوبة"></div>'+
             '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" id="task-note" maxlength="200"></div>'+
+            '<div class="field-sm full"><label>قايمة فحص (اختياري — بند في كل سطر؛ لو سبتها فاضية وربطت إجراء بتتاخد خطواته)</label><textarea id="task-checklist" rows="3" maxlength="1500" style="width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font:inherit;"></textarea></div>'+
             '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="task-recur" style="width:auto;"> مهمة متكررة أسبوعيًا</label></div>'+
             '<div class="field-sm full" id="task-recur-days-wrap" style="display:none;"><label>تتكرر كل أسبوع أيام:</label><div style="display:flex;gap:12px;flex-wrap:wrap;">'+
               WEEKDAYS.map(function(w){ return '<label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" class="task-recur-day-chk" value="'+w.v+'" style="width:auto;"> '+w.l+'</label>'; }).join('')+
@@ -7597,7 +7758,7 @@
           '<td class="ltr">'+dateKey+'</td>'+
           '<td>'+escH(t.greenhouse||'—')+'</td>'+
           '<td>'+escH(t.assignedTo||'—')+(t.coverForName ? ' <span class="hint" style="margin:0;">🔁 بدل '+escH(t.coverForName)+'</span>' : '')+'</td>'+
-          '<td>'+escH(t.title)+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' 🔁':'')+(t.sopTitle?(' <span style="color:var(--muted);font-size:0.75rem;">('+t.sopTitle+')</span>'):'')+'</td>'+
+          '<td>'+escH(t.title)+(Array.isArray(t.checklist)&&t.checklist.length ? ' <span class="hint" style="margin:0;">☑ '+t.checklist.filter(function(x){ return x.done; }).length+'/'+t.checklist.length+'</span>' : '')+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' 🔁':'')+(t.sopTitle?(' <span style="color:var(--muted);font-size:0.75rem;">('+t.sopTitle+')</span>'):'')+'</td>'+
           '<td><span class="status-pill '+(t.status==='done'?'good':'alert')+'">'+(t.status==='done'?'تم':'معلّقة')+'</span></td>'+
           '<td><div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;"><button class="btn-ghost btn-sm task-toggle-btn" style="border-radius:8px;white-space:nowrap;">'+(t.status==='done'?'إلغاء الإتمام':'تحديد كمنجزة')+'</button><button class="btn-ghost btn-sm task-edit-btn" style="border-radius:8px;white-space:nowrap;">✏️ تعديل</button></div></td>'+
           '<td><button class="del-btn task-delete-btn" title="حذف">✕</button></td>'+
@@ -7656,8 +7817,11 @@
     });
 
     $all('.task-card', body).forEach(function(card){
+      $all('.task-chk', card).forEach(function(c){ c.addEventListener('change', function(){ setTaskChecklistItem(card.getAttribute('data-datekey'), card.getAttribute('data-taskid'), parseInt(c.getAttribute('data-i'),10), c.checked); }); });
       var btn = card.querySelector('.task-done-btn');
       if(btn) btn.addEventListener('click', function(){
+        var left = $all('.task-chk', card).filter(function(c){ return !c.checked; }).length;
+        if(left && !confirm('فيه '+left+' بند في قايمة الفحص لسه ما اتعلّمش. تخلّص المهمة برضه؟')) return;
         setTaskStatus(card.getAttribute('data-datekey'), card.getAttribute('data-taskid'), 'done').then(function(){
           toast('تمام، اتسجلت'); renderTasksPanel();
         });
@@ -7698,6 +7862,7 @@
         title: $('#task-title').value.trim(),
         note: $('#task-note').value.trim(),
         sopId: sopId, sopTitle: sopObj ? sopObj.title : '',
+        checklist: (function(){ var c = parseChecklist($('#task-checklist').value); return (!c.length && sopObj && sopObj.steps) ? parseChecklist(sopObj.steps) : c; })(),
         recur: recurDays.length ? {weekdays: recurDays} : null
       }).then(function(){
         toast('اتعيّنت المهمة');
@@ -7831,9 +7996,60 @@
   /* ---------- Fertilizer Equations panel ---------- */
   function fmtPpm(v){ return fmtNum(v); }
 
+
+  /* ---------- حاسبة تعديل المحلول (pH / EC) ---------- */
+  function solFactorGet(t){ var v = null; try{ v = parseFloat(localStorage.getItem('oroots_solf_'+t)); }catch(e){} return v > 0 ? v : 0; }
+  function solFactorSet(t, v){ try{ localStorage.setItem('oroots_solf_'+t, String(v)); }catch(e){} }
+  function renderSolCalc(){
+    var host = $('#sol-calc'); if(!host) return;
+    var num = function(id){ var v = parseFloat(($('#'+id, host) || {}).value); return isFinite(v) ? v : NaN; };
+    host.innerHTML = '<details class="chart-card" id="sol-details" style="margin-top:14px;"><summary style="cursor:pointer;font-weight:800;">🧮 حاسبة تعديل المحلول (pH وEC)</summary>'+
+      '<p class="hint help-note">الـ EC بيتحسب بقانون الخلط (دقيق لو المحلول بيتخلط خطيًا). الـ pH بيعتمد على قلوية مياهك، فمحتاج «معايرة» مرة بتجربة صغيرة (برطمان) تحدد بيها كمية الحمض أو القاعدة اللي بتغيّر pH وحدة. بعد كده الحاسبة بتقدّر الكمية على الخزان. التقدير خطي تقريبي: ضيف نص الكمية الأول وقيس تاني.</p>'+
+      '<h3 style="font-size:.95rem;margin:8px 0 4px;">1) معايرة الـ pH (مرة واحدة)</h3>'+
+      '<div class="form-grid"><div class="field-sm"><label>النوع</label><select id="sc-jtype"><option value="acid">حمض (بينزّل pH)</option><option value="base">قاعدة (بترفع pH)</option></select></div>'+
+        '<div class="field-sm"><label>حجم الماء في التجربة (لتر)</label><input type="number" step="any" min="0" class="ltr" id="sc-jv"></div>'+
+        '<div class="field-sm"><label>pH قبل</label><input type="number" step="any" class="ltr" id="sc-j0"></div>'+
+        '<div class="field-sm"><label>pH بعد</label><input type="number" step="any" class="ltr" id="sc-j1"></div>'+
+        '<div class="field-sm"><label>الكمية اللي اتضافت (مل)</label><input type="number" step="any" min="0" class="ltr" id="sc-jml"></div></div>'+
+      '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="sc-jsave">احفظ المعايرة</button> <span class="hint" id="sc-jinfo" style="margin:0;"></span></div>'+
+      '<h3 style="font-size:.95rem;margin:12px 0 4px;">2) احسب التعديل</h3>'+
+      '<div class="form-grid"><div class="field-sm"><label>حجم الخزان (لتر)</label><input type="number" step="any" min="0" class="ltr" id="sc-v"></div>'+
+        '<div class="field-sm"><label>pH الحالي</label><input type="number" step="any" class="ltr" id="sc-ph0"></div>'+
+        '<div class="field-sm"><label>pH المطلوب</label><input type="number" step="any" class="ltr" id="sc-ph1"></div>'+
+        '<div class="field-sm"><label>EC الحالي (mS/cm)</label><input type="number" step="any" min="0" class="ltr" id="sc-ec0"></div>'+
+        '<div class="field-sm"><label>EC المطلوب</label><input type="number" step="any" min="0" class="ltr" id="sc-ec1"></div>'+
+        '<div class="field-sm"><label>EC المحلول المركّز (لو عاوز ترفع EC)</label><input type="number" step="any" min="0" class="ltr" id="sc-ecs"></div></div>'+
+      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="sc-calc">احسب</button></div><div id="sc-out" style="margin-top:8px;"></div></details>';
+    var info = function(){ var a = solFactorGet('acid'), b = solFactorGet('base'); $('#sc-jinfo', host).textContent = 'معايرة محفوظة — حمض: '+(a ? (Math.round(a*10)/10+' مل/100 لتر لكل 1 pH') : 'لسه')+' — قاعدة: '+(b ? (Math.round(b*10)/10+' مل/100 لتر لكل 1 pH') : 'لسه'); };
+    info();
+    $('#sc-jsave', host).addEventListener('click', function(){
+      var v = num('sc-jv'), p0 = num('sc-j0'), p1 = num('sc-j1'), ml = num('sc-jml'), t = $('#sc-jtype', host).value, dp = t==='acid' ? p0 - p1 : p1 - p0;
+      if(!(v > 0 && ml > 0 && dp > 0)){ toast('اكتب حجم وكمية ومعاير pH صحيحين (الحمض لازم ينزّل pH والقاعدة ترفعه)'); return; }
+      solFactorSet(t, ml / v * 100 / dp); info(); toast('اتحفظت المعايرة');
+    });
+    $('#sc-calc', host).addEventListener('click', function(){
+      var V = num('sc-v'), ph0 = num('sc-ph0'), ph1 = num('sc-ph1'), ec0 = num('sc-ec0'), ec1 = num('sc-ec1'), ecs = num('sc-ecs'), out = [];
+      if(!(V > 0)){ $('#sc-out', host).innerHTML = '<p class="hint">اكتب حجم الخزان.</p>'; return; }
+      if(isFinite(ph0) && isFinite(ph1)){
+        var d = ph0 - ph1;
+        if(Math.abs(d) < 0.05) out.push('✅ الـ pH قريب من المطلوب.');
+        else { var t = d > 0 ? 'acid' : 'base', f = solFactorGet(t), ml = f * V / 100 * Math.abs(d);
+          out.push(f ? ('🧪 pH: ضيف حوالي <strong>'+Math.round(ml)+' مل</strong> '+(t==='acid' ? 'حمض' : 'قاعدة')+' (ابدأ بنص الكمية ≈ '+Math.round(ml/2)+' مل، ودوّر، وقيس تاني).') : ('🧪 pH: محتاج '+(t==='acid' ? 'تنزّله' : 'ترفعه')+' بمقدار '+Math.abs(d).toFixed(2)+' — احفظ معايرة ال'+(t==='acid' ? 'حمض' : 'قاعدة')+' فوق عشان تتحسب الكمية.')); }
+      }
+      if(isFinite(ec0) && isFinite(ec1) && ec1 > 0){
+        if(Math.abs(ec0 - ec1) < 0.05) out.push('✅ الـ EC قريب من المطلوب.');
+        else if(ec0 > ec1){ var w = V * (ec0 / ec1 - 1); out.push('💧 EC: عالي — ضيف حوالي <strong>'+(Math.round(w*10)/10)+' لتر ماء</strong> (الحجم هيبقى '+(Math.round((V+w)*10)/10)+' لتر، تأكد إن الخزان يسع).'); }
+        else if(isFinite(ecs) && ecs > ec1){ var st = V * (ec1 - ec0) / (ecs - ec1); out.push('🌿 EC: واطي — ضيف حوالي <strong>'+(Math.round(st*100)/100)+' لتر محلول مركّز</strong> (EC '+ecs+').'); }
+        else out.push('🌿 EC: واطي — اكتب EC المحلول المركّز (لازم يكون أعلى من المطلوب) عشان تتحسب الكمية.');
+      }
+      $('#sc-out', host).innerHTML = out.length ? '<div class="view-only-banner" style="background:var(--surface-2);color:var(--ink);display:block;">'+out.map(function(x){ return '<div style="margin:3px 0;">'+x+'</div>'; }).join('')+'</div>' : '<p class="hint">اكتب pH و/أو EC (الحالي والمطلوب).</p>';
+    });
+  }
+
   function renderNutrientsPanel(){
     var body = $('#nutrients-body');
     if(!body) return;
+    if($('#sol-calc') && !$('#sol-calc').firstChild) safe(renderSolCalc);
 
     var ferts = allFertilizers();
     var stockPpm = computeStockPpm(currentMix, currentTankVolume);
@@ -8920,7 +9136,7 @@
     var pestEditing = pestEditId ? pestLog.filter(function(x){ return x.id===pestEditId; })[0] : null;
     if(pestEditId && !pestEditing) pestEditId = null;
     body.innerHTML =
-      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;" id="pest-form-title">'+(pestEditing?'✏️ تعديل إصابة':'تسجيل إصابة/معاملة جديدة')+'</h2>'+
+      '<div data-sub="entry"><div class="form-actions" style="margin:0 0 10px;"><button type="button" class="btn btn-ghost btn-sm" id="pest-round-btn">🚶 ابدأ جولة كشف آفات (مهمة لكل صوبة)</button></div><h2 class="section-title" style="margin-top:0;" id="pest-form-title">'+(pestEditing?'✏️ تعديل إصابة':'تسجيل إصابة/معاملة جديدة')+'</h2>'+
       '<form class="entry-form" id="pest-form">'+
         '<div class="form-grid">'+
           '<div class="field-sm full"><label>الوقت</label><input type="datetime-local" class="ltr" id="pest-ts" required></div>'+
@@ -8952,6 +9168,7 @@
       '<div class="tasks-list">'+listHtml+'</div></div>';
 
     $('#pest-ts').value = nowLocalInputValue();
+    var prb = $('#pest-round-btn'); if(prb) prb.addEventListener('click', startScoutRound);
     pestTrendWire(gh);
     ['pests','bio','sticky','pher'].forEach(function(k){ lfWire(k); });
     $('#pest-treated').addEventListener('change', function(){
@@ -12065,12 +12282,69 @@
   }
 
   /* ----- اللوحة ----- */
+
+  /* ---------- توقّع الحصاد مقابل طلبات العملاء ---------- */
+  function fcYieldMap(){
+    var acc = {};
+    harvestLog.forEach(function(h){ var kg = costKgOf(h), p = parseInt(h.pipes,10) || 0; if(!isFinite(kg) || p < 1) return; var k = cropKey(h.cropName); (acc[k] = acc[k] || {kg:0, p:0}).kg += kg; acc[k].p += p; });
+    var out = {}; Object.keys(acc).forEach(function(k){ out[k] = acc[k].kg / acc[k].p; }); return out;
+  }
+  /* مواسير جاهزة دلوقتي / هتجهز خلال 7 / 14 يوم، لكل صنف (من مخططات المواسير) */
+  function fcSupplyPipes(){
+    var today = todayStr(), out = {};
+    (pipeMaps || []).forEach(function(m){
+      (m.groups || []).forEach(function(g){
+        if(!g.plantDate) return;
+        var k = cropKey(g.crop), e = out[k] || (out[k] = {name:g.crop, now:0, d7:0, d14:0});
+        var done = parseInt(g.cuts,10) || 0, max = Math.max(1, parseInt(g.maxCuts,10) || 1), hd = parseFloat(g.harvestDays) || 0, rg = parseFloat(g.regrowDays) || hd;
+        var ref = g.lastCutDate || g.plantDate, d = planAddDays(ref, done > 0 ? rg : hd), first = true;
+        for(var i = done; i < max; i++){
+          var delta = dayDiff(today, d);
+          if(delta <= 0){ if(first) e.now += g.pipes; }
+          else { if(delta <= 7) e.d7 += g.pipes; if(delta <= 14) e.d14 += g.pipes; }
+          first = false; d = planAddDays(d, rg || 1); if(dayDiff(today, d) > 14) break;
+        }
+      });
+    });
+    return out;
+  }
+  function fcDemandKg(){
+    var today = todayStr(), end7 = planAddDays(today, 7), end14 = planAddDays(today, 14), out = {};
+    qOrders.forEach(function(o){
+      var d = String(o.date||''); if(!d || d < today || d > end14) return;
+      (o.items || []).forEach(function(it){
+        var q = parseFloat(it.required); if(!(q > 0)) return;
+        var kg = it.unit==='g' ? q/1000 : (it.unit==='kg' || !it.unit ? q : NaN);
+        var k = cropKey(it.product), e = out[k] || (out[k] = {name:it.product, d7:0, d14:0, other:0});
+        if(!isFinite(kg)){ e.other += q; return; }
+        if(d <= end7) e.d7 += kg; e.d14 += kg;
+      });
+    });
+    return out;
+  }
+  function qForecastViewHtml(){
+    var y = fcYieldMap(), sup = fcSupplyPipes(), dem = fcDemandKg(), keys = Object.keys(sup).concat(Object.keys(dem)).filter(function(v, i, a){ return a.indexOf(v) === i; });
+    var f1 = function(n){ return isFinite(n) ? (Math.round(n*10)/10).toLocaleString('en-US') : '—'; };
+    if(!keys.length) return '<div class="chart-card"><h3>🔮 توقّع الحصاد مقابل الطلبات</h3><p class="empty-note">محتاج مواسير في مخطط الحصاد و/أو طلبات عملاء خلال 14 يوم الجايين.</p></div>';
+    var rows = keys.map(function(k){
+      var s = sup[k] || {name:'', now:0, d7:0, d14:0}, d = dem[k] || {name:'', d7:0, d14:0, other:0}, yk = y[k], name = s.name || d.name;
+      var kgNow = yk ? s.now*yk : NaN, kg7 = yk ? (s.now + s.d7)*yk : NaN, kg14 = yk ? (s.now + s.d14)*yk : NaN;
+      var g7 = kg7 - d.d7, g14 = kg14 - d.d14, cell = function(v){ return '<td class="num ltr" style="'+(isFinite(v) ? (v < 0 ? 'color:var(--alert);font-weight:800;' : 'color:var(--good);font-weight:700;') : '')+'">'+(isFinite(v) ? (v>0?'+':'')+f1(v) : '—')+'</td>'; };
+      return '<tr><td>'+escH(name)+(d.other ? '<div class="hint" style="margin:2px 0 0;">+ طلبات بوحدة تانية ('+f1(d.other)+')</div>' : '')+'</td><td class="num">'+s.now+'<div class="hint" style="margin:0;">≈ '+f1(kgNow)+' كجم</div></td><td class="num ltr">'+f1(kg7)+'</td><td class="num ltr">'+f1(d.d7)+'</td>'+cell(g7)+'<td class="num ltr">'+f1(kg14)+'</td><td class="num ltr">'+f1(d.d14)+'</td>'+cell(g14)+'</tr>';
+    }).join('');
+    var noYield = keys.filter(function(k){ return sup[k] && !y[k]; }).map(function(k){ return sup[k].name; });
+    return '<div class="chart-card"><h3>🔮 توقّع الحصاد مقابل الطلبات (7 و14 يوم)</h3>'+
+      '<p class="hint help-note">المتوقع = المواسير الجاهزة دلوقتي + اللي هتجهز في الفترة، مضروبة في متوسط إنتاج الماسورة من حصادك السابق (لازم تكون سجّلت حصاد بعدد مواسير). المطلوب = طلبات العملاء اللي تاريخها في الفترة بوحدة كجم أو جرام. الأحمر = عجز.</p>'+
+      '<div class="table-wrap"><table><thead><tr><th>الصنف</th><th>مواسير جاهزة</th><th>متوقع 7 أيام (كجم)</th><th>مطلوب 7</th><th>الفرق</th><th>متوقع 14 يوم</th><th>مطلوب 14</th><th>الفرق</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      (noYield.length ? '<p class="hint">⚠️ مفيش بيانات إنتاج للماسورة لـ: '+escH(noYield.join('، '))+' — سجّل حصاد بعدد مواسير عشان يتحسب التوقّع.</p>' : '')+'</div>';
+  }
+
   function renderQualityPanel(){
     var body = $('#quality-body');
     if(!body) return;
     var pill = function(v, label){ return '<button type="button" class="range-pill'+(qView===v?' active':'')+'" data-v="'+v+'">'+label+'</button>'; };
-    var nav = '<div class="range-filter" id="q-nav">'+pill('orders','📦 الطلبات')+pill('sorting','🧺 الفرز')+pill('reports','📊 التقارير')+pill('complaints','📣 الشكاوى')+'</div>';
-    body.innerHTML = nav + '<div id="q-view">'+(qView==='reports' ? qReportsViewHtml() : (qView==='complaints' ? qComplaintsViewHtml() : (qView==='sorting' ? qSortViewHtml() : qOrdersViewHtml())))+'</div>';
+    var nav = '<div class="range-filter" id="q-nav">'+pill('orders','📦 الطلبات')+pill('sorting','🧺 الفرز')+pill('reports','📊 التقارير')+pill('forecast','🔮 التوقّع')+pill('complaints','📣 الشكاوى')+'</div>';
+    body.innerHTML = nav + '<div id="q-view">'+(qView==='reports' ? qReportsViewHtml() : (qView==='forecast' ? qForecastViewHtml() : (qView==='complaints' ? qComplaintsViewHtml() : (qView==='sorting' ? qSortViewHtml() : qOrdersViewHtml()))))+'</div>';
     $all('#q-nav .range-pill', body).forEach(function(b){ b.addEventListener('click', function(){ qView = b.getAttribute('data-v'); renderQualityPanel(); }); });
     if(qView==='orders'){
       var nb = $('#q-new-btn'); if(nb) nb.addEventListener('click', function(){ qoDraft = qoNew(); renderQualityPanel(); });
@@ -13672,7 +13946,7 @@
     function ds(k, ix){ var a = d[k]; return a ? a[ix] : null; }
     function dliAt(ix){ var v = dv('shortwave_radiation_sum', ix); return v===null ? null : wxDli(v*1e6); }   // MJ/m² → J/m²
     var days = [];
-    for(var k=i+1; k<Math.min(dt.length, i+4); k++) days.push({date:dt[k], code:dv('weather_code',k), tmax:dv('temperature_2m_max',k), tmin:dv('temperature_2m_min',k), rain:dv('precipitation_sum',k), pp:dv('precipitation_probability_max',k), dli:dliAt(k)});
+    for(var k=i+1; k<Math.min(dt.length, i+4); k++) days.push({date:dt[k], code:dv('weather_code',k), tmax:dv('temperature_2m_max',k), tmin:dv('temperature_2m_min',k), ws:dv('wind_speed_10m_max',k), rain:dv('precipitation_sum',k), pp:dv('precipitation_probability_max',k), dli:dliAt(k)});
     var hours = [];
     (h.time || []).forEach(function(tm, ix){
       if(String(tm) > now && hours.length < 12) hours.push({h:String(tm).slice(11,16), temp:wxNum((h.temperature_2m || [])[ix]), code:(h.weather_code || [])[ix], pp:wxNum((h.precipitation_probability || [])[ix])});
@@ -13732,7 +14006,32 @@
   }
   function wxCard(label, value, sub){ return '<div class="wx-card"><small>'+label+'</small><b>'+value+'</b>'+(sub ? '<em>'+sub+'</em>' : '')+'</div>'; }
   function wxDayName(date){ try{ return new Date(date+'T12:00:00').toLocaleDateString('ar-EG-u-nu-latn', {weekday:'long'}); }catch(e){ return date; } }
+
+  /* ---------- تنبيهات الطقس المتوقع (النهارده + يومين جايين) ---------- */
+  function wxThr(){
+    var h = parseFloat(settings.wxHeat), c = parseFloat(settings.wxCold), w = parseFloat(settings.wxWind);
+    return {heat: isFinite(h) ? h : 38, cold: isFinite(c) ? c : 6, wind: w > 0 ? w : 14};
+  }
+  function wxAlertList(x, thr){
+    var out = [], days = [{date:x.now ? String(x.now).slice(0,10) : todayStr(), tmax:x.tmax, tmin:x.tmin, ws:x.wsMax, rain:x.rainSum, pp:x.pp}].concat(x.days || []);
+    days.forEach(function(d, i){
+      var when = i===0 ? 'النهارده' : (i===1 ? 'بكرة' : d.date);
+      if(isFinite(d.tmax) && d.tmax >= thr.heat) out.push({lv:'alert', t:'🔥 '+when+': موجة حر — عظمى '+Math.round(d.tmax)+'°C. جهّز التظليل والتهوية وزوّد الري.'});
+      if(isFinite(d.tmin) && d.tmin <= thr.cold) out.push({lv:'alert', t:'🥶 '+when+': برد — صغرى '+Math.round(d.tmin)+'°C. غطّي/دفّي الصوب وراجع حرارة المحلول.'});
+      if(isFinite(d.ws) && d.ws >= thr.wind) out.push({lv:'alert', t:'💨 '+when+': رياح شديدة — لحد '+(Math.round(d.ws*3.6))+' كم/س. اتأكد من تثبيت الأغطية والأبواب.'});
+      if(isFinite(d.rain) && d.rain >= 3 && (d.pp == null || d.pp >= 60)) out.push({lv:'warn', t:'🌧️ '+when+': مطر متوقع '+(Math.round(d.rain*10)/10)+' مم. أجّل الرش وراجع التصريف.'});
+    });
+    return out;
+  }
+  function renderWxAlerts(){
+    var el = $('#wx-alerts'); if(!el) return;
+    var x = wxSame(wxExtra) ? wxExtra : null; if(!x){ el.innerHTML = ''; return; }
+    var list = wxAlertList(x, wxThr());
+    el.innerHTML = list.length ? '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--ink);display:block;"><strong>⛅ تنبيهات الطقس القريب</strong>'+list.map(function(a){ return '<div style="margin:3px 0;">'+escH(a.t)+'</div>'; }).join('')+'</div>' : '';
+  }
+
   function wxRenderDetail(){
+    safe(renderWxAlerts);
     var el = document.getElementById('wx-detail'); if(!el) return;
     var d = (wxData && wxSame(wxData)) ? wxData : null, x = wxSame(wxExtra) ? wxExtra : null;
     if(!wxOpen || (!d && !x)){ el.innerHTML = ''; return; }
@@ -14257,6 +14556,9 @@
     'مشاكل المكافحة': 'عدد الإصابات المسجلة في آخر 30 يوم، مقارنةً بالفترة اللي قبلها.',
     'نقص صواني المشتل': 'عدد الصواني الناقصة عن احتياج خطة المشتل.',
     'إنتاج الماسورة': 'متوسط إنتاج الماسورة الواحدة من الحصاد.',
+    'تكلفة الكيلو': 'إجمالي التكاليف المسجّلة في آخر 30 يوم ÷ كيلوهات الحصاد في نفس الفترة (من قسم التكاليف في المخازن).',
+    'فاقد الفرز': 'نسبة الفاقد من الخامة اللي جت (بالكيلو) في جلسات الفرز آخر 30 يوم.',
+    'التزام تسجيل القراءات': 'نسبة القراءات اليومية المطلوبة (ري/تربة لكل نظام + مناخ لكل صوبة) اللي اتسجلت في آخر 7 أيام.',
     'نمو اليوم': 'الزيادة في وزن النبات كل يوم (جم/يوم).',
     'الجرعة': 'الجرعة الموصى بيها لكل لتر أو لكل 100 لتر مياه.',
     'يستهدف': 'الآفات أو الأمراض اللي المنتج بيعالجها.',
@@ -14447,6 +14749,8 @@
     dh.value = (settings.digestHour>=0 && settings.digestHour<=23 && settings.digestHour!=='' && settings.digestHour!==undefined) ? settings.digestHour : 7;
     ch.value = (settings.checkHour>=0 && settings.checkHour<=23 && settings.checkHour!=='' && settings.checkHour!==undefined) ? settings.checkHour : 11;
     $('#da-ec-drift').value = driftEc(); $('#da-ph-drift').value = driftPh();
+    $('#da-trap-thr').value = trapThr();
+    var wt = wxThr(); $('#da-wx-heat').value = wt.heat; $('#da-wx-cold').value = wt.cold; $('#da-wx-wind').value = wt.wind;
   }
   function fillRemindForm(){
     var f = $('#remind-from'), t = $('#remind-to'); if(!f || !t) return;
@@ -14499,7 +14803,7 @@
     $('#btn-save-daily').addEventListener('click', function(){
       var ecd = parseFloat($('#da-ec-drift').value), phd = parseFloat($('#da-ph-drift').value);
       if(!(ecd > 0 && phd > 0)){ toast('اكتب حدّ انحراف أكبر من صفر'); return; }
-      saveSettings({digestOn:$('#da-digest-on').checked, digestHour:parseInt($('#da-digest-hour').value,10), checkOn:$('#da-check-on').checked, checkHour:parseInt($('#da-check-hour').value,10), ecDrift:ecd, phDrift:phd}).then(function(){
+      saveSettings({digestOn:$('#da-digest-on').checked, digestHour:parseInt($('#da-digest-hour').value,10), checkOn:$('#da-check-on').checked, checkHour:parseInt($('#da-check-hour').value,10), ecDrift:ecd, phDrift:phd, trapThr:parseFloat($('#da-trap-thr').value)||30, wxHeat:parseFloat($('#da-wx-heat').value)||38, wxCold:(isFinite(parseFloat($('#da-wx-cold').value)) ? parseFloat($('#da-wx-cold').value) : 6), wxWind:parseFloat($('#da-wx-wind').value)||14}).then(function(){
         $('#msg-daily').classList.remove('hidden'); setTimeout(function(){ $('#msg-daily').classList.add('hidden'); }, 1800); renderAllSoon();
       });
     });
@@ -14734,6 +15038,7 @@
   renderSoilPanel = fsWrap(renderSoilPanel);
   renderHarvestPanel = fsWrap(renderHarvestPanel);
   renderInventoryPanel = fsWrap(renderInventoryPanel);
+  var _rtp = renderTasksPanel; renderTasksPanel = function(){ _rtp.apply(this, arguments); safe(renderHandover); };
   renderNurseryPanel = fsWrap(renderNurseryPanel);
   renderNutrientsPanel = fsWrap(renderNutrientsPanel);
   renderPestsPanel = fsWrap(renderPestsPanel);
@@ -15107,6 +15412,11 @@
       pipeMaps = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
       bootTick('k27', snap); renderAllSoon();
     }, function(err){ console.error('pipeMaps snapshot error', err); });
+
+    db.collection('handover').orderBy('createdAt','desc').limit(100).onSnapshot(function(snap){
+      handoverLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
+      noteReads('handover', snap); renderAllSoon();
+    }, function(err){ console.error('handover snapshot error', err); });
 
     histQ('costs','date').limit(3000).onSnapshot(function(snap){
       costsLog = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
