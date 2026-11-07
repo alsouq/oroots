@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-YJYAL5Klc+CD24pd5+kQlboQjN+vFDUXOKt02E1hnPI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IMhxHQIM9DDUbukOTgsw0mX0TeLOexfD3HimpqyIJ84=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -4508,7 +4508,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     el.textContent = 'ماسورة '+(i+1)+' — '+g.crop+' — '+map.plantsPerPipe+' نبتة — عمر '+Math.max(0,age)+' يوم'+(c.max>1?(' — قطفة '+Math.min(c.done+1,c.max)+' من '+c.max):'')+' — '+
       (r.st==='ready' ? (c.max>1 ? 'جاهزة للقطفة ✅' : 'جاهزة للحصاد ✅') : (r.st==='over' ? (c.max>1 ? 'متأخرة عن القطفة ⚠️' : 'متأخرة عن الحصاد ⚠️') : (r.st==='future' ? 'لسه ما اتزرعتش' : 'تجهز بعد '+left+' يوم')))+pestTxt;
   }
-  function pipeOpenEdit(id){ panelSubSet('harvest','pipes'); pipeEditId = id; renderHarvestPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
+  function pipeOpenEdit(id){ panelSubSet('harvest','pipes','temp'); pipeEditId = id; renderHarvestPanel(); var d = $('#pipe-form-details'); if(d && d.scrollIntoView) d.scrollIntoView({behavior:'smooth', block:'center'}); }
   function wirePipeGroups(){
     $all('.pipe-grp').forEach(function(card){
       var id = card.getAttribute('data-gid');
@@ -7634,7 +7634,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(!d.tabs.some(function(t){ return t[0]===sub; }) || !subAllowed(pk, sub)) sub = subFirstAllowed(pk);
     panel.setAttribute('data-sub', sub);
     $all('.subtabs .subtab-btn', panel).forEach(function(b){ var on = b.getAttribute('data-subtab')===sub; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
-    if(persist){ panel.setAttribute('data-want', sub); try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} }
+    if(persist){ panel.setAttribute('data-want', sub); if(persist !== 'temp'){ try{ localStorage.setItem('oroots_sub_'+pk, sub); }catch(e){} } }
     // المخططات اللي اتعملت وهي مخفية (عرضها صفر) بنعيد رسمها دلوقتي عشان تاخد عرضها الصح
     $all('.svg-chart-holder[id]', panel).forEach(function(h){ var a = svgChartArgs[h.id]; if(a && h.offsetParent!==null) renderSvgChart(h, a.ds, a.opts); });
   }
@@ -10028,7 +10028,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
 
     $all('.pest-edit-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        panelSubSet('pests','entry'); pestEditId = btn.closest('.pest-card').getAttribute('data-id'); pestTreatId = null;
+        panelSubSet('pests','entry','temp'); pestEditId = btn.closest('.pest-card').getAttribute('data-id'); pestTreatId = null;
         renderPestsPanel();
         var f = $('#pest-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'});
       });
@@ -10714,14 +10714,14 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     });
     $all('.nursery-edit-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        panelSubSet('nursery','entry'); nurseryEditingId = btn.closest('tr').getAttribute('data-id');
+        panelSubSet('nursery','entry','temp'); nurseryEditingId = btn.closest('tr').getAttribute('data-id');
         nurseryTransplantId = null;
         renderNurseryPanel();
       });
     });
     $all('.nursery-transplant-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){
-        panelSubSet('nursery','entry'); nurseryTransplantId = btn.closest('tr').getAttribute('data-id');
+        panelSubSet('nursery','entry','temp'); nurseryTransplantId = btn.closest('tr').getAttribute('data-id');
         nurseryEditingId = null;
         renderNurseryPanel();
       });
@@ -11958,7 +11958,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       var u = card.querySelector('.sp-undo'); if(u) u.addEventListener('click', function(){ sprayMarkDone(e, false).then(function(){ toast('اترجّع'); }); });
       var sk = card.querySelector('.sp-skip'); if(sk) sk.addEventListener('click', function(){ sprayAskSkip(card, e); });
       var us = card.querySelector('.sp-unskip'); if(us) us.addEventListener('click', function(){ sprayUnskip(e); });
-      var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ panelSubSet('spray','entry'); sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
+      var ed = card.querySelector('.sp-edit'); if(ed) ed.addEventListener('click', function(){ panelSubSet('spray','entry','temp'); sprayEditId = id; renderSprayPanel(); var f = $('#sp-form'); if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth', block:'start'}); });
       var dl = card.querySelector('.sp-del'); if(dl) dl.addEventListener('click', function(){
         if(!requireAdminForDelete()) return;
         if(!confirm('تمسح "'+sprayTitle(e)+'" من الجدول؟'+(e.taskId?' (وهتتمسح من مهام '+(e.assignedTo||'الموظف')+' كمان)':''))) return;
@@ -12013,7 +12013,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       }
       done.then(function(){
         toast(wasEditing ? 'اتحفظ التعديل' : 'اتضاف للجدول'+(assignee?(' واتبعت لـ '+assignee.displayName):''));
-        sprayEditId = null; sprayDate = date; panelSubSet('spray','schedule'); renderSprayPanel();
+        sprayEditId = null; sprayDate = date; panelSubSet('spray','schedule','temp'); renderSprayPanel();
       }).catch(function(e){ console.error(e); toast('حصل خطأ، حاول تاني'); btn.disabled = false; });
     });
     applyPermissionLock(body, 'spray');
