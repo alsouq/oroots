@@ -1,9 +1,9 @@
 /* O'Roots — بيبعت أي إشعار جديد (مهمة جديدة، رش/تسميد، إلغاء...) على موبايل المستلم حتى لو التطبيق مقفول.
-   بيشتغل على GitHub Actions كل 5 دقايق (أو أي Node). بيقرا الإشعارات اللي اتعملت في آخر 6 ساعات ولسه ما اتبعتتش،
+   بيشتغل على GitHub Actions كل 5 دقايق (أو أي Node). بيقرا الإشعارات اللي اتعملت في آخر ساعة ولسه ما اتبعتتش،
    وبيبعتها لأجهزة المستلم (مجموعة pushTokens)، وبعدين بيعلّم الإشعار pushedAt عشان ما يتبعتش تاني. */
 'use strict';
 const APP_URL = process.env.APP_URL || 'https://alsouq.github.io/oroots/';
-const LOOKBACK_MS = 1 * 3600 * 1000;
+const LOOKBACK_MS = 1 * 3600 * 1000;   // ساعة بس (الإشعار بيتعلّم pushedAt بعد ما يتبعت) — بيقلّل القراءات اليومية على Firestore
 const BAD_TOKEN = /registration-token-not-registered|invalid-registration-token|invalid-argument/;
 
 function buildPush(n, appUrl){

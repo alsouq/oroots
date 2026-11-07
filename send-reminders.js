@@ -51,15 +51,146 @@ function buildMessage(list, today){
   return {title, body};
 }
 
+
+/* ===== تنبيهات يومية إضافية: القراءات الناقصة + ملخص الصبح + مخزون منخفض + انحراف الصرف عن الري ===== */
+const DEFAULT_DIGEST_HOUR = 7, DEFAULT_CHECK_HOUR = 11, DEFAULT_EC_DRIFT = 0.6, DEFAULT_PH_DRIFT = 0.8;
+const safePart = s => String(s).replace(/\//g, '-').slice(0, 300);
+const rid = (source, id, date) => id ? `${source}_${safePart(id)}_${date}` : `${source}_${date}`;
+function hourOr(v, def){ v = Number(v); return (Number.isInteger(v) && v >= 0 && v <= 23) ? v : def; }
+function numOr(v, def){ v = parseFloat(v); return (isFinite(v) && v > 0) ? v : def; }
+function dayBefore(date){ return new Date(new Date(date + 'T12:00:00Z').getTime() - 86400000).toISOString().slice(0, 10); }
+function isFruit(sys){ return sys && sys.gtype === 'fruit'; }
+/* المطلوب تسجيله يوميًا: ثمريات ← تربة، ورقيات ← ري، وكل صوبة ← مناخ */
+function expectedTargets(systems){
+  const out = [], ghs = new Set();
+  (systems || []).forEach(sy => {
+    if(!sy || !sy.id) return;
+    const label = (sy.greenhouse ? sy.greenhouse + ' — ' : '') + (sy.name || sy.id);
+    if(isFruit(sy)) out.push({kind: 'soil', source: 'soil', id: sy.id, label, tab: 'soil'});
+    else out.push({kind: 'water', source: 'irrigation', id: sy.id, label, tab: 'water'});
+    if(sy.greenhouse) ghs.add(sy.greenhouse);
+  });
+  ghs.forEach(g => out.push({kind: 'climate', source: 'climate', id: g, label: g + ' (مناخ)', tab: 'climate'}));
+  return out;
+}
+function canEditTab(u, tab){
+  if(!u) return false;
+  if(u.role === 'admin') return true;
+  const p = u.permissions || {};
+  let v = p[tab];
+  if(v === undefined && tab === 'soil') v = p.water;
+  return v === 'edit';
+}
+function recipientsFor(users, tab){
+  return (users || []).filter(u => u && u.username && canEditTab(u, tab)).map(u => String(u.username).toLowerCase());
+}
+/* snapsById: Map(id → data|null) — مستندات القراءات الموجودة النهارده */
+function findMissing(targets, snapsById, date){
+  return targets.filter(t => {
+    const d = snapsById.get(rid(t.source, t.kind === 'climate' ? t.id : t.id, date));
+    return !(d && Array.isArray(d.entries) && d.entries.length);
+  });
+}
+function lastEntry(doc){ const e = doc && Array.isArray(doc.entries) ? doc.entries.slice().sort((a, b) => String(a.ts).localeCompare(String(b.ts))) : []; return e.length ? e[e.length - 1] : null; }
+const MET = {ph: 'pH', ec: 'EC', temp: 'حرارة المياه'};
+/* خارج المدى + انحراف الصرف عن الري (للأنظمة الورقية) */
+function waterIssues(systems, docs, cfg, today){
+  const out = [], ecD = numOr(cfg && cfg.ecDrift, DEFAULT_EC_DRIFT), phD = numOr(cfg && cfg.phDrift, DEFAULT_PH_DRIFT), yest = dayBefore(today);
+  (systems || []).forEach(sy => {
+    if(!sy || !sy.id || isFruit(sy)) return;
+    const label = (sy.greenhouse ? sy.greenhouse + ' — ' : '') + (sy.name || sy.id);
+    const pick = src => lastEntry(docs.get(rid(src, sy.id, today))) || lastEntry(docs.get(rid(src, sy.id, yest)));
+    const irr = pick('irrigation'), dra = pick('drainage');
+    if(irr) ['ph', 'ec', 'temp'].forEach(k => {
+      const r = cfg && cfg[k], v = parseFloat(irr[k]);
+      if(Array.isArray(r) && isFinite(v) && (v < r[0] || v > r[1])) out.push(`${label}: ${MET[k]} الري ${v} خارج المدى (${r[0]}–${r[1]})`);
+    });
+    if(irr && dra){
+      const dEc = parseFloat(dra.ec) - parseFloat(irr.ec), dPh = parseFloat(dra.ph) - parseFloat(irr.ph);
+      if(isFinite(dEc) && Math.abs(dEc) >= ecD) out.push(`${label}: EC الصرف ${dEc > 0 ? 'أعلى' : 'أقل'} من الري بـ ${Math.abs(dEc).toFixed(2)}`);
+      if(isFinite(dPh) && Math.abs(dPh) >= phD) out.push(`${label}: pH الصرف ${dPh > 0 ? 'أعلى' : 'أقل'} من الري بـ ${Math.abs(dPh).toFixed(2)}`);
+    }
+  });
+  return out;
+}
+function lowStock(items){
+  return (items || []).filter(i => i && i.minQty !== undefined && i.minQty !== null && i.minQty !== '' && i.quantity !== undefined && i.quantity !== null && i.quantity !== '' && parseFloat(i.quantity) <= parseFloat(i.minQty))
+    .map(i => `${i.name || 'صنف'} (${i.quantity}${i.unit ? ' ' + i.unit : ''} ≤ ${i.minQty})`);
+}
+function digestFor(email, user, ctx){
+  const lines = [], isAdmin = user && user.role === 'admin';
+  if(isAdmin || canEditTab(user, 'water')) ctx.water.slice(0, 4).forEach(l => lines.push('💧 ' + l));
+  if(isAdmin || canEditTab(user, 'inventory')) ctx.stock.slice(0, 3).forEach(l => lines.push('📦 مخزون منخفض: ' + l));
+  const t = (ctx.tasks.get(email) || []), late = t.filter(x => x.date < ctx.today).length;
+  if(t.length) lines.push(`📋 مهام معلّقة: ${t.length}${late ? ' (متأخرة ' + late + ')' : ''}`);
+  return lines;
+}
+async function pushTo({db, messaging, email, title, body, tag, url}){
+  const tokSnap = await db.collection('pushTokens').where('email', '==', email).get();
+  const tokens = tokSnap.docs.map(d => d.data()).filter(t => t.token).map(t => t.token);
+  if(!tokens.length) return 0;
+  const res = await messaging.sendEachForMulticast({tokens, data: {title, body, tag, url: url || APP_URL}, webpush: {headers: {Urgency: 'high', TTL: '43200'}}});
+  await Promise.all(res.responses.map((r, i) => {
+    const code = r.error && r.error.code;
+    if(code && /registration-token-not-registered|invalid-registration-token|invalid-argument/.test(code)) return db.collection('pushTokens').doc(tokens[i]).delete();
+  }));
+  return res.successCount;
+}
+/* بيشتغل كل ساعة: لو جه ميعاد الملخص أو فحص القراءات ولسه ما اتعملش النهارده، بينفّذه مرة واحدة */
+async function runDaily({db, messaging, now, cfg}){
+  const out = {digest: 0, missing: 0};
+  const stDoc = await db.doc('settings/reminderState').get(), st = stDoc.exists ? stDoc.data() : {};
+  const wantDigest = cfg.digestOn !== false && now.hour >= hourOr(cfg.digestHour, DEFAULT_DIGEST_HOUR) && st.digestDate !== now.date;
+  const wantCheck = cfg.checkOn !== false && now.hour >= hourOr(cfg.checkHour, DEFAULT_CHECK_HOUR) && st.missingDate !== now.date;
+  if(!wantDigest && !wantCheck) return out;
+  const sysDoc = await db.doc('settings/systems').get(), usersDoc = await db.doc('settings/users').get();
+  const systems = sysDoc.exists ? (sysDoc.data().list || []) : [], users = usersDoc.exists ? (usersDoc.data().list || []) : [];
+  const yest = dayBefore(now.date), targets = expectedTargets(systems);
+  const ids = new Set();
+  targets.forEach(t => ids.add(rid(t.source, t.id, now.date)));
+  if(wantDigest) systems.forEach(sy => { if(sy && sy.id && !isFruit(sy)) ['irrigation', 'drainage'].forEach(src => { ids.add(rid(src, sy.id, now.date)); ids.add(rid(src, sy.id, yest)); }); });
+  const refs = [...ids].map(i => db.collection('readings').doc(i));
+  const snaps = refs.length ? await db.getAll(...refs) : [];
+  const docs = new Map(); snaps.forEach(s => docs.set(s.id, s.exists ? s.data() : null));
+  const write = {};
+  if(wantCheck){
+    const miss = findMissing(targets, docs, now.date), byUser = new Map();
+    miss.forEach(t => recipientsFor(users, t.tab).forEach(e => { if(!byUser.has(e)) byUser.set(e, []); byUser.get(e).push(t.label); }));
+    for(const [email, list] of byUser){
+      const body = list.slice(0, 5).map(x => '• ' + x).join('\n') + (list.length > 5 ? `\n+${list.length - 5} تانية` : '');
+      out.missing += await pushTo({db, messaging, email, title: `📝 لسه ما اتسجلتش قراءات النهارده (${list.length})`, body, tag: 'oroots-missing'});
+    }
+    write.missingDate = now.date;
+  }
+  if(wantDigest){
+    const invSnap = await db.collection('inventory').get();
+    const ctxBase = {today: now.date, water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
+    const tdocs = (await db.getAll(...lastDates(now.date, LOOKBACK).map(d => db.collection('readings').doc('tasks_' + d)))).filter(s => s.exists).map(s => ({id: s.id, data: s.data()}));
+    const tasks = groupPending(tdocs, users);
+    for(const u of users){
+      if(!u || !u.username) continue;
+      const email = String(u.username).toLowerCase(), lines = digestFor(email, u, {...ctxBase, tasks});
+      if(!lines.length) continue;
+      const extra = lines.length > 6 ? `\n+${lines.length - 6} تانية` : '';
+      out.digest += await pushTo({db, messaging, email, title: '☀️ ملخص الصبح', body: lines.slice(0, 6).join('\n') + extra, tag: 'oroots-digest'});
+    }
+    write.digestDate = now.date;
+  }
+  await db.doc('settings/reminderState').set(write, {merge: true});
+  return out;
+}
+
 async function main(){
   const admin = require('firebase-admin');
   admin.initializeApp({credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))});
   const db = admin.firestore();
   const now = cairoNow(new Date());
   const cfgSnap = await db.doc('settings/config').get();
-  const win = resolveWindow(cfgSnap.exists ? cfgSnap.data() : {});
+  const cfg = cfgSnap.exists ? cfgSnap.data() : {};
+  try{ const r = await runDaily({db, messaging: admin.messaging(), now, cfg}); console.log('تنبيهات يومية:', r); }
+  catch(e){ console.error('تنبيهات يومية فشلت (مش بتوقف تذكير المهام):', e.message); }
+  const win = resolveWindow(cfg);
   if(now.hour < win.from || now.hour >= win.to){ console.log('خارج ساعات التنبيه:', now, win); return; }
-
   const refs = lastDates(now.date, LOOKBACK).map(d => db.collection('readings').doc('tasks_' + d));
   const snaps = (await db.getAll(...refs)).filter(s => s.exists).map(s => ({id: s.id, data: s.data()}));
   const usersDoc = await db.doc('settings/users').get();
@@ -85,5 +216,5 @@ async function main(){
   }
 }
 
-module.exports = {resolveWindow, cairoNow, lastDates, groupPending, buildMessage};
+module.exports = {resolveWindow, cairoNow, lastDates, groupPending, buildMessage, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });
