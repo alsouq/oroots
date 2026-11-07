@@ -144,7 +144,7 @@ function farmInsights(systems, docs, today, nowTs, cfg){
     if(!sy || !sy.id) return;
     const label = (sy.greenhouse ? sy.greenhouse + ' — ' : '') + (sy.name || sy.id);
     if(sy.greenhouse) ghs.add(sy.greenhouse);
-    if(isFruit(sy)) FL.lgAnomalies(entriesOf('soil', sy.id), ['ph', 'ec', 'temp', 'moist'], nowMs).forEach(a => out.push({tab: 'soil', text: `🔎 ${label} (تربة): ${a.text}`}));
+    if(isFruit(sy)) FL.lgAnomalies(entriesOf('soil', sy.id), ['ph', 'ec', 'moist'], nowMs).forEach(a => out.push({tab: 'soil', text: `🔎 ${label} (تربة): ${a.text}`}));
     else [['irrigation', 'ري'], ['drainage', 'صرف']].forEach(([src, nm]) => FL.lgAnomalies(entriesOf(src, sy.id), ['ph', 'ec', 'temp'], nowMs).forEach(a => out.push({tab: 'water', text: `🔎 ${label} (${nm}): ${a.text}`})));
   });
   ghs.forEach(g => {
