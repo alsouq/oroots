@@ -1,0 +1,26 @@
+name: firestore-backup
+on:
+  schedule:
+    - cron: '30 22 * * 4'    # كل خميس 22:30 UTC (يعني بعد منتصف الليل بتوقيت القاهرة تقريبًا) — أسبوعي عشان نوفّر قراءات Firestore
+  workflow_dispatch:          # تشغيل يدوي
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save firebase-admin@12
+      - run: node backup-firestore.js backup --out=backups
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      # الملف مشفّر (AES-256) — بيتحفظ كـ Artifact لمدة 30 يوم. حمّله من تاب Actions ← تشغيل ← Artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oroots-backup
+          path: backups/*.enc
+          retention-days: 30
+          if-no-files-found: error
