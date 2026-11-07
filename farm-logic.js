@@ -15,16 +15,25 @@
     }
     return Math.round(h * 10) / 10;
   }
+  /* العتبات الافتراضية (قابلة للتعديل من الإعدادات): حرارة من/إلى، رطوبة من/إلى، وساعات الخطر المتوسط والعالي في آخر 24 ساعة */
   var LG_DISEASES = [
-    {id:'botrytis', name:'العفن الرمادي (بوترايتس)', test:function(t, r){ return t >= 15 && t <= 23 && r >= 90; }, med:3, high:6, tip:'قلّل الرطوبة بالتهوية والتسخين الخفيف قبل الفجر، وتجنّب الرش المسائي.'},
-    {id:'downy', name:'البياض الزغبي', test:function(t, r){ return t >= 10 && t <= 24 && r >= 85; }, med:4, high:8, tip:'زوّد حركة الهواء وقلّل الرطوبة الليلية وراجع الأوراق السفلية.'},
-    {id:'powdery', name:'البياض الدقيقي (تقدير استرشادي)', test:function(t, r){ return t >= 22 && t <= 28 && r >= 70 && r <= 90; }, med:10, high:16, tip:'راجع الأوراق القديمة وظلّل الإصابات المبكرة، وفكّر في وقاية بالكبريت أو بديل حيوي.'}
+    {id:'botrytis', name:'العفن الرمادي (بوترايتس)', tMin:15, tMax:23, rhMin:90, rhMax:100, med:3, high:6, tip:'قلّل الرطوبة بالتهوية والتسخين الخفيف قبل الفجر، وتجنّب الرش المسائي.'},
+    {id:'downy', name:'البياض الزغبي', tMin:10, tMax:24, rhMin:85, rhMax:100, med:4, high:8, tip:'زوّد حركة الهواء وقلّل الرطوبة الليلية وراجع الأوراق السفلية.'},
+    {id:'powdery', name:'البياض الدقيقي (تقدير استرشادي)', tMin:22, tMax:28, rhMin:70, rhMax:90, med:10, high:16, tip:'راجع الأوراق القديمة وظلّل الإصابات المبكرة، وفكّر في وقاية بالكبريت أو بديل حيوي.'}
   ];
+  /* over = {botrytis:{tMin,tMax,rhMin,rhMax,med,high,on}, ...} (اختياري): أي حقل مش رقم صالح بيرجع للافتراضي، و on:false بيقفل المرض */
+  function lgDiseaseCfg(d, over){
+    var o = (over && over[d.id]) || {}, c = {id:d.id, name:d.name, tip:d.tip, on:o.on !== false};
+    ['tMin', 'tMax', 'rhMin', 'rhMax', 'med', 'high'].forEach(function(k){ var v = parseFloat(o[k]); c[k] = isFinite(v) ? v : d[k]; });
+    if(c.high < c.med) c.high = c.med;
+    return c;
+  }
   /* مخاطر الأمراض لصوبة واحدة من قراءات مناخها: [{id, name, level:'medium'|'high', hours, tip}] (تقدير استرشادي مش تشخيص) */
-  function lgDiseaseRisks(entries, nowMs){
+  function lgDiseaseRisks(entries, nowMs, over){
     var out = [];
-    LG_DISEASES.forEach(function(d){
-      var h = lgRiskHours(entries, nowMs, d.test);
+    LG_DISEASES.forEach(function(d0){
+      var d = lgDiseaseCfg(d0, over); if(!d.on) return;
+      var h = lgRiskHours(entries, nowMs, function(t, r){ return t >= d.tMin && t <= d.tMax && r >= d.rhMin && r <= d.rhMax; });
       if(h >= d.high) out.push({id:d.id, name:d.name, level:'high', hours:h, tip:d.tip});
       else if(h >= d.med) out.push({id:d.id, name:d.name, level:'medium', hours:h, tip:d.tip});
     });
@@ -51,4 +60,4 @@
     return out;
   }
 /*LOGIC-END*/
-module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgAnomalies: lgAnomalies}; })();
+module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies}; })();

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1puWga92TgxSfdOdjkVYzX5rycxoZW0XJvc22/A92SQ=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zCIc8TD2DHRKo1fgPQlEVEC+ZZBHCKyb+YaeOdPTvmw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1256,6 +1256,13 @@
         <div class="form-actions"><button class="btn btn-primary btn-sm" id="btn-save-daily">حفظ</button> <span class="save-msg hidden" id="msg-daily">تم الحفظ</span></div>
       </div>
 
+      <div class="settings-card" id="disease-card">
+        <h3>🍄 عتبات مخاطر الأمراض</h3>
+        <p class="hint help-note">التطبيق بيحسب عدد الساعات في آخر 24 ساعة اللي الحرارة والرطوبة كانوا فيها داخل النطاق ده، ولو وصل الحد المتوسط أو العالي بيتنبّه (في «نظرة عامة» وملخص الصبح). القيم الافتراضية عامة وتقدير استرشادي، فعدّلها حسب خبرتك مع محاصيلك. قفل المرض بيوقف تنبيهاته.</p>
+        <div id="dis-box"></div>
+        <div class="form-actions"><button class="btn btn-primary btn-sm" id="btn-save-dis">حفظ العتبات</button> <button class="btn btn-ghost btn-sm" id="btn-reset-dis">رجّع الافتراضي</button> <span class="save-msg hidden" id="msg-dis">تم الحفظ</span></div>
+      </div>
+
       <div class="settings-card">
         <h3>⏰ تنبيه المهام كل ساعة</h3>
         <p class="hint help-note">الموظف اللي بيفعّل التنبيه على موبايله بيوصله تنبيه كل ساعة بمهامه اللي لسه ما خلصتهاش، وبس جوه الساعات دي (بتوقيت القاهرة). التغيير بيتطبق من التنبيه الجاي.</p>
@@ -2053,6 +2060,7 @@
         var names = {ph:'نطاق pH', ec:'نطاق EC', temp:'نطاق الحرارة', remindFrom:'بداية تنبيه المهام (الساعة)', remindTo:'نهاية تنبيه المهام (الساعة)', weatherName:'منطقة الطقس', weatherLat:'خط عرض الطقس', weatherLon:'خط طول الطقس', digestOn:'ملخص الصبح', digestHour:'ساعة ملخص الصبح', checkOn:'فحص القراءات الناقصة', checkHour:'ساعة فحص القراءات', ecDrift:'حد انحراف EC الصرف', trapThr:'حد تنبيه اللاصقات', wxHeat:'إنذار الحر', wxCold:'إنذار البرد', wxWind:'إنذار الرياح', phDrift:'حد انحراف pH الصرف'};
         Object.keys(patch||{}).forEach(function(k){
           if(k==='accessCode'){ if(old.accessCode!==patch.accessCode) logAudit('edit', 'admin', 'غيّر كود الدخول'); return; }
+          if(k==='disease'){ if(JSON.stringify(old.disease)!==JSON.stringify(patch.disease)) logAudit('edit', 'admin', 'عدّل عتبات مخاطر الأمراض'); return; }
           if(JSON.stringify(old[k])!==JSON.stringify(patch[k])){
             var fmt = function(v){ return Array.isArray(v) ? v.join(' – ') : (v==null?'—':v); };
             logAudit('edit', 'admin', (names[k]||k)+': من '+fmt(old[k])+' إلى '+fmt(patch[k]));
@@ -14065,16 +14073,25 @@
     }
     return Math.round(h * 10) / 10;
   }
+  /* العتبات الافتراضية (قابلة للتعديل من الإعدادات): حرارة من/إلى، رطوبة من/إلى، وساعات الخطر المتوسط والعالي في آخر 24 ساعة */
   var LG_DISEASES = [
-    {id:'botrytis', name:'العفن الرمادي (بوترايتس)', test:function(t, r){ return t >= 15 && t <= 23 && r >= 90; }, med:3, high:6, tip:'قلّل الرطوبة بالتهوية والتسخين الخفيف قبل الفجر، وتجنّب الرش المسائي.'},
-    {id:'downy', name:'البياض الزغبي', test:function(t, r){ return t >= 10 && t <= 24 && r >= 85; }, med:4, high:8, tip:'زوّد حركة الهواء وقلّل الرطوبة الليلية وراجع الأوراق السفلية.'},
-    {id:'powdery', name:'البياض الدقيقي (تقدير استرشادي)', test:function(t, r){ return t >= 22 && t <= 28 && r >= 70 && r <= 90; }, med:10, high:16, tip:'راجع الأوراق القديمة وظلّل الإصابات المبكرة، وفكّر في وقاية بالكبريت أو بديل حيوي.'}
+    {id:'botrytis', name:'العفن الرمادي (بوترايتس)', tMin:15, tMax:23, rhMin:90, rhMax:100, med:3, high:6, tip:'قلّل الرطوبة بالتهوية والتسخين الخفيف قبل الفجر، وتجنّب الرش المسائي.'},
+    {id:'downy', name:'البياض الزغبي', tMin:10, tMax:24, rhMin:85, rhMax:100, med:4, high:8, tip:'زوّد حركة الهواء وقلّل الرطوبة الليلية وراجع الأوراق السفلية.'},
+    {id:'powdery', name:'البياض الدقيقي (تقدير استرشادي)', tMin:22, tMax:28, rhMin:70, rhMax:90, med:10, high:16, tip:'راجع الأوراق القديمة وظلّل الإصابات المبكرة، وفكّر في وقاية بالكبريت أو بديل حيوي.'}
   ];
+  /* over = {botrytis:{tMin,tMax,rhMin,rhMax,med,high,on}, ...} (اختياري): أي حقل مش رقم صالح بيرجع للافتراضي، و on:false بيقفل المرض */
+  function lgDiseaseCfg(d, over){
+    var o = (over && over[d.id]) || {}, c = {id:d.id, name:d.name, tip:d.tip, on:o.on !== false};
+    ['tMin', 'tMax', 'rhMin', 'rhMax', 'med', 'high'].forEach(function(k){ var v = parseFloat(o[k]); c[k] = isFinite(v) ? v : d[k]; });
+    if(c.high < c.med) c.high = c.med;
+    return c;
+  }
   /* مخاطر الأمراض لصوبة واحدة من قراءات مناخها: [{id, name, level:'medium'|'high', hours, tip}] (تقدير استرشادي مش تشخيص) */
-  function lgDiseaseRisks(entries, nowMs){
+  function lgDiseaseRisks(entries, nowMs, over){
     var out = [];
-    LG_DISEASES.forEach(function(d){
-      var h = lgRiskHours(entries, nowMs, d.test);
+    LG_DISEASES.forEach(function(d0){
+      var d = lgDiseaseCfg(d0, over); if(!d.on) return;
+      var h = lgRiskHours(entries, nowMs, function(t, r){ return t >= d.tMin && t <= d.tMax && r >= d.rhMin && r <= d.rhMax; });
       if(h >= d.high) out.push({id:d.id, name:d.name, level:'high', hours:h, tip:d.tip});
       else if(h >= d.med) out.push({id:d.id, name:d.name, level:'medium', hours:h, tip:d.tip});
     });
@@ -14105,7 +14122,7 @@
     var nowMs = lgTs(nowLocalInputValue()), out = [];
     greenhouseGroups().forEach(function(g){
       var ce = flattenEntries('climate', g.name);
-      lgDiseaseRisks(ce, nowMs).forEach(function(r){ out.push({lv:r.level==='high' ? 'alert' : 'warn', t:'🍄 '+g.name+': خطر '+r.name+' ('+(r.level==='high' ? 'عالي' : 'متوسط')+' — '+r.hours+' ساعة ظروف مناسبة في آخر 24 ساعة). '+r.tip}); });
+      lgDiseaseRisks(ce, nowMs, settings.disease).forEach(function(r){ out.push({lv:r.level==='high' ? 'alert' : 'warn', t:'🍄 '+g.name+': خطر '+r.name+' ('+(r.level==='high' ? 'عالي' : 'متوسط')+' — '+r.hours+' ساعة ظروف مناسبة في آخر 24 ساعة). '+r.tip}); });
       lgAnomalies(ce, ['temp','rh'], nowMs).forEach(function(a){ out.push({lv:'warn', t:'🔎 '+g.name+' (مناخ): '+a.text}); });
     });
     systems.forEach(function(sy){
@@ -14837,7 +14854,26 @@
   }
   function driftEc(){ var v = parseFloat(settings.ecDrift); return v>0 ? v : 0.6; }
   function driftPh(){ var v = parseFloat(settings.phDrift); return v>0 ? v : 0.8; }
+  function renderDiseaseForm(){
+    var box = $('#dis-box'); if(!box) return;
+    box.innerHTML = LG_DISEASES.map(function(d0){
+      var c = lgDiseaseCfg(d0, settings.disease);
+      var f = function(k, lbl, step){ return '<div class="field-sm"><label>'+lbl+'</label><input type="number" step="'+step+'" class="ltr dis-in" data-d="'+d0.id+'" data-k="'+k+'" value="'+c[k]+'"></div>'; };
+      return '<div class="dis-block" style="margin:10px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--border);"><label style="display:flex;align-items:center;gap:8px;font-weight:800;"><input type="checkbox" class="dis-on" data-d="'+d0.id+'" style="width:auto;"'+(c.on ? ' checked' : '')+'> '+escH(d0.name)+'</label>'+
+        '<div class="form-grid" style="margin-top:8px;">'+f('tMin','حرارة من (°C)','0.5')+f('tMax','حرارة إلى (°C)','0.5')+f('rhMin','رطوبة من (٪)','1')+f('rhMax','رطوبة إلى (٪)','1')+f('med','ساعات = خطر متوسط','1')+f('high','ساعات = خطر عالي','1')+'</div></div>';
+    }).join('');
+  }
+  function collectDiseaseCfg(){
+    var out = {};
+    LG_DISEASES.forEach(function(d){
+      var o = {on: !!($('.dis-on[data-d="'+d.id+'"]') || {}).checked};
+      ['tMin','tMax','rhMin','rhMax','med','high'].forEach(function(k){ var el = $('.dis-in[data-d="'+d.id+'"][data-k="'+k+'"]'); var v = el ? parseFloat(el.value) : NaN; if(isFinite(v)) o[k] = v; });
+      out[d.id] = o;
+    });
+    return out;
+  }
   function fillDailyForm(){
+    safe(renderDiseaseForm);
     var dh = $('#da-digest-hour'), ch = $('#da-check-hour'); if(!dh || !ch) return;
     if(!dh.options.length){ for(var h=0; h<=23; h++){ dh.add(new Option(hourLabel(h), h)); ch.add(new Option(hourLabel(h), h)); } }
     $('#da-digest-on').checked = settings.digestOn !== false; $('#da-check-on').checked = settings.checkOn !== false;
@@ -14894,6 +14930,16 @@
     });
     $('#btn-clear-wx').addEventListener('click', function(){
       saveSettings({weatherName:'', weatherLat:'', weatherLon:''}).then(function(){ wxData = null; wxRender(); toast('اتخفى الطقس'); });
+    });
+    $('#btn-save-dis').addEventListener('click', function(){
+      var cfg = collectDiseaseCfg(), bad = '';
+      LG_DISEASES.forEach(function(d){ var o = cfg[d.id]; if(o.tMin > o.tMax || o.rhMin > o.rhMax){ bad = d.name; } });
+      if(bad){ toast('«الأدنى» لازم يكون أقل من «الأعلى» في: '+bad); return; }
+      saveSettings({disease: cfg}).then(function(){ $('#msg-dis').classList.remove('hidden'); setTimeout(function(){ $('#msg-dis').classList.add('hidden'); }, 1800); renderAllSoon(); });
+    });
+    $('#btn-reset-dis').addEventListener('click', function(){
+      if(!confirm('ترجّع كل عتبات الأمراض للقيم الافتراضية؟')) return;
+      saveSettings({disease: {}}).then(function(){ renderDiseaseForm(); toast('اتسترجعت القيم الافتراضية'); renderAllSoon(); });
     });
     $('#btn-save-daily').addEventListener('click', function(){
       var ecd = parseFloat($('#da-ec-drift').value), phd = parseFloat($('#da-ph-drift').value);

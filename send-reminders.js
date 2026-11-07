@@ -136,7 +136,7 @@ async function fetchWeather(cfg, fetchJson){
   try{ return (await fetchJson(url)).daily || null; }catch(e){ console.error('الطقس:', e.message); return null; }
 }
 /* مخاطر الأمراض + القراءات الشاذة من قراءات آخر 5 أيام. docs: Map(id → data). بيرجّع [{tab, text}] */
-function farmInsights(systems, docs, today, nowTs){
+function farmInsights(systems, docs, today, nowTs, cfg){
   const out = [], nowMs = FL.lgTs(nowTs), days = [0, 1, 2, 3, 4].map(i => { let d = today; for(let k = 0; k < i; k++) d = dayBefore(d); return d; });
   const entriesOf = (src, id) => { const all = []; days.forEach(d => { const x = docs.get(rid(src, id, d)); if(x && Array.isArray(x.entries)) all.push(...x.entries); }); return all; };
   const ghs = new Set();
@@ -149,7 +149,7 @@ function farmInsights(systems, docs, today, nowTs){
   });
   ghs.forEach(g => {
     const ce = entriesOf('climate', g);
-    FL.lgDiseaseRisks(ce, nowMs).forEach(r => out.push({tab: 'climate', text: `🍄 ${g}: خطر ${r.name} (${r.level === 'high' ? 'عالي' : 'متوسط'} — ${r.hours} ساعة)`}));
+    FL.lgDiseaseRisks(ce, nowMs, cfg && cfg.disease).forEach(r => out.push({tab: 'climate', text: `🍄 ${g}: خطر ${r.name} (${r.level === 'high' ? 'عالي' : 'متوسط'} — ${r.hours} ساعة)`}));
     FL.lgAnomalies(ce, ['temp', 'rh'], nowMs).forEach(a => out.push({tab: 'climate', text: `🔎 ${g} (مناخ): ${a.text}`}));
   });
   return out;
@@ -213,7 +213,7 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
   if(wantDigest){
     const invSnap = await db.collection('inventory').get();
     const weather = weatherAlerts(await fetchWeather(cfg, fetchJson), cfg);
-    const ctxBase = {today: now.date, weather, insights: farmInsights(systems, docs, now.date, now.ts || (now.date + 'T' + String(now.hour).padStart(2, '0') + ':00')), water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
+    const ctxBase = {today: now.date, weather, insights: farmInsights(systems, docs, now.date, now.ts || (now.date + 'T' + String(now.hour).padStart(2, '0') + ':00'), cfg), water: waterIssues(systems, docs, cfg, now.date), stock: lowStock(invSnap.docs.map(d => d.data()))};
     const tdocs = (await db.getAll(...lastDates(now.date, LOOKBACK).map(d => db.collection('readings').doc('tasks_' + d)))).filter(s => s.exists).map(s => ({id: s.id, data: s.data()}));
     const tasks = groupPending(tdocs, users);
     for(const u of users){
