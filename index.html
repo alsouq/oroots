@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ApjUcRPfMZayNA5pGJ4PJeO44oTgfxzXY+eASmXTva0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-O/FYsZzLkiajQ5liduLp/d/l959y8hMcL+9bdTNiKNo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -570,7 +570,10 @@
   .legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
   .chart-empty-msg{color:var(--muted);font-size:0.82rem;padding:34px 4px;text-align:center;margin:0;}
   .mini-charts{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;}
-  .mini-charts > *{grid-column:span 12;} @media(min-width:820px){.mini-charts > *{grid-column:span 4;}}
+  .mini-charts > *{grid-column:span 12;} @media(min-width:820px){.mini-charts > *{grid-column:span 4;}
+    /* آخر صف ما يفضلش فيه فراغ: كارت لوحده ياخد الصف كله، وكارتين ياخدوا نص نص */
+    .mini-charts > :nth-child(3n+1):last-child{grid-column:span 12;} .mini-charts > :nth-child(3n+1):nth-last-child(2),.mini-charts > :nth-child(3n+2):last-child{grid-column:span 6;}}
+  .ovd-sec{margin:0 0 6px;} .chart-card[data-ovid]{overflow:auto;}
   #io-list,#ov-custom-list,#water-compare,#water-calib-charts{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:12px;row-gap:0;align-items:start;}
   #io-list > *,#ov-custom-list > *,#water-compare > *,#water-calib-charts > *{grid-column:span 12;}
   @media(max-width:819px){[data-sz]{grid-column:span 12 !important;}}
@@ -5578,6 +5581,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(yMin===yMax){ yMin -= 1; yMax += 1; }
     if(opts.band){ yMin = Math.min(yMin, opts.band.lo); yMax = Math.max(yMax, opts.band.hi); }
     var yPad = (yMax-yMin)*0.15; yMin -= yPad; yMax += yPad;
+    (function(){ var ml = 0; for(var q=0;q<=4;q++){ ml = Math.max(ml, fmtNum(yMax-(yMax-yMin)/4*q).length); } padL = Math.max(40, Math.ceil(ml*6.3)+12); plotW = W - padL - padR; })();   // عرض محور القيم على حسب أطول رقم (وإلا الأرقام الكبيرة بتتقص)
 
     function xPix(x){ return padL + (x-xMin)/(xMax-xMin) * plotW; }
     function yPix(y){ return padT + (1-(y-yMin)/(yMax-yMin)) * plotH; }
@@ -5585,7 +5589,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var gridColor = cssVar('--border') || '#DCE2D2';
     var textColor = cssVar('--muted') || '#63695A';
     var parts = [];
-    parts.push('<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:'+H+'px;display:block;overflow:visible;">');
+    parts.push('<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:'+H+'px;display:block;overflow:visible;direction:ltr;">');
 
     var hLines = 4;
     for(var i=0;i<=hLines;i++){
@@ -14564,6 +14568,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     ioAutoAxes(ser, ioCatMap(ioCatalog()));
     return {id:genId(), title:title, days:30, ov:true, series:ser};
   }
+  function ovCardOf(id){ var hd = document.getElementById(id); return hd ? hd.closest('.chart-card') : document.querySelector('.chart-card[data-ovid="'+String(id).replace(/"/g,'')+'"]'); }
   function ovCloseMenu(){ var m = document.getElementById('ov-menu'); if(m && m.parentNode) m.parentNode.removeChild(m); }
   /* العرض والارتفاع (نفس اختيارات لوحات التبويبات) */
   function ovCurSize(ctx){
@@ -14578,7 +14583,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function ovShowMenu(btn, ctx){
     ovCloseMenu();
     var m = document.createElement('div'); m.id = 'ov-menu'; m.className = 'ov-menu';
-    m.innerHTML = '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button>'+ovSizeChips(ctx)+'<button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? 'إزالة المخطط' : 'حذف المخطط')+'</button>';
+    m.innerHTML = (ctx.stat ? '<button type="button" data-a="rename">🏷 تغيير الاسم</button>' : '<button type="button" data-a="edit">✏️ تعديل المخطط</button><button type="button" data-a="rename">🏷 تغيير الاسم</button><button type="button" data-a="dup">📑 تكرار المخطط</button>')+ovSizeChips(ctx)+'<button type="button" data-a="del" class="ov-danger">🗑 '+(ctx.kind==='builtin' ? (ctx.stat ? 'إخفاء الجدول' : 'إزالة المخطط') : 'حذف المخطط')+'</button>';
     document.body.appendChild(m);
     var r = btn.getBoundingClientRect(), mw = m.offsetWidth || 190;
     m.style.top = Math.min(r.bottom + 4, (window.innerHeight || 700) - 190)+'px';
@@ -14593,8 +14598,9 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var id = ctx.id, cur = ctx.title || ctx.orig || id;
     if(a==='w' || a==='h'){
       var sz = ovPrefs.sizes[id] = Object.assign({}, ovPrefs.sizes[id] || {}); sz[a] = v;
-      var hd = document.getElementById(id), cd = hd && hd.closest('.chart-card');
-      if(a==='w'){ szApply(cd, v); setTimeout(svgRedrawAll, 60); }
+      var hd = document.getElementById(id), cd = ovCardOf(id);
+      if(ctx.stat){ if(a==='w') szApply(cd, v); else if(cd){ cd.style.height = v+'px'; cd.style.overflow = 'auto'; } }
+      else if(a==='w'){ szApply(cd, v); setTimeout(svgRedrawAll, 60); }
       else { var ar = svgChartArgs[id]; if(hd && ar) renderSvgChart(hd, ar.ds, ar.opts); }
       ioSaveAll(customCharts, ovPrefs).then(function(){ toast('اتغيّر الحجم'); });
       return;
@@ -14602,14 +14608,14 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(a==='rename'){
       var nt = window.prompt('اسم المخطط:', cur); if(nt===null) return; nt = nt.trim(); if(!nt) return;
       ovPrefs.titles[id] = nt;
-      (function(){ var hd = document.getElementById(id), tt = hd && hd.closest('.chart-card') && hd.closest('.chart-card').querySelector('.ov-title'); if(tt) tt.textContent = nt; })();
+      (function(){ var cd = ovCardOf(id), tt = cd && cd.querySelector('.ov-title'); if(tt) tt.textContent = nt; })();
       ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('edit','charts','غيّر اسم مخطط: '+cur+' ← '+nt); toast('اتغيّر الاسم'); });
       return;
     }
     if(a==='del'){
-      if(!confirm('تشيل المخطط "'+cur+'" من نظرة عامة؟\n(تقدر ترجّعه من زر "إظهار المخططات المخفية")')) return;
+      if(!confirm('تشيل "'+cur+'" من نظرة عامة؟\n(تقدر ترجّعه من زر "إظهار المخططات المخفية")')) return;
       ovPrefs.hidden[id] = true;
-      (function(){ var hd = document.getElementById(id), cd = hd && hd.closest('.chart-card'); if(cd) cd.style.display = 'none'; })();
+      (function(){ var cd = ovCardOf(id); if(cd) cd.style.display = 'none'; })();
       ioSaveAll(customCharts, ovPrefs).then(function(){ logAudit('delete','charts','شال مخطط من نظرة عامة: '+cur); toast('اتشال المخطط'); });
       return;
     }
@@ -14649,7 +14655,19 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var root = document, sizedAny = false;
     var isAdmin = !!currentUser;
     $all('.chart-card', root).forEach(function(card){
-      var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3'); if(!holder || !h3) return;
+      var holder = card.querySelector('.svg-chart-holder[id]'), h3 = card.querySelector('h3');
+      if(!holder && h3 && card.closest('#panel-overview') && !card.closest('.io-card') && !h3.querySelector('.ov-title')){   // كروت الجداول/الأرقام: نفس خيارات المخططات (تكبير / اسم / حجم / إخفاء)
+        var sorig = helpHeadText(h3), sid = 'ovs:'+sorig;
+        card.setAttribute('data-ovid', sid);
+        if(ovPrefs.hidden[sid]){ card.style.display = 'none'; return; }
+        szApply(card, ovPrefs.sizes[sid] && ovPrefs.sizes[sid].w);
+        if(ovPrefs.sizes[sid] && ovPrefs.sizes[sid].h){ card.style.height = ovPrefs.sizes[sid].h+'px'; card.style.overflow = 'auto'; }
+        h3.setAttribute('data-orig', sorig); h3.className = 'ov-h3';
+        var sdot = h3.querySelector('.tab-dot'), sdotHtml = sdot ? sdot.outerHTML : '';
+        h3.innerHTML = sdotHtml+'<span class="ov-title">'+escH(ovPrefs.titles[sid] || sorig)+'</span><span class="ov-acts"><button type="button" class="ov-exp-btn" title="تكبير" aria-label="تكبير">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="ov-menu-btn" data-cid="'+escH(sid)+'" data-stat="1" title="خيارات" aria-label="خيارات">⋮</button>' : '')+'</span>';
+        return;
+      }
+      if(!holder || !h3) return;
       var id = holder.id, inOv = !!card.closest('#panel-overview');
       if(inOv){
       }
@@ -14692,7 +14710,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(b){
       ev.stopPropagation();
       var h3 = b.closest('h3'), tt = h3 ? h3.querySelector('.ov-title') : null;
-      ovShowMenu(b, {kind:'builtin', inOv:!!b.closest('#panel-overview'), id:b.getAttribute('data-cid'), title:tt ? tt.textContent : '', orig:h3 ? (h3.getAttribute('data-orig') || '') : ''});
+      ovShowMenu(b, {kind:'builtin', stat:b.getAttribute('data-stat')==='1', inOv:!!b.closest('#panel-overview'), id:b.getAttribute('data-cid'), title:tt ? tt.textContent : '', orig:h3 ? (h3.getAttribute('data-orig') || '') : ''});
       return;
     }
     if(!t.closest('#ov-menu')) ovCloseMenu();
