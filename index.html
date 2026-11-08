@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IMhxHQIM9DDUbukOTgsw0mX0TeLOexfD3HimpqyIJ84=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ckiMxj4MrdQQj5ZYdUgHeEbdZfC6elJJdyZyNbX5dgs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -448,6 +448,7 @@
   details.strip > summary::after{content:"▾";color:var(--muted);transition:transform .2s;flex:none;margin-inline-start:auto;} details.strip[open] > summary::after{transform:rotate(180deg);}
   .subtabs{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin:0 0 4px;}
   .subtab-btn{flex:1 1 auto;text-align:center;padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  #kpi-range .subtab-btn{flex:0 0 auto;padding:4px 12px;font-size:.74rem;border-radius:10px;}
   .subtab-btn:hover{color:var(--ink);} .subtab-btn.active{background:linear-gradient(135deg,var(--brand),var(--brand-strong));color:var(--on-brand);border-color:transparent;box-shadow:0 4px 12px color-mix(in srgb,var(--brand) 30%,transparent);}
   .panel[data-sub] [data-sub]{display:none;}
   .panel[data-sub="entry"] [data-sub~="entry"],
@@ -6056,8 +6057,10 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       '<div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;font-variant-numeric:tabular-nums;">'+value+'<small style="font-size:.8rem;margin-inline-start:4px;">'+unit+'</small></div>'+
       '<div style="margin:4px 0;">'+trend+'</div>'+(spark||'')+'</div>';
   }
+  function kpiDays(){ var v = null; try{ v = parseInt(localStorage.getItem('oroots_kpi_days'),10); }catch(e){} return [7,30,90,180,365].indexOf(v) >= 0 ? v : 30; }
   function renderOverviewKpis(){
     var el = $('#overview-kpis'); if(!el) return;
+    var N = kpiDays(), N2 = N*2;
     var D = 86400000, now = Date.now(), fmt = function(n){ return Number(Math.round(n*10)/10).toLocaleString('en-US'); };
     var inWin = function(ts, a, b){ var t = new Date(ts).getTime(); return !isNaN(t) && t >= now-a*D && t < now-b*D; };
     var kg = function(h){ var q = parseFloat(h.quantity)||0; return h.unit==='kg' ? q : (h.unit==='g' ? q/1000 : 0); };
@@ -6065,45 +6068,50 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     // الحصاد (كجم + جرام بس)
     var hCur = 0, hPrev = 0, buckets = [0,0,0,0,0,0];
     harvestLog.forEach(function(h){
-      if(inWin(h.ts, 30, 0)){ hCur += kg(h); var bi = Math.min(5, Math.floor((now-new Date(h.ts).getTime())/(5*D))); buckets[5-bi] += kg(h); }
-      else if(inWin(h.ts, 60, 30)) hPrev += kg(h);
+      if(inWin(h.ts, N, 0)){ hCur += kg(h); var bi = Math.min(5, Math.floor((now-new Date(h.ts).getTime())/(N/6*D))); buckets[5-bi] += kg(h); }
+      else if(inWin(h.ts, N2, N)) hPrev += kg(h);
     });
     cards.push(kpiCard('الحصاد', fmt(hCur), 'كجم', hCur, hPrev, false, kpiSpark(buckets, '#6AA84F')));
     // كجم لكل ماسورة (من المواسير المسجّلة في تبويب الحصاد)
     var pipes = pipeMaps.reduce(function(s,m){ return s + (parseFloat(m.totalPipes)||0); }, 0);
     if(pipes>0 && hCur>0) cards.push(kpiCard('إنتاج الماسورة', fmt(hCur/pipes), 'كجم/ماسورة', hCur/pipes, hPrev/pipes, false, ''));
     // تكلفة الكيلو (من التكاليف المسجّلة ÷ كيلوهات الحصاد في نفس الفترة)
-    var cC = 0, cP = 0; costsLog.forEach(function(c){ var t = new Date(String(c.date)+'T12:00:00').getTime(), a = parseFloat(c.amount)||0; if(isNaN(t)) return; if(t >= now-30*D) cC += a; else if(t >= now-60*D) cP += a; });
+    var cC = 0, cP = 0; costsLog.forEach(function(c){ var t = new Date(String(c.date)+'T12:00:00').getTime(), a = parseFloat(c.amount)||0; if(isNaN(t)) return; if(t >= now-N*D) cC += a; else if(t >= now-N2*D) cP += a; });
     if(cC > 0 && hCur > 0) cards.push(kpiCard('تكلفة الكيلو', fmt(cC/hCur), 'ج.م/كجم', cC/hCur, (cP > 0 && hPrev > 0) ? cP/hPrev : 0, true, ''));
     // فاقد الفرز (٪ من اللي جه، بالكيلو)
     try{
       var inSort = function(o, a, b){ var t = new Date(String(o.date)+'T12:00:00').getTime(); return !isNaN(t) && t >= now-a*D && t < now-b*D; };
-      var aC = qAggregate(qSorts.filter(function(o){ return inSort(o, 30, 0); })).byUnit.kg, aP = qAggregate(qSorts.filter(function(o){ return inSort(o, 60, 30); })).byUnit.kg;
+      var aC = qAggregate(qSorts.filter(function(o){ return inSort(o, N, 0); })).byUnit.kg, aP = qAggregate(qSorts.filter(function(o){ return inSort(o, N2, N); })).byUnit.kg;
       if(aC && aC.rec > 0) cards.push(kpiCard('فاقد الفرز', fmt(aC.waste/aC.rec*100), '٪', aC.waste/aC.rec, (aP && aP.rec > 0) ? aP.waste/aP.rec : 0, true, ''));
     }catch(e){}
     // التزام تسجيل القراءات: كام يوم من آخر 7 فيه قراءة لكل (نظام/صوبة) مطلوب
     try{
       var tg = [], gh = {}; systems.forEach(function(sy){ tg.push([sysGType(sy)==='fruit' ? 'soil' : 'irrigation', sy.id]); gh[ghNameOf(sy)] = 1; }); Object.keys(gh).forEach(function(g){ tg.push(['climate', g]); });
-      var have = 0, want = 0; for(var dd = 0; dd < 7; dd++){ var dk = planAddDays(todayStr(), -dd); tg.forEach(function(t){ want++; var d = findDoc(t[0], dk, t[1]); if(d && d.entries && d.entries.length) have++; }); }
-      if(want) cards.push('<div class="stat-card kpi-card"><div class="hint" style="margin:0;">التزام تسجيل القراءات</div><div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;">'+Math.round(have/want*100)+'<small style="font-size:.8rem;margin-inline-start:4px;">٪ (آخر 7 أيام)</small></div><div class="hint" style="margin:4px 0;">'+have+' من '+want+' قراءة يومية مطلوبة</div></div>');
+      var have = 0, want = 0; for(var dd = 0; dd < N; dd++){ var dk = planAddDays(todayStr(), -dd); tg.forEach(function(t){ want++; var d = findDoc(t[0], dk, t[1]); if(d && d.entries && d.entries.length) have++; }); }
+      if(want) cards.push('<div class="stat-card kpi-card"><div class="hint" style="margin:0;">التزام تسجيل القراءات</div><div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;">'+Math.round(have/want*100)+'<small style="font-size:.8rem;margin-inline-start:4px;">٪ (آخر '+N+' يوم)</small></div><div class="hint" style="margin:4px 0;">'+have+' من '+want+' قراءة يومية مطلوبة</div></div>');
     }catch(e){}
     // إنجاز المهام
     var today = todayStr(), tasks = flattenTasks(), tc = {a:0,d:0}, tp = {a:0,d:0};
     tasks.forEach(function(t){
-      var diff = dayDiff(today, t.ts.slice(0,10)), o = (diff<=0 && diff>=-30) ? tc : ((diff<-30 && diff>=-60) ? tp : null);
+      var diff = dayDiff(today, t.ts.slice(0,10)), o = (diff<=0 && diff>=-N) ? tc : ((diff<-N && diff>=-N2) ? tp : null);
       if(!o) return; o.a++; if(t.status==='done') o.d++;
     });
     if(tc.a) cards.push(kpiCard('إنجاز المهام', Math.round(tc.d/tc.a*100), '٪', tc.d/tc.a, tp.a ? tp.d/tp.a : 0, false, ''));
     // المكافحة (عدد المشاكل المسجّلة — الأقل أحسن)
     var pc = 0, pp = 0;
-    pestLog.forEach(function(p){ if(inWin(p.ts, 30, 0)) pc++; else if(inWin(p.ts, 60, 30)) pp++; });
+    pestLog.forEach(function(p){ if(inWin(p.ts, N, 0)) pc++; else if(inWin(p.ts, N2, N)) pp++; });
     cards.push(kpiCard('مشاكل المكافحة', pc, 'مشكلة', pc, pp, true, ''));
     // نقص الصواني (من خطة المشتل)
     var miss = 0, hasPlan = false;
     try{ nurseryTilesData().tiles.forEach(function(t){ t.rows.forEach(function(r){ if(r.need>0){ hasPlan = true; miss += Math.max(0, r.need - r.have); } }); }); }catch(e){}
     if(hasPlan) cards.push('<div class="stat-card kpi-card"><div class="hint" style="margin:0;">نقص صواني المشتل</div><div style="font-size:1.6rem;font-weight:500;direction:ltr;text-align:start;">'+fmt(miss)+'<small style="font-size:.8rem;margin-inline-start:4px;">صينية</small></div><div style="margin:4px 0;"><span class="status-pill '+(miss>0?'alert':'good')+'">'+(miss>0?'محتاج شتل':'مكتمل')+'</span></div></div>');
-    el.innerHTML = '<h2 class="section-title" style="margin-top:6px;">مؤشرات آخر ٣٠ يوم</h2><div class="kpi-grid">'+cards.join('')+'</div>'+
-      '<p class="hint help-note" style="margin-top:-6px;">الحصاد بيحسب الكيلو والجرام بس. المقارنة مع الـ٣٠ يوم اللي قبلهم.</p>';
+    var ranges = [[7,'أسبوع'],[30,'شهر'],[90,'٣ شهور'],[180,'٦ شهور'],[365,'سنة']];
+    var lim = histDays(), warn = (lim > 0 && N*2 > lim) ? '<p class="hint help-note" style="margin-top:-6px;">⚠️ التطبيق محمّل بيانات آخر '+lim+' يوم بس، فالمقارنة بالفترة اللي قبلها ممكن تبقى ناقصة. زوّد «مدة البيانات المحمّلة» من الإعدادات.</p>' : '';
+    el.innerHTML = '<h2 class="section-title" style="margin-top:6px;">مؤشرات آخر '+(ranges.filter(function(r){ return r[0]===N; })[0]||[0,N+' يوم'])[1]+'</h2>'+
+      '<div class="subtabs" id="kpi-range" style="padding:0 0 8px;gap:6px;justify-content:flex-start;">'+ranges.map(function(r){ return '<button type="button" class="subtab-btn'+(r[0]===N?' active':'')+'" data-d="'+r[0]+'">'+r[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="kpi-grid">'+cards.join('')+'</div>'+warn+
+      '<p class="hint help-note" style="margin-top:-6px;">الحصاد بيحسب الكيلو والجرام بس. المقارنة مع نفس المدة اللي قبلها.</p>';
+    $all('#kpi-range button', el).forEach(function(b){ b.addEventListener('click', function(){ try{ localStorage.setItem('oroots_kpi_days', b.getAttribute('data-d')); }catch(e){} renderOverviewKpis(); }); });
   }
   function renderSystemsOverview(){
     renderCropRefs();
@@ -15381,7 +15389,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
      وبتظهر لما تدوس على الـ ؟ اللي جنب العنوان. */
   var HELP_HEADS = 'h1,h2,h3,.io-title,.db-dt,details.strip > summary';
   var HELP_TABS = {
-    overview:  {t:'نظرة عامة', tip:'ملخص كل الصوب والأنظمة ومؤشرات آخر 30 يوم', intro:'ملخص سريع لكل المزرعة: مؤشرات آخر 30 يوم، التنبيهات المتأخرة، ومخططات الري والمناخ لكل الصوب.', items:['اضغط على أي صوبة أو نظام عشان تفتح تفاصيله.','التصفية فوق كل مخطط بتحدد الفترة: 24 ساعة أو 7 أيام أو 30 يوم أو بين تاريخين تختارهم من التقويم.','زرار التكبير بيفتح المخطط ملء الشاشة. زرار ⋮ (للمدير) بيخفي المخطط أو بيغيّر اسمه.']},
+    overview:  {t:'نظرة عامة', tip:'ملخص كل الصوب والأنظمة ومؤشرات الفترة اللي تختارها', intro:'ملخص سريع لكل المزرعة: مؤشرات آخر 30 يوم، التنبيهات المتأخرة، ومخططات الري والمناخ لكل الصوب.', items:['اضغط على أي صوبة أو نظام عشان تفتح تفاصيله.','التصفية فوق كل مخطط بتحدد الفترة: 24 ساعة أو 7 أيام أو 30 يوم أو بين تاريخين تختارهم من التقويم.','زرار التكبير بيفتح المخطط ملء الشاشة. زرار ⋮ (للمدير) بيخفي المخطط أو بيغيّر اسمه.']},
     charts:    {t:'المخططات', tip:'مخططات مخصصة بتجمع أي مقاييس مع بعض', intro:'بتركّب مخططات بنفسك: أي مقياس من أي مكان (مناخ، مياه، حصاد، مكافحة...) على نفس الرسم.', items:['اختار القسم ← نوع العنصر ← المكان (صوبة أو نظام أو صنف) وضيف أكتر من خط.','اللي أرقامه مختلفة الحجم حطّه على المحور الأيمن، أو كبّره/صغّره بمعامل الضرب.','من جدول المخطط شغّل أو اقفل أي خط، وسحب صباعك على المخطط بيعرض القيم في الوقت ده.']},
     soil:      {t:'بيانات التربة', tip:'pH وEC وحرارة ورطوبة التربة لصوب الثمريات', intro:'قياسات التربة لصوب الثمريات (طماطم وخلافه): pH وEC وحرارة ورطوبة التربة، مع مخططات وسجل وتصدير.'},
     water:     {t:'بيانات المياه', tip:'قراءات pH وEC وحرارة الري لكل نظام', intro:'تسجيل ومتابعة قراءات المياه (pH وEC والحرارة) لكل نظام: الري والصرف والخزان، ومعايرة تصرف نقط الري.', items:['التبويب مقسّم لأقسام فرعية: إدخال القياسات (كل نماذج الإدخال والإدخال السريع)، والمخططات، والسجلات، ومعايرة الأجهزة.','اختار الصوبة وبعدها النظام عشان تشوف بياناته.','القراءة اللي برّه المدى المضبوط في الإعدادات بتتلوّن بلون التنبيه.','معايرة الري بتحسب تصرف النقطة والنظام (لتر/دقيقة) وبتتستخدم في حساب استهلاك المياه في تبويب نمو النبات.']},
@@ -16003,10 +16011,57 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function usageAdd(k, n){
     var day = pacificDay(); if(usage.d !== day){ usage = {d:day, r:0, w:0}; }
     usage[k] += (n > 0 ? n : 1); usageSave();
+    usageSchedule();
     var pct = usage[k] / USAGE_LIM[k], flag = 'oroots_usage_warn_'+k+'_'+usage.d, seen = null;
     if(pct >= 0.8){ try{ seen = localStorage.getItem(flag); }catch(e){}
       if(!seen){ try{ localStorage.setItem(flag, '1'); }catch(e){} try{ toast('⚠️ جهازك استهلك '+Math.round(pct*100)+'٪ من حصة '+(k==='r' ? 'القراءات' : 'الكتابات')+' المجانية اليومية. لو الحصة خلصت التسجيل هيقف لحد التجديد.', 9000); }catch(e){} }
     }
+  }
+  /* ---------- استهلاك الفريق كله: كل جهاز بيبعت عدّاده كل ~١٠ دقايق في مستند usageStats، والمدير بيجمعهم ---------- */
+  var usageDevId = (function(){ try{ var v = localStorage.getItem('oroots_dev_id'); if(!v){ v = Math.random().toString(36).slice(2, 8); localStorage.setItem('oroots_dev_id', v); } return v; }catch(e){ return 'x'+Math.random().toString(36).slice(2, 6); } })();
+  var usageSync = {timer:null, last:0, d:'', r:-1, w:-1};
+  function usageSchedule(){ if(usageSync.timer) return; usageSync.timer = setTimeout(function(){ usageSync.timer = null; usageFlush(); }, 10*60*1000); }
+  function usageFlush(){
+    try{
+      if(!db || !currentUser) return;
+      if(usageSync.d === usage.d && usageSync.r === usage.r && usageSync.w === usage.w) return;
+      var rec = {day:usage.d, user:String(currentUser).toLowerCase(), device:usageDevId, r:usage.r, w:usage.w, updatedAt:Date.now()};
+      usageSync.last = Date.now();
+      db.collection('usageStats').doc(rec.day+'__'+rec.user+'__'+usageDevId).set(rec).catch(function(){});
+      usageSync.d = usage.d; usageSync.r = usage.r; usageSync.w = usage.w;   // بعد الكتابة (هي نفسها اتعدّت كمان) عشان ما تعملش دورة بلا نهاية
+    }catch(e){}
+  }
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden' && Date.now() - usageSync.last > 3*60*1000) usageFlush(); });
+  var teamUsage = {ts:0, docs:null, busy:false};
+  function loadTeamUsage(force){
+    if(!db || currentUserRole !== 'admin' || teamUsage.busy) return;
+    if(!force && ((teamUsage.docs && Date.now() - teamUsage.ts < 120000) || teamUsage.err)) return;
+    teamUsage.err = null;
+    teamUsage.busy = true; usageFlush();
+    db.collection('usageStats').where('day', '==', pacificDay()).get().then(function(sn){
+      teamUsage.docs = sn.docs.map(function(d){ return d.data(); }); teamUsage.ts = Date.now(); teamUsage.busy = false; renderReadStats();
+    }).catch(function(e){ teamUsage.busy = false; teamUsage.err = (e && e.code) || 'error'; renderReadStats(); });
+  }
+  function teamUsageHtml(){
+    if(currentUserRole !== 'admin') return '';
+    var head = '<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الفريق كله النهارده</h4>';
+    if(teamUsage.err === 'permission-denied') return head+'<p class="hint">لازم تنشر قواعد Firestore الجديدة (فيها usageStats) عشان العدّاد الجماعي يشتغل.</p>';
+    if(!teamUsage.docs) return head+'<p class="hint">'+(teamUsage.busy ? 'بيجمع أرقام الفريق…' : 'مفيش أرقام لسه.')+'</p>';
+    var by = {}, tr = 0, tw = 0;
+    teamUsage.docs.forEach(function(d){
+      var u = by[d.user] || (by[d.user] = {user:d.user, r:0, w:0, dev:0, t:0});
+      u.r += d.r||0; u.w += d.w||0; u.dev++; u.t = Math.max(u.t, d.updatedAt||0); tr += d.r||0; tw += d.w||0;
+    });
+    var rows = Object.keys(by).map(function(k){ return by[k]; }).sort(function(a, b){ return (b.r+b.w) - (a.r+a.w); });
+    var pr = tr/USAGE_LIM.r, pw = tw/USAGE_LIM.w, worst = Math.max(pr, pw);
+    var verdict = worst >= 0.8 ? '<span style="color:var(--alert);font-weight:700;">🔴 الحصة قربت تخلص ('+Math.round(worst*100)+'٪ من الأعلى) — قلّل الاستخدام أو رقّي الخطة</span>' :
+      (worst >= 0.5 ? '<span style="color:var(--tank);font-weight:700;">🟠 عدّيت النص ('+Math.round(worst*100)+'٪)</span>' : '<span style="color:var(--good);font-weight:700;">🟢 الوضع تمام ('+Math.round(worst*100)+'٪ من الأعلى)</span>');
+    return head+usageBarHtml('قراءات الفريق', tr, USAGE_LIM.r)+usageBarHtml('كتابات الفريق', tw, USAGE_LIM.w)+
+      '<p style="margin:6px 0;">'+verdict+'</p>'+
+      '<div class="table-wrap"><table><thead><tr><th>المستخدم</th><th>قراءات</th><th>كتابات</th><th>أجهزة</th><th>آخر تحديث</th></tr></thead><tbody>'+
+      rows.map(function(u){ return '<tr><td class="ltr">'+escH(u.user)+'</td><td class="num">'+u.r.toLocaleString('en-US')+' <span class="hint" style="margin:0;">('+(tr ? Math.round(u.r/tr*100) : 0)+'٪)</span></td><td class="num">'+u.w.toLocaleString('en-US')+'</td><td class="num">'+u.dev+'</td><td class="ltr num">'+escH(new Date(u.t).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}))+'</td></tr>'; }).join('')+'</tbody></table></div>'+
+      '<p class="hint" style="margin:6px 0 4px;">الأرقام بتتحدّث من كل جهاز كل ~١٠ دقايق (يعني متأخرة شوية)، وبتشمل اللي التطبيق بيعدّه بس: سكربتات GitHub (التنبيهات والنسخ الاحتياطي) واستعلامات الـConsole برّه العدّاد، فسيب هامش أمان.</p>'+
+      '<div class="form-actions" style="margin:0 0 12px;"><button type="button" class="btn btn-ghost btn-sm" id="btn-team-usage">🔄 تحديث أرقام الفريق</button></div>';
   }
   function quotaResetText(){
     try{
@@ -16039,8 +16094,10 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var box = document.getElementById('reads-box'); if(!box) return;
     var rows = Object.keys(readStats).map(function(k){ return [k, readStats[k]]; }).sort(function(a, b){ return b[1]-a[1]; });
     var tot = rows.reduce(function(s, r){ return s + r[1]; }, 0);
-    box.innerHTML = '<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الجهاز ده النهارده (من الحصة المجانية)</h4>'+usageBarHtml('قراءات', usage.r, USAGE_LIM.r)+usageBarHtml('كتابات', usage.w, USAGE_LIM.w)+'<p class="hint" style="margin:4px 0 10px;">الحصة بتتجدد الساعة '+quotaResetText()+' بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.</p>'+'<p class="hint" style="margin:0 0 8px;">قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
+    box.innerHTML = teamUsageHtml()+'<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الجهاز ده النهارده (من الحصة المجانية)</h4>'+usageBarHtml('قراءات', usage.r, USAGE_LIM.r)+usageBarHtml('كتابات', usage.w, USAGE_LIM.w)+'<p class="hint" style="margin:4px 0 10px;">الحصة بتتجدد الساعة '+quotaResetText()+' بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.</p>'+'<p class="hint" style="margin:0 0 8px;">قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
       (rows.length ? '<div class="table-wrap"><table><thead><tr><th>المجموعة</th><th>قراءات</th></tr></thead><tbody>'+rows.slice(0, 15).map(function(r){ return '<tr><td class="ltr">'+escH(r[0])+'</td><td class="num">'+r[1]+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="empty-note">لسه مفيش قراءات من السيرفر في الجلسة دي (البيانات جت من الذاكرة المحلية).</p>');
+    var tb = document.getElementById('btn-team-usage'); if(tb) tb.addEventListener('click', function(){ loadTeamUsage(true); });
+    loadTeamUsage(false);
   }
   function bootTick(key, snap){
     noteReads(BOOT_NAMES[key] || key, snap);
