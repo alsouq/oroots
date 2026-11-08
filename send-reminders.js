@@ -232,7 +232,11 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
 async function main(){
   const admin = require('firebase-admin');
   admin.initializeApp({credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))});
+  let U = null, c = null; try{ U = require('./usage-report'); c = U.install(admin.firestore); }catch(e){}   // عدّاد استهلاك السكربت (اختياري)
   const db = admin.firestore();
+  try{ await mainBody(admin, db); } finally { if(U) await U.report(db, admin.firestore.FieldValue, 'task-reminders', c); }
+}
+async function mainBody(admin, db){
   const now = cairoNow(new Date());
   const cfgSnap = await db.doc('settings/config').get();
   const cfg = cfgSnap.exists ? cfgSnap.data() : {};

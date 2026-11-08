@@ -40,8 +40,12 @@ async function run({db, messaging, now = Date.now(), appUrl = APP_URL}){
 async function main(){
   const admin = require('firebase-admin');
   admin.initializeApp({credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))});
-  const stats = await run({db: admin.firestore(), messaging: admin.messaging()});
-  console.log('إشعارات جديدة:', JSON.stringify(stats));
+  let U = null, c = null; try{ U = require('./usage-report'); c = U.install(admin.firestore); }catch(e){}   // عدّاد استهلاك السكربت (اختياري)
+  const db = admin.firestore();
+  try{
+    const stats = await run({db, messaging: admin.messaging()});
+    console.log('إشعارات جديدة:', JSON.stringify(stats));
+  } finally { if(U) await U.report(db, admin.firestore.FieldValue, 'push-notifications', c); }
 }
 module.exports = {buildPush, run};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });

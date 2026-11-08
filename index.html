@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-P/USM+hpm+EtkSTBHVCMk7yO7Fc4vMkIuCANgIlJz70=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GaRqfb/Gg7eMnTTF687PljqflhKgpaDULh2MXdRV+3U=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1047,6 +1047,7 @@
         <button type="button" class="btn btn-ghost btn-sm" id="btn-print-weekly">🖨️ طباعة تقرير (اختار الفترة)</button>
       </div>
       <div id="overview-kpis"></div>
+      <div id="overview-harvest-all"></div>
       <div id="wx-alerts"></div>
       <div id="risk-alerts"></div>
       <div id="overview-alerts"></div>
@@ -6143,12 +6144,37 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       '<p class="hint help-note" style="margin-top:-6px;">الحصاد بيحسب الكيلو والجرام بس. المقارنة مع نفس المدة اللي قبلها.</p>';
     $all('#kpi-range button', el).forEach(function(b){ b.addEventListener('click', function(){ try{ localStorage.setItem('oroots_kpi_days', b.getAttribute('data-d')); }catch(e){} renderOverviewKpis(); }); });
   }
+  /* الحصاد كله من أول تسجيل: إجمالي يومي لكل الأنظمة + خط لكل صنف (المحور بيمتد من أول حصاد لحد النهارده) */
+  function renderOverviewHarvestAll(){
+    var el = $('#overview-harvest-all'); if(!el) return;
+    var byCrop = {}, tot = {}, first = Infinity, sum = 0, nd = {};
+    harvestLog.forEach(function(h){
+      var q = parseFloat(h.quantity) || 0, kg = h.unit==='kg' ? q : (h.unit==='g' ? q/1000 : 0), d = String(h.ts||'').slice(0,10);
+      if(!(kg > 0) || !d) return;
+      var c = String(h.cropName || '—'); (byCrop[c] = byCrop[c] || {})[d] = ((byCrop[c][d]) || 0) + kg;
+      tot[d] = (tot[d] || 0) + kg; sum += kg; nd[d] = 1;
+      var t = new Date(d+'T12:00:00').getTime(); if(t < first) first = t;
+    });
+    if(!isFinite(first)){ el.innerHTML = ''; return; }
+    var now = Date.now(), win = [Math.min(first - 43200000, now - 14*86400000), now];
+    var mk = function(map){ var pts = Object.keys(map).sort().map(function(d){ return {x:new Date(d+'T12:00:00').getTime(), y:Math.round(map[d]*100)/100}; }); pts.__win = win; return pts; };
+    var ds = [{key:'all', label:'الإجمالي', color:'#C9932F', points:mk(tot)}];
+    Object.keys(byCrop).sort().forEach(function(c, i){ ds.push({key:'crop'+i, label:c, color:paletteColor(i), points:mk(byCrop[c])}); });
+    var lim = histDays();
+    el.innerHTML = '<h2 class="section-title">الحصاد — كل المزرعة</h2>'+
+      '<div class="chart-card"><h3>الحصاد اليومي — كل الأنظمة والأصناف (كجم)</h3><div class="chart-wrap"><div id="ov-harvest-all" class="svg-chart-holder"></div></div></div>'+
+      '<p class="hint help-note" style="margin-top:-4px;">إجمالي الحصاد المعروض: <b class="ltr num">'+(Math.round(sum*10)/10).toLocaleString('en-US')+'</b> كجم على <b class="ltr num">'+Object.keys(nd).length+'</b> يوم حصاد، من '+escH(ioFmtD(first))+' لحد النهارده.'+
+      (lim > 0 ? ' (المعروض محدود بآخر '+lim+' يوم محمّلين — لو عايز أقدم من كده زوّد «مدة البيانات المحمّلة» من الإعدادات)' : '')+'</p>';
+    renderSvgChart($('#ov-harvest-all'), ds, {height:230});
+    ovDecorate();
+  }
   function renderSystemsOverview(){
     renderCropRefs();
     renderOverviewAlerts();
     safe(renderWxAlerts);
     safe(renderFarmInsights);
     safe(renderOverviewKpis);
+    safe(renderOverviewHarvestAll);
     var el = $('#systems-overview');
     var detailEl = $('#overview-system-detail');
     if(!el) return;
@@ -6354,6 +6380,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     hvCrops.forEach(function(c, i){
       var hEl = byId('ovd-hv-'+i); if(!hEl) return;
       var pts = hvList.filter(function(h){ return h.cropName===c; }).map(function(h){ return {x:new Date(h.ts).getTime(), y:parseFloat(h.quantity)||0}; });
+      if(pts.length){ var fx = Math.min.apply(null, pts.map(function(q){ return q.x; })), nw = Date.now(); pts.__win = [Math.min(fx - 43200000, nw - 14*86400000), nw]; }
       renderSvgChart(hEl, [{key:'hv'+i, label:c, color:'#C9932F', points:pts}], {height:170});
     });
 
@@ -14616,6 +14643,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     else if(id==='ovd-cl-rad'){ if(gh) one('cd|'+gh+'|rad', '#8C6FA2'); }
     else if((m = /^ovd-hv-(\d+)$/.exec(id))){ var crop = sysId ? harvestCropsForSystem(sysId)[parseInt(m[1], 10)] : null; if(crop) one('hs|'+sysId+'|'+crop, '#C9932F'); }
     else if(id==='ovd-pests'){ if(gh) one('p|'+gh+'|*', '#D8543A'); }
+    else if(id==='ov-harvest-all'){ var seen = {}; harvestLog.forEach(function(h){ if(h.cropName && !seen[h.cropName]){ seen[h.cropName] = 1; one('h|'+h.cropName, paletteColor(Object.keys(seen).length-1)); } }); }
     else if(id==='harvest-chart'){ if(sysId && harvestChartCrop) one('hs|'+sysId+'|'+harvestChartCrop, '#C9932F'); }
     if(!ser.length) return null;
     ser.forEach(function(s){ s.id = genId(); s.axis = 'L'; s.scale = 1; });
@@ -15957,6 +15985,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     window.addEventListener('unhandledrejection', function(ev){
       var r = ev && ev.reason, m = r && (r.message || String(r));
       if(m && ((r && r.code === 'resource-exhausted') || /quota exceeded|resource-exhausted/i.test(m))){
+        try{ quotaHit(); }catch(e){}
         if(!permWarned || Date.now() - permWarned > 8000){ permWarned = Date.now(); try{ toast(quotaMsg(), 10000); }catch(e){} }
         return;
       }
@@ -16148,8 +16177,39 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   var BOOT_NAMES = {"k1": "readings", "k2": "settings/config", "k3": "settings/systems", "k4": "settings/users", "k5": "sops", "k6": "fertilizers", "k7": "targetProfiles", "k8": "nutrientRecipes", "k9": "pestlog", "k10": "bioReleases", "k11": "stickyTraps", "k12": "pheromoneTraps", "k13": "nursery", "k14": "irrigCalib", "k15": "inventory", "k16": "harvest", "k17": "settings/nurseryPlans", "k18": "instrumentCalibrations", "k19": "notifications", "k20": "qualityOrders", "k21": "qualitySorting", "k22": "qualityComplaints", "k23": "sprayPlan", "k24": "settings/cropNames", "k25": "settings/customers", "k26": "settings/nurseryTiles", "k27": "settings/pipeMaps", "k28": "nurseryPlanLog"};
   /* عدّاد قراءات Firestore الفعلية (من السيرفر) في الجلسة دي — بيظهر للمدير في الإعدادات */
   var readStats = {};
+  /* Firestore بيحاسب كل مستندات الـlistener من الأول لو بدأ جديد أو رجع بعد أكتر من ٣٠ دقيقة قفل — مش بس المتغيّر.
+     عشان العدّاد ما يقلّش عن الحقيقي: أول لقطة من السيرفر لكل listener بتتعدّ بحجمها الكامل لو فتحنا التطبيق بعد غياب طويل،
+     أو لو الـlistener اتعمل من جديد (زي تحميل فترة أقدم). */
+  var readsSeen = {}, readsCold = {};
+  var appColdStart = (function(){ var last = 0; try{ last = parseInt(localStorage.getItem('oroots_last_seen'), 10) || 0; }catch(e){} return Date.now() - last > 25*60*1000; })();
+  try{ localStorage.setItem('oroots_last_seen', String(Date.now())); setInterval(function(){ try{ localStorage.setItem('oroots_last_seen', String(Date.now())); }catch(e){} }, 60000); }catch(e){}
+  (function(){
+    var hiddenAt = 0;
+    document.addEventListener('visibilitychange', function(){
+      if(document.visibilityState === 'hidden'){ hiddenAt = Date.now(); return; }
+      if(hiddenAt && Date.now() - hiddenAt > 25*60*1000){ readsSeen = {}; appColdStart = true; }
+      hiddenAt = 0;
+    });
+  })();
   function noteReads(name, snap){
-    try{ if(snap && snap.docChanges && !(snap.metadata && snap.metadata.fromCache)){ var n = snap.docChanges().length; readStats[name] = (readStats[name] || 0) + n; if(n > 0) usageAdd('r', n); } }catch(e){}
+    try{
+      if(snap && snap.docChanges && !(snap.metadata && snap.metadata.fromCache)){
+        var n = snap.docChanges().length;
+        if(!readsSeen[name]){ readsSeen[name] = true; if(appColdStart || readsCold[name]){ n = Math.max(n, snap.size || 0); } delete readsCold[name]; }
+        readStats[name] = (readStats[name] || 0) + n; if(n > 0) usageAdd('r', n);
+      }
+    }catch(e){}
+  }
+  /* لما بلّغ Firebase إن الحصة خلصت: بنفتكر ده النهارده (بتوقيت الحصة) عشان العدّاد يعرضه */
+  var quotaFlag = null;
+  function quotaHit(){
+    var day = pacificDay(); if(quotaFlag && quotaFlag.d === day) return; quotaFlag = {d:day, at:Date.now()};
+    try{ localStorage.setItem('oroots_quota_hit', JSON.stringify(quotaFlag)); }catch(e){}
+    try{ safe(renderReadStats); }catch(e){}
+  }
+  function quotaActive(){
+    if(!quotaFlag){ try{ quotaFlag = JSON.parse(localStorage.getItem('oroots_quota_hit') || 'null'); }catch(e){ quotaFlag = null; } }
+    return quotaFlag && quotaFlag.d === pacificDay() ? quotaFlag : null;
   }
   /* ---------- عداد استهلاك Firebase اليومي (للجهاز ده): القراءات والكتابات مقابل الحصة المجانية ---------- */
   var USAGE_LIM = {r:50000, w:20000};
@@ -16225,6 +16285,11 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
   function installUsageMeter(){
     try{
+      ['error', 'warn'].forEach(function(k){   // رسائل Firestore نفسها بتقول Quota exceeded: بنلقطها من هنا (حتى لو مفيش كود بيستقبلها)
+        var o = console[k]; if(o.__q) return;
+        console[k] = function(){ try{ var t = Array.prototype.map.call(arguments, function(a){ return a && a.message ? a.message : String(a); }).join(' '); if(/quota exceeded|resource-exhausted/i.test(t)) quotaHit(); }catch(e){} return o.apply(console, arguments); };
+        console[k].__q = 1;
+      });
       var F = firebase.firestore;
       var wrap = function(proto, name, fn){ if(!proto || !proto[name] || proto[name].__um) return; var o = proto[name]; proto[name] = function(){ try{ fn(); }catch(e){} return o.apply(this, arguments); }; proto[name].__um = 1; };
       var wrapGet = function(proto){ if(!proto || !proto.get || proto.get.__um) return; var o = proto.get; proto.get = function(){ var p = o.apply(this, arguments); try{ p.then(function(sn){ usageAdd('r', sn && sn.size != null ? Math.max(1, sn.size) : 1); }, function(){}); }catch(e){} return p; }; proto.get.__um = 1; };
@@ -16247,7 +16312,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var box = document.getElementById('reads-box'); if(!box) return;
     var rows = Object.keys(readStats).map(function(k){ return [k, readStats[k]]; }).sort(function(a, b){ return b[1]-a[1]; });
     var tot = rows.reduce(function(s, r){ return s + r[1]; }, 0);
-    box.innerHTML = teamUsageHtml()+'<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الجهاز ده النهارده (من الحصة المجانية)</h4>'+usageBarHtml('قراءات', usage.r, USAGE_LIM.r)+usageBarHtml('كتابات', usage.w, USAGE_LIM.w)+'<p class="hint" style="margin:4px 0 10px;">الحصة بتتجدد الساعة '+quotaResetText()+' بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.</p>'+'<p class="hint" style="margin:0 0 8px;">قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
+    var qa = quotaActive(), qBanner = qa ? '<div class="hint" style="border:1px solid var(--alert);border-radius:10px;padding:8px 12px;margin:0 0 10px;color:var(--alert);font-weight:700;">⛔ Firebase بلّغ النهارده (الساعة '+escH(new Date(qa.at).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}))+') إن الحصة المجانية خلصت، والتسجيل واقف لحد التجديد (حوالي '+escH(quotaResetText())+' بتوقيت القاهرة). الأرقام تحت تقدير ناقص: الحقيقي أعلى منها، لأن فيه استهلاك مش بيتعدّ (فتح الـConsole، وسكربتات لسه ما اتحدّثتش، وقراءات الـlisteners بعد غياب طويل).</div>' : '';
+    box.innerHTML = qBanner+teamUsageHtml()+'<h4 style="margin:0 0 4px;font-size:.92rem;">استهلاك الجهاز ده النهارده (من الحصة المجانية)</h4>'+usageBarHtml('قراءات', usage.r, USAGE_LIM.r)+usageBarHtml('كتابات', usage.w, USAGE_LIM.w)+'<p class="hint" style="margin:4px 0 10px;">الحصة بتتجدد الساعة '+quotaResetText()+' بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.</p>'+'<p class="hint" style="margin:0 0 8px;">قراءات من السيرفر في الجلسة دي: <strong>'+tot+'</strong> مستند (الحد المجاني 50 ألف قراءة في اليوم لكل المستخدمين مع بعض).</p>'+
       (rows.length ? '<div class="table-wrap"><table><thead><tr><th>المجموعة</th><th>قراءات</th></tr></thead><tbody>'+rows.slice(0, 15).map(function(r){ return '<tr><td class="ltr">'+escH(r[0])+'</td><td class="num">'+r[1]+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="empty-note">لسه مفيش قراءات من السيرفر في الجلسة دي (البيانات جت من الذاكرة المحلية).</p>');
     var tb = document.getElementById('btn-team-usage'); if(tb) tb.addEventListener('click', function(){ loadTeamUsage(true); });
     loadTeamUsage(false);
@@ -16333,9 +16399,16 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       console.error('readings snapshot error', err);
     });
   }
+  var readingsDeclined = 0;
   function ensureReadingsRange(days, silent){
     var need = (days===null) ? Infinity : days, cur = (readingsLoadDays===null) ? Infinity : readingsLoadDays;
     if(!(need > cur)) return;
+    if(need > 30){   // فترة أطول من ٣٠ يوم = آلاف المستندات من حصتك اليومية: لازم موافقة صريحة
+      var nn = need === Infinity ? 365 : need, perDay = Math.max(20, readingsDocs.length / Math.max(1, cur === Infinity ? 365 : cur)), est = Math.min(20000, Math.round(perDay * nn));
+      if(need <= readingsDeclined) return;
+      if(!window.confirm('عرض فترة أطول من ٣٠ يوم هيحمّل حوالي '+est.toLocaleString('en-US')+' مستند قراءات من Firebase (الحصة المجانية اليومية ٥٠٬٠٠٠ قراءة للفريق كله). تكمّل؟')){ readingsDeclined = need; return; }
+    }
+    readsCold.readings = true; readsSeen.readings = false;
     readingsLoadDays = days;
     if(!silent) toast('بيحمّل بيانات أقدم…');
     subscribeReadings(days);

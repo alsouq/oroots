@@ -70,10 +70,12 @@ async function main(){
   }
   const admin = require('firebase-admin');
   admin.initializeApp({credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))});
+  let U = null, c = null; try{ U = require('./usage-report'); c = U.install(admin.firestore); }catch(e){}   // عدّاد استهلاك السكربت (اختياري)
   const db = admin.firestore();
   if(cmd === 'backup'){
     checkPass(pass);
     const o = await exportAll(db), dir = arg('out') || 'backups'; fs.mkdirSync(dir, {recursive: true});
+    if(U) await U.report(db, admin.firestore.FieldValue, 'firestore-backup', c);   // النسخة بتقرا كل المستندات: بنسجّل استهلاكها
     const f = path.join(dir, `oroots-${o.exportedAt.slice(0, 10)}.json.gz.enc`);
     fs.writeFileSync(f, encrypt(o, pass)); console.log('اتعملت نسخة:', f, '—', countDocs(o), 'مستند'); return;
   }
