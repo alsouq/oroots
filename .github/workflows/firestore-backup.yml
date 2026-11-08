@@ -3,6 +3,8 @@ on:
   schedule:
     - cron: '30 22 * * 4'    # كل خميس 22:30 UTC (يعني بعد منتصف الليل بتوقيت القاهرة تقريبًا) — أسبوعي عشان نوفّر قراءات Firestore
   workflow_dispatch:          # تشغيل يدوي
+permissions:
+  contents: read      # أقل صلاحية للـGITHUB_TOKEN
 jobs:
   backup:
     runs-on: ubuntu-latest

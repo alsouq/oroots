@@ -6,6 +6,8 @@ on:
 concurrency:
   group: push-notifications
   cancel-in-progress: false
+permissions:
+  contents: read      # أقل صلاحية للـGITHUB_TOKEN
 jobs:
   send:
     runs-on: ubuntu-latest

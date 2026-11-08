@@ -3,6 +3,8 @@ on:
   schedule:
     - cron: '5 * * * *'      # كل ساعة (UTC) — السكربت نفسه بيفلتر ساعات العمل بتوقيت القاهرة
   workflow_dispatch:          # تشغيل يدوي للتجربة
+permissions:
+  contents: read      # أقل صلاحية للـGITHUB_TOKEN
 jobs:
   send:
     runs-on: ubuntu-latest
