@@ -1,6 +1,6 @@
-/* hb-engine.js — محرك حساب المعادلات السمادية، منقول بنفس خوارزمية HydroBuddy 1.98
+/* hb-engine.js — محرك حساب المعادلات السمادية، منقول بنفس خوارزمية المرجع 1.98
    (hb_main.pas: Button2Click). الجزء بين HB-BEGIN و HB-END بيتنسخ حرفيًا جوه index.html
-   واختبار tests/hb-engine.test.js بيتأكد إن النسختين متطابقتين وإن الأرقام = مخرجات HydroBuddy الأصلية. */
+   واختبار tests/hb-engine.test.js بيتأكد إن النسختين متطابقتين وإن الأرقام = مخرجات المرجع الأصلية. */
 /*HB-BEGIN*/
 var HB_EL = [
   {k:'N_NO3', n:'N (NO3-)', mw:14.007, eq:1, zi:1, lmc:71.46, emp:0.403791},
@@ -21,7 +21,7 @@ var HB_EL = [
   {k:'Cl', n:'Cl', mw:35.453, eq:1, zi:1, lmc:0, emp:0}
 ];
 var HB_SIO2 = 0.4684, HB_P2O5 = 2.2915, HB_K2O = 1.2047, HB_P2O5_MIX = 2.290;
-/* تقريب زي round() بتاع HydroBuddy (Pascal بدقة extended): الأنصاف بتتقرّب لفوق، مع تعويض خطأ الـ double الصغير */
+/* تقريب زي round() بتاع المرجع (Pascal بدقة extended): الأنصاف بتتقرّب لفوق، مع تعويض خطأ الـ double الصغير */
 function hbRound(v, p){
   var t = Math.pow(10, p), x = Math.abs(v * t);
   return (v < 0 ? -1 : 1) * Math.round(x * (1 + 1e-12)) / t + 0;

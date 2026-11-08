@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zfwh1aYk8iTPBUleDPDn0jgztPZjia0rC0FWjaO9nG8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-P/USM+hpm+EtkSTBHVCMk7yO7Fc4vMkIuCANgIlJz70=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -2134,7 +2134,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(!instrumentCalibrations.length){ toast('لا توجد بيانات للتصدير'); return; }
     var header = ['النوع','اسم الجهاز','تاريخ المعايرة','المعايرة القادمة','محلول المعايرة','ملاحظة النتيجة','بواسطة'];
     var lines = [header.map(csvEscape).join(',')];
-    instrumentCalibrations.filter(function(x){ return lfInRange('instr', x.calibrationDate); }).sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); }).forEach(function(x){
+    instrumentCalibrations.filter(function(x){ return lfInRange('instr', x.calibrationDate); }).sort(function(a,b){ return String(b.calibrationDate||'').localeCompare(String(a.calibrationDate||'')); }).forEach(function(x){
       lines.push([instrumentTypeLabel(x.instrumentType), x.instrumentName, x.calibrationDate, x.nextDueDate, x.solutionUsed, x.resultNote, x.by].map(csvEscape).join(','));
     });
     downloadsCap.save({filename:'oroots-instrument-calibration-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){
@@ -2144,12 +2144,12 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function renderInstrumentCalibSection(){
     var el = $('#instrument-calib-body');
     if(!el) return;
-    var list = instrumentCalibrations.slice().sort(function(a,b){ return b.calibrationDate.localeCompare(a.calibrationDate); });
+    var list = instrumentCalibrations.slice().sort(function(a,b){ return String(b.calibrationDate||'').localeCompare(String(a.calibrationDate||'')); });
     var overdue = overdueInstrumentCalibs();
     var rows = list.length ? list.map(function(x){
-      return '<tr data-id="'+x.id+'"'+lfAttr('instr', x.calibrationDate)+'><td>'+instrumentTypeLabel(x.instrumentType)+'</td><td>'+(x.instrumentName||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('instr', x.calibrationDate)+'><td>'+instrumentTypeLabel(x.instrumentType)+'</td><td>'+escH(x.instrumentName||'—')+'</td>'+
         '<td class="ltr num">'+x.calibrationDate+'</td><td>'+(x.nextDueDate?nextReleaseBadge(x.nextDueDate):'—')+'</td>'+
-        '<td>'+(x.solutionUsed||'—')+'</td><td>'+(x.resultNote||'—')+'</td><td>'+(x.by||'—')+'</td>'+
+        '<td>'+escH(x.solutionUsed||'—')+'</td><td>'+escH(x.resultNote||'—')+'</td><td>'+escH(x.by||'—')+'</td>'+
         '<td><button class="del-btn instr-calib-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد سجلات معايرة بعد.</td></tr>';
 
@@ -2689,7 +2689,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       if(p.treated && p.pesticideName) add(p.pesticideName, p.ts);
       pestTreatmentsOf(p).forEach(function(t){ if(t.pesticideName) add(t.pesticideName, t.ts || t.date); });
     });
-    return out.sort(function(a, b){ return b.safe.localeCompare(a.safe); });
+    return out.sort(function(a, b){ return String(b.safe||'').localeCompare(String(a.safe||'')); });
   }
   function phiWarnHtml(risks){
     if(!risks.length) return '';
@@ -2707,7 +2707,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function harvestTraceOpen(h){
     var sys = getSystem(h.systemId), gh = sys ? ghNameOf(sys) : '', day = String(h.ts||'').slice(0,10), from = planAddDays(day, -21), L = [];
     var inRange = function(d){ d = String(d||'').slice(0,10); return d >= from && d <= day; };
-    var sprays = sprayPlan.filter(function(e){ return inRange(e.date) && (!gh || (e.halls||[]).indexOf(gh) >= 0); }).sort(function(a, b){ return a.date.localeCompare(b.date); });
+    var sprays = sprayPlan.filter(function(e){ return inRange(e.date) && (!gh || (e.halls||[]).indexOf(gh) >= 0); }).sort(function(a, b){ return String(a.date||'').localeCompare(String(b.date||'')); });
     var treats = [];
     pestLog.forEach(function(p){ if(gh && p.greenhouse !== gh) return;
       if(p.treated && p.pesticideName && inRange(p.ts)) treats.push({ts:p.ts, name:p.pesticideName, dose:p.dose, why:p.problemName});
@@ -2764,7 +2764,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     }
   }
   function harvestForSystem(systemId){
-    return harvestLog.filter(function(h){ return h.systemId===systemId; }).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    return harvestLog.filter(function(h){ return h.systemId===systemId; }).sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
   }
   function harvestCropsForSystem(systemId){
     var crops = [];
@@ -2865,7 +2865,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var existing = findDoc(sourceKey, dateKey, systemId);
     var entries = existing ? existing.entries.slice() : [];
     entries.push(entry);
-    entries.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    entries.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     return saveDoc(sourceKey, dateKey, entries, systemId);
   }
 
@@ -2880,7 +2880,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var existing = findDoc('climate', dateKey, greenhouseName);
     var entries = existing ? existing.entries.slice() : [];
     entries.push(entry);
-    entries.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    entries.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     return saveDoc('climate', dateKey, entries, greenhouseName);
   }
 
@@ -3199,7 +3199,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
   function calibForSystem(systemId){
     return irrigCalib.filter(function(c){ return c.systemId===systemId; })
-      .sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+      .sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
   }
   function calcPerPointLpm(volumeMl, points, durationSec){
     var v = parseFloat(volumeMl), n = parseFloat(points), t = parseFloat(durationSec);
@@ -3458,7 +3458,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
   function flattenPestlog(greenhouseName){
     var list = greenhouseName ? pestLog.filter(function(p){ return p.greenhouse===greenhouseName; }) : pestLog.slice();
-    return list.sort(function(a,b){ return b.ts.localeCompare(a.ts); });
+    return list.sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
   }
   function addPestIncidentRaw(data){
     var incident = {
@@ -4255,7 +4255,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     while(true){ var ds = cur.toISOString().slice(0,10); if(ds > hi) break; ticks += '<span class="tl-tick" style="left:'+pct(ds).toFixed(2)+'%">'+ds.slice(0,7)+'</span>'; cur.setUTCMonth(cur.getUTCMonth() + 1); }
     var td = pct(today).toFixed(2);
     var html = '<div class="tl" dir="ltr"><div class="tl-row tl-head"><div class="tl-lbl"></div><div class="tl-trk">'+ticks+'</div></div>';
-    rows.sort(function(a, b){ return a.from.localeCompare(b.from); }).forEach(function(r){
+    rows.sort(function(a, b){ return String(a.from||'').localeCompare(String(b.from||'')); }).forEach(function(r){
       var l = pct(r.from), w = Math.max(0.6, pct(r.to) - l), late = r.to < today;
       html += '<div class="tl-row"><div class="tl-lbl" dir="auto" title="'+escH(r.label)+'">'+escH(r.label)+'</div><div class="tl-trk">'+
         '<span class="tl-bar '+(r.kind==='nur' ? 'nur' : 'grp')+(late ? ' late' : '')+'" style="left:'+l.toFixed(2)+'%;width:'+w.toFixed(2)+'%" title="'+escH(r.label+' — '+r.from+' ← '+r.to)+'"></span>'+
@@ -4348,8 +4348,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
           ready:planAddDays(today, nd2.n), firstCut:planAddDays(today, nd2.n + hd2), trays:traysFor(free), plants:free*ppp});
       }
     });
-    rows.sort(function(a,b){ return a.sow.localeCompare(b.sow); });
-    pool.sort(function(a,b){ return a.sow.localeCompare(b.sow); });
+    rows.sort(function(a,b){ return String(a.sow||'').localeCompare(String(b.sow||'')); });
+    pool.sort(function(a,b){ return String(a.sow||'').localeCompare(String(b.sow||'')); });
     rows.forEach(function(r){
       var need = r.trays, ck = cropKey(r.crop);
       pool.forEach(function(b){
@@ -4669,7 +4669,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var cycleDays = harvestDays + nurseryDays;
     var transplantedForSystem = nurseryLog.filter(function(n){
       return String(n.cropName||'').trim().toLowerCase()===cropKey && n.systemId===plan.systemId && n.transplantDate;
-    }).sort(function(a,b){ return b.transplantDate.localeCompare(a.transplantDate); });
+    }).sort(function(a,b){ return String(b.transplantDate||'').localeCompare(String(a.transplantDate||'')); });
     var lastTransplant = transplantedForSystem.length ? transplantedForSystem[0].transplantDate : null;
 
     var idealNextSowDate = null, daysLate = null, alreadySownNext = false;
@@ -4913,7 +4913,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
 
   /* ---------- tasks (reuse the generic date-keyed readings pattern, source='tasks', no systemId) ---------- */
-  function escH(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function escH(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function myDisplayName(){
     var u = currentUser ? findUser(currentUser) : null;
     return (u && u.displayName) ? u.displayName : '';
@@ -5069,7 +5069,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     }); });
   }
   function flattenTasks(){
-    return flattenEntries('tasks').slice().sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    return flattenEntries('tasks').slice().sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
   }
   function makeTaskEntry(dateKey, data){
     return {
@@ -5217,7 +5217,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       if(systemId!==undefined && (d.systemId||null)!==(systemId||null)) return;
       (d.entries||[]).forEach(function(e){ out.push(e); });
     });
-    out.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    out.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     return out;
   }
 
@@ -5230,7 +5230,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
         out.push(copy);
       });
     });
-    out.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    out.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     return out;
   }
 
@@ -5344,7 +5344,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
               if(d===2 && newEntries.length){ newEntries[0].ec = +(c.ec[1]+0.6).toFixed(2); }
               var existing = findDoc(s.key, dateKey, sysId);
               var merged = (existing ? existing.entries.slice() : []).concat(newEntries);
-              merged.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+              merged.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
               return saveDoc(s.key, dateKey, merged, sysId);
             });
           });
@@ -5368,7 +5368,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
             });
             var existing = findDoc('climate', dateKey, ghName);
             var merged = (existing ? existing.entries.slice() : []).concat(newEntries);
-            merged.sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+            merged.sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
             return saveDoc('climate', dateKey, merged, ghName);
           });
         });
@@ -5489,7 +5489,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     });
     var out = [];
     Object.keys(byDate).forEach(function(dk){
-      var dayEntries = byDate[dk].slice().sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+      var dayEntries = byDate[dk].slice().sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
       var res = computeDailyCumulative(dayEntries);
       if(res[metricKey]===null || res.dayCount===0) return;   // يوم كل قراءاته بالليل: مفيش DLI يتحسب
       out.push({x:new Date(dk+'T12:00:00').getTime(), y:res[metricKey]});
@@ -5877,7 +5877,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var isCurrent = endStr >= todayStrV;   // التنبيهات المتأخرة والمهام المعلّقة بتعكس الوضع الحالي، يعني بس لو الفترة بتوصل لليوم
 
     var allTasks = flattenTasks();
-    var pendingTasks = (isCurrent ? allTasks.filter(function(t){ return t.status==='pending'; }) : allTasks.filter(function(t){ var d = t.ts.slice(0,10); return d >= weekAgoStr && d <= endStr; })).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    var pendingTasks = (isCurrent ? allTasks.filter(function(t){ return t.status==='pending'; }) : allTasks.filter(function(t){ var d = t.ts.slice(0,10); return d >= weekAgoStr && d <= endStr; })).sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     var overdueTasks = isCurrent ? pendingTasks.filter(function(t){ return t.ts.slice(0,10) < todayStrV; }) : [];
     var overdueReleases = isCurrent ? bioReleases.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate) < 0; }) : [];
     var overdueInstrPr = isCurrent ? overdueInstrumentCalibs() : [];
@@ -5901,8 +5901,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       (!isCurrent ? '' : overdueTasks.length||overdueReleases.length||overdueInstrPr.length ?
         '<table><thead><tr><th>النوع</th><th>التفاصيل</th><th>الموعد</th></tr></thead><tbody>'+
           overdueTasks.map(function(t){ return '<tr><td>مهمة</td><td>'+escH(t.title)+(t.assignedTo?(' — '+escH(t.assignedTo)):'')+(t.greenhouse?(' — '+escH(t.greenhouse)):'')+'</td><td>'+t.ts.slice(0,10)+'</td></tr>'; }).join('')+
-          overdueReleases.map(function(x){ return '<tr><td>إطلاق حيوي</td><td>'+escH(x.beneficialName)+' — '+(x.greenhouse||'')+'</td><td>'+x.nextReleaseDate+'</td></tr>'; }).join('')+
-          overdueInstrPr.map(function(x){ return '<tr><td>معايرة جهاز</td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td>'+x.nextDueDate+'</td></tr>'; }).join('')+
+          overdueReleases.map(function(x){ return '<tr><td>إطلاق حيوي</td><td>'+escH(x.beneficialName)+' — '+escH(x.greenhouse||'')+'</td><td>'+x.nextReleaseDate+'</td></tr>'; }).join('')+
+          overdueInstrPr.map(function(x){ return '<tr><td>معايرة جهاز</td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+escH(x.instrumentName||'')+'</td><td>'+x.nextDueDate+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد تنبيهات متأخرة.</p>')+
 
       '<h2>'+(isCurrent ? 'المهام المعلّقة' : 'مهام الفترة')+' ('+pendingTasks.length+')</h2>'+
@@ -5920,7 +5920,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       '<h2>الإصابات المسجلة في الفترة ('+weekPests.length+')</h2>'+
       (weekPests.length ?
         '<table><thead><tr><th>التاريخ</th><th>الصوبة</th><th>المرض/الآفة</th><th>الحالة</th></tr></thead><tbody>'+
-          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+(x.greenhouse||'—')+'</td><td>'+escH(x.problemName)+'</td><td>'+(x.eradicated?'اتقضي عليها':(x.treated?'اتعالجت':'لسه'))+'</td></tr>'; }).join('')+
+          weekPests.map(function(x){ return '<tr><td>'+fmtTs(x.ts)+'</td><td>'+escH(x.greenhouse||'—')+'</td><td>'+escH(x.problemName)+'</td><td>'+(x.eradicated?'اتقضي عليها':(x.treated?'اتعالجت':'لسه'))+'</td></tr>'; }).join('')+
         '</tbody></table>' : '<p class="pr-empty">لا توجد إصابات مسجلة في الفترة دي.</p>')+
 
       '<h2>حالة الصوب</h2>'+
@@ -5943,10 +5943,10 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       rows.push('<tr><td><span class="status-pill alert">مهمة</span></td><td>'+escH(t.title)+(t.assignedTo?(' — '+escH(t.assignedTo)):'')+(t.greenhouse?(' — '+escH(t.greenhouse)):'')+'</td><td class="ltr num">'+t.ts.slice(0,10)+'</td></tr>');
     });
     overdueReleases.slice(0,6).forEach(function(x){
-      rows.push('<tr><td><span class="status-pill alert">إطلاق حيوي</span></td><td>'+escH(x.beneficialName)+' — '+(x.greenhouse||'')+'</td><td class="ltr num">'+x.nextReleaseDate+'</td></tr>');
+      rows.push('<tr><td><span class="status-pill alert">إطلاق حيوي</span></td><td>'+escH(x.beneficialName)+' — '+escH(x.greenhouse||'')+'</td><td class="ltr num">'+x.nextReleaseDate+'</td></tr>');
     });
     overdueInstr.slice(0,6).forEach(function(x){
-      rows.push('<tr><td><span class="status-pill alert">معايرة جهاز</span></td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+(x.instrumentName||'')+'</td><td class="ltr num">'+x.nextDueDate+'</td></tr>');
+      rows.push('<tr><td><span class="status-pill alert">معايرة جهاز</span></td><td>'+instrumentTypeLabel(x.instrumentType)+' — '+escH(x.instrumentName||'')+'</td><td class="ltr num">'+x.nextDueDate+'</td></tr>');
     });
     el.innerHTML = '<details class="chart-card strip" id="overdue-details" style="border-color:var(--alert);"'+(overdueAlertsOpen?' open':'')+'>'+
       '<summary style="color:var(--alert);">⚠️ تنبيهات متأخرة ('+totalAlerts+')</summary>'+
@@ -6245,10 +6245,10 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     '</div>';
 
     /* ---- pests + biocontrol (greenhouse) ---- */
-    var recentPests = pestLog.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.ts.localeCompare(a.ts); }).slice(0,5);
+    var recentPests = pestLog.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); }).slice(0,5);
     var pestsHtml = '<div class="chart-card"><h3>آخر إصابات الصوبة</h3>'+
       (recentPests.length ? '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الآفة/المرض</th><th>الشدة</th><th>الحالة</th></tr></thead><tbody>'+
-        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+escH(x.problemName)+'</td><td>'+(x.severity||'—')+'</td><td>'+(x.eradicated?'<span class=\'status-pill good\'>اتقضي عليها ✅</span>':x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
+        recentPests.map(function(x){ return '<tr><td class="ltr num">'+fmtTs(x.ts)+'</td><td>'+escH(x.problemName)+'</td><td>'+escH(x.severity||'—')+'</td><td>'+(x.eradicated?'<span class=\'status-pill good\'>اتقضي عليها ✅</span>':x.treated?'<span class=\'status-pill good\'>اتعالجت</span>':'<span class=\'status-pill alert\'>لسه</span>')+'</td></tr>'; }).join('')+
       '</tbody></table></div>' : '<p class="empty-note">لا توجد إصابات مسجلة.</p>')+
     '</div>';
     var relForGh = bioReleases.filter(function(x){ return x.greenhouse===gh; });
@@ -6273,7 +6273,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     '</div>';
 
     /* ---- tasks (greenhouse) ---- */
-    var pendingTasksList = flattenTasks().filter(function(t){ return t.greenhouse===gh && t.status==='pending'; }).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    var pendingTasksList = flattenTasks().filter(function(t){ return t.greenhouse===gh && t.status==='pending'; }).sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     var tasksHtml = '<div class="chart-card"><h3>مهام معلّقة للصوبة</h3>'+
       (pendingTasksList.length ? '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المهمة</th><th>المكلّف</th></tr></thead><tbody>'+
         pendingTasksList.slice(0,8).map(function(t){ return '<tr><td class="ltr num">'+t.ts.slice(0,10)+'</td><td>'+escH(t.title)+'</td><td>'+escH(t.assignedTo||'—')+'</td></tr>'; }).join('')+
@@ -6750,7 +6750,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
         '<td class="num ltr" style="'+(metricStatus('ec',e.ec)==='alert'?'color:var(--alert)':'')+'">'+e.ec+'</td>'+
         '<td class="num ltr" style="'+(metricStatus('temp',e.temp)==='alert'?'color:var(--alert)':'')+'">'+e.temp+'</td>'+
         '<td><span class="status-pill '+st+'">'+(st==='good'?'سليم':'تنبيه')+'</span></td>'+
-        '<td>'+(e.by||'—')+'</td>'+
+        '<td>'+escH(e.by||'—')+'</td>'+
         '<td>'+escH(e.note||'—')+'</td>'+
         '<td><button class="del-btn" title="حذف">✕</button></td>';
       tr.querySelector('.del-btn').addEventListener('click', function(){
@@ -6800,7 +6800,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     entries.forEach(function(e){
       var dateKey = e.ts.slice(0,10), tr = document.createElement('tr');
       tr.setAttribute('data-lf', 'w-soil'); tr.setAttribute('data-d', dateKey);
-      tr.innerHTML = '<td class="ltr num">'+fmtTs(e.ts)+'</td><td class="num ltr">'+e.ph+'</td><td class="num ltr">'+e.ec+'</td><td class="num ltr">'+(e.moist===undefined ? '—' : e.moist)+'</td><td>'+(e.by||'—')+'</td><td>'+escH(e.note||'—')+'</td><td><button class="del-btn" title="حذف">✕</button></td>';
+      tr.innerHTML = '<td class="ltr num">'+fmtTs(e.ts)+'</td><td class="num ltr">'+e.ph+'</td><td class="num ltr">'+e.ec+'</td><td class="num ltr">'+(e.moist===undefined ? '—' : e.moist)+'</td><td>'+escH(e.by||'—')+'</td><td>'+escH(e.note||'—')+'</td><td><button class="del-btn" title="حذف">✕</button></td>';
       tr.querySelector('.del-btn').addEventListener('click', function(){ if(confirm('تحذف القراءة دي؟')) deleteReading('soil', dateKey, e.id, systemId).then(function(){ toast('اتحذفت'); renderSoilPanel(); }); });
       tb.appendChild(tr);
     });
@@ -7470,12 +7470,12 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       '<div data-sub="charts">'+statsHtml+
       (crops.length ?
         '<h2 class="section-title">مخطط المحصول</h2>'+
-        '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>'+
+        '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+escH(c)+'">'+escH(c)+'</button>'; }).join('')+'</div>'+
         '<label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0;"><input type="checkbox" id="harvest-compare-season" style="width:auto;"'+(harvestCompareLastSeason?' checked':'')+'> قارن بنفس الفترة من الموسم اللي فات (سنة قبل كده)</label>'+
         '<div class="chart-card"><h3>حصاد '+(harvestChartCrop||'')+' عبر الزمن</h3><div class="chart-wrap"><div id="harvest-chart" class="svg-chart-holder"></div></div><p class="hint" id="harvest-chart-total" style="margin:6px 0 0;"></p></div>'
       : '')+'</div>'+
       '<div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
-      (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+c.replace(/"/g,'&quot;')+'">'+c+'</button>'; }).join('')+'</div>' : '')+
+      (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+escH(c)+'">'+escH(c)+'</button>'; }).join('')+'</div>' : '')+
       lfBarHtml('harvest')+
       '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
       '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الدفعة</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
@@ -7597,7 +7597,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
           '<td>'+escH(h.cropName)+'</td>'+
           '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
           '<td class="num">'+(h.pipes>0 ? h.pipes : '—')+'</td>'+
-          '<td>'+(h.by||'—')+'</td>'+
+          '<td>'+escH(h.by||'—')+'</td>'+
           '<td>'+escH(h.note||'—')+'</td>'+
           '<td><button class="del-btn hv-trace" title="تتبّع المصدر">🔎</button> <button class="del-btn hv-del" title="حذف">✕</button></td>';
         tr.querySelector('.hv-trace').addEventListener('click', function(){ harvestTraceOpen(h); });
@@ -7789,8 +7789,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
 
   /* ---------- بيانات المناخ (climate: temp, RH -> AH/VPD/HD; lux -> W/m2, PPFD, DLI, J/cm2) ---------- */
   function climateStatChip(label, value, unit){
-    return '<div class="climate-chip"><span class="cc-label">'+label+'</span>'+
-      '<span class="cc-val ltr num">'+value+(unit?(' <span class="cc-unit">'+unit+'</span>'):'')+'</span></div>';
+    return '<div class="climate-chip"><span class="cc-label">'+escH(label)+'</span>'+
+      '<span class="cc-val ltr num">'+escH(value)+(unit?(' <span class="cc-unit">'+escH(unit)+'</span>'):'')+'</span></div>';
   }
 
   function renderClimatePanel(){
@@ -7832,7 +7832,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     }
 
     var lookupDay = climateSelectedDay || todayStr();
-    var dayEntries = entries.filter(function(e){ return e.ts.slice(0,10)===lookupDay; }).sort(function(a,b){ return a.ts.localeCompare(b.ts); });
+    var dayEntries = entries.filter(function(e){ return e.ts.slice(0,10)===lookupDay; }).sort(function(a,b){ return String(a.ts||'').localeCompare(String(b.ts||'')); });
     var daily = computeDailyCumulative(dayEntries);
     var dailyHtml;
     if(daily.dli===null){
@@ -7949,7 +7949,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
         '<td class="num ltr">'+fmtNum(hd)+'</td>'+
         '<td class="num ltr">'+fmtNum(rad)+'</td>'+
         '<td class="num ltr">'+fmtNum(ppfd)+'</td>'+
-        '<td>'+(e.by||'—')+'</td>'+
+        '<td>'+escH(e.by||'—')+'</td>'+
         '<td>'+escH(e.note||'—')+'</td>'+
         '<td><button class="del-btn" title="حذف">✕</button></td>';
       tr.querySelector('.del-btn').addEventListener('click', function(){
@@ -8268,7 +8268,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
           '<div class="task-card-head"><span class="task-date-badge">'+dateLabel+'</span>'+(t.greenhouse?('<span class="task-gh">'+escH(t.greenhouse)+'</span>'):'')+'</div>'+
           '<div class="task-title">'+escH(t.title)+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' <span class="hint" style="font-weight:400;">🔁 '+recurDaysLabel(t.recur)+'</span>':'')+'</div>'+
           (t.note ? '<div class="task-note">'+escH(t.note)+'</div>' : '')+
-          (t.sopTitle ? '<div class="task-sop-link">📋 الإجراء المرجعي: '+t.sopTitle+'</div>' : '')+
+          (t.sopTitle ? '<div class="task-sop-link">📋 الإجراء المرجعي: '+escH(t.sopTitle)+'</div>' : '')+
           checklistHtml(t)+
           '<button class="btn btn-primary btn-sm task-done-btn">تم ✓</button>'+
           '</div>';
@@ -8309,14 +8309,14 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
         '<datalist id="known-names-list">'+namesDatalist+'</datalist>';
       assignSectionHtml = '<h2 class="section-title">تعيين مهمة جديدة</h2>'+voiceBoxHtml()+assignFormHtml;
 
-      var sortedAll = allTasks.slice().sort(function(a,b){ return b.ts.localeCompare(a.ts); });
+      var sortedAll = allTasks.slice().sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
       var tableRowsHtml = sortedAll.map(function(t){
         var dateKey = t.ts.slice(0,10);
         return '<tr data-taskid="'+t.id+'" data-datekey="'+dateKey+'" data-who="'+escH(String(t.assignedTo||'').trim().toLowerCase())+'" data-st="'+(t.status==='done'?'done':'pending')+'"'+lfAttr('tasks', dateKey)+'>'+
           '<td class="ltr">'+dateKey+'</td>'+
           '<td>'+escH(t.greenhouse||'—')+'</td>'+
           '<td>'+escH(t.assignedTo||'—')+(t.coverForName ? ' <span class="hint" style="margin:0;">🔁 بدل '+escH(t.coverForName)+'</span>' : '')+'</td>'+
-          '<td>'+escH(t.title)+(Array.isArray(t.checklist)&&t.checklist.length ? ' <span class="hint" style="margin:0;">☑ '+t.checklist.filter(function(x){ return x.done; }).length+'/'+t.checklist.length+'</span>' : '')+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' 🔁':'')+(t.sopTitle?(' <span style="color:var(--muted);font-size:0.75rem;">('+t.sopTitle+')</span>'):'')+'</td>'+
+          '<td>'+escH(t.title)+(Array.isArray(t.checklist)&&t.checklist.length ? ' <span class="hint" style="margin:0;">☑ '+t.checklist.filter(function(x){ return x.done; }).length+'/'+t.checklist.length+'</span>' : '')+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' 🔁':'')+(t.sopTitle?(' <span style="color:var(--muted);font-size:0.75rem;">('+escH(t.sopTitle)+')</span>'):'')+'</td>'+
           '<td><span class="status-pill '+(t.status==='done'?'good':'alert')+'">'+(t.status==='done'?'تم':'معلّقة')+'</span></td>'+
           '<td><div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;"><button class="btn-ghost btn-sm task-toggle-btn" style="border-radius:8px;white-space:nowrap;">'+(t.status==='done'?'إلغاء الإتمام':'تحديد كمنجزة')+'</button><button class="btn-ghost btn-sm task-edit-btn" style="border-radius:8px;white-space:nowrap;">✏️ تعديل</button></div></td>'+
           '<td><button class="del-btn task-delete-btn" title="حذف">✕</button></td>'+
@@ -9496,7 +9496,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
   function pestTrendRowsHtml(map){
     var rows = Object.keys(map).map(function(k){ return map[k]; }).filter(function(x){ return x.cur || x.prev; })
-      .sort(function(a,b){ return (b.cur-a.cur) || (b.prev-a.prev) || a.name.localeCompare(b.name); });
+      .sort(function(a,b){ return (b.cur-a.cur) || (b.prev-a.prev) || String(a.name||'').localeCompare(String(b.name||'')); });
     if(!rows.length) return '<p class="empty-note">مفيش إصابات متسجلة في الفترة دي.</p>';
     var mx = Math.max.apply(null, rows.map(function(x){ return Math.max(x.cur, x.prev); }).concat([1]));
     var up = 0, down = 0;
@@ -9960,15 +9960,15 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       var eradInfo = p.eradicated ? '<div class="pest-erad-info">✅ تم القضاء على الإصابة'+(p.eradicatedAt?(' — '+escH(fmtTs(new Date(p.eradicatedAt).toISOString().slice(0,16)))):'')+'<br>👤 '+escH(p.eradicatedBy||p.eradicatedByEmail||'—')+'</div>' : '';
       return '<div class="pest-card'+(p.eradicated?' eradicated':'')+'" data-id="'+p.id+'"'+lfAttr('pests', p.ts)+'>'+
         '<div class="pest-card-head"><span class="task-date-badge">'+fmtTs(p.ts)+'</span>'+pestCategoryLabel[p.category]+' '+sevBadge+' '+eradBadge+'</div>'+
-        '<div class="task-title">'+(p.problemName||'—')+'</div>'+
-        (p.location?('<div class="task-note">📍 '+p.location+'</div>'):'')+
+        '<div class="task-title">'+escH(p.problemName||'—')+'</div>'+
+        (p.location?('<div class="task-note">📍 '+escH(p.location)+'</div>'):'')+
         ((p.systemId || p.pipeNo) ? ('<div class="task-note">🌿 '+(p.systemId ? escH(auditSysName(p.systemId)) : '')+(p.pipeNo ? ((p.systemId ? ' — ' : '')+'ماسورة '+escH(p.pipeNo)) : '')+'</div>') : '')+
         photoHtml+
         treatHtml+eradInfo+tpPlanSummaryHtml(p)+
         (p.note?('<div class="task-note">'+escH(p.note)+'</div>'):'')+
         (pestTreatId===p.id ? pestTreatFormHtml(p) : '')+
         '<div class="pest-foot">'+
-          '<span class="pest-by">بواسطة '+(p.by||'—')+(p.updatedAt?' · اتعدّلت':'')+'</span>'+
+          '<span class="pest-by">بواسطة '+escH(p.by||'—')+(p.updatedAt?' · اتعدّلت':'')+'</span>'+
           '<span class="pest-acts">'+
             (p.eradicated ? '' : '<button type="button" class="btn btn-ghost btn-sm pest-plan-btn" title="جدول رش علاجي مقترح من مخزنك">🤖 جدول علاج</button>')+
             (p.eradicated ? '<button type="button" class="btn btn-ghost btn-sm pest-uneradicate-btn">↩ رجّعها نشطة</button>' : ('<button type="button" class="btn btn-primary btn-sm pest-treat-btn">➕ معاملة</button>'+((p.treated || pestTreatmentsOf(p).length) ? '<button type="button" class="btn btn-primary btn-sm pest-erad-btn" style="background:#2f9e63;border-color:#2f9e63;">✅ تأكيد القضاء</button>' : '')))+
@@ -10258,16 +10258,16 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function stickyColorLabel(v){ var m = STICKY_COLORS.filter(function(c){ return c.v===v; })[0]; return m ? m.l : (v||'—'); }
 
   function renderBioControlSectionHtml(gh){
-    var relList = bioReleases.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.releaseDate.localeCompare(a.releaseDate); });
-    var stList = stickyTraps.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.placedDate.localeCompare(a.placedDate); });
-    var phList = pheromoneTraps.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return b.placedDate.localeCompare(a.placedDate); });
+    var relList = bioReleases.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return String(b.releaseDate||'').localeCompare(String(a.releaseDate||'')); });
+    var stList = stickyTraps.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return String(b.placedDate||'').localeCompare(String(a.placedDate||'')); });
+    var phList = pheromoneTraps.filter(function(x){ return x.greenhouse===gh; }).sort(function(a,b){ return String(b.placedDate||'').localeCompare(String(a.placedDate||'')); });
 
     var pestNamesUsed = []; bioReleases.forEach(function(x){ if(x.targetPest && pestNamesUsed.indexOf(x.targetPest)<0) pestNamesUsed.push(x.targetPest); });
     var overdue = relList.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate)<0; }).length;
     var soon = relList.filter(function(x){ return x.nextReleaseDate && daysUntil(x.nextReleaseDate)>=0 && daysUntil(x.nextReleaseDate)<=3; }).length;
 
     var relRows = relList.length ? relList.map(function(x){
-      return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+escH(x.beneficialName)+'</td><td>'+(x.targetPest||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('bio', x.releaseDate)+'><td class="ltr num">'+x.releaseDate+'</td><td>'+escH(x.beneficialName)+'</td><td>'+escH(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.perM2||'—')+'</td><td>'+(x.nextReleaseDate?nextReleaseBadge(x.nextReleaseDate):'—')+'</td>'+
         '<td>'+escH(x.note||'—')+'</td><td><button type="button" class="btn btn-ghost btn-sm bio-photos-btn">📷 '+(x.photoCount||'+')+'</button></td><td><button class="del-btn bio-release-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="8" class="empty-note">لا توجد إطلاقات مسجلة لهذه الصوبة.</td></tr>';
@@ -10278,7 +10278,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد لاصقات مسجلة.</td></tr>';
 
     var phRows = phList.length ? phList.map(function(x){
-      return '<tr data-id="'+x.id+'"'+lfAttr('pher', x.placedDate)+'><td class="ltr num">'+x.placedDate+'</td><td>'+(x.targetPest||'—')+'</td>'+
+      return '<tr data-id="'+x.id+'"'+lfAttr('pher', x.placedDate)+'><td class="ltr num">'+x.placedDate+'</td><td>'+escH(x.targetPest||'—')+'</td>'+
         '<td class="num ltr">'+(x.count||'—')+'</td><td>'+escH(x.note||'—')+'</td><td><button class="del-btn pheromone-del" title="حذف">✕</button></td></tr>';
     }).join('') : '<tr><td colspan="5" class="empty-note">لا توجد مصائد مسجلة.</td></tr>';
 
@@ -10294,8 +10294,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       '<details class="nut-details" open><summary>🐞 إطلاقات الأعداء الحيوية</summary>'+
         '<form class="entry-form" id="bio-release-form">'+
           '<div class="form-grid">'+
-            '<div class="field-sm"><label>العدو الحيوي</label><input type="text" id="bio-name" list="bio-name-list" required placeholder="مثال: Phytoseiulus persimilis"><datalist id="bio-name-list">'+BENEFICIAL_NAMES.map(function(n){ return '<option value="'+n+'">'; }).join('')+'</datalist></div>'+
-            '<div class="field-sm"><label>يستهدف (الآفة)</label><input type="text" id="bio-target" list="bio-target-list" placeholder="مثال: العنكبوت الأحمر"><datalist id="bio-target-list">'+pestNamesUsed.map(function(n){ return '<option value="'+n+'">'; }).join('')+'</datalist></div>'+
+            '<div class="field-sm"><label>العدو الحيوي</label><input type="text" id="bio-name" list="bio-name-list" required placeholder="مثال: Phytoseiulus persimilis"><datalist id="bio-name-list">'+BENEFICIAL_NAMES.map(function(n){ return '<option value="'+escH(n)+'">'; }).join('')+'</datalist></div>'+
+            '<div class="field-sm"><label>يستهدف (الآفة)</label><input type="text" id="bio-target" list="bio-target-list" placeholder="مثال: العنكبوت الأحمر"><datalist id="bio-target-list">'+pestNamesUsed.map(function(n){ return '<option value="'+escH(n)+'">'; }).join('')+'</datalist></div>'+
             '<div class="field-sm"><label>تاريخ الإطلاق</label><input type="date" class="ltr" id="bio-release-date" required></div>'+
             '<div class="field-sm"><label>موعد الإطلاق القادم (اختياري)</label><input type="date" class="ltr" id="bio-next-date"></div>'+
             '<div class="field-sm"><label>العدد لكل م² (اختياري)</label><input type="number" step="any" min="0" class="ltr" id="bio-per-m2" placeholder="مثال: 6"></div>'+
@@ -10781,7 +10781,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       var statusHtml = n.harvested
         ? '<span class="status-pill good">اتحصدت '+n.transplantDate+' — '+(n.containers||0)+' عبوة = '+fmtGrams(n.totalG)+'</span>'
         : n.transplantDate
-        ? '<span class="status-pill good">اتنقلت '+n.transplantDate+(n.greenhouse?(' — '+n.greenhouse):'')+(sys?(' / '+sys.name):'')+'</span>'
+        ? '<span class="status-pill good">اتنقلت '+n.transplantDate+(n.greenhouse?(' — '+escH(n.greenhouse)):'')+(sys?(' / '+escH(sys.name)):'')+'</span>'
         : '<span class="status-pill alert">لسه في المشتل</span>';
       if(n.transplantDate && n.fromTrays){
         statusHtml += '<div style="color:var(--muted);font-size:0.76rem;margin-top:4px;">'+(n.harvested?'اتحصد ':'نزل ')+batchTrays(n)+' من '+n.fromTrays+' — باقي '+n.remainingAfter+' في المشتل</div>';
@@ -11978,7 +11978,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var logoEl = document.querySelector('header img'), logo = logoEl ? logoEl.getAttribute('src') : '';
     var sections = halls.map(function(h, idx){
       var es = inRange.filter(function(e){ return (e.halls||[]).indexOf(h)>=0; }).sort(function(a,b){
-        return a.date.localeCompare(b.date) || ((slotRank[a.slot||'']) - (slotRank[b.slot||'']));
+        return String(a.date||'').localeCompare(String(b.date||'')) || ((slotRank[a.slot||'']) - (slotRank[b.slot||'']));
       });
       if(!es.length) return '';
       total += es.length;
@@ -15169,7 +15169,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   }
   /* قراءات دفعة واحدة مرتبة بالتاريخ، مع عمر الدفعة بالأيام */
   function growthSeries(recs){
-    return recs.slice().sort(function(a,b){ return a.date.localeCompare(b.date) || (a.createdAt||0)-(b.createdAt||0); }).map(function(r){
+    return recs.slice().sort(function(a,b){ return String(a.date||'').localeCompare(String(b.date||'')) || (a.createdAt||0)-(b.createdAt||0); }).map(function(r){
       return {rec:r, date:r.date, day:Math.round((grDay0(r.date) - grDay0(r.batch))/86400000), w:parseFloat(r.avgWeight)};
     }).filter(function(p){ return isFinite(p.w) && p.w > 0 && isFinite(p.day); });
   }
