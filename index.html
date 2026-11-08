@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-O/FYsZzLkiajQ5liduLp/d/l959y8hMcL+9bdTNiKNo=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zfwh1aYk8iTPBUleDPDn0jgztPZjia0rC0FWjaO9nG8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -626,16 +626,16 @@
   table{width:100%;border-collapse:collapse;font-size:0.85rem;min-width:0;}
   thead th{
     position:sticky;top:0;background:var(--surface);z-index:1;
-    text-align:right;padding:10px 12px;color:var(--muted);font-weight:600;
+    text-align:right;padding:8px 12px;color:var(--muted);font-weight:600;
     font-size:0.75rem;border-bottom:1px solid var(--border);white-space:nowrap;
   }
-  tbody td{padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  tbody td{padding:7px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
   /* الخلايا اللي اتجاهها ltr (أرقام/تواريخ/أوقات) كانت بتتحاذى لليسار وعنوانها يمين: بنوحّدها يمين (specificity صفر عشان أي جدول ليه محاذاة خاصة يفضل زي ما هو) */
   :where(tbody td.ltr, tbody td.num, tbody td[dir=ltr]){text-align:right;}
   tbody tr:last-child td{border-bottom:none;}
   :where(.table-wrap tbody tr:nth-child(even)){background:color-mix(in srgb,var(--surface-2) 55%,transparent);}
   tbody tr:hover{background:var(--surface-2);}
-  @media (max-width:719px){ thead th{padding:9px 8px;} tbody td{padding:9px 8px;} }
+  @media (max-width:719px){ thead th{padding:7px 8px;} tbody td{padding:7px 8px;} }
   .del-btn{background:none;border:none;color:var(--muted);font-size:0.95rem;padding:4px 8px;border-radius:6px;}
   .del-btn:hover{color:var(--alert);background:var(--alert-soft);}
 
@@ -666,6 +666,12 @@
   .inline-add-form input{flex:1 1 140px;padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:0.9rem;}
   .systems-list-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px dashed var(--border);font-size:0.88rem;}
   .systems-list-row:first-child{border-top:none;}
+  /* قوايم طويلة (مكتبة الأسمدة وغيرها): صفوف مدمجة عشان ما تطوّلش الصفحة */
+  #fert-library-list .systems-list-row{padding:4px 4px;font-size:.8rem;line-height:1.35;gap:8px;}
+  #fert-library-list .systems-list-row > span:first-child{min-width:0;}
+  #fert-library-list .systems-list-row .btn-sm,#fert-library-list .systems-list-row .del-btn{padding:2px 8px;font-size:.76rem;min-height:0;border-radius:8px;line-height:1.3;}
+  #fert-library-list{max-height:360px !important;}
+  .fert-checkbox-list{gap:2px;padding:6px 10px;max-height:240px;} .fert-checkbox-row{font-size:.8rem;padding:2px 0;}
   .mini-system-tiles{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
   .mini-system-tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 13px;font-size:0.82rem;display:flex;align-items:center;gap:7px;cursor:pointer;}
   .mini-system-tile:hover{border-color:var(--brand);}
@@ -3300,10 +3306,24 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
 
   /* ---------- fertilizer library (custom, in addition to DEFAULT_FERTILIZERS) ---------- */
   function persistLocalFertilizers(){
+    fertVer++;
     try{ localStorage.setItem('oroots_local_fertilizers', JSON.stringify(customFertilizers)); }catch(e){}
   }
+  var fertVer = 0, fertCache = null, fertCacheSrc = null, fertCacheKey = '';
+  function isBuiltinFertId(id){ return /^(hb|d)-/.test(String(id)); }
+  /* المكتبة = الجاهز (HydroBuddy + الافتراضي) مع أي تعديلات (مستندات override بنفس الـid) + المخصص */
   function allFertilizers(){
-    return HB_FERTS.concat(DEFAULT_FERTILIZERS, customFertilizers);
+    var key = customFertilizers.length+'|'+fertVer;
+    if(fertCache && fertCacheSrc === customFertilizers && fertCacheKey === key) return fertCache;
+    var ov = {}; customFertilizers.forEach(function(x){ if(isBuiltinFertId(x.id)) ov[x.id] = x; });
+    var base = HB_FERTS.concat(DEFAULT_FERTILIZERS).map(function(b){
+      var o = ov[b.id]; if(!o) return b;
+      var m = Object.assign({}, b, o, {id:b.id, edited:true});
+      if(b.hb){ m.hb = true; m.ml = b.ml; m.liquid = b.liquid; m.density = b.density; }
+      return m;
+    });
+    fertCache = base.concat(customFertilizers.filter(function(x){ return !isBuiltinFertId(x.id); })); fertCacheSrc = customFertilizers; fertCacheKey = key;
+    return fertCache;
   }
   function getFertilizer(id){
     var list = allFertilizers();
@@ -8877,9 +8897,11 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var fertLibraryHtml = ferts.map(function(f){
       var fc = f.comp || {}, compStr = NUTRIENT_ELEMENTS.filter(function(e){ return fc[e.key]; }).map(function(e){ return e.key+' '+fc[e.key]+'%'; }).join(' · ');
       var isCustom = f.id.indexOf('d-') !== 0 && f.id.indexOf('hb-') !== 0;
-      var extra = [(f.purity && f.purity < 1) ? 'نقاوة '+Math.round(f.purity*100)+'%' : '', f.liquid ? 'سائل' : '', f.cost ? 'سعر '+f.cost+'/كجم' : ''].filter(Boolean).join(' · ');
+      var extra = [(f.purity && f.purity < 1) ? 'نقاوة '+Math.round(f.purity*100)+'%' : '', f.liquid ? 'سائل' : '', f.cost ? 'سعر '+(+(+f.cost).toFixed(2))+'/كجم' : ''].filter(Boolean).join(' · ');
       return '<div class="systems-list-row" data-s="'+escH((f.name+' '+(f.formula||'')).toLowerCase())+'"><span><strong>'+escH(f.name)+'</strong>'+(f.formula ? ' <span class="ltr" style="color:var(--muted);">'+escH(f.formula)+'</span>' : '')+'<br><span style="color:var(--muted);font-size:0.76rem;">('+(f.tank==='-'?'أي خزان':'خزان '+f.tank)+') '+compStr+(extra ? ' — '+extra : '')+'</span></span>'+
-        (isCustom ? '<button class="del-btn fert-delete-btn" data-fertid="'+escH(f.id)+'" title="حذف">✕</button>' : '<span style="color:var(--muted);font-size:0.72rem;">'+(f.hb ? 'جاهز' : 'افتراضي')+'</span>')+
+        '<span style="display:flex;align-items:center;gap:4px;flex:none;">'+(f.edited ? '<span class="status-pill good" style="font-size:.68rem;">معدّل</span>' : '')+
+          '<button type="button" class="btn btn-ghost btn-sm fert-edit-btn" data-fertid="'+escH(f.id)+'" title="تعديل الاسم والنسب والسعر" aria-label="تعديل">✏️</button>'+
+          (isCustom ? '<button class="del-btn fert-delete-btn" data-fertid="'+escH(f.id)+'" title="حذف">✕</button>' : (f.edited ? '<button type="button" class="btn btn-ghost btn-sm fert-reset-btn" data-fertid="'+escH(f.id)+'" title="رجوع للأصل">↺</button>' : '<span style="color:var(--muted);font-size:0.72rem;">'+(f.hb ? 'جاهز' : 'افتراضي')+'</span>'))+'</span>'+
         '</div>';
     }).join('');
 
@@ -9121,58 +9143,90 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     $all('.fert-delete-btn', body).forEach(function(btn){
       btn.addEventListener('click', function(){ deleteCustomFertilizer(btn.getAttribute('data-fertid')); });
     });
+    $all('.fert-edit-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){ var f = getFertilizer(btn.getAttribute('data-fertid')); if(f) showFertForm(f); });
+    });
+    $all('.fert-reset-btn', body).forEach(function(btn){
+      btn.addEventListener('click', function(){ resetBuiltinFert(btn.getAttribute('data-fertid')); });
+    });
     applyPermissionLock($('#nutrients-body'), 'nutrients');
   }
 
 
-  function showFertForm(){
+  /* إضافة / تعديل سماد (مخصص أو جاهز): الاسم والصيغة والنسب والنقاوة والسعر ونوع الخزان.
+     الأسمدة الجاهزة (HydroBuddy / الافتراضية) بتتعدّل بمستند "override" بنفس الـid في مجموعة fertilizers، ويتعمل لها استرجاع للأصل. */
+  function showFertForm(f){
     var holder = $('#fert-form-holder');
     if(!holder) return;
+    var editing = !!f, builtin = editing && isBuiltinFertId(f.id), fc = (editing && f.comp) || {};
     var elInputsHtml = NUTRIENT_ELEMENTS.map(function(e){
-      return '<div class="field-sm"><label>% '+e.label+'</label><input type="number" step="0.01" min="0" max="100" class="ltr fert-comp-input" data-el="'+e.key+'" value="0"></div>';
+      return '<div class="field-sm"><label>% '+e.label+'</label><input type="number" step="any" min="0" max="100" class="ltr fert-comp-input" data-el="'+e.key+'" value="'+(fc[e.key] || 0)+'"></div>';
     }).join('');
+    var tank0 = editing ? (f.tank || '-') : 'A', conc0 = editing && f.conc != null && f.conc !== '' && f.conc !== f.tank ? String(f.conc) : '';
     holder.innerHTML =
       '<form class="entry-form" id="fert-form">'+
+        '<h3 style="margin:0 0 8px;font-size:.95rem;">'+(editing ? '✏️ تعديل سماد' : '➕ سماد جديد')+(builtin ? ' <span class="hint" style="margin:0;">(من المكتبة الجاهزة — التعديل بيتحفظ عندكم وتقدر ترجّع الأصل)</span>' : '')+'</h3>'+
         '<div class="form-grid">'+
-          '<div class="field-sm full"><label>اسم السماد</label><input type="text" id="fert-name" maxlength="150" required></div>'+
-          '<div class="field-sm"><label>الخزان</label><select id="fert-tank"><option value="A">A (مع نترات الكالسيوم)</option><option value="B">B (كبريتات/فوسفات)</option><option value="-">أي خزان</option></select></div>'+
+          '<div class="field-sm full"><label>اسم السماد</label><input type="text" id="fert-name" maxlength="150" required value="'+escH(editing ? f.name : '')+'"></div>'+
+          '<div class="field-sm"><label>الصيغة الكيميائية (اختياري)</label><input type="text" id="fert-formula" class="ltr" maxlength="80" value="'+escH(editing ? (f.formula || '') : '')+'"></div>'+
+          '<div class="field-sm"><label>الخزان</label><select id="fert-tank"><option value="A"'+(tank0==='A'?' selected':'')+'>A (مع نترات الكالسيوم)</option><option value="B"'+(tank0==='B'?' selected':'')+'>B (كبريتات/فوسفات)</option><option value="-"'+(tank0==='-'?' selected':'')+'>أي خزان</option></select></div>'+
         '</div>'+
+        '<p class="hint help-note" style="margin:6px 0;">النسب هنا = % وزن العنصر نفسه (مش الأكسيد) في السماد. لو الكيس مكتوب عليه P2O5 أو K2O أو SiO2 اختار من القوايم تحت وهنحوّلها.</p>'+
         '<div class="form-grid">'+elInputsHtml+'</div>'+
         '<div class="form-grid">'+
           '<div class="field-sm"><label>الفوسفور مُدخل كـ</label><select id="fert-ox-P"><option value="P">P</option><option value="P2O5">P2O5</option></select></div>'+
           '<div class="field-sm"><label>البوتاسيوم مُدخل كـ</label><select id="fert-ox-K"><option value="K">K</option><option value="K2O">K2O</option></select></div>'+
           '<div class="field-sm"><label>السيليكون مُدخل كـ</label><select id="fert-ox-Si"><option value="Si">Si</option><option value="SiO2">SiO2</option></select></div>'+
-          '<div class="field-sm"><label>النقاوة Purity (%)</label><input type="number" step="0.1" min="1" max="100" class="ltr" id="fert-purity" value="100"></div>'+
-          '<div class="field-sm"><label>سائل؟</label><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="fert-liquid"> سماد سائل</label></div>'+
-          '<div class="field-sm"><label>الكثافة (جم/مل)</label><input type="number" step="0.001" min="0.1" class="ltr" id="fert-density" value="1"></div>'+
-          '<div class="field-sm"><label>السعر (للكجم أو للتر)</label><input type="number" step="any" min="0" class="ltr" id="fert-cost" value="0"></div>'+
-          '<div class="field-sm"><label>نوع المحلول المركّز</label><select id="fert-conc"><option value="">حسب الخزان</option><option value="A">A</option><option value="B">B</option><option value="0">مش مناسب للمركّزات</option></select></div>'+
+          '<div class="field-sm"><label>النقاوة Purity (%)</label><input type="number" step="0.1" min="1" max="100" class="ltr" id="fert-purity" value="'+(editing && f.purity > 0 ? +(f.purity*100).toFixed(2) : 100)+'"></div>'+
+          '<div class="field-sm"><label>السعر (للكجم أو للتر)</label><input type="number" step="any" min="0" class="ltr" id="fert-cost" value="'+(editing && f.cost ? f.cost : 0)+'"></div>'+
+          '<div class="field-sm"><label>نوع المحلول المركّز</label><select id="fert-conc"><option value=""'+(conc0===''?' selected':'')+'>حسب الخزان</option><option value="A"'+(conc0==='A'?' selected':'')+'>A</option><option value="B"'+(conc0==='B'?' selected':'')+'>B</option><option value="0"'+(conc0==='0'?' selected':'')+'>مش مناسب للمركّزات</option></select></div>'+
+          '<div class="field-sm"><label>سائل؟</label><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="fert-liquid"'+(editing && f.liquid ? ' checked' : '')+(builtin ? ' disabled' : '')+'> سماد سائل'+(builtin ? ' (ثابت للجاهز)' : '')+'</label></div>'+
+          '<div class="field-sm"><label>الكثافة (جم/مل)</label><input type="number" step="0.001" min="0.1" class="ltr" id="fert-density" value="'+(editing && f.density ? f.density : 1)+'"'+(builtin ? ' disabled' : '')+'></div>'+
         '</div>'+
-        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ السماد</button> <button type="button" class="btn btn-ghost btn-sm" id="fert-cancel-btn">إلغاء</button></div>'+
+        (editing ? '<p class="hint help-note" style="margin:6px 0;">ملحوظة: ربط الخصم من المخزن وسعر الجرام بيتم باسم السماد، فلو غيّرت الاسم غيّر اسم الصنف في «المخازن» كمان. سعر السماد هنا بيُستخدم في تكلفة الخلطة وتكلفة الإنتاج لو الصنف مالوش سعر في المخزن.</p>' : '')+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(editing ? 'حفظ التعديل' : 'حفظ السماد')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="fert-cancel-btn">إلغاء</button></div>'+
       '</form>';
+    holder.scrollIntoView && holder.scrollIntoView({block:'nearest'});
     $('#fert-cancel-btn').addEventListener('click', function(){ holder.innerHTML=''; });
     $('#fert-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var name = $('#fert-name').value.trim();
       if(!name){ toast('اكتب اسم'); return; }
-      var comp = {};
+      var comp = {}, purity = Math.min(100, Math.max(1, parseFloat($('#fert-purity').value)||100));
       $all('.fert-comp-input', holder).forEach(function(inp){
         var v = parseFloat(inp.value);
         var k = inp.getAttribute('data-el');
         var ox = {P:['fert-ox-P','P2O5',0.4364], K:['fert-ox-K','K2O',0.8301], Si:['fert-ox-Si','SiO2',0.4674]}[k];
         if(v && ox && $('#'+ox[0]).value===ox[1]) v = v*ox[2];
-        var purity = Math.min(100, Math.max(1, parseFloat($('#fert-purity').value)||100));
-        if(v) comp[k] = +(v*purity/100).toFixed(4);
+        if(v) comp[k] = +(+v).toFixed(4);
       });
-      var extra = {cost:parseFloat($('#fert-cost').value)||0};
-      if($('#fert-conc').value) extra.conc = $('#fert-conc').value;
-      if($('#fert-liquid').checked){ extra.liquid = true; extra.density = parseFloat($('#fert-density').value)||1; }
-      addCustomFertilizer(name, $('#fert-tank').value, comp, extra).then(function(){
-        toast('اتحفظ السماد');
-        holder.innerHTML='';
-        renderNutrientsPanel();
-      });
+      var fields = {name:name, formula:$('#fert-formula').value.trim(), tank:$('#fert-tank').value, comp:comp, purity:+(purity/100).toFixed(4), cost:parseFloat($('#fert-cost').value)||0};
+      var conc = $('#fert-conc').value; if(conc) fields.conc = conc; else fields.conc = '';
+      var done = function(){ toast(editing ? 'اتحفظ التعديل' : 'اتحفظ السماد'); holder.innerHTML=''; renderNutrientsPanel(); };
+      if(editing){
+        var rec;
+        if(builtin){ rec = Object.assign({}, fields, {id:f.id, override:true, createdBy:currentUser||'', createdAt:Date.now()}); }
+        else {
+          var raw = customFertilizers.filter(function(x){ return x.id===f.id; })[0] || {id:f.id};
+          rec = Object.assign({}, raw, fields);
+          if($('#fert-liquid').checked){ rec.liquid = true; rec.density = parseFloat($('#fert-density').value)||1; } else { delete rec.liquid; delete rec.density; }
+        }
+        fertVer++;
+        saveFertilizer(rec).then(done).catch(function(e){ console.error(e); toast('⛔ التعديل ما اتحفظش'+(e && e.code==='permission-denied' ? ' (مفيش صلاحية)' : '')); });
+      } else {
+        var extra = Object.assign({}, fields); delete extra.name; delete extra.tank; delete extra.comp;
+        if($('#fert-liquid').checked){ extra.liquid = true; extra.density = parseFloat($('#fert-density').value)||1; }
+        addCustomFertilizer(name, fields.tank, comp, extra).then(done);
+      }
     });
+  }
+  /* استرجاع سماد جاهز للقيم الأصلية (بيمسح مستند التعديل) */
+  function resetBuiltinFert(id){
+    if(!confirm('ترجّع السماد ده للقيم الأصلية (الاسم والنسب والسعر)؟')) return;
+    var f = getFertilizer(id);
+    if(db){ trashDelete('fertilizers', id).then(function(){ toast('اترجّع للأصل'); }).catch(function(){ toast('تعذر الاسترجاع (محتاج صلاحية مدير)'); }); }
+    else { customFertilizers = customFertilizers.filter(function(x){ return x.id !== id; }); persistLocalFertilizers(); renderAll(); toast('اترجّع للأصل'); }
+    if(f) logAudit('edit', 'nutrients', 'استرجاع سماد للأصل: '+f.name);
   }
 
   function exportNutrientMixCSV(){
@@ -11887,7 +11941,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var html = '<option value="">— اختار المنتج —</option>';
     var f = inv('fertilizer'), m = inv('pesticide');
     if(f.length) html += '<optgroup label="أسمدة (المخزن)">'+f.map(function(x){ return opt(x.name, x.dose?(' — '+x.dose):''); }).join('')+'</optgroup>';
-    if(customFertilizers.length) html += '<optgroup label="أسمدة المعادلات">'+customFertilizers.map(function(x){ return opt(x.name||x.id); }).join('')+'</optgroup>';
+    if(customFertilizers.length) html += '<optgroup label="أسمدة المعادلات">'+customFertilizers.filter(function(x){ return !isBuiltinFertId(x.id); }).map(function(x){ return opt(x.name||x.id); }).join('')+'</optgroup>';
     if(m.length) html += '<optgroup label="مبيدات (المخزن)">'+m.map(function(x){ return opt(x.name, x.dose?(' — '+x.dose):''); }).join('')+'</optgroup>';
     html += '<option value="__other__">أخرى (اكتب يدوي)</option>';
     return html;
@@ -15158,7 +15212,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function fertPricePerG(fertilizerId, name){
     var f = getFertilizer(fertilizerId), nm = String((f && f.name) || name || '').trim().toLowerCase();
     var inv = inventoryItems.filter(function(x){ return x.type==='fertilizer' && String(x.name).trim().toLowerCase()===nm && parseFloat(x.price) > 0; })[0];
-    if(!inv) return null;
+    if(!inv) return (f && parseFloat(f.cost) > 0) ? parseFloat(f.cost)/1000 : null;   // مفيش سعر في المخزن: بنستخدم سعر السماد في مكتبة المعادلات (للكجم/اللتر)
     return inv.unit==='كجم' ? parseFloat(inv.price)/1000 : (inv.unit==='جم' ? parseFloat(inv.price) : null);
   }
   /* أسمدة تحضيرات الخزان بين تاريخين (من بعد fromDate لحد toDate) للنظام (أو لكل أنظمة الصوبة لو النظام فاضي)، مضروبة في نسبة الدفعة */
