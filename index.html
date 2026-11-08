@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ckiMxj4MrdQQj5ZYdUgHeEbdZfC6elJJdyZyNbX5dgs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ApjUcRPfMZayNA5pGJ4PJeO44oTgfxzXY+eASmXTva0=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -627,6 +627,8 @@
     font-size:0.75rem;border-bottom:1px solid var(--border);white-space:nowrap;
   }
   tbody td{padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  /* الخلايا اللي اتجاهها ltr (أرقام/تواريخ/أوقات) كانت بتتحاذى لليسار وعنوانها يمين: بنوحّدها يمين (specificity صفر عشان أي جدول ليه محاذاة خاصة يفضل زي ما هو) */
+  :where(tbody td.ltr, tbody td.num, tbody td[dir=ltr]){text-align:right;}
   tbody tr:last-child td{border-bottom:none;}
   :where(.table-wrap tbody tr:nth-child(even)){background:color-mix(in srgb,var(--surface-2) 55%,transparent);}
   tbody tr:hover{background:var(--surface-2);}
@@ -5386,11 +5388,13 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       .map(function(e){ return {x:new Date(e.ts).getTime(), y:e[metric]}; });
   }
 
+  /* بترجّع النقط جوه الفترة، ومعاها __win = حدود الفترة المختارة عشان المحور الأفقي في المخطط يمتد على الفترة كلها (مش على بيانات موجودة بس) */
   function filterPointsByRange(points, days){
-    if(days && typeof days==='object') return points.filter(function(p){ return p.x>=days.from && p.x<=days.to; });   // فترة مخصصة {from,to}
+    var out, now = Date.now();
+    if(days && typeof days==='object'){ out = points.filter(function(p){ return p.x>=days.from && p.x<=days.to; }); out.__win = [days.from, days.to]; return out; }   // فترة مخصصة {from,to}
     if(!days) return points;
-    var cutoff = Date.now() - days*86400000;
-    return points.filter(function(p){ return p.x>=cutoff; });
+    var cutoff = now - days*86400000;
+    out = points.filter(function(p){ return p.x>=cutoff; }); out.__win = [cutoff, now]; return out;
   }
 
   /* ---------- climate formulas ----------
@@ -5568,6 +5572,8 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     visible.forEach(function(d){ d.points.forEach(function(p){ xs.push(p.x); ys.push(p.y); }); });
     var xMin = Math.min.apply(null, xs), xMax = Math.max.apply(null, xs);
     var yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
+    var win = null; datasets.forEach(function(d){ if(!win && d.points && d.points.__win) win = d.points.__win; });
+    if(win && win[1] > win[0]){ xMin = win[0]; xMax = win[1]; }   // المحور بيمتد على الفترة المختارة كلها
     if(xMin===xMax){ xMin -= 3600000*6; xMax += 3600000*6; }
     if(yMin===yMax){ yMin -= 1; yMax += 1; }
     if(opts.band){ yMin = Math.min(yMin, opts.band.lo); yMax = Math.max(yMax, opts.band.hi); }
@@ -8529,6 +8535,62 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   /* ---------- سجل تحضير الخزان: كل مرة بتتحضّر فيها خلطة تسميد (النظام، الحجم، الأسمدة بالجرام) ---------- */
   var tlDraft = null, tlOpen = false;
   function tlSysLabel(id){ return id ? auditSysName(id) : '—'; }
+  /* مجموعات التحضير: المدير بيحدد بنفسه الأنظمة اللي بتاخد من نفس التحضيرة + نوع المحصول (بتتحفظ في settings/tankGroups) */
+  var tankGroups = (function(){ try{ var a = JSON.parse(localStorage.getItem('oroots_tankgroups') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } })();
+  var tlGroupEdit = null;
+  function tlGroupSys(g){ return (g.systemIds || []).filter(function(id){ return !!getSystem(id); }); }
+  function tlRecLabel(t){
+    var ids = Array.isArray(t.systemIds) && t.systemIds.length ? t.systemIds : (t.systemId ? [t.systemId] : []);
+    if(t.groupName) return '🧺 '+t.groupName+' ('+ids.length+' نظام)';
+    return tlSysLabel(t.systemId);
+  }
+  function tlGroupsSave(list){
+    tankGroups = list;
+    if(!db){ try{ localStorage.setItem('oroots_tankgroups', JSON.stringify(list)); }catch(e){} return Promise.resolve(); }
+    return db.doc('settings/tankGroups').set({list:list, updatedAt:Date.now(), updatedBy:currentUser||''});
+  }
+  function tlRefreshGroups(){
+    var f = $('#tl-sys');
+    if(f && tlDraft){ tlDraft.systemId = f.value; var ts = $('#tl-ts'), vl = $('#tl-vol'); if(ts) tlDraft.ts = ts.value; if(vl) tlDraft.volume = vl.value; }
+    if($('#tl-form')) tlDrawForm();
+    tlDrawGroups();
+  }
+  function tlDrawGroups(){
+    var box = $('#tl-groups'); if(!box) return;
+    if(currentUserRole !== 'admin'){ box.innerHTML = ''; return; }
+    var e = tlGroupEdit;
+    var list = tankGroups.map(function(g){
+      return '<div class="systems-list-row" data-gid="'+escH(g.id)+'"><span><strong>'+escH(g.name)+'</strong>'+(g.crop ? ' <span style="color:var(--muted);">— '+escH(g.crop)+'</span>' : '')+'<br><span style="color:var(--muted);font-size:.76rem;">'+tlGroupSys(g).map(function(id){ return escH(auditSysName(id)); }).join('، ')+'</span></span>'+
+        '<span><button type="button" class="btn btn-ghost btn-sm tg-edit">تعديل</button> <button type="button" class="del-btn tg-del" title="حذف">✕</button></span></div>';
+    }).join('');
+    var ghs = {}; systems.forEach(function(sy){ (ghs[ghNameOf(sy)] = ghs[ghNameOf(sy)] || []).push(sy); });
+    var form = e ? '<form class="entry-form" id="tg-form" style="margin-top:8px;"><div class="form-grid">'+
+      '<div class="field-sm"><label>اسم المجموعة</label><input type="text" id="tg-name" maxlength="60" required value="'+escH(e.name)+'" placeholder="مثلًا: كل أنظمة الخس"></div>'+
+      '<div class="field-sm"><label>نوع المحصول</label><input type="text" id="tg-crop" maxlength="40" list="tg-crops" value="'+escH(e.crop)+'" placeholder="خس / أعشاب / طماطم…"><datalist id="tg-crops"><option value="خس"><option value="أعشاب"><option value="طماطم"><option value="ثمريات"></datalist></div></div>'+
+      '<p class="hint" style="margin:6px 0;">علّم الأنظمة اللي بتاخد من نفس التحضيرة:</p>'+
+      Object.keys(ghs).map(function(g){ return '<div style="margin:6px 0;"><strong style="font-size:.82rem;">'+escH(g)+'</strong> <button type="button" class="io-link tg-all" data-gh="'+escH(g)+'">تحديد الكل</button><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:4px;">'+
+        ghs[g].map(function(sy){ return '<label style="display:flex;align-items:center;gap:5px;font-weight:400;font-size:.84rem;"><input type="checkbox" class="tg-sys" data-gh="'+escH(g)+'" value="'+escH(sy.id)+'"'+(e.systemIds.indexOf(sy.id) >= 0 ? ' checked' : '')+' style="width:auto;"> '+escH(systemLabel(sy))+'</label>'; }).join('')+'</div></div>'; }).join('')+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ المجموعة</button> <button type="button" class="btn btn-ghost btn-sm" id="tg-cancel">إلغاء</button></div></form>' : '';
+    box.innerHTML = '<details class="nut-details"'+(e ? ' open' : '')+' style="margin-top:10px;"><summary>🧺 مجموعات التحضير (أنظمة بتاخد من نفس الخزان)</summary>'+
+      '<p class="hint help-note">حدّد أنت الأنظمة المشتركة مع بعض ونوع المحصول فيها. وانت بتسجّل تحضيرة بتختار المجموعة وتتسجّل على كل أنظمتها مرة واحدة.</p>'+
+      (list || '<p class="empty-note">لسه مفيش مجموعات.</p>')+
+      (e ? '' : '<div class="form-actions"><button type="button" class="btn btn-ghost btn-sm" id="tg-new">+ مجموعة جديدة</button></div>')+form+'</details>';
+    var nb = $('#tg-new', box); if(nb) nb.addEventListener('click', function(){ tlGroupEdit = {id:genId(), name:'', crop:'', systemIds:[]}; tlDrawGroups(); });
+    $all('.tg-edit', box).forEach(function(b){ b.addEventListener('click', function(){ var g = tankGroups.filter(function(x){ return x.id === b.closest('.systems-list-row').getAttribute('data-gid'); })[0]; if(g){ tlGroupEdit = {id:g.id, name:g.name, crop:g.crop||'', systemIds:(g.systemIds||[]).slice()}; tlDrawGroups(); } }); });
+    $all('.tg-del', box).forEach(function(b){ b.addEventListener('click', function(){ var id = b.closest('.systems-list-row').getAttribute('data-gid'); if(!confirm('تحذف المجموعة دي؟ (التحضيرات القديمة المسجّلة عليها مش هتتأثر)')) return; tlGroupsSave(tankGroups.filter(function(x){ return x.id !== id; })).then(function(){ toast('اتحذفت'); tlRefreshGroups(); }).catch(function(){ toast('تعذر الحذف'); }); }); });
+    var cb = $('#tg-cancel', box); if(cb) cb.addEventListener('click', function(){ tlGroupEdit = null; tlDrawGroups(); });
+    $all('.tg-all', box).forEach(function(b){ b.addEventListener('click', function(){ var gh = b.getAttribute('data-gh'); $all('.tg-sys', box).forEach(function(c){ if(c.getAttribute('data-gh') === gh) c.checked = true; }); }); });
+    var fm = $('#tg-form', box);
+    if(fm) fm.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var ids = $all('.tg-sys', box).filter(function(c){ return c.checked; }).map(function(c){ return c.value; });
+      if(!ids.length){ toast('علّم نظام واحد على الأقل'); return; }
+      var g = {id:tlGroupEdit.id, name:$('#tg-name', box).value.trim(), crop:$('#tg-crop', box).value.trim(), systemIds:ids};
+      if(!g.name){ toast('اكتب اسم المجموعة'); return; }
+      var next = tankGroups.some(function(x){ return x.id === g.id; }) ? tankGroups.map(function(x){ return x.id === g.id ? g : x; }) : tankGroups.concat([g]);
+      tlGroupsSave(next).then(function(){ toast('اتحفظت المجموعة'); logAudit('edit', 'nutrients', 'مجموعة تحضير: '+g.name); tlGroupEdit = null; tlRefreshGroups(); }).catch(function(){ toast('تعذر الحفظ (مفيش صلاحية؟)'); });
+    });
+  }
   function tlNewDraft(){
     var rows = (typeof currentMix !== 'undefined' ? currentMix : []).filter(function(m){ return m.grams > 0; }).map(function(m){ return {fertilizerId:m.fertilizerId, grams:Math.round(m.grams*100)/100}; });
     return {systemId:'', ts:nowLocalInputValue(), volume:currentTankVolume || '', rows:rows.length ? rows : [{fertilizerId:'', grams:''}], deduct:true};
@@ -8551,17 +8613,17 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     if(!$('#tl-details', host)){
       host.innerHTML = '<details class="chart-card" id="tl-details" style="margin-top:14px;"><summary style="cursor:pointer;font-weight:800;">🧪 سجل تحضير الخزان</summary>'+
         '<p class="hint help-note">سجّل كل مرة بتحضّر فيها خزان تسميد: النظام اللي هيروح له والأسمدة بالجرام. من السجل ده التطبيق بيحسب كمية الأسمدة اللي اتستهلكت على كل دفعة، ومنها «معامل تحويل الأسمدة» وتكلفة السماد لكل كجم في تبويب نمو النبات (لازم تختار نفس النظام في الوزنة). «من الخلطة الحالية» بيملّي الأسمدة من حاسبة الوصفات فوق.</p>'+
-        '<div id="tl-form"></div><div id="tl-list"></div></details>';
+        '<div id="tl-form"></div><div id="tl-groups"></div><div id="tl-list"></div></details>';
       var det = $('#tl-details', host); det.addEventListener('toggle', function(){ tlOpen = det.open; }); if(tlOpen) det.open = true;
       tlDraft = tlNewDraft(); tlDrawForm();
     }
-    tlDrawList();
+    tlDrawList(); tlDrawGroups();
   }
   function tlDrawForm(){
     var box = $('#tl-form'); if(!box || !tlDraft) return; var d = tlDraft;
     var fertOpts = function(sel){ return '<option value="">— اختار سماد —</option>'+allFertilizers().map(function(f){ return '<option value="'+escH(f.id)+'"'+(f.id===sel?' selected':'')+'>'+escH(f.name)+'</option>'; }).join(''); };
     box.innerHTML = '<form class="entry-form" id="tl-f"><div class="form-grid">'+
-      '<div class="field-sm"><label>النظام</label><select id="tl-sys" required><option value="">— اختار —</option>'+systems.map(function(sy){ return '<option value="'+escH(sy.id)+'"'+(sy.id===d.systemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field-sm"><label>النظام / المجموعة</label><select id="tl-sys" required><option value="">— اختار —</option>'+(tankGroups.length ? '<optgroup label="مجموعات (التحضيرة بتتسجّل على كل أنظمتها)">'+tankGroups.map(function(g){ var n = tlGroupSys(g).length; return n ? '<option value="g:'+escH(g.id)+'"'+(d.systemId==='g:'+g.id?' selected':'')+'>'+escH(g.name)+(g.crop ? ' — '+escH(g.crop) : '')+' ('+n+' نظام)</option>' : ''; }).join('')+'</optgroup>' : '')+'<optgroup label="نظام واحد">'+systems.map(function(sy){ return '<option value="'+escH(sy.id)+'"'+(sy.id===d.systemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>'; }).join('')+'</optgroup></select></div>'+
       '<div class="field-sm"><label>الوقت</label><input type="datetime-local" class="ltr" id="tl-ts" value="'+escH(d.ts)+'" required></div>'+
       '<div class="field-sm"><label>حجم الخزان (لتر)</label><input type="number" step="any" min="0" class="ltr" id="tl-vol" value="'+escH(d.volume)+'" required></div></div>'+
       '<div id="tl-rows">'+d.rows.map(function(r, i){ return '<div class="form-grid" style="margin-top:6px;align-items:end;"><div class="field-sm"><label>السماد</label><select class="tl-fert" data-i="'+i+'">'+fertOpts(r.fertilizerId)+'</select></div><div class="field-sm" style="display:flex;gap:6px;align-items:end;"><div style="flex:1;min-width:0;"><label>الكمية (جم)</label><input type="number" step="any" min="0" class="ltr tl-g" data-i="'+i+'" value="'+escH(r.grams)+'"></div><button type="button" class="del-btn tl-rm" data-i="'+i+'" title="شيل">✕</button></div></div>'; }).join('')+'</div>'+
@@ -8582,9 +8644,11 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       if(!items.length){ toast('اكتب سماد واحد على الأقل بكميته'); return; }
       if(!(vol > 0)){ toast('اكتب حجم الخزان'); return; }
       if(!db){ toast('محتاج اتصال'); return; }
-      var rec = {id:genId(), ts:d.ts || nowLocalInputValue(), systemId:d.systemId, volume:vol, items:items, totalGrams:Math.round(items.reduce(function(a, x){ return a + x.grams; }, 0)*100)/100, deducted:!!d.deduct, by:currentUser||'', createdAt:Date.now()};
+      var grp = /^g:/.test(d.systemId) ? tankGroups.filter(function(x){ return 'g:'+x.id === d.systemId; })[0] : null, sysIds = grp ? tlGroupSys(grp) : [d.systemId];
+      if(!sysIds.length){ toast('مفيش أنظمة في المجموعة دي'); return; }
+      var rec = {id:genId(), ts:d.ts || nowLocalInputValue(), systemId:sysIds[0], systemIds:sysIds, group:grp ? grp.id : '', groupName:grp ? grp.name : '', volume:vol, items:items, totalGrams:Math.round(items.reduce(function(a, x){ return a + x.grams; }, 0)*100)/100, deducted:!!d.deduct, by:currentUser||'', createdAt:Date.now()};
       db.collection('tankLog').doc(rec.id).set(rec).then(function(){
-        logAudit('add', 'nutrients', 'تحضير خزان: '+tlSysLabel(rec.systemId)+' — '+rec.volume+' لتر — '+rec.totalGrams+' جم أسمدة');
+        logAudit('add', 'nutrients', 'تحضير خزان: '+tlRecLabel(rec)+' — '+rec.volume+' لتر — '+rec.totalGrams+' جم أسمدة');
         var after = rec.deducted ? tlDeduct(items) : Promise.resolve(null);
         return after.then(function(r){ toast('اتسجّل التحضير'+(r ? (r.deducted ? (' واتخصم من المخزن ('+r.deducted+' صنف)') : ' (ما اتخصمش من المخزن — مفيش أصناف متطابقة)') : '')+((r && r.unmatched.length) ? ' — من غير خصم: '+r.unmatched.join('، ') : ''), 7000); });
       }).then(function(){ tlOpen = true; tlDraft = tlNewDraft(); tlDrawForm(); }).catch(function(err){ toast('⛔ التحضير ما اتحفظش'+(err && err.code==='permission-denied' ? ': مفيش صلاحية (تعديل المعادلات السمادية، وقواعد Firestore لازم تتحدّث)' : ''), 8000); });
@@ -8593,7 +8657,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
   function tlDrawList(){
     var box = $('#tl-list'); if(!box) return;
     var rows = tankLog.slice().sort(function(a, b){ return String(b.ts).localeCompare(String(a.ts)); }).slice(0, 20).map(function(t){
-      return '<tr data-id="'+escH(t.id)+'"><td class="ltr num">'+escH(fmtTs(t.ts))+'</td><td>'+escH(tlSysLabel(t.systemId))+'</td><td class="num">'+escH(t.volume)+'</td><td>'+escH((t.items||[]).map(function(x){ return x.name+' '+x.grams+'جم'; }).join('، '))+'</td><td class="num"><b>'+escH(t.totalGrams)+'</b></td><td><button class="del-btn tl-del" title="حذف">✕</button></td></tr>';
+      return '<tr data-id="'+escH(t.id)+'"><td class="ltr num">'+escH(fmtTs(t.ts))+'</td><td>'+escH(tlRecLabel(t))+'</td><td class="num">'+escH(t.volume)+'</td><td>'+escH((t.items||[]).map(function(x){ return x.name+' '+x.grams+'جم'; }).join('، '))+'</td><td class="num"><b>'+escH(t.totalGrams)+'</b></td><td><button class="del-btn tl-del" title="حذف">✕</button></td></tr>';
     }).join('');
     box.innerHTML = rows ? '<h3 style="margin:14px 0 6px;font-size:.92rem;">آخر التحضيرات</h3><div class="table-wrap"><table><thead><tr><th>الوقت</th><th>النظام</th><th>لتر</th><th>الأسمدة</th><th>جم</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '<p class="empty-note">لسه ما سجلتش تحضير خزان.</p>';
     $all('.tl-del', box).forEach(function(b){ b.addEventListener('click', function(){
@@ -13682,6 +13746,18 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     $all('.io-tog', host).forEach(function(c){ c.addEventListener('change', function(){ var sid = c.getAttribute('data-sid'); if(c.checked) delete st.hidden[sid]; else st.hidden[sid] = true; rerender(); }); });
     var mb = host.querySelector('.io-menu-btn');
     if(mb) mb.addEventListener('click', function(ev){ ev.stopPropagation(); if(wctx && wctx.menu) wctx.menu(mb); else ovShowMenu(mb, {kind:'custom', chart:chart, isDefault:isDefault}); });
+    return ctx;
+  }
+  /* بيظبط ارتفاع الرسم على الارتفاع الفعلي للـwidget (بعد ما يتحط في الصفحة) عشان الكارت ما يتقصش ولا يطلع له شريط تمرير */
+  function ioFit(box, host, ctx){
+    try{
+      var wrap = host.querySelector('.io-svgwrap'); if(!wrap || !ctx || ctx.st.full || ctx.chart.tableOnly || !box.clientHeight) return;
+      var cs = getComputedStyle(host), other = (parseFloat(cs.paddingTop)||0) + (parseFloat(cs.paddingBottom)||0) + (parseFloat(cs.borderTopWidth)||0) + (parseFloat(cs.borderBottomWidth)||0);
+      Array.prototype.forEach.call(host.children, function(c){ if(c !== wrap){ var m = getComputedStyle(c); other += c.offsetHeight + (parseFloat(m.marginTop)||0) + (parseFloat(m.marginBottom)||0); } });
+      var H = Math.floor(box.clientHeight - other - 4);
+      if(H < 110){ H = 110; box.style.height = Math.ceil(other + 110 + 4)+'px'; }   // الـwidget أصغر من أقل حجم يتعرض فيه المخطط كامل: بيكبر لأقل حجم مناسب بدل ما المخطط يتقص
+      ctx.svgH = H; ioDraw(host, ctx);   // دايمًا بنعيد الرسم بعد ما الكارت يتحط في الصفحة: عرضه الحقيقي اتعرف (وإلا الرسم بيتمطّط)
+    }catch(e){}
   }
 
   /* ====================== منشئ المخطط: نافذة نص شاشة (قسم ← نوع العنصر ← المكان) ====================== */
@@ -14013,7 +14089,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     body.innerHTML = '<div class="db-head"><h1 class="page-title" style="margin:0;">'+escH(pg.title)+'</h1><div class="db-head-a">'+
       (isAdmin ? '<button type="button" class="btn btn-primary btn-sm" id="db-add">➕ إضافة</button><button type="button" class="io-menu-btn" id="db-pmenu" title="خيارات التبويب" aria-label="خيارات التبويب">⋮</button>' : '')+'</div></div>'+
       '<div class="db-grid" id="db-grid"></div>'+(pg.widgets.length ? '' : '<p class="empty-note">التبويب فاضي. دوس "➕ إضافة" وضيف لوحة مؤشرات أو مخطط.</p>');
-    var grid = $('#db-grid', body);
+    var grid = $('#db-grid', body), fits = [];
     pg.widgets.forEach(function(w){
       var el = document.createElement('div'); el.className = 'db-w'; el.setAttribute('data-wid', w.id);
       el.style.gridColumn = 'span '+(w.w || 6); el.style.height = (w.h || 380)+'px';
@@ -14021,7 +14097,7 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       try{
         if(w.type==='chart'){
           var host = document.createElement('div'); wc.appendChild(host);
-          ioRenderCard(w.chart, host, isAdmin, false, {svgH:Math.max(150, (w.h || 430) - 150), menu:function(btn){ dashWidgetMenu(btn, pg, w); }});
+          fits.push({box:el, host:host, ctx:ioRenderCard(w.chart, host, isAdmin, false, {svgH:Math.max(110, (w.h || 430) - 220), menu:function(btn){ dashWidgetMenu(btn, pg, w); }})});
         } else {
           wc.innerHTML = '<div class="db-dc"><div class="db-dh"><div class="db-dt" dir="auto">'+escH(w.title || '')+'</div><div class="db-wa"><button type="button" class="io-exp-btn db-exp" title="تكبير" aria-label="تكبير">'+IO_ICON_EXP+'</button>'+(isAdmin ? '<button type="button" class="io-menu-btn db-wmenu" title="خيارات" aria-label="خيارات">⋮</button>' : '')+'</div></div><div class="db-db">'+dashContent(w)+'</div></div>';
         }
@@ -14029,6 +14105,9 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       if(isAdmin){ var rs = document.createElement('div'); rs.className = 'db-rs'; rs.title = 'اسحب لتغيير الحجم'; rs.innerHTML = '<svg viewBox="0 0 12 12" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 5l6 6M1 1l10 10"/></svg>'; el.appendChild(rs); }
       grid.appendChild(el);
     });
+    fits.forEach(function(f){ ioFit(f.box, f.host, f.ctx); });
+    var refit = function(){ if(grid.isConnected) fits.forEach(function(f){ ioFit(f.box, f.host, f.ctx); }); };
+    setTimeout(refit, 150); try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(refit); }catch(e){}
     grid.addEventListener('click', function(ev){
       var t = ev.target; if(!t || !t.closest) return;
       var ex = t.closest('.db-exp');
@@ -15070,10 +15149,12 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
     var out = {g:0, cost:0, preps:0, unpriced:{}}, k = (parseFloat(sharePct) > 0 ? parseFloat(sharePct) : 100)/100;
     tankLog.forEach(function(t){
       var d = String(t.ts||'').slice(0,10);
-      if(ids.indexOf(t.systemId) < 0 || d <= fromDate || d > toDate) return;
+      var tIds = Array.isArray(t.systemIds) && t.systemIds.length ? t.systemIds : [t.systemId];
+      if(!tIds.some(function(x){ return ids.indexOf(x) >= 0; }) || d <= fromDate || d > toDate) return;
       out.preps++;
+      var share = tIds.length > 1 ? 1/tIds.length : 1;   // تحضيرة مجموعة: كل نظام ياخد نصيبه بالتساوي
       (t.items||[]).forEach(function(it){
-        var g = (parseFloat(it.grams)||0)*k, pr = fertPricePerG(it.fertilizerId, it.name);
+        var g = (parseFloat(it.grams)||0)*k*share, pr = fertPricePerG(it.fertilizerId, it.name);
         out.g += g; if(pr !== null) out.cost += g*pr; else out.unpriced[it.name || it.fertilizerId] = 1;
       });
     });
@@ -16419,6 +16500,10 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
       leaves = Array.isArray(dd.list) ? dd.list : [];
       renderAllSoon(); leaveSweepSoon();
     }, function(err){ console.error('leaves snapshot error', err); });
+    db.doc('settings/tankGroups').onSnapshot(function(snap){
+      tankGroups = (snap.exists && Array.isArray(snap.data().list)) ? snap.data().list : [];
+      noteReads('settings/tankGroups', snap); safe(tlRefreshGroups);
+    }, function(err){ console.error('tankGroups snapshot error', err); });
     db.doc('settings/nurseryTiles').onSnapshot(function(snap){
       nurseryTilesNew = (snap.exists && snap.data().tiles && typeof snap.data().tiles==='object') ? snap.data().tiles : null;
       syncNurseryTiles();
