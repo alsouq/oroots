@@ -3,13 +3,13 @@
    فكل الواجهة بتتترجم من غير ما نغيّر كود كل شاشة. الأرقام في النص بتتحوّل لـ # وبترجع في مكانها (فـ"آخر ٧ أيام" و"آخر 30 يوم" مدخل واحد).
    اللي ملهوش ترجمة بيفضل عربي. الجزء بين I18N-BEGIN و I18N-END بيتنسخ حرفيًا جوه index.html (يتأكد منه tests/i18n.test.js). */
 /*I18N-BEGIN*/
-var I18N_LANGS = {ar:{dir:'rtl', name:'العربية'}, en:{dir:'ltr', name:'English'}, de:{dir:'ltr', name:'Deutsch'}};
+var I18N_LANGS = {ar:{dir:'rtl', name:'العربية'}, en:{dir:'ltr', name:'English'}};
 var I18N_NUM = /[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?/g;
 var I18N_AR = /[؀-ۿ]/;
 var I18N_DIGITS = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.'};
 function i18nAsciiNum(n){ return String(n).replace(/[٠-٩٫]/g, function(c){ return I18N_DIGITS[c]; }); }
 /* المفتاح: النص بعد ما كل رقم يتحوّل لـ # */
-function i18nKey(core){ return core.replace(I18N_NUM, '#'); }
+function i18nKey(core){ return core.replace(I18N_NUM, '#').replace(/\u066A/g, '%'); }
 function i18nFill(tr, nums){ var i = 0; return tr.replace(/#/g, function(){ return i < nums.length ? i18nAsciiNum(nums[i++]) : '#'; }); }
 /* dict: {نص عربي: ترجمة}. بيرجّع الترجمة أو null لو مفيش. بيحافظ على المسافات اللي في الأطراف. */
 function i18nLookup(dict, text){
@@ -66,7 +66,14 @@ function i18nLookup(dict, text){
       if(ok2) tr = res.join('').replace(/\u061F/g, '?').replace(/\u060C/g, ',');
     }
   }
-  if(tr == null) return null;
+  if(tr == null){
+    // رموز/إيموجي في الأول أو الآخر (🏷 ⏱️ ...): بنترجم النص اللي جواها ونرجّعها
+    var sm = /^([^\u0600-\u06FFA-Za-z0-9(«"']+)([\s\S]*)$/.exec(core);
+    if(sm && sm[2]){ var r1 = i18nLookup(dict, sm[2]); if(r1 != null) return lead + sm[1] + r1 + tail; }
+    var em = /^([\s\S]*[\u0600-\u06FF])([^\u0600-\u06FFA-Za-z0-9)»"']+)$/.exec(core);
+    if(em){ var r2 = i18nLookup(dict, em[1]); if(r2 != null) return lead + r2 + em[2] + tail; }
+    return null;
+  }
   return lead + i18nFill(tr, nums) + tail;
 }
 /*I18N-END*/
