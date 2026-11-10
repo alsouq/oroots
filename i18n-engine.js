@@ -23,13 +23,23 @@ function i18nLookup(dict, text){
     if(pm && dict[pm[1]] != null){ tr = dict[pm[1]] + pm[2].replace('؟', '?').replace('،', ','); }
   }
   if(tr == null){
+    // عنوان: قيمة — بنترجم كل واحد لوحده (القيمة كلها مرة واحدة، فتقدر تكون قايمة فيها فواصل)
+    var lv = /^([^:]{1,40}):\s([\s\S]+)$/.exec(key);
+    if(lv){
+      var l1 = dict[lv[1]] != null ? dict[lv[1]] : i18nLookup(dict, lv[1]), v1 = dict[lv[2]] != null ? dict[lv[2]] : i18nLookup(dict, lv[2]);
+      if(l1 != null && v1 != null) tr = String(l1).trim().replace(/:$/, '') + ': ' + String(v1).trim();
+    }
+  }
+  if(tr == null){
     // نص مركّب (a — b · c): بنترجم كل جزء لوحده لو كله له ترجمة
     var parts = key.split(/(\s[—·|•\/]\s|،\s|:\s)/);
     if(parts.length > 1){
       var ok = true, out = parts.map(function(p, i){
         if(i % 2) return p.replace('،', ',');
         if(!I18N_AR.test(p)) return p;
-        var t2 = dict[p.trim()]; if(t2 == null){ ok = false; return p; }
+        var pt = p.trim(), t2 = dict[pt];
+        if(t2 == null && pt){ t2 = i18nLookup(dict, pt); if(t2 != null) t2 = t2.trim(); }   // كل جزء ممكن يتترجم بالقواعد التانية كمان
+        if(t2 == null){ ok = false; return p; }
         return p.replace(p.trim(), t2);
       });
       if(ok) tr = out.join('');
