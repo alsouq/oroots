@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Q3b8H6mJUi8N8Nqo9iinet9kxHFi7dK7v9xIVKxW/kw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-STKVEVk0sOOPDPie/mF3mgZgTNXkSBZDk1XhFGfPajI=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1106,11 +1106,11 @@
       <div id="overview-alerts" data-sub="main"></div>
       <div id="overview-crop-refs" data-sub="main"></div>
 
-      <h2 class="section-title" data-sub="gh sw sc so">الصوب والأنظمة</h2>
-      <p class="hint help-note" data-sub="gh sw sc so" style="margin-top:-4px;">اختار الصوبة، وبعدين اختار النظام، عشان تشوف كل بياناته في مكان واحد.</p>
-      <div id="systems-overview" data-sub="gh sw sc so"></div>
-      <div id="overview-system-detail" data-sub="gh sw sc so"></div>
-<div id="ov-custom" data-sub="gh"></div>
+      <h2 class="section-title" data-sub="sw sc so">الصوب والأنظمة</h2>
+      <p class="hint help-note" data-sub="sw sc so" style="margin-top:-4px;">اختار الصوبة، وبعدين اختار النظام، عشان تشوف كل بياناته في مكان واحد.</p>
+      <div id="systems-overview" data-sub="sw sc so"></div>
+      <div id="overview-system-detail" data-sub="sw sc so"></div>
+<div id="ov-custom" data-sub="main"></div>
 
       <h2 class="section-title" data-sub="main">ملخص سريع (كل الصوب)</h2>
       <div class="climate-stats" id="overview-quickstats" data-sub="main"></div>
@@ -1569,6 +1569,8 @@
     'home':'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>',
     'spray':'<path d="M3 3h.01M7 5h.01M11 7h.01M3 7h.01M7 9h.01M3 11h.01"/><rect width="4" height="4" x="15" y="5"/><path d="m19 9 2 2v10c0 .6-.4 1-1 1h-6c-.6 0-1-.4-1-1V11l2-2"/><path d="m13 14 8-2M13 19l8-2"/>',
     'potted':'<path d="M12 11V8"/><path d="M12 8c0-2.5-1.8-4.2-4.5-4.5C7.2 6 9 8 12 8Z"/><path d="M12 8c0-2.5 1.8-4.2 4.5-4.5C16.8 6 15 8 12 8Z"/><path d="M5 11h14l-1.5 9a1 1 0 0 1-1 .9h-9a1 1 0 0 1-1-.9Z"/>',
+    'coins':'<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
+    'tomato':'<path d="M12 7c-4.4 0-8 2.7-8 6.5S7.6 20 12 20s8-2.7 8-6.5S16.4 7 12 7Z"/><path d="M12 7V4M9 5.5 12 7l3-1.5M9.5 8.5 12 7l2.5 1.5"/>',
     'more-vertical':'<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>'
   };
   var ICON_MAP = {
@@ -1586,7 +1588,7 @@
     '⚙':'settings','▾':'chevron-down','⌄':'chevron-down','⌃':'chevron-up','‹':'chevron-left','›':'chevron-right',
     '🍄':'mushroom','🆕':'sparkles','🧮':'calculator','🌬':'wind','◐':'contrast','⎋':'log-out','👁':'eye',
     '⏩':'fast-forward','⚡':'zap','🧪':'flask','🔴':'circle-dot','🟡':'circle','🪤':'funnel','💬':'message-circle',
-    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🎨':'palette','🧴':'spray','🪴':'potted'
+    '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🎨':'palette','🧴':'spray','💰':'coins','🍅':'tomato','🪴':'potted'
   };
   var ICON_RE = /(?:[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF])\uFE0F?/gu;
   var ICON_QUICK = /[\u{1F000}-\u{1FAFF}\u2039\u203A\u2190-\u21FF\u22EE\u2300-\u23FF\u25A0-\u25FF\u2600-\u27BF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF]/u;
@@ -6867,13 +6869,13 @@ var I18N_DICT = {"en":{"جارِ الاتصال بالتخزين…":"Connecting
       '<div class="system-pills" id="overview-gh-pills">'+groups.map(function(g){
         return '<button type="button" class="system-pill'+(g.name===overviewGreenhouse?' active':'')+'" data-gh="'+escH(g.name)+'">'+escH(g.name)+'</button>';
       }).join('')+'</div>'+
-      '<div class="system-pills" id="overview-sys-pills" data-sub="gh sw so" style="margin-top:8px;">'+curGroup.systems.map(function(sys){
+      '<div class="system-pills" id="overview-sys-pills" data-sub="sw so" style="margin-top:8px;">'+curGroup.systems.map(function(sys){
         var st = combinedSystemStatus(sys.id);
         var dotColor = st==='good' ? 'var(--good)' : (st==='alert' ? 'var(--alert)' : 'var(--border)');
         return '<button type="button" class="system-pill'+(sys.id===overviewSystemId?' active':'')+'" data-sysid="'+sys.id+'">'+
           '<span class="tab-dot" style="background:'+dotColor+';margin-inline-end:6px;"></span>'+escH(sys.name)+'</button>';
       }).join('')+'</div>'+
-      '<div data-sub="sw"><div class="fan-strip" style="margin-top:10px;">'+curGroup.systems.map(function(sys){ return '<div class="pump-box" data-sys="'+escH(sys.id)+'" data-label="'+escH(sys.name)+'">'+pumpCardHtml(sys.id, sys.name)+'</div>'; }).join('')+'</div></div>';
+'';
 
     $all('#overview-gh-pills .system-pill', el).forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -6999,9 +7001,10 @@ var I18N_DICT = {"en":{"جارِ الاتصال بالتخزين…":"Connecting
     var grid = function(h){ return h ? '<div class="mini-charts" style="margin-top:12px;">'+h+'</div>' : ''; };
 
     el.innerHTML =
-      '<div data-sub="gh sw so"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — نظرة تفصيلية (للقراءة فقط)</h2></div></div>'+
-      '<div data-sub="sc"><div class="system-header"><h2>'+escH(gh)+' — مناخ الصوبة (للقراءة فقط)</h2></div></div>'+
-      '<div data-sub="gh sw sc so">'+rangeHtml+'</div>'+
+      '<div data-sub="sw so"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — نظرة تفصيلية (للقراءة فقط)</h2></div></div>'+
+      '<div data-sub="sw"><div class="pump-box" data-sys="'+escH(sys.id)+'" data-label="">'+pumpCardHtml(sys.id)+'</div></div>'+
+      '<div data-sub="sc"><div class="system-header"><h2>'+escH(gh)+' — مناخ الصوبة (للقراءة فقط)</h2></div>'+safeStr(function(){ return ghFansHtml(gh); })+'</div>'+
+      '<div data-sub="sw sc so">'+rangeHtml+'</div>'+
       '<div data-sub="sw"><h3 class="section-title">مياه الري والمعايرة</h3>'+
       '<div class="mini-charts">'+waterHtml+calibHtml+'</div>'+grid(waterCharts+calibCharts)+'</div>'+
       '<div data-sub="sc"><h3 class="section-title">المناخ</h3>'+
@@ -8348,7 +8351,7 @@ var I18N_DICT = {"en":{"جارِ الاتصال بالتخزين…":"Connecting
     nursery: {def:'entry',    tabs:[['entry','📝 تسجيل صينية'],['auto','🗓️ خطة الزراعة'],['records','📋 السجل'],['plan','📊 الملخص والخطة']]},
     tasks:   {def:'mine',     tabs:[['mine','✅ مهامّك'],['assign','➕ تعيين مهمة'],['all','📋 كل المهام'],['sops','📖 الإجراءات']]},
     spray:   {def:'schedule', tabs:[['schedule','📅 الجدول'],['entry','➕ إضافة رش/تسميد']]},
-    overview:{def:'main',     tabs:[['main','🏠 الأساسي'],['harvest','🌿 الحصاد'],['gh','🏭 الصوب والأنظمة'],['sw','💧 مياه النظام'],['sc','🌡️ مناخ الصوبة'],['so','🧺 حصاد ومهام النظام'],['trend','📈 الاتجاهات'],['costs','💰 التكاليف'],['stock','📦 المخازن والأسمدة']]},
+    overview:{def:'main',     tabs:[['main','🏠 الأساسي'],['harvest','🌿 الحصاد'],['sw','💧 مياه النظام'],['sc','🌡️ مناخ الصوبة'],['so','🧺 حصاد ومهام النظام'],['trend','📈 الاتجاهات'],['costs','💰 التكاليف'],['stock','📦 المخازن والأسمدة']]},
     growth:  {def:'entry',    tabs:[['entry','📝 إدخال وزنة'],['summary','📊 الملخص والتنبؤ'],['records','📋 السجل'],['ref','🌿 المعايير المثلى']]}
   };
   /* قسم "إدخال/تسجيل" بيظهر بس للي عنده صلاحية تعديل على التاب (المدير أو صلاحية "تعديل") */
