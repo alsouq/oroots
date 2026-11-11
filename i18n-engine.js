@@ -26,7 +26,8 @@ function i18nLookup(dict, text){
     // عنوان: قيمة — بنترجم كل واحد لوحده (القيمة كلها مرة واحدة، فتقدر تكون قايمة فيها فواصل)
     var lv = /^([^:]{1,40}):\s([\s\S]+)$/.exec(key);
     if(lv){
-      var l1 = dict[lv[1]] != null ? dict[lv[1]] : i18nLookup(dict, lv[1]), v1 = dict[lv[2]] != null ? dict[lv[2]] : i18nLookup(dict, lv[2]);
+      var tx = function(x){ return !I18N_AR.test(x) ? x : (dict[x] != null ? dict[x] : i18nLookup(dict, x)); };   // الجزء اللي مفيهوش عربي (زي LG1 — S1) بيفضل زي ما هو
+      var l1 = tx(lv[1]), v1 = tx(lv[2]);
       if(l1 != null && v1 != null) tr = String(l1).trim().replace(/:$/, '') + ': ' + String(v1).trim();
     }
   }

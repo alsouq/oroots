@@ -6,9 +6,11 @@ const APP_URL = process.env.APP_URL || 'https://alsouq.github.io/oroots/';
 const LOOKBACK_MS = 1 * 3600 * 1000;   // ساعة بس (الإشعار بيتعلّم pushedAt بعد ما يتبعت) — بيقلّل القراءات اليومية على Firestore
 const BAD_TOKEN = /registration-token-not-registered|invalid-registration-token|invalid-argument/;
 
-function buildPush(n, appUrl){
-  const body = String(n.body || '') + (n.fromName ? ' — من ' + n.fromName : '');
-  return {title: String(n.title || "O'Roots"), body: body.trim(), tag: String(n.id), url: appUrl || APP_URL};
+const PI = require('./push-i18n.js');
+/* dict = قاموس لغة المستلم (null = عربي زي ما هو) */
+function buildPush(n, appUrl, dict){
+  const body = PI.trText(String(n.body || ''), dict) + (n.fromName ? (dict ? ' — from ' : ' — من ') + PI.trText(String(n.fromName), dict) : '');
+  return {title: PI.trText(String(n.title || "O'Roots"), dict), body: body.trim(), tag: String(n.id), url: appUrl || APP_URL};
 }
 /* db: Firestore، messaging: admin.messaging() — متمرّرين من بره عشان نقدر نختبر من غير شبكة */
 async function run({db, messaging, now = Date.now(), appUrl = APP_URL}){
@@ -17,13 +19,15 @@ async function run({db, messaging, now = Date.now(), appUrl = APP_URL}){
   const byUser = new Map();
   pending.forEach(d => { const to = String(d.data().to).toLowerCase(); if(!byUser.has(to)) byUser.set(to, []); byUser.get(to).push(d); });
   const stats = {users: byUser.size, sent: 0, failed: 0, noDevice: 0};
+  const memo = {}, dicts = {}, userList = byUser.size ? await PI.userDictList(db) : [];
   for(const [email, docs] of byUser){
+    const lang = await PI.langOf(db, email, memo), dict = lang === 'ar' ? null : (dicts[lang] || (dicts[lang] = PI.makeDict(lang, userList)));
     const tokSnap = await db.collection('pushTokens').where('email', '==', email).get();
     const tokens = tokSnap.docs.map(d => d.data().token).filter(Boolean);
     for(const d of docs){
       if(tokens.length){
         const res = await messaging.sendEachForMulticast({
-          tokens, data: buildPush(d.data(), appUrl),
+          tokens, data: buildPush(d.data(), appUrl, dict),
           webpush: {headers: {Urgency: 'high', TTL: '86400'}}
         });
         stats.sent += res.successCount; stats.failed += res.failureCount;

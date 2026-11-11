@@ -168,7 +168,19 @@ function digestFor(email, user, ctx){
   if(t.length) lines.push(`📋 مهام معلّقة: ${t.length}${late ? ' (متأخرة ' + late + ')' : ''}`);
   return lines;
 }
-async function pushTo({db, messaging, email, title, body, tag, url}){
+const PI = require('./push-i18n.js');
+/* بيرجّع دالة بتجيب قاموس لغة المستخدم (null = عربي) — مرة واحدة لكل تشغيلة */
+function trFactory(db){
+  const memo = {}, dicts = {}; let listP = null;
+  return async (email) => {
+    const lang = await PI.langOf(db, email, memo); if(lang === 'ar') return null;
+    if(!listP) listP = PI.userDictList(db);
+    return dicts[lang] || (dicts[lang] = PI.makeDict(lang, await listP));
+  };
+}
+async function pushTo({db, messaging, email, title, body, tag, url, trf}){
+  const dict = trf ? await trf(email) : null;
+  if(dict){ title = PI.trText(title, dict); body = PI.trText(body, dict); }
   const tokSnap = await db.collection('pushTokens').where('email', '==', email).get();
   const tokens = tokSnap.docs.map(d => d.data()).filter(t => t.token).map(t => t.token);
   if(!tokens.length) return 0;
@@ -181,7 +193,7 @@ async function pushTo({db, messaging, email, title, body, tag, url}){
 }
 /* بيشتغل كل ساعة: لو جه ميعاد الملخص أو فحص القراءات ولسه ما اتعملش النهارده، بينفّذه مرة واحدة */
 async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await fetch(u)).json()}){
-  const out = {digest: 0, missing: 0};
+  const out = {digest: 0, missing: 0}, trf = trFactory(db);
   const stDoc = await db.doc('settings/reminderState').get(), st = stDoc.exists ? stDoc.data() : {};
   const wantDigest = cfg.digestOn !== false && now.hour >= hourOr(cfg.digestHour, DEFAULT_DIGEST_HOUR) && st.digestDate !== now.date;
   const wantCheck = cfg.checkOn !== false && now.hour >= hourOr(cfg.checkHour, DEFAULT_CHECK_HOUR) && st.missingDate !== now.date;
@@ -206,7 +218,7 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
     miss.forEach(t => recipientsFor(users, t.tab).forEach(e => { if(!byUser.has(e)) byUser.set(e, []); byUser.get(e).push(t.label); }));
     for(const [email, list] of byUser){
       const body = list.slice(0, 5).map(x => '• ' + x).join('\n') + (list.length > 5 ? `\n+${list.length - 5} تانية` : '');
-      out.missing += await pushTo({db, messaging, email, title: `📝 لسه ما اتسجلتش قراءات النهارده (${list.length})`, body, tag: 'oroots-missing'});
+      out.missing += await pushTo({db, messaging, email, title: `📝 لسه ما اتسجلتش قراءات النهارده (${list.length})`, body, tag: 'oroots-missing', trf});
     }
     write.missingDate = now.date;
   }
@@ -221,7 +233,7 @@ async function runDaily({db, messaging, now, cfg, fetchJson = async u => (await 
       const email = String(u.username).toLowerCase(), lines = digestFor(email, u, {...ctxBase, tasks});
       if(!lines.length) continue;
       const extra = lines.length > 8 ? `\n+${lines.length - 8} تانية` : '';
-      out.digest += await pushTo({db, messaging, email, title: '☀️ ملخص الصبح', body: lines.slice(0, 8).join('\n') + extra, tag: 'oroots-digest'});
+      out.digest += await pushTo({db, messaging, email, title: '☀️ ملخص الصبح', body: lines.slice(0, 8).join('\n') + extra, tag: 'oroots-digest', trf});
     }
     write.digestDate = now.date;
   }
@@ -249,13 +261,15 @@ async function mainBody(admin, db){
   const usersDoc = await db.doc('settings/users').get();
   const per = groupPending(snaps, usersDoc.exists ? usersDoc.data().list : []);
   console.log('موظفين عندهم مهام معلّقة:', per.size);
+  const trf = trFactory(db);
 
   for(const [email, list] of per){
     const tokSnap = await db.collection('pushTokens').where('email', '==', email).get();
     // remind:false = الموظف قفل تذكير المهام (لسه بيستقبل الإشعارات العادية). الأجهزة القديمة من غير الحقل ده بتتعامل كأنها شغّالة
     const tokens = tokSnap.docs.map(d => d.data()).filter(t => t.token && t.remind !== false).map(t => t.token);
     if(!tokens.length){ console.log('مفيش جهاز مسجّل لـ', email); continue; }
-    const m = buildMessage(list, now.date);
+    const m = buildMessage(list, now.date), dict = await trf(email);
+    if(dict){ m.title = PI.trText(m.title, dict); m.body = PI.trText(m.body, dict); }
     const res = await admin.messaging().sendEachForMulticast({
       tokens,
       data: {title: m.title, body: m.body, tag: 'oroots-tasks', url: APP_URL},
@@ -269,5 +283,5 @@ async function mainBody(admin, db){
   }
 }
 
-module.exports = {farmInsights, resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
+module.exports = {trFactory, farmInsights, resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });
