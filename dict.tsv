@@ -68,10 +68,10 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 عملية	process	Vorgang
 — معروض آخر # (صدّر CSV للكل)	— showing last # (export CSV for all)	— letzte # angezeigt (CSV-Export für alle)
 الدور	Role	Rolle
-بيضة	Egg	Ei
-يرقة	Larva	Larve
-عذراء	Pupa	Puppe
-حشرة كاملة	Adult	Adulte
+بيضة	Egg	x
+يرقة	Larva	x
+عذراء	Pupa	x
+حشرة كاملة	Adult	x
 مبيد	Pesticide	Pflanzenschutzmittel
 — خصم	— deduct	— abziehen
 (المتبقي	(remaining	(Rest
@@ -85,14 +85,14 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 الحد الأدنى للتنبيه (اختياري)	Minimum alert level (optional)	Mindestwarnstand (optional)
 سعر الوحدة (ج.م) (اختياري)	Unit price (EGP) (optional)	Stückpreis (EGP) (optional)
 يشتغل على أي طور من أطوار الحشرة	Works on any stage of the insect life cycle	Wirkt auf jedes Entwicklungsstadium des Insekts
-إلغاء	Cancel	Abbrechen
+إلغاء	Cancel	Cancel
 ⏳ مدة الأمان:	⏳ Safety interval:	⏳ Wartezeit:
 يوم	day	Tag
 الطور:	Stage:	Stadium:
 لا توجد أصناف بعد. ضيف سماد أو مبيد من النموذج فوق.	No items yet. Add a fertilizer or pesticide from the form above.	Noch keine Artikel. Fügen Sie oben im Formular einen Dünger oder ein Pflanzenschutzmittel hinzu.
 ⚠️ مخزون منخفض (	⚠️ Low stock (	⚠️ Niedriger Bestand (
 منخفض	Low	Niedrig
-صنف	item	Artikel
+صنف	Item	Item
 معروض	shown	angezeigt
 عام	General	Allgemein
 قيمة المخزون	Stock value	Lagerwert
@@ -214,7 +214,7 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 لـ	for	für
 — هتجهز تاني بعد	— ready again in	— wieder bereit in
 جاهزة للحصاد	ready to harvest	erntereif
-نبتة	plants	Pflanzen
+نبتة	plants	plants
 ماسورة جاهزة للحصاد	pipe ready to harvest	Rohr erntereif
 نبتة)	plants)	Pflanzen)
 ماسورة عدّت ميعاد الحصاد بأكتر من	pipe is past its harvest date by more than	Rohr hat den Erntetermin um mehr als
@@ -280,7 +280,7 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 ⏩ شوف الوضع بعد:	⏩ See the state after:	⏩ Zustand ansehen nach:
 🔍 حجم الشكل:	🔍 Shape size:	🔍 Formgröße:
 ✏️ تعديل المجموعة	✏️ Edit group	✏️ Gruppe bearbeiten
-حفظ التعديل	Save changes	Änderungen speichern
+حفظ التعديل	Save changes	Save changes
 🐛 إصابة نشطة:	🐛 Active infestation:	🐛 Aktiver Befall:
 نبتة — عمر	plants — age	Pflanzen — Alter
 جاهزة للقطفة ✅	ready for cut ✅	schnittreif ✅
@@ -302,7 +302,7 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 اتضافت المجموعة	Group added	Gruppe hinzugefügt
 ، قلّل المجموعات الأول	, reduce the groups first	, reduzieren Sie zuerst die Gruppen
 رفع الصور مش متاح دلوقتي	Photo upload is not available right now	Foto-Upload ist derzeit nicht verfügbar
-بدل	instead of	anstelle von
+بدل	instead of	instead of
 (إجازة)	(leave)	(Urlaub)
 اتحوّلتلك	were assigned to you	wurden Ihnen zugewiesen
 مهمة بدل	task instead of	Aufgabe anstelle von
@@ -547,7 +547,7 @@ W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق
 ⏳ برّه فترات الري دلوقتي	⏳ Outside irrigation periods now	⏳ Derzeit außerhalb der Bewässerungszeiten
 (من المعايرة)	(from calibration)	(aus der Kalibrierung)
 وقت التشغيل اليومي	Daily run time	Tägliche Laufzeit
-دقيقة	minutes	Minuten
+دقيقة	Minutes	Minutes
 كمية الري اليومية	Daily irrigation volume	Tägliche Bewässerungsmenge
 ⚠️ مفيش معايرة للنقاط للنظام ده — سجّل معايرة من «إدخال القياسات» عشان تتحسب الكميات.	⚠️ No emitter calibration for this system — log a calibration from "Enter measurements" so quantities can be calculated.	⚠️ Keine Tropferkalibrierung für dieses System — erfassen Sie eine Kalibrierung unter „Messungen eingeben“, damit Mengen berechnet werden.
 ℹ️ مفيش مواسير مزروعة في إنفوجراف الحصاد للنظام ده	ℹ️ No pipes are planted in the harvest infographic for this system	ℹ️ Für dieses System sind in der Ernte-Infografik keine Rohre bepflanzt
@@ -1045,7 +1045,7 @@ EC متوقع mS/cm	Expected EC mS/cm	Erwartete EC mS/cm
 (كانت	(was	(war
 إطلاق حيوي متأخر	Biocontrol release overdue	Nützlingsausbringung überfällig
 (كان	(was	(war
-بكرة	tomorrow	morgen
+بكرة	Tomorrow	Tomorrow
 ماسورة عدّت ميعاد الحصاد/القطفة	Pipe is past the harvest/cut date	Rohr hat den Ernte-/Schnitttermin überschritten
 قراءة ري خارج المدى	Irrigation reading out of range	Bewässerungsmesswert außerhalb des Bereichs
 خد نسخة احتياطية من البيانات	Take a backup of the data	Sichern Sie die Daten
@@ -1494,7 +1494,7 @@ O'Roots — صباح الخير 👋	O'Roots — Good morning 👋	O'Roots — G
 في آخر	in the last	in den letzten
 قراءات — اتأكد من الحساس أو إن القراءة مش بتتنسخ	readings — check the sensor or that the reading isn't being copied	Messwerten — prüfen Sie den Sensor oder ob der Messwert nicht kopiert wird
 بتتحرك في اتجاه واحد	moving in one direction	bewegt sich in eine Richtung
-لتحت	downward	abwärts
+لتحت	Down	Down
 أيام (من	days (from	Tage (von
 : خطر	: risk	: Risiko
 عالي	high	hoch
@@ -1672,7 +1672,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 كل الفترة	Entire period	Gesamter Zeitraum
 رجوع للفترة الأصلية	Back to original period	Zurück zum ursprünglichen Zeitraum
 (خزان A)	(Tank A)	(Tank A)
-ملاحظة (اختياري)	Note (optional)	Notiz (optional)
+ملاحظة (اختياري)	Note (optional)	Note (optional)
 السجل	Log	Protokoll
 الوقت	Time	Zeit
 معلّقة	Pending	Offen
@@ -1684,7 +1684,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 (# نبات)	(# plants)	(# Pflanzen)
 نزّل للنظام	Move to system	In System übertragen
 # ساعة	# hours	# Stunden
-ملاحظة	Note	Notiz
+ملاحظة	Note	Note
 مهمة	Task	Aufgabe
 الحموضة pH	Acidity pH	Säuregrad pH
 رجوع لآخر فترة	Back to latest period	Zurück zum letzten Zeitraum
@@ -1700,7 +1700,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 نمو النبات	Plant growth	Pflanzenwachstum
 # منتصف الليل	# midnight	# Mitternacht
 # ظهراً	# noon	# Mittag
-النوع	Type	Typ
+النوع	Type	Type
 التاريخ	Date	Datum
 حرارة	Temperature	Temperatur
 آخر قراءة	Last reading	Letzte Messung
@@ -1713,7 +1713,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 الرش والتسميد	Spraying & fertilizing	Spritzen & Düngen
 الجودة	Quality	Qualität
 المخازن	Inventory	Lager
-الإعدادات	Settings	Einstellungen
+الإعدادات	Settings	Settings
 حرارة من (°C)	Temperature from (°C)	Temperatur von (°C)
 حرارة إلى (°C)	Temperature to (°C)	Temperatur bis (°C)
 رطوبة من (٪)	Humidity from (%)	Feuchte von (%)
@@ -1728,14 +1728,14 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 رطوبة ٪	Humidity %	Feuchte %
 إشعاع W/م²	Radiation W/m²	Strahlung W/m²
 أي ملاحظة على القراءة	Any note on the reading	Beliebige Notiz zur Messung
-ريحان إيطالي	Italian basil	Italienisches Basilikum
-حفظ	Save	Speichern
+ريحان إيطالي	Italian basil	Italian basil
+حفظ	Save	Save
 الكمية	Quantity	Menge
 شدة الإضاءة (Lux)	Light intensity (Lux)	Lichtstärke (Lux)
 أخرى	Other	Sonstige
-خيار	Choose	Wählen
-إضافة	Add	Hinzufügen
-جرجير	Arugula	Rucola
+خيار	Cucumber	Cucumber
+إضافة	Add	Add
+جرجير	Arugula	Arugula
 المهمة	Task	Aufgabe
 كجم	kg	kg
 تسجيل الدخول	Sign in	Anmelden
@@ -1747,10 +1747,10 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 ألوان التطبيق	App colors	App-Farben
 بيانات تجريبية	Demo data	Demodaten
 إخفاء الأسماء	Hide names	Namen ausblenden
-الصنف	Crop	Kultur
-خس	Lettuce	Salat
+الصنف	Variety	Variety
+خس	Lettuce	Lettuce
 ريحان	Basil	Basilikum
-طماطم	Tomato	Tomate
+طماطم	Tomato	Tomato
 فلفل	Pepper	Paprika
 مياه الري	Irrigation water	Bewässerungswasser
 مياه الصرف	Drainage water	Drainagewasser
@@ -1798,7 +1798,7 @@ DLI اليومي (mol/m²/يوم)	Daily DLI (mol/m²/day)	Tägliches DLI (mol/m�
 (خزان B) Mn #% — سعر #/كجم	(Tank B) Mn #% — price #/kg	(Tank B) Mn #% — Preis #/kg
 (خزان B) B #% · Mo #% — سائل · سعر #/كجم	(Tank B) B #% · Mo #% — liquid · price #/kg	(Tank B) B #% · Mo #% — flüssig · Preis #/kg
 المحصول	Crop	Kultur
-النهارده	Today	Heute
+النهارده	Today	Today
 المواسير	Pipes	Rohre
 التاريخ والوقت	Date & time	Datum & Uhrzeit
 الشخص	Person	Person
@@ -1845,7 +1845,7 @@ DLI اليومي (mol/m²/يوم)	Daily DLI (mol/m²/day)	Tägliches DLI (mol/m�
 بقدونس	Parsley	Petersilie
 كزبرة	Coriander	Koriander
 سبانخ	Spinach	Spinat
-كيل	Kale	Grünkohl
+كيل	Kale	Kale
 فراولة	Strawberry	Erdbeere
 قيم مرجعية عامة للزراعة المائية، وممكن تختلف حسب الصنف والموسم وتوصية المورد. EC بوحدة mS/cm. "هواء" = حرارة جو الصوبة، و"محلول" = حرارة مياه الري/الخزان.	General reference values for hydroponics; they may vary by crop, season and supplier recommendation. EC in mS/cm. "Air" = greenhouse air temperature, "Solution" = irrigation/tank water temperature.	Allgemeine Richtwerte für Hydroponik; sie können je nach Kultur, Saison und Lieferantenempfehlung abweichen. EC in mS/cm. „Luft“ = Lufttemperatur im Gewächshaus, „Lösung“ = Temperatur des Bewässerungs-/Tankwassers.
 ＋ إضافة صنف	＋ Add crop	＋ Kultur hinzufügen
@@ -1949,7 +1949,7 @@ EC (mS/cm) — الري / الصرف / الخزان	EC (mS/cm) — irrigation / 
 الطقس في الشريط العلوي	Weather in the top bar	Wetter in der oberen Leiste
 بيظهر فوق الصفحة مع التاريخ والوقت: الحرارة والرطوبة والرياح والإشعاع للمنطقة اللي تحددها هنا (المصدر Open-Meteo، بيتحدّث كل # دقايق). ابحث عن اسم المنطقة، أو اكتب إحداثيات المزرعة بالظبط.	Shown at the top of the page with date and time: temperature, humidity, wind and radiation for the area you set here (source Open-Meteo, updated every # minutes). Search for the area name, or enter the farm's exact coordinates.	Wird oben auf der Seite mit Datum und Uhrzeit angezeigt: Temperatur, Feuchte, Wind und Strahlung für die hier festgelegte Region (Quelle Open-Meteo, Aktualisierung alle # Minuten). Suchen Sie nach dem Regionsnamen oder geben Sie die genauen Koordinaten des Betriebs ein.
 ابحث عن المنطقة	Search for area	Region suchen
-بحث	Search	Suchen
+بحث	Search	Search
 اسم المنطقة	Area name	Regionsname
 خط العرض (Lat)	Latitude (Lat)	Breitengrad (Lat)
 خط الطول (Lon)	Longitude (Lon)	Längengrad (Lon)
@@ -1995,7 +1995,7 @@ EC (mS/cm) — الري / الصرف / الخزان	EC (mS/cm) — irrigation / 
 نوع الصوبة	Greenhouse type	Gewächshaustyp
 اسم/رقم النظام	System name/number	Systemname/-nummer
 مثال: القاهرة أو Cairo	Example: Cairo or القاهرة	Beispiel: Cairo oder القاهرة
-لفوق	Up	Nach oben
+لفوق	Up	Up
 إنتاج الماسورة	Production per pipe	Produktion je Rohr
 كجم/ماسورة	kg/pipe	kg/Rohr
 لوحتي	My dashboard	Mein Dashboard
@@ -2156,7 +2156,7 @@ L/min للنظام	L/min for system	L/min für das System
 الرطوبة النسبية	Relative humidity	Relative Luftfeuchte
 — اختار الصنف —	— Choose crop —	— Kultur wählen —
 النظام (اختياري)	System (optional)	System (optional)
-الصوبة	Greenhouse	Gewächshaus
+الصوبة	Greenhouse	Greenhouse
 # ماسورة ≈ # نبتة	# pipes ≈ # plants	# Rohre ≈ # Pflanzen
 عمر النبات # يوم من #-#-# — أول حصاد بعد # يوم	Plant age # days from #-#-# — first harvest after # days	Pflanzenalter # Tage ab #-#-# — erste Ernte nach # Tagen
 قطفة # من # — بتتقطف كل # يوم	Cut # of # — cut every # days	Schnitt # von # — Schnitt alle # Tage
@@ -2167,7 +2167,7 @@ L/min للنظام	L/min for system	L/min für das System
 ٪ (آخر # يوم)	% (last # days)	% (letzte # Tage)
 الحصاد بيحسب الكيلو والجرام بس. المقارنة مع نفس المدة اللي قبلها.	Harvest counts kg and grams only. Comparison is with the same period before.	Die Ernte zählt nur kg und Gramm. Verglichen wird mit demselben vorherigen Zeitraum.
 الحصاد — كل المزرعة	Harvest — whole farm	Ernte — gesamter Betrieb
-الحصاد اليومي — كل الأنظمة والأصناف (كجم)	Daily harvest — all systems and crops (kg)	Tägliche Ernte — alle Systeme und Kulturen (kg)
+الحصاد اليومي — كل الأنظمة والأصناف (كجم)	Daily harvest — all systems and varieties (kg)	Daily harvest — all systems and varieties (kg)
 إجمالي الحصاد المعروض:	Total harvest shown:	Angezeigte Gesamternte:
 كجم على	kg over	kg an
 يوم حصاد، من #/#/# لحد النهارده. (المعروض محدود بآخر # يوم محمّلين — لو عايز أقدم من كده زوّد «مدة البيانات المحمّلة» من الإعدادات)	harvest days, from #/#/# until today. (Shown is limited to the last # loaded days — if you want older, increase “Loaded data range” in Settings)	Erntetagen, vom #/#/# bis heute. (Die Anzeige ist auf die letzten # geladenen Tage begrenzt — für ältere Daten erhöhen Sie den „Geladenen Datenbereich“ in den Einstellungen)
@@ -2247,7 +2247,7 @@ mol/m²/يوم	mol/m²/day	mol/m²/Tag
 المعايرة القادمة (اختياري)	Next calibration (optional)	Nächste Kalibrierung (optional)
 محلول المعايرة المستخدم (اختياري)	Calibration solution used (optional)	Verwendete Kalibrierlösung (optional)
 ملاحظة النتيجة (اختياري)	Result note (optional)	Ergebnisnotiz (optional)
-الجهاز	Instrument	Gerät
+الجهاز	Device	Device
 القادمة	Next	Nächste
 المحلول	Solution	Lösung
 النتيجة	Result	Ergebnis
@@ -2261,7 +2261,7 @@ mol/m²/يوم	mol/m²/day	mol/m²/Tag
 رش ورقي	Foliar spray	Blattspritzung
 تسميد	Fertilizing	Düngung
 الصالات	Halls	Hallen
-المنتج	Product	Produkt
+المنتج	Product	Product
 — اختار المنتج —	— Choose product —	— Produkt wählen —
 الجرعة / التركيز	Dose / concentration	Dosis / Konzentration
 — أي وقت —	— Any time —	— Beliebige Zeit —
@@ -2469,7 +2469,7 @@ LG# — آخر # يوم مقارنةً بالـ # يوم اللي قبلها	LG#
 مثال: # مل/لتر	e.g. # ml/L	z. B. # ml/L
 مثال: Phytoseiulus persimilis	e.g. Phytoseiulus persimilis	z. B. Phytoseiulus persimilis
 مثال: العنكبوت الأحمر	e.g. red spider mite	z. B. Rote Spinne
-مثال: #	e.g. #	z. B. #
+مثال: #	Example: #	Example: #
 خس رومين	Romaine lettuce	Romana-Salat
 -#٪ عن الفترة اللي قبلها	-#% vs. the previous period	-#% gegenüber dem Vorzeitraum
 لا يوجد حصاد مسجل.	No harvest logged.	Keine Ernte erfasst.
@@ -2496,7 +2496,7 @@ LG# — آخر # يوم مقارنةً بالـ # يوم اللي قبلها	LG#
 ملخص المشتل (اللي لسه فيه)	Nursery summary (what is still in it)	Anzucht-Zusammenfassung (was noch darin ist)
 إجمالي الصواني في المشتل	Total trays in nursery	Trays insgesamt in der Anzucht
 إجمالي النباتات (# / صينية)	Total plants (# per tray)	Pflanzen insgesamt (# pro Tray)
-النباتات	Plants	Pflanzen
+النباتات	Plants	Plants
 أكبر عمر	Oldest age	Höchstes Alter
 خطة المشتل — احتياج كل نظام من الصواني	Nursery plan — each system's tray need	Anzuchtplan — Traybedarf jedes Systems
 إجمالي النواقص من الصواني لكل صنف (كل الصوب)	Total tray shortfall per crop (all halls)	Gesamtes Tray-Defizit je Kultur (alle Hallen)
@@ -2520,7 +2520,7 @@ LG#: مطلوب # صينية، الموجود في المشتل #، الناقص
 LG# — S# — سجل الحصاد	LG# — S# — harvest log	LG# — S# — Erntelog
 تسجيل حصاد جديد	Log a new harvest	Neue Ernte erfassen
 الصنف / المحصول	Crop / variety	Kultur / Sorte
-الوحدة	Unit	Einheit
+الوحدة	Unit	Unit
 جم	g	g
 قطعة	piece	Stück
 صندوق	Crate	Kiste
@@ -2683,7 +2683,7 @@ pH المحلول	Solution pH	pH der Lösung
 مصروف جديد	New expense	Neue Ausgabe
 البند	Item	Posten
 عمالة	Labor	Arbeit
-كهرباء	Electricity	Strom
+كهرباء	Electricity	Electricity
 مياه	Water	Wasser
 عبوات وتغليف	Packaging	Verpackung
 نقل	Transport	Transport
@@ -2721,7 +2721,7 @@ pH المحلول	Solution pH	pH der Lösung
 مدير — كل الصلاحيات	Admin — all permissions	Admin — alle Berechtigungen
 مفيش إجازات مسجلة.	No leave recorded.	Kein Urlaub erfasst.
 الموظف اللي هينزل إجازة	Employee going on leave	Mitarbeiter im Urlaub
-من	From	Von
+من	of	of
 إلى	To	Bis
 البديل (هتتحول له المهام)	Substitute (tasks will be transferred to them)	Vertretung (Aufgaben werden ihr übertragen)
 سجّل الإجازة	Record leave	Urlaub erfassen
@@ -2857,7 +2857,7 @@ DLI اليومي	Daily DLI	Tägliches DLI
 عدد الصواني الناقصة عن احتياج خطة المشتل.	The number of trays missing compared with the nursery plan's need.	Die Anzahl der fehlenden Trays im Vergleich zum Bedarf des Anzuchtplans.
 متوسط إنتاج الماسورة الواحدة من الحصاد.	The average production of a single pipe from the harvest.	Die durchschnittliche Produktion eines einzelnen Rohrs aus der Ernte.
 إجمالي التكاليف المسجّلة في آخر # يوم ÷ كيلوهات الحصاد في نفس الفترة (من قسم التكاليف في المخازن).	Total costs logged in the last # days ÷ harvest kilograms in the same period (from the costs section in Inventory).	Gesamtkosten der letzten # Tage ÷ Ernte-Kilogramm im selben Zeitraum (aus dem Kostenbereich im Lager).
-فاقد الفرز	Sorting waste	Sortierausschuss
+فاقد الفرز	Sorting waste	Sorting waste
 نسبة الفاقد من الخامة اللي جت (بالكيلو) في جلسات الفرز آخر # يوم.	The percentage of waste from the incoming raw material (in kg) in sorting sessions over the last # days.	Der Prozentsatz an Ausschuss vom eingehenden Rohmaterial (in kg) in Sortiersitzungen der letzten # Tage.
 نسبة القراءات اليومية المطلوبة (ري/تربة لكل نظام + مناخ لكل صوبة) اللي اتسجلت في آخر # أيام.	The percentage of required daily readings (irrigation/soil per system + climate per greenhouse) that were logged in the last # days.	Der Prozentsatz der erforderlichen täglichen Messwerte (Bewässerung/Boden je System + Klima je Gewächshaus), die in den letzten # Tagen erfasst wurden.
 نمو اليوم	Growth today	Wachstum heute
@@ -2951,7 +2951,7 @@ ppm — Parts Per Million (جزء في المليون)	ppm — Parts Per Million
 تلغي الإجازة دي؟ المهام اللي اتحوّلت بالفعل هتفضل عند البديل.	Cancel this leave? Tasks already transferred will stay with the substitute.	Diesen Urlaub stornieren? Bereits übertragene Aufgaben bleiben bei der Vertretung.
 اتلغت الإجازة	Leave cancelled	Urlaub storniert
 المهمة مش موجودة	Task not found	Aufgabe nicht gefunden
-اتحفظ التعديل	Edit saved	Änderung gespeichert
+اتحفظ التعديل	Changes saved	Changes saved
 متأكد؟ هيمسح كل القراءات (التجريبية والحقيقية) من المصادر التلاتة.	Are you sure? This will delete all readings (demo and real) from the three sources.	Sicher? Dies löscht alle Messwerte (Demo und echte) aus den drei Quellen.
 اتمسحت كل القراءات	All readings deleted	Alle Messwerte gelöscht
 ^تحذف "	Delete “	„
@@ -3384,9 +3384,837 @@ O'Roots — مراقبة جودة المياه	O'Roots — Water Quality Monitor
 إخفاء التفاصيل	Hide details	Hide details
 تفاصيل الطقس	Weather details	Weather details
 الحصة بتتجدد الساعة #:# بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.	The quota renews at #:# Cairo time. This is an estimate for your device only; the quota is shared among all users and GitHub scripts, and the actual figure is in Firebase Console → Firestore → Usage.	x
+إظهار المخططات المخفية (#)	Show hidden charts (#)	Show hidden charts (#)
+(#) O'Roots — مراقبة جودة المياه	(#) O'Roots — Water Quality Monitoring	(#) O'Roots — Water Quality Monitoring
+⏰ مهمة متأخرة: عندك زيارة للجونة (+# تانية)	⏰ Overdue task: you have a visit to El Gouna (+# more)	⏰ Overdue task: you have a visit to El Gouna (+# more)
+مهمة متأخرة: عندك زيارة للجونة (+# تانية)	Overdue task: you have a visit to El Gouna (+# more)	Overdue task: you have a visit to El Gouna (+# more)
+زيارة للجونة	Visit to El Gouna	Visit to El Gouna
+اعرف أكتر (بحث في جوجل)	Learn more (Google search)	Learn more (Google search)
+تغيير الاسم	Rename	Rename
+أرجال	Arjal	Arjal
+الترايسيلوكسان المعدل	Modified trisiloxane	Modified trisiloxane
+إيميداكلوبريد (Imidacloprid) بتركيز #%.	Imidacloprid at #% concentration.	Imidacloprid at #% concentration.
+المن، والذبابة البيضاء، والتربس، والجاسيد.	Aphids, whiteflies, thrips and jassids.	Aphids, whiteflies, thrips and jassids.
+ثيوفانات ميثيل	Thiophanate-methyl	Thiophanate-methyl
+البياض الدقيقي والأعفان والتبقعات , توبسين	Powdery mildew, rots and leaf spots, Topsin	Powdery mildew, rots and leaf spots, Topsin
+اكروبات مانكوزيب	Acrobat Mancozeb	Acrobat Mancozeb
+#% دايميثومورف و #% مانكوزيب.	#% dimethomorph and #% mancozeb.	#% dimethomorph and #% mancozeb.
+الندوة المتأخرة، البياض الزغبي	Late blight, downy mildew	Late blight, downy mildew
+أكروبات نحاس	Acrobat Copper	Acrobat Copper
+دايميثومورف #% + أوكسي كلور النحاس #%	Dimethomorph #% + copper oxychloride #%	Dimethomorph #% + copper oxychloride #%
+اللفحات، البياض الزغبي، أعفان الجذور	Blights, downy mildew, root rots	Blights, downy mildew, root rots
+الفيردى	Verdi	Verdi
+ميتافلوميزون (Metaflumizone) بتركيز #%	Metaflumizone at #% concentration	Metaflumizone at #% concentration
+توتا أبسولوتا	Tuta absoluta	Tuta absoluta
+اميستار	Amistar	Amistar
+ازوكسي ستروبين Azoxystrobin #%	Azoxystrobin #%	Azoxystrobin #%
+مبيد فطري جهازي واسع المدى	Broad-spectrum systemic fungicide	Broad-spectrum systemic fungicide
+اميستار توب	Amistar Top	Amistar Top
+ازوكسي ستروبين Azoxystrobin #% + ديفينوكونازول Difenoconazole #%	Azoxystrobin #% + difenoconazole #%	Azoxystrobin #% + difenoconazole #%
+بياض دقيقي وزغبي ، تبقعات أوراق ، أصدأ	Powdery and downy mildew, leaf spots, rusts	Powdery and downy mildew, leaf spots, rusts
+أنتي مايت #%	Anti-Mite #%	Anti-Mite #%
+بيريدابين (Pyridaben) بنسبة #%.	Pyridaben at #%.	Pyridaben at #%.
+أكاروسي وحشري	Acaricide and insecticide	Acaricide and insecticide
+انجيان	Engeo	Engeo
+كلورانترانيليبرول (Chlorantraniliprole) بتركيز #%	Chlorantraniliprole at #% concentration	Chlorantraniliprole at #% concentration
+التوتا أبسليوتا ، دودة ورق القطن والديدان القارضة	Tuta absoluta, cotton leafworm and cutworms	Tuta absoluta, cotton leafworm and cutworms
+التوتا أبسليوتا ،دودة ورق القطن والديدان القارضة	Tuta absoluta, cotton leafworm and cutworms	Tuta absoluta, cotton leafworm and cutworms
+انهبيتور	Inhibitor	Inhibitor
+• مواد عضوية طبيعية#%+كربون عضوي#%+نيتروجين: #%.	• Natural organic matter #% + organic carbon #% + nitrogen: #%.	• Natural organic matter #% + organic carbon #% + nitrogen: #%.
+النيماتودا .	Nematodes.	Nematodes.
+أورفيجو	Orvego	Orvego
+أميتوسترادين + دايميثومورف	Ametoctradin + dimethomorph	Ametoctradin + dimethomorph
+اورونس سوبر	Orons Super	Orons Super
+فينيبروكسيمات (Fenpyroximate) بنسبة #%	Fenpyroximate at #%	Fenpyroximate at #%
+ايزو #%	Iso #%	Iso #%
+أندوكساكارب #%	Indoxacarb #%	Indoxacarb #%
+ديدان الحشد الخريفية، ديدان ثمار الطماطم، فراشة درنات البطاطس، دودة ورق القطن، الدودة الخضراء، ديدان ثمار العنب، صانعات الأنفاق.	Fall armyworm, tomato fruitworms, potato tuber moth, cotton leafworm, green worm, grape berry moths, leaf miners.	Fall armyworm, tomato fruitworms, potato tuber moth, cotton leafworm, green worm, grape berry moths, leaf miners.
+باندل	Bundle	Bundle
+كبريت بتركيز #%	Sulfur at #% concentration	Sulfur at #% concentration
+أعفان الثمار والبياض الدقيقي	Fruit rots and powdery mildew	Fruit rots and powdery mildew
+برايم سي	Prime C	Prime C
+Pirimiphos-methyl #% برميفوس ميثيل	Pirimiphos-methyl #%	Pirimiphos-methyl #%
+الحشرات الطائرة	Flying insects	Flying insects
+# / لتر سولار	# / L diesel	# / L diesel
+بروفي	Profi	Profi
+بيريبروكسيفين (Pyriproxyfen) بتركيز #% EC.	Pyriproxyfen at #% EC.	Pyriproxyfen at #% EC.
+الذبابة البيضاء-المن- الحشرات القشرية	Whitefly - aphids - scale insects	Whitefly - aphids - scale insects
+بروكسي إس	Proxy S	Proxy S
+Acetamiprid #% اسيتامبريد + Pyriproxyfen #% بيريبروكسيفين	Acetamiprid #% + pyriproxyfen #%	Acetamiprid #% + pyriproxyfen #%
+المن – الذبابة البيضاء – التربس – الجاسيد – الحشرات القشرية – البق الدقيقي	Aphids – whitefly – thrips – jassids – scale insects – mealybugs	Aphids – whitefly – thrips – jassids – scale insects – mealybugs
+بريفكس N#	Previcur N#	Previcur N#
+Propamocarb hydrochloride #% بروباموكارب هيدروكلورايد	Propamocarb hydrochloride #%	Propamocarb hydrochloride #%
+الندوة المتأخرة ، البياض الزغبي	Late blight, downy mildew	Late blight, downy mildew
+بلندو سبشيال	Blando Special	Blando Special
+Beta-cyfluthrin #% بيتا سيفلوثرين	Beta-cyfluthrin #%	Beta-cyfluthrin #%
+يرقات الذباب	Fly larvae	Fly larvae
+بوب إكس لارج	Pop X Large	Pop X Large
+Iba #% + Vitamin B #% + Vitamin C #% , #% اندول بيوتريك اسيد - #% فيتامين بى - # % فيتامين سى	IBA #% + vitamin B #% + vitamin C #%, #% indole butyric acid - #% vitamin B - #% vitamin C	IBA #% + vitamin B #% + vitamin C #%, #% indole butyric acid - #% vitamin B - #% vitamin C
+منشط جذور	Root stimulant	Root stimulant
+بوليز ام دى اف	Polyz MDF	Polyz MDF
+ميترام كومبليكس (Metiram Complex) بنسبة #%	Metiram Complex at #%	Metiram Complex at #%
+الندوة المبكرة ، البياض الزغبي	Early blight, downy mildew	Early blight, downy mildew
+بيرنا ستار	Perna Star	Perna Star
+Glycerin Easters #% استرات الجلسرين ( مبيدات عضوية او حيوية )	Glycerin esters #% (organic or biological pesticides)	Glycerin esters #% (organic or biological pesticides)
+مبيد حشري ومخصب حيوي نباتي	Insecticide and plant bio-fertilizer	Insecticide and plant bio-fertilizer
+بيليز #%	Pelize #%	Pelize #%
+• بوسكاليد (Boscalid): بنسبة #% • بيراكلوستروبين (Pyraclostrobin): بنسبة #%	• Boscalid: #% • Pyraclostrobin: #%	• Boscalid: #% • Pyraclostrobin: #%
+البياض الدقيقي، البياض الزغبي، أعفان الثمار، الجرب، والندوة المبكرة.	Powdery mildew, downy mildew, fruit rots, scab and early blight.	Powdery mildew, downy mildew, fruit rots, scab and early blight.
+# ملل /لتر	# ml / L	# ml / L
+بيليو #%	Pelio #%	Pelio #%
+بريداليل #%   Pyridalyl #%	Pyridalyl #%   Pyridalyl #%	Pyridalyl #%   Pyridalyl #%
+بينون #	Pinon #	Pinon #
+أزوكسيستروبين Azoxystrobin بنسبة #% + ميتالاكسيل-إم Metalaxyl-M بنسبة #%	Azoxystrobin at #% + Metalaxyl-M at #%	Azoxystrobin at #% + Metalaxyl-M at #%
+البياض الزغبي والندوات	Downy mildew and blights	Downy mildew and blights
+بيني	Penny	Penny
+#%امامكتين بنزوات+ #%اندوكسكارب , Emamectin benzoate #% + Indoxacarb #%	#% emamectin benzoate + #% indoxacarb, Emamectin benzoate #% + Indoxacarb #%	#% emamectin benzoate + #% indoxacarb, Emamectin benzoate #% + Indoxacarb #%
+مبيد حشري وأكاروسي	Insecticide and acaricide	Insecticide and acaricide
+بيوتكت	Biotect	Biotect
+بكتيريا Bacillus thuringiensis بتركيز #%	Bacillus thuringiensis bacteria at #% concentration	Bacillus thuringiensis bacteria at #% concentration
+توتا أبسليوتا ، دودة ورق القطن	Tuta absoluta, cotton leafworm	Tuta absoluta, cotton leafworm
+بيوكسان	Pioxan	Pioxan
+سايموكسانيل Cymoxanil #% + مـانـكـوزيب Mancozeb #%	Cymoxanil #% + Mancozeb #%	Cymoxanil #% + Mancozeb #%
+البياض الزغبى والندوات واللطعة الأرجوانية	Downy mildew, blights and purple blotch	Downy mildew, blights and purple blotch
+بيومكتين	Biomectin	Biomectin
+Abamectin #% أبامكتين	Abamectin #%	Abamectin #%
+مبيد أكاروسي وحشري	Acaricide and insecticide	Acaricide and insecticide
+ترولز	Trolls	Trolls
+تيبوكونازول Tebuconazole #%	Tebuconazole #%	Tebuconazole #%
+مادة ناشرة	Spreader	Spreader
+تكنو اويل	Techno Oil	Techno Oil
+Vegetable oil زيت نباتي ( مبيدات عضوية او حيوية )	Vegetable oil (organic or biological pesticides)	Vegetable oil (organic or biological pesticides)
+تيبرو وان #%	Tebro One #%	Tebro One #%
+دايمثويت #%	Dimethoate #%	Dimethoate #%
+دودة ورق القطن	Cotton leafworm	Cotton leafworm
+تيكو	Tico	Tico
+Fosetyl-Aluminium #% فوستيل ألمنيوم	Fosetyl-Aluminium #%	Fosetyl-Aluminium #%
+مركب وقائي وعلاجي لأمراض أعفان الجذور والتصمغات	Protective and curative compound for root rot and gummosis diseases	Protective and curative compound for root rot and gummosis diseases
+تيكو # كجم	Tico # kg	Tico # kg
+جات فاست	Jet Fast	Jet Fast
+Abamectin #% ابامكتين + Thiamethoxam #% ثياميثوكسام	Abamectin #% + Thiamethoxam #%	Abamectin #% + Thiamethoxam #%
+الذبابة البيضاء ، العنكبوت الأحمر العادي	Whitefly, common red spider mite	Whitefly, common red spider mite
+داكونيل	Daconil	Daconil
+Chlorothalonil #% كلوروثالونيل	Chlorothalonil #%	Chlorothalonil #%
+الندوة المبكرة والمتأخرة، تبقع الأوراق، البياض الدقيقي، لفحة الساق الصمغية، وأعفان الثمار	Early and late blight, leaf spot, powdery mildew, gummy stem blight and fruit rots	Early and late blight, leaf spot, powdery mildew, gummy stem blight and fruit rots
+دانيسرابا	Danisaraba	Danisaraba
+سيفلوميتوفين Cyflumetofen #%	Cyflumetofen #%	Cyflumetofen #%
+مبيد أكاروسي	Acaricide	Acaricide
+دروكالم	Drocalm	Drocalm
+ثيوسيكلام هيدروجين أوكسالات بنسبة #%	Thiocyclam hydrogen oxalate at #%	Thiocyclam hydrogen oxalate at #%
+التربس و المن و الذبابة البيضاء و ديدان و فراشات الثمار و ديدان الازهار و سوسة الطماطم و صانعات الانفاق.	Thrips, aphids, whitefly, fruit worms and moths, flower worms, tomato weevil and leaf miners.	Thrips, aphids, whitefly, fruit worms and moths, flower worms, tomato weevil and leaf miners.
+دل كب جولد	Del Cup Gold	Del Cup Gold
+كبريتات النحاس المائية (Copper Sulfate Pentahydrate) بتركيز #%	Copper Sulfate Pentahydrate at #% concentration	Copper Sulfate Pentahydrate at #% concentration
+الندوات المبكرة والمتأخرة، البياض الزغبي، وتبقع الأوراق	Early and late blights, downy mildew and leaf spot	Early and late blights, downy mildew and leaf spot
+دلتاكيل	Deltakill	Deltakill
+دلتاميثرين (Deltamethrin) بتركيز #%	Deltamethrin at #% concentration	Deltamethrin at #% concentration
+مبيد حشري واسع المدى	Broad-spectrum insecticide	Broad-spectrum insecticide
+دوجما	Dogma	Dogma
+Acetamiprid #% اسيتامبريد + Bifenthrin #% بايفينثرين	Acetamiprid #% + Bifenthrin #%	Acetamiprid #% + Bifenthrin #%
+المنّ، الذبابة البيضاء، التربس، الجاسيد، البق الدقيقي، والحشرات القشرية،دودة ورق القطن، أبو دقيق، واليرقات المختلفة	Aphids, whitefly, thrips, jassids, mealybugs, scale insects, cotton leafworm, thrips-like pests and various larvae	Aphids, whitefly, thrips, jassids, mealybugs, scale insects, cotton leafworm, thrips-like pests and various larvae
+الحشرات القارضة مثل: اليرقات وبعض الخنافس	Chewing insects such as larvae and some beetles	Chewing insects such as larvae and some beetles
+الحشرات الثاقبة الماصة مثل: المنّ، الذبابة البيضاء، التربس. +	Piercing-sucking insects such as aphids, whitefly, thrips. +	Piercing-sucking insects such as aphids, whitefly, thrips. +
+دوركالم	Dorkalm	Dorkalm
+ثيو سيكلام هيدروجين اوكسالات # % SP	Thiocyclam hydrogen oxalate # % SP	Thiocyclam hydrogen oxalate # % SP
+صانعات الانفاق و الفراشات و الثاقبات الماصة	Leaf miners, moths and piercing-sucking insects	Leaf miners, moths and piercing-sucking insects
+دولف اكس #%	Dolf X #%	Dolf X #%
+Lambda Cyhalotrin #% لمبادا سيهالوثرين	Lambda cyhalothrin #%	Lambda cyhalothrin #%
+الذبابة البيضاء و التربس و المن و ديدان اللوز و يحد من انتشار العناكب	Whitefly, thrips, aphids, bollworms and limits the spread of spider mites	Whitefly, thrips, aphids, bollworms and limits the spread of spider mites
+ديفنس	Defense	Defense
+البياض الدقيقي ،الصدأ	Powdery mildew, rust	Powdery mildew, rust
+رازومار	Razormar	Razormar
+مستخلص طحالب بحرية # % - أحماض امينية حرة # % - نتروجين كلى # % - فوسفور # % - بوتاسيوم # % - عوامل تنشيط # – حديد # – زنك # – منجنيز # %ب	Seaweed extract # % - free amino acids # % - total nitrogen # % - phosphorus # % - potassium # % - activating agents # – iron # – zinc # – manganese # %	Seaweed extract # % - free amino acids # % - total nitrogen # % - phosphorus # % - potassium # % - activating agents # – iron # – zinc # – manganese # %
+منشط عام للجذور	General root stimulant	General root stimulant
+ران واي #%	Ran Way #%	Ran Way #%
+بوبروفيزين (Buprofezin) بنسبة #%.	Buprofezin at #%.	Buprofezin at #%.
+• الذبابة البيضاء. • الحشرات القشرية. • البق الدقيقي. • الحلم الدودي.	• Whitefly. • Scale insects. • Mealybugs. • Vermiform mites.	• Whitefly. • Scale insects. • Mealybugs. • Vermiform mites.
+ربنت #%	Rebent #%	Rebent #%
+أزوكسي ستروبين #% + دايميثومورف #%	Azoxystrobin #% + dimethomorph #%	Azoxystrobin #% + dimethomorph #%
+البياض الزغبي والدقيقي والندوات وأعفان الثمار	Downy and powdery mildew, blights and fruit rots	Downy and powdery mildew, blights and fruit rots
+روبيك	Robic	Robic
+Bifenthrin #% بايفنثرين + Acetamiprid #% اسيتامبريد	Bifenthrin #% + Acetamiprid #%	Bifenthrin #% + Acetamiprid #%
+المن – الذبابة البيضاء – الحشرات القشرية – البق الدقيقى – الجاسيد التربس	Aphids – whitefly – scale insects – mealybugs – jassids – thrips	Aphids – whitefly – scale insects – mealybugs – jassids – thrips
+ريفاس توب	Revus Top	Revus Top
+مانديبروباميد (Mandipropamid) بنسبة #% + دايفيناكونازول (Difenoconazole) بنسبة #%:	Mandipropamid at #% + Difenoconazole at #%:	Mandipropamid at #% + Difenoconazole at #%:
+اللفحة المبكرة واللفحة المتأخرة البياض الزغبي	Early blight, late blight, downy mildew	Early blight, late blight, downy mildew
+رينوفيشن انجوري	Renovation Injury	Renovation Injury
+ني بالفسفور والبوتاسيوم والأحماض المستخلصة من مصدر نباتي طبيعي.	Rich in phosphorus, potassium and acids extracted from a natural plant source.	Rich in phosphorus, potassium and acids extracted from a natural plant source.
+مركب ومخصب زراعي	Agricultural compound and fertilizer	Agricultural compound and fertilizer
+زووم #	Zoom #	Zoom #
+هيدروكسيد النحاس (Copper Hydroxide) بتركيز يتراوح بين #% (نحاس معدني) إلى #%	Copper Hydroxide at a concentration ranging from #% (metallic copper) to #%	Copper Hydroxide at a concentration ranging from #% (metallic copper) to #%
+الندوة المبكرة والأمراض الفطرية	Early blight and fungal diseases	Early blight and fungal diseases
+زينتاري	Xentari	Xentari
+Bacillus thruringiensis subsp.Aizawai #% باسيلس ثور نجنسيس - ازاوى ( مبيدات عضوية او حيوية )	Bacillus thuringiensis subsp. Aizawai #% (organic or biological pesticides)	Bacillus thuringiensis subsp. Aizawai #% (organic or biological pesticides)
+دودة ثمار العنب فراشة درنات البطاطس دودة ورق القطن	Grape berry moth, potato tuber moth, cotton leafworm	Grape berry moth, potato tuber moth, cotton leafworm
+ساندكيور #%	Sandcure #%	Sandcure #%
+مانكوزيب #% + ميتالاكسيل #%	Mancozeb #% + metalaxyl #%	Mancozeb #% + metalaxyl #%
+البياض الزغبي، الندوة البدرية والمتأخرة، اللطعة الأرجوانية، تصمغ وأشنات الموالح، وتثقب الأوراق.	Downy mildew, early and late blight, purple blotch, citrus gummosis and lichens, and shot hole.	Downy mildew, early and late blight, purple blotch, citrus gummosis and lichens, and shot hole.
+سبيدو #%	Speedo #%	Speedo #%
+إيمامكتين بنزوات (Emamectin benzoate )	Emamectin benzoate	Emamectin benzoate
+العديد من الآفات الحشرية	Many insect pests	Many insect pests
+سنتروم كالسيوم بورون	Centrum Calcium Boron	Centrum Calcium Boron
+الكالسيوم + البورون	Calcium + boron	Calcium + boron
+سوبر توكس # لتر	Super Tox # L	Super Tox # L
+كلوثيانيدين Clothianidin #%	Clothianidin #%	Clothianidin #%
+للحشرات القشرية و المن و التربس و صانعات الانفاق	For scale insects, aphids, thrips and leaf miners	For scale insects, aphids, thrips and leaf miners
+سوبر توكس # مللي	Super Tox # ml	Super Tox # ml
+سولو	Solo	Solo
+اكاروس	Mites	Mites
+سيبروف	Cyprov	Cyprov
+سيبروداينيل #% + فلودايوكسينيل #%	Cyprodinil #% + fludioxonil #%	Cyprodinil #% + fludioxonil #%
+مكافحة أعفان الثمار (البوترايتس)	Control of fruit rots (Botrytis)	Control of fruit rots (Botrytis)
+سيف-كي	Safe-K	Safe-K
+بوتاسيوم #%	Potassium #%	Potassium #%
+سماد ورقي	Foliar fertilizer	Foliar fertilizer
+# ملي / لتر	# ml / L	# ml / L
+صن فلكس	Sunflex	Sunflex
+كبريت Sulfur #%	Sulfur #%	Sulfur #%
+أمراض البياض الدقيقي، والجرب، والأكاروسات (العناكب).	Powdery mildew diseases, scab and mites (spiders).	Powdery mildew diseases, scab and mites (spiders).
+فابلوس	Fabulous	Fabulous
+CHLOROTHALONIL #% + Tebuconazole #% , كلوروثالونيل #% + تيبوكونازول #%	CHLOROTHALONIL #% + Tebuconazole #%, chlorothalonil #% + tebuconazole #%	CHLOROTHALONIL #% + Tebuconazole #%, chlorothalonil #% + tebuconazole #%
+الندوة المبكرة والمتأخرة والبياض الزغبي و البياض الدقيقي	Early and late blight, downy mildew and powdery mildew	Early and late blight, downy mildew and powdery mildew
+فانتي #%	Fanti #%	Fanti #%
+كلورفينابير #% (Chlorfenapyr)	Chlorfenapyr #%	Chlorfenapyr #%
+مبيد أكاروسي والديدان	Acaricide and worm killer	Acaricide and worm killer
+#ملل / لتر	# ml / L	# ml / L
+فانجو #%	Fango #%	Fango #%
+بيراكلوستروبين (Pyraclostrobin) بتركيز #%.	Pyraclostrobin at #% concentration.	Pyraclostrobin at #% concentration.
+البياض الدقيقي، الندوة المبكرة (البدرية)، الصدأ، وأعفان الثمار	Powdery mildew, early blight, rust and fruit rots	Powdery mildew, early blight, rust and fruit rots
+فرسيس	Versys	Versys
+أفيدوبيروبين (Afidopyropen) بتركيز # جم/لتر	Afidopyropen at # g/L concentration	Afidopyropen at # g/L concentration
+المن، الذبابة البيضاء، نطاط الأوراق (الجاسيد)، التربس، وقملة سان جوزي	Aphids, whitefly, leafhoppers (jassids), thrips and San Jose scale	Aphids, whitefly, leafhoppers (jassids), thrips and San Jose scale
+فورتين	Fortin	Fortin
+Dinotefuran #% دينوتيفوران	Dinotefuran #%	Dinotefuran #%
+الذبابة البيضاء والتربس- البق الدقيقي – الحشرة القشرية – صانعات الانفاق	Whitefly and thrips - mealybugs – scale insects – leaf miners	Whitefly and thrips - mealybugs – scale insects – leaf miners
+فوس فيرت	Phos Vert	Phos Vert
+الفوسفور	Phosphorus	Phosphorus
+فيناالدم	Finaldam	Finaldam
+بيفنازات (Bifenazate) بتركيز #% SC	Bifenazate at #% SC	Bifenazate at #% SC
+فلوميتوكوين (Flometoquin) بنسبة #% SC.	Flometoquin at #% SC.	Flometoquin at #% SC.
+التربس والذبابه البيضاء وأكاروس صدأ الموالح	Thrips, whitefly and citrus rust mite	Thrips, whitefly and citrus rust mite
+كارتيفون	Cartevon	Cartevon
+نوفاليرون (Novaluron) بنسبة #% + إندوكساكارب (Indoxacarb) بنسبة #%	Novaluron at #% + Indoxacarb at #%	Novaluron at #% + Indoxacarb at #%
+ديدان الثمار و دودة ورق القطن و دودة الحشد الخريفية و سوسة الطماطم و حفارات الساق و فراشة الدرنات و صانعات الانفاق و التربس و الذبابة البيضاء و النطاطات	Fruit worms, cotton leafworm, fall armyworm, tomato weevil, stem borers, tuber moth, leaf miners, thrips, whitefly and hoppers	Fruit worms, cotton leafworm, fall armyworm, tomato weevil, stem borers, tuber moth, leaf miners, thrips, whitefly and hoppers
+كاستلو	Castlo	Castlo
+لوفينيورون (Lufenuron) بنسبة #%.	Lufenuron at #%.	Lufenuron at #%.
+ديدان الأوراق والأزهار والثمار، وصانعات الأنفاق، وحفار ساق الباذنجان، وذباب الفاكهة	Leaf, flower and fruit worms, leaf miners, eggplant stem borer and fruit flies	Leaf, flower and fruit worms, leaf miners, eggplant stem borer and fruit flies
+كانكون	Cancun	Cancun
+ترايفلوميرون   #%    Triflumuron#%	Triflumuron   #%    Triflumuron#%	Triflumuron   #%    Triflumuron#%
+مانع للإنسلاخ (IGR) الديدان بأنواعها و الجراد و نطاطات الأوراق	Molting inhibitor (IGR) for all kinds of worms, locusts and leafhoppers	Molting inhibitor (IGR) for all kinds of worms, locusts and leafhoppers
+كبريو توب	Cabrio Top	Cabrio Top
+• بيراكلوستروبين (Pyraclostrobin) بنسبة تقريبية #% • ميترام (Metiram) بنسبة تقريبية #%	• Pyraclostrobin at approx. #% • Metiram at approx. #%	• Pyraclostrobin at approx. #% • Metiram at approx. #%
+البياض الدقيقي / الندوة المتأخرة / الندوة المبكرة	Powdery mildew / late blight / early blight	Powdery mildew / late blight / early blight
+كت داون # جرام	Cut Down # g	Cut Down # g
+فلونيكاميد (Flonicamid) بنسبة #%.	Flonicamid at #%.	Flonicamid at #%.
+المن ،الذبابة البيضاء ،التربس	Aphids, whitefly, thrips	Aphids, whitefly, thrips
+فلونيكاميد (Flonicamid) بنسبة #%	Flonicamid at #%	Flonicamid at #%
+كفروستار	Cufrostar	Cufrostar
+أزوكسي ستروبين (Azoxystrobin) بنسبة #%	Azoxystrobin at #%	Azoxystrobin at #%
+الندوة المتأخرة و لفحه الازهار  و البياض الزغبي والبياض الدقيقي	Late blight, flower blight, downy mildew and powdery mildew	Late blight, flower blight, downy mildew and powdery mildew
+كوفريت	Cuprit	Cuprit
+أسيتات النحاس بنسبة #%.	Copper acetate at #%.	Copper acetate at #%.
+اللفحات، الندوات (المبكرة والمتأخرة)، البياض الزغبي، تبقعات الأوراق، والأنثراكنوز	Blights, blights (early and late), downy mildew, leaf spots and anthracnose	Blights, blights (early and late), downy mildew, leaf spots and anthracnose
+كونكور	Concor	Concor
+سبيرودايكلوفين (Spirodiclofen) بنسبة #%	Spirodiclofen at #%	Spirodiclofen at #%
+مبيد اكاروسي	Acaricide	Acaricide
+كيليك بوتاسيوم	Kelik Potassium	Kelik Potassium
+بوتاسيوم #% , potassium	Potassium #%, potassium	Potassium #%, potassium
+كيوركس	Kyorex	Kyorex
+اوكساميل #% Oxamyl-#%	Oxamyl #% Oxamyl-#%	Oxamyl #% Oxamyl-#%
+مبيد نماتودا	Nematicide	Nematicide
+نسب متوازنة من العناصر	Balanced ratios of nutrients	Balanced ratios of nutrients
+ليكس #%	Lex #%	Lex #%
+ثياميثوكسام (Thiamethoxam) بنسبة #%.	Thiamethoxam at #%.	Thiamethoxam at #%.
+الذبابة البيضاء، المن، التربس، الجاسيد، البق الدقيقي، والحشرة القشرية.	Whitefly, aphids, thrips, jassids, mealybugs and scale insects.	Whitefly, aphids, thrips, jassids, mealybugs and scale insects.
+ماجما	Magma	Magma
+سيموكسانيل Cymoxanil #% + فاموكسادون Famoxadone #%	Cymoxanil #% + Famoxadone #%	Cymoxanil #% + Famoxadone #%
+الندوة المبكرة والندوة المتأخرة والبياض الزغبي	Early blight, late blight and downy mildew	Early blight, late blight and downy mildew
+ماجنفكو	Magnifco	Magnifco
+هيكسيثيازوكس Hexythiazox #%	Hexythiazox #%	Hexythiazox #%
+مارسا	Marsa	Marsa
+ميثوكسي فينوزيد (Methoxyfenozide #% SC).	Methoxyfenozide (Methoxyfenozide #% SC).	Methoxyfenozide (Methoxyfenozide #% SC).
+دودة ورق القطن، الدودة الخضراء، دودة ثمار العنب، وصانعات الأنفاق، وفراشة درنات البطاطس.	Cotton leafworm, green worm, grape berry moth, leaf miners and potato tuber moth.	Cotton leafworm, green worm, grape berry moth, leaf miners and potato tuber moth.
+مايستك	Mystic	Mystic
+بايريميثانيل (Pyrimethanil) بتركيز #%	Pyrimethanil at #% concentration	Pyrimethanil at #% concentration
+العفن الرمادي (البوتريتس) في الفراولة والعنب، وعفن الثمار في الخيار بالصوب، وتبقعات الأوراق، والعفن الأخضر والأزرق في الموالح	Gray mold (Botrytis) in strawberries and grapes, fruit rot in greenhouse cucumbers, leaf spots, and green and blue mold in citrus	Gray mold (Botrytis) in strawberries and grapes, fruit rot in greenhouse cucumbers, leaf spots, and green and blue mold in citrus
+منتوفوس	Mentofos	Mentofos
+فيناميفوس (Fenamiphos) بنسبة #% EC.	Fenamiphos at #% EC.	Fenamiphos at #% EC.
+مبيد نيماتودي	Nematicide	Nematicide
+موسبيلان	Mospilan	Mospilan
+أسيتاميبريد (Acetamiprid) بتركيز #%	Acetamiprid at #% concentration	Acetamiprid at #% concentration
+المن – الذبابة البضاء – الجاسيد- خنفساء البنجر – فراشة وسوسة وذبابة البنجر ( صانعات الانفاق )	Aphids – whitefly – jassids – beet beetle – beet moth, weevil and fly (leaf miners)	Aphids – whitefly – jassids – beet beetle – beet moth, weevil and fly (leaf miners)
+مونتورو	Montoro	Montoro
+دايفينوكونازول #% + بروبيكونازول #%	Difenoconazole #% + propiconazole #%	Difenoconazole #% + propiconazole #%
+البياض الدقيقي، الأصداء، تبقعات الأوراق، الندوة المبكرة، لفحة الساق الصمغية	Powdery mildew, rusts, leaf spots, early blight, gummy stem blight	Powdery mildew, rusts, leaf spots, early blight, gummy stem blight
+ميس تربل	Mess Triple	Mess Triple
+الندورة المتأخرة والمبكرة وتبقع الأوراق والبياض الزغبي	Late and early blight, leaf spot and downy mildew	Late and early blight, leaf spot and downy mildew
+نوتس #%	Notes #%	Notes #%
+بوسكاليد (Boscalid #%)	Boscalid (Boscalid #%)	Boscalid (Boscalid #%)
+البياض الدقيقي , العفن الأبيض والعفن الرمادي (Botrytis) , تبقعات الأوراق , الندوة المبكرة (Alternaria) , الانثراكنوز , مونيلا الخوخ والجرب	Powdery mildew, white mold and gray mold (Botrytis), leaf spots, early blight (Alternaria), anthracnose, peach brown rot (Monilinia) and scab	Powdery mildew, white mold and gray mold (Botrytis), leaf spots, early blight (Alternaria), anthracnose, peach brown rot (Monilinia) and scab
+نومولت	Nomolt	Nomolt
+تيفلوبنزورون (Teflubenzuron) بنسبة #%	Teflubenzuron at #%	Teflubenzuron at #%
+دودة ورق القطن، وصانعات الأنفاق	Cotton leafworm and leaf miners	Cotton leafworm and leaf miners
+نيو أرجال	New Arjal	New Arjal
+هاسبرو	Hasbro	Hasbro
+هيمكسازول (Hymexazol) بنسبة #%	Hymexazol at #%	Hymexazol at #%
+هوليستر	Holister	Holister
+سبيروتترامات (Spirotetramat) بتركيز #	Spirotetramat at # concentration	Spirotetramat at # concentration
+المن , التربس , الذبابة البيضاء ، البق الدقيقي ، الحشرات القشرية , البسيلا ، النطاطات	Aphids, thrips, whitefly, mealybugs, scale insects, psyllids, hoppers	Aphids, thrips, whitefly, mealybugs, scale insects, psyllids, hoppers
+هيدروفوس	Hydrofos	Hydrofos
+فوسفور #% - ماغنيسيوم #% - بوتاسيوم  #%	Phosphorus #% - magnesium #% - potassium  #%	Phosphorus #% - magnesium #% - potassium  #%
+مستخلصات طحالب بحرية	Seaweed extracts	Seaweed extracts
+محلول أعشاب	Herbs solution	Herbs solution
+محلول طماطم S#	Tomato solution S#	Tomato solution S#
+محلول خس # لتر	Lettuce solution # L	Lettuce solution # L
+بيفنازات #% Bifenazate #%	Bifenazate #% Bifenazate #%	x
+مانكوزيب #% – بنالكسيل #% – سيموكسنيل #%	Mancozeb #% – benalaxyl #% – cymoxanil #%	x
+مخططاتي (قابلة للتعديل)	My charts (editable)	My charts (editable)
+الحصاد اليومي — كل الأنظمة والأصناف (كجم) ؟	Daily harvest — all systems and varieties (kg)?	Daily harvest — all systems and varieties (kg)?
+العناصر (#)	Items (#)	Items (#)
+الرقم ×	Factor ×	Factor ×
+مثال: مناخ الصوبة #	Example: greenhouse climate #	Example: greenhouse climate #
+🟢 الري شغّال دلوقتي لحد #:#	🟢 Irrigation is on now until #:#	🟢 Irrigation is on now until #:#
+⏸ الري مقفول دلوقتي لحد #:#	⏸ Irrigation is off now until #:#	⏸ Irrigation is off now until #:#
+# د	# min	# min
+نفاذية الغطاء ≈ #%	Cover transmittance ≈ #%	Cover transmittance ≈ #%
+(# قراءة من إمبارح): إشعاع الصوبة ÷ إشعاع برّه.	(# readings from yesterday): greenhouse radiation ÷ outdoor radiation.	(# readings from yesterday): greenhouse radiation ÷ outdoor radiation.
+فرق الحرارة وقت الظهيرة (جوه − برّه):	Temperature difference at midday (inside − outside):	Temperature difference at midday (inside − outside):
+-#°م	-#°C	-#°C
+فرق الرطوبة (جوه − برّه):	Humidity difference (inside − outside):	Humidity difference (inside − outside):
+الإشعاع الداخلي في كل ساعة =	Indoor radiation in each hour =	Indoor radiation in each hour =
+نفاذية الغطاء τ = #	Cover transmittance τ = #	Cover transmittance τ = #
+× إشعاع برّه الصوبة في نفس الساعة (من Open-Meteo). τ = متوسط (إشعاع الصوبة ÷ إشعاع برّه) من # قراءة لوكس (اللوكس ÷ # → W/م²) وقت ما برّه فوق # W/م² (من إمبارح)	× outdoor radiation in the same hour (from Open-Meteo). τ = average of (greenhouse radiation ÷ outdoor radiation) from # lux readings (lux ÷ # → W/m²) when outdoor is above # W/m² (from yesterday)	× outdoor radiation in the same hour (from Open-Meteo). τ = average of (greenhouse radiation ÷ outdoor radiation) from # lux readings (lux ÷ # → W/m²) when outdoor is above # W/m² (from yesterday)
+# يوم فيهم انحراف كبير بين الصرف والري (الحد: EC ±# وpH ±#). EC الصرف الأعلى غالبًا معناه تراكم أملاح؛ وpH مختلف كتير معناه راجع المحلول.	# days with a large deviation between drainage and irrigation (limit: EC ±# and pH ±#). Higher drain EC usually means salt build-up; a very different pH means check the solution.	# days with a large deviation between drainage and irrigation (limit: EC ±# and pH ±#). Higher drain EC usually means salt build-up; a very different pH means check the solution.
+# معايرة — المتوسط # مل/دقيقة — أقل # — أعلى #	# calibrations — average # ml/min — lowest # — highest #	# calibrations — average # ml/min — lowest # — highest #
+مثال: الصف #، على بعد # سم من النقاط	Example: row #, # cm away from the emitters	Example: row #, # cm away from the emitters
+بيفكّرك بمهامك اللي لسه ما خلصتهاش كل ساعة (من # ص لـ # ص) لحد ما تدوس "تم ✓".	It reminds you of your unfinished tasks every hour (from # AM to # AM) until you press "Done ✓".	It reminds you of your unfinished tasks every hour (from # AM to # AM) until you press "Done ✓".
+(جودة / شكوى)	(quality / complaint)	(quality / complaint)
+أنظمة الخس — خس (# نظام)	Lettuce systems — lettuce (# systems)	Lettuce systems — lettuce (# systems)
+أنظمة الاعشاب — أعشاب (# نظام)	Herb systems — herbs (# systems)	Herb systems — herbs (# systems)
+أنظمة الطماطم — طماطم (# نظام)	Tomato systems — tomato (# systems)	Tomato systems — tomato (# systems)
+أنظمة الطماطم (# نظام)	Tomato systems (# systems)	Tomato systems (# systems)
+أنظمة الاعشاب (# نظام)	Herb systems (# systems)	Herb systems (# systems)
+أنظمة الخس	Lettuce systems	Lettuce systems
+أنظمة الاعشاب	Herb systems	Herb systems
+أنظمة الطماطم	Tomato systems	Tomato systems
+— أعشاب	— herbs	— herbs
+أعشاب	Herbs	Herbs
+تم الأطلاق في انظمة S# مستردة جمب الباب - S# البقدونس	Released in systems S# mustard next to the door - S# parsley	Released in systems S# mustard next to the door - S# parsley
+بتزيد/جديدة: #	Increasing/new: #	Increasing/new: #
+آخر # أسابيع	Last # weeks	Last # weeks
+سجل المعاملات (#)	Treatment log (#)	Treatment log (#)
+🤖 كورس علاج مخطَّط: #/# جات فاست ← #/# كونكور ← #/# كاجورا ← 🧼 #/# صن فلكس	🤖 Planned treatment course: #/# Jet Fast ← #/# Concor ← #/# Kajura ← 🧼 #/# Sunflex	🤖 Planned treatment course: #/# Jet Fast ← #/# Concor ← #/# Kajura ← 🧼 #/# Sunflex
+بواسطة abdelrhmankotp#@gmail.com · اتعدّلت	By abdelrhmankotp#@gmail.com · edited	By abdelrhmankotp#@gmail.com · edited
+تم القضاء على الإصابة — #/# #:#	Infestation eradicated — #/# #:#	Infestation eradicated — #/# #:#
+تم الحد من انتشارا الآفة (موت الافراد)  # /#	Pest spread was reduced (individuals died) # /#	Pest spread was reduced (individuals died) # /#
+جدول رش علاجي مقترح من مخزنك	Suggested curative spray schedule from your stock	Suggested curative spray schedule from your stock
+اتحصد # من # — باقي # في المشتل	Harvested # of # — # left in the nursery	Harvested # of # — # left in the nursery
+نزل # من # — باقي # في المشتل	Moved out # of # — # left in the nursery	Moved out # of # — # left in the nursery
+الصواني متزرعة (# صينية — ميعادها #-#-#)	Trays are sown (# trays — due #-#-#)	Trays are sown (# trays — due #-#-#)
+الصواني متزرعة (# صينية)	Trays are sown (# tray)	Trays are sown (# tray)
+# صينية ≈ # نبتة (متزرع منها #)	# trays ≈ # plants (# of them sown)	# trays ≈ # plants (# of them sown)
+ازرع # صينية بعد # يوم (#-#-#)	Sow # trays in # day (#-#-#)	Sow # trays in # day (#-#-#)
+ازرع # صينية دلوقتي — هتجهز للنقل #-#-# وأول حصاد حوالين #-#-#	Sow # trays now — they will be ready to move #-#-# and the first harvest around #-#-#	Sow # trays now — they will be ready to move #-#-# and the first harvest around #-#-#
+منهم # صينية من غير نظام محدد.	of which # trays have no specific system.	of which # trays have no specific system.
+صواني في المشتل زيادة عن احتياج الخطة (من غير نظام محدد): مايكرو جرين بنجر احمر (#)، مايكروجرين فجل (#)، شبت (#)	Trays in the nursery in excess of the plan's need (no specific system): red beet microgreens (#), radish microgreens (#), dill (#)	Trays in the nursery in excess of the plan's need (no specific system): red beet microgreens (#), radish microgreens (#), dill (#)
+مشتل: ميزونا (# صينية)	Nursery: Mizuna (# trays)	Nursery: Mizuna (# trays)
+مشتل: مسطردة (# صينية) — #-#-# ← #-#-#	Nursery: Mustard (# trays) — #-#-# ← #-#-#	Nursery: Mustard (# trays) — #-#-# ← #-#-#
+جرجير — مواسير #	Arugula — pipes #	Arugula — pipes #
+ماسورة # — ريحان إيطالي — عمر # يوم	Pipe # — Italian basil — age # days	Pipe # — Italian basil — age # days
+منحنى نمو خس (جم/نبات)	Lettuce growth curve (g/plant)	Lettuce growth curve (g/plant)
+مرتبط بـ # جلسة فرز	Linked to # sorting session	Linked to # sorting session
+أصناف بدون ربط بمكوّن: Chives # Grams (# كيس = # جم)، Lettuce Red Oakleaf (# كيس = # جم)	Varieties not linked to an ingredient: Chives # Grams (# bags = # g), Lettuce Red Oakleaf (# bags = # g)	Varieties not linked to an ingredient: Chives # Grams (# bags = # g), Lettuce Red Oakleaf (# bags = # g)
+أصناف بدون ربط بمكوّن: Microgreen Mix (# قطعة = # جم)، Tomato Cherry Mix (KG) (# كجم = # جم)	Varieties not linked to an ingredient: Microgreen Mix (# pieces = # g), Tomato Cherry Mix (KG) (# kg = # g)	Varieties not linked to an ingredient: Microgreen Mix (# pieces = # g), Tomato Cherry Mix (KG) (# kg = # g)
+يستهدف: المن، والذبابة البيضاء، والتربس، والجاسيد.	Targets: Aphids, whiteflies, thrips and jassids.	Targets: Aphids, whiteflies, thrips and jassids.
+الطور: بيضة، يرقة، عذراء، حشرة كاملة	Stage: egg, larva, pupa, adult	Stage: egg, larva, pupa, adult
+الطور: —	Stage: —	Stage: —
+واتساب: #	WhatsApp: #	WhatsApp: #
+إلغاء الإجازة	Cancel the leave	Cancel the leave
+ميكس · وصفة # جم · # مكوّن	Mix · recipe # g · # ingredients	Mix · recipe # g · # ingredients
+ميكس · وصفة # جم · # مكوّن ·	Mix · recipe # g · # ingredients ·	Mix · recipe # g · # ingredients ·
+وزن الكيس المكتوب # جم	stated bag weight # g	stated bag weight # g
+صنف منفرد · وحدة # جم · بيتحسب على: ريحان إيطالي	Single variety · unit # g · calculated on: Italian basil	Single variety · unit # g · calculated on: Italian basil
+صنف منفرد · وحدة # جم · بيتحسب على: كيل توسكان #%، كيل بور #%	Single variety · unit # g · calculated on: Tuscan kale #%, Kale Pur #%	Single variety · unit # g · calculated on: Tuscan kale #%, Kale Pur #%
+# عملية — معروض آخر # (صدّر CSV للكل)	# operations — showing the last # (export CSV for all)	# operations — showing the last # (export CSV for all)
+تسجيل دخول (مدير)	Sign-in (admin)	Sign-in (admin)
+تسجيل دخول (موظف)	Sign-in (employee)	Sign-in (employee)
+نزل # صينية من ريحان إيطالي في LG# / S# بتاريخ #-#-#، وباقي # في المشتل مفيش # مواسير فاضية ورا بعض في مخطط النظام، ضيفهم يدوي.	Moved out # trays of Italian basil in LG# / S# on #-#-#, and # remain in the nursery. There are no # empty pipes in a row in the system diagram, add them manually.	Moved out # trays of Italian basil in LG# / S# on #-#-#, and # remain in the nursery. There are no # empty pipes in a row in the system diagram, add them manually.
+نزلت كل الصواني (#) من بتافيا أحمر في LG# / S# بتاريخ #-#-#، ومفيش حاجة باقية من الصنف ده في المشتل مفيش # مواسير فاضية ورا بعض في مخطط النظام، ضيفهم يدوي.	All trays (#) of red Batavia were moved out in LG# / S# on #-#-#, and nothing of this variety is left in the nursery. There are no # empty pipes in a row in the system diagram, add them manually.	All trays (#) of red Batavia were moved out in LG# / S# on #-#-#, and nothing of this variety is left in the nursery. There are no # empty pipes in a row in the system diagram, add them manually.
+مهمة: رش ورقي: كيليك بوتاسيوم (# ملل / لتر) — لـ مجدي — LG# + LG# + FG# — الحالة: تمت	Task: Foliar spray: Kelik Potassium (# ml / L) — for Magdy — LG# + LG# + FG# — Status: done	Task: Foliar spray: Kelik Potassium (# ml / L) — for Magdy — LG# + LG# + FG# — Status: done
+صينية: مايكرو جرين بنجر احمر — الكمية #	Tray: red beet microgreens — quantity #	Tray: red beet microgreens — quantity #
+مناخ صوبة EG — حرارة #° / رطوبة #% / إضاءة # Lux (وقت القراءة #/# #:#)	Greenhouse climate EG — temperature #° / humidity #% / light # Lux (reading time #/# #:#)	Greenhouse climate EG — temperature #° / humidity #% / light # Lux (reading time #/# #:#)
+قراءة soil — FG# — S# — pH # / EC # / حرارة undefined° (وقت القراءة #/# #:#)	Soil reading — FG# — S# — pH # / EC # / temperature undefined° (reading time #/# #:#)	Soil reading — FG# — S# — pH # / EC # / temperature undefined° (reading time #/# #:#)
+قراءة الري — FG# — S# — pH # / EC # / حرارة #° (وقت القراءة #/# #:#)	Irrigation reading — FG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)	Irrigation reading — FG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)
+قراءة الخزان — LG# — S# — pH # / EC # / حرارة #° (وقت القراءة #/# #:#)	Tank reading — LG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)	Tank reading — LG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)
+قراءة الصرف — LG# — S# — pH # / EC # / حرارة #° (وقت القراءة #/# #:#)	Drainage reading — LG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)	Drainage reading — LG# — S# — pH # / EC # / temperature #° (reading time #/# #:#)
+معايرة ري — LG# — S#: # لتر/دقيقة للنقطة (# نقاط، # مل في # ث)	Irrigation calibration — LG# — S#: # L/min per emitter (# points, # ml in # s)	Irrigation calibration — LG# — S#: # L/min per emitter (# points, # ml in # s)
+خصم # ماسورة ورد كوين من المخطط بعد الحصاد	Deduct # pipes of Queen Rose from the diagram after harvest	Deduct # pipes of Queen Rose from the diagram after harvest
+حصاد: ورد كوين — # قطعة — # ماسورة — LG# — S#	Harvest: Queen Rose — # pieces — # pipes — LG# — S#	Harvest: Queen Rose — # pieces — # pipes — LG# — S#
+إضافة مجموعة مواسير: ريحان إيطالي — # ماسورة	Add pipe group: Italian basil — # pipes	Add pipe group: Italian basil — # pipes
+حصاد: طماطم كرزي مكس — # كجم — FG# — S#	Harvest: Cherry tomato mix — # kg — FG# — S#	Harvest: Cherry tomato mix — # kg — FG# — S#
+تعديل مجموعة مواسير: سلق — # ماسورة	Edit pipe group: Chard — # pipes	Edit pipe group: Chard — # pipes
+تعديل رش/تسميد: رش ورقي: كونكور (# مل / لتر)	Edit spraying/fertilizing: Foliar spray: Concor (# ml / L)	Edit spraying/fertilizing: Foliar spray: Concor (# ml / L)
+نهاية تنبيه المهام (الساعة): من # إلى #	Task reminder end (hour): from # to #	Task reminder end (hour): from # to #
+حد انحراف EC الصرف: من — إلى #	Drain EC deviation limit: from — to #	Drain EC deviation limit: from — to #
+مخطط: الحصاد اليومي — كل الأنظمة والأصناف (كجم) ؟ (# خط)	Chart: Daily harvest — all systems and varieties (kg)? (# lines)	Chart: Daily harvest — all systems and varieties (kg)? (# lines)
+أنظمة الطماطم (# نظام) — # لتر — # جم أسمدة	Tomato systems (# systems) — # L — # g fertilizers	Tomato systems (# systems) — # L — # g fertilizers
+طباعة جدول الرش والتسميد: شهر نوفمبر # (#-#-# إلى #-#-#) (# عنصر)	Print the spraying and fertilizing schedule: November # (#-#-# to #-#-#) (# items)	Print the spraying and fertilizing schedule: November # (#-#-# to #-#-#) (# items)
+(#%)	(#%)	(#%)
+مجموع الوصفة: # جم	Recipe total: # g	Recipe total: # g
+vega algeno — # ملل / لتر	vega algeno — # ml / L	vega algeno — # ml / L
+كيليك بوتاسيوم — # ملل / لتر	Kelik Potassium — # ml / L	Kelik Potassium — # ml / L
+أنتي مايت #% — # جم / # لتر	Anti-Mite #% — # g / # L	Anti-Mite #% — # g / # L
+ساندكيور #% — #مل/ لتر \	Sandcure #% — # ml / L \	Sandcure #% — # ml / L \
+برايم سي — # / لتر سولار	Prime C — # / L diesel	Prime C — # / L diesel
+الشهر السابق	Previous month	Previous month
+الشهر التالي	Next month	Next month
+نوفمبر #	November #	November #
+جدول الشهر كامل (اضغط على يوم)	Full month schedule (tap a day)	Full month schedule (tap a day)
+العنكبوت الأحمر ذو البقعتين	Two-spotted red spider mite	Two-spotted red spider mite
+عفن قاعدة في ريحان الليمون	Basal rot in lemon basil	Basal rot in lemon basil
+نقص عناصر	Nutrient deficiency	Nutrient deficiency
+يرقة قارضة	Chewing larva	Chewing larva
+يرقة قارضة في المستردة	Chewing larva in mustard	Chewing larva in mustard
+لم يتم الأنبات	Did not germinate	Did not germinate
+# احمر و # أخضر	# red and # green	# red and # green
+باكت في الممر	Pack in the aisle	Pack in the aisle
+نصف صينية	Half a tray	Half a tray
+شتلات المدرسة	School seedlings	School seedlings
+ورد #	Roses #	Roses #
+حذف المعاملة	Delete the treatment	Delete the treatment
+صورة الإصابة	Infestation photo	Infestation photo
+شيل الصنف ده	Remove this variety	Remove this variety
+صورة الإجراء	Procedure photo	Procedure photo
+ح	Su	Su
+ن	Mo	Mo
+ث	Tu	Tu
+ر	We	We
+خ	Th	Th
+ج	Fr	Fr
+س	Sa	Sa
+يناير #	January #	January #
+فبراير #	February #	February #
+مارس #	March #	March #
+أبريل #	April #	April #
+مايو #	May #	May #
+يونيو #	June #	June #
+يوليو #	July #	July #
+أغسطس #	August #	August #
+سبتمبر #	September #	September #
+أكتوبر #	October #	October #
+ديسمبر #	December #	December #
+•\tعفن الجذور وموت البادرات  (Damping-off). و فطريات البيثيوم (Pythium).و فطريات الفيوزاريوم والذبول (Fusarium). و فطريات الفيرتيسيليوم (Verticillium) والريزوكتونيا (Rhizoctonia	• Root rot and damping-off of seedlings (Damping-off). Pythium fungi (Pythium). Fusarium fungi and wilt (Fusarium). Verticillium fungi (Verticillium) and Rhizoctonia (Rhizoctonia	• Root rot and damping-off of seedlings (Damping-off). Pythium fungi (Pythium). Fusarium fungi and wilt (Fusarium). Verticillium fungi (Verticillium) and Rhizoctonia (Rhizoctonia
+ورد كوين	Queen flowers	Queen flowers
+ورد	Edible flowers	Edible flowers
+ورد بوراج	Borage flowers	Borage flowers
+ورد ماري جولد	Marigold flowers	Marigold flowers
+اوراق ورد كوين	Queen flower leaves	Queen flower leaves
+طماطم كرزي مكس	Cherry tomato mix	Cherry tomato mix
+طماطم بيف مكس	Beef tomato mix	Beef tomato mix
+مسطردة	Mustard	Mustard
+حبق	Basil	Basil
+ميزونا	Mizuna	Mizuna
+تشايفز	Chives	Chives
+ريحان ليمون	Lemon basil	Lemon basil
+مايكرو جرين مكس	Microgreen mix	Microgreen mix
+بقدونس كرلي	Curly parsley	Curly parsley
+بتافيا أحمر	Red Batavia	Red Batavia
+جرجير بري	Wild arugula	Wild arugula
+كرفس	Celery	Celery
+مايكرو جرين بنجر احمر	Red beet microgreens	Red beet microgreens
+مايكرو جرين بنجر اصفر	Yellow beet microgreens	Yellow beet microgreens
+مايكرو جرين جرجير	Arugula microgreens	Arugula microgreens
+مايكرو جرين سلق	Chard microgreens	Chard microgreens
+صنية اسفنج	Sponge tray	Sponge tray
+بيبي روسو	Baby Rosso	Baby Rosso
+بيبي لولورسو	Baby Lollo Rosso	Baby Lollo Rosso
+مالتي ليف أحمر	Red multi-leaf	Red multi-leaf
+مالتي ليف احمر	Red multi-leaf	Red multi-leaf
+باتافيا كورتيز	Batavia Cortez	Batavia Cortez
+ماجيك فلور	Magic Flower	Magic Flower
+عبدالرحمن	Abdelrahman	Abdelrahman
+رحاب	Rehab	Rehab
+احمد	Ahmed	Ahmed
+محمد	Mohamed	Mohamed
+هدير	Hadeer	Hadeer
+سمير	Samir	Samir
+عمر # يوم	age # days	age # days
+ماسورة #	Pipe #	Pipe #
+واتساب: +#	WhatsApp: +#	WhatsApp: +#
+عندك زيارة للجونة	You have a visit to El Gouna	You have a visit to El Gouna
+بدل عبدالرحمن	Instead of Abdelrahman	Instead of Abdelrahman
+بيئة الشتلات	Seedling medium	Seedling medium
+فتح وغلق خلايا النحل	Opening and closing the beehives	Opening and closing the beehives
+غسيل مواسير الزراعة	Washing the growing pipes	Washing the growing pipes
+تركيب للاصق علي مواسير الزراعة	Fitting tape on the growing pipes	Fitting tape on the growing pipes
+غسيل خلايا التبريد للصوبة الزراعية	Washing the cooling pads of the greenhouse	Washing the cooling pads of the greenhouse
+غسيل سقف الصوب الزراعية	Washing the greenhouse roofs	Washing the greenhouse roofs
+محلول نقع الشتلات قبل نقلها لنظام الزراعة	Seedling soaking solution before transferring them to the growing system	Seedling soaking solution before transferring them to the growing system
+غسيل الفلاتر	Washing the filters	Washing the filters
+(#) بيتموس : (#) برليت : (#) فيرموكليت	(#) peat moss : (#) perlite : (#) vermiculite	(#) peat moss : (#) perlite : (#) vermiculite
+# جم كربونات بوتاسيوم لكل # لتر بيئة أو # جم كربونات كالسيوم لكل # لتر بيئة (حسب التوفير)	# g potassium carbonate per # L of medium or # g calcium carbonate per # L of medium (depending on availability)	# g potassium carbonate per # L of medium or # g calcium carbonate per # L of medium (depending on availability)
+# جم NPK #-#-# لكل # لتر بيئة	# g NPK #-#-# per # L of medium	# g NPK #-#-# per # L of medium
+# جم سلفات ماغنيسيوم	# g magnesium sulfate	# g magnesium sulfate
+منشط جذور حسب التوصيات علي العبوه	Root stimulant as recommended on the package	Root stimulant as recommended on the package
+# لتر ماء لكل # لتر بيئة	# L of water per # L of medium	# L of water per # L of medium
+افتح خلايا النحل علي وضع النقطتين مفتوحتان في الصباح الباكر مع اول ضوء للشمس.	Open the beehives with both dots open early in the morning at first light.	Open the beehives with both dots open early in the morning at first light.
+اغلق خلايا النحل علي وضع نقطة واحدة مفتوحة قبل غروب الشمس بساعتين أي في ال # عصرا.	Close the beehives with one dot open two hours before sunset, i.e. at # PM.	Close the beehives with one dot open two hours before sunset, i.e. at # PM.
+ملئ حوض التطهير بالماء.	Fill the disinfection tank with water.	Fill the disinfection tank with water.
+إذابة الكلور في دلو خارجي بمعدل كوب صغير لكل # سم إرتفاع في الحوض.	Dissolve the chlorine in an outside bucket at the rate of a small cup per # cm of height in the tank.	Dissolve the chlorine in an outside bucket at the rate of a small cup per # cm of height in the tank.
+إضافة الكلور المركز للحوض.	Add the concentrated chlorine to the tank.	Add the concentrated chlorine to the tank.
+تقليب المحلول جيدا.	Stir the solution well.	Stir the solution well.
+نقع المواسير في محلول التطهير لمدة من # : # ساعات.	Soak the pipes in the disinfection solution for # to # hours.	Soak the pipes in the disinfection solution for # to # hours.
+غسيل وفرك المواسير بالفرشة.	Wash and scrub the pipes with the brush.	Wash and scrub the pipes with the brush.
+شطف المواسير بالماء النظيف.	Rinse the pipes with clean water.	Rinse the pipes with clean water.
+وضع المواسير علي الحامل حتي تجف.	Place the pipes on the rack until they dry.	Place the pipes on the rack until they dry.
+بعد تركيب مواسير الزراعة في النظام وتشغيل الماء قم بلف قطعة من اللاصق علي نهاية الماسورة لمنع تسريب المياه علي الارض.	After installing the growing pipes in the system and turning on the water, wrap a piece of tape around the end of the pipe to prevent water leaking onto the floor.	After installing the growing pipes in the system and turning on the water, wrap a piece of tape around the end of the pipe to prevent water leaking onto the floor.
+يتم إيقاف خلايا التبريد عن العمل قبل البدء ب ساعات حتي تجف تماما	The cooling pads are turned off hours before starting so they dry completely	The cooling pads are turned off hours before starting so they dry completely
+ثم ابداء غسيل ألواح خلايا التبريد للصوبة الزراعية بأستخدام موتور رش الضغط العالي من الداخل.	Then start washing the cooling pad panels of the greenhouse using the high-pressure spray motor from the inside.	Then start washing the cooling pad panels of the greenhouse using the high-pressure spray motor from the inside.
+ثم قم بغسيل الألواح من الخارج.	Then wash the panels from the outside.	Then wash the panels from the outside.
+ثم قم بإفراغ خزان مياه التبريد من المياه.	Then empty the cooling water tank.	Then empty the cooling water tank.
+ثم قم بتنظيفة وغسيلة من الرواسب و الطين.	Then clean and wash it of sediments and mud.	Then clean and wash it of sediments and mud.
+ثم بعد ذلك أعد ملئ الخزان بالماء و إبدأ التشغيل خلايا التبريد.	Then refill the tank with water and start the cooling pads.	Then refill the tank with water and start the cooling pads.
+ثم تقوم بفتح المحابس الجانبة لخلايا التبريد للتأكد من نظافة الشبكة.	Then open the side valves of the cooling pads to make sure the mesh is clean.	Then open the side valves of the cooling pads to make sure the mesh is clean.
+ثم أغلق المحابس بعد التأكد من خروج الماء نظيف و أنتهي.	Then close the valves after making sure clean water comes out, and you are done.	Then close the valves after making sure clean water comes out, and you are done.
+يتم غسيل سقف الصوبة الزراعية بالماء النظيف بأستخدام موتور رش الضغط العالي.	The greenhouse roof is washed with clean water using the high-pressure spray motor.	The greenhouse roof is washed with clean water using the high-pressure spray motor.
+يتم تحضير محلول مبيد فطري مخصص لاعفان الجذور و البادرات مواد فعاله (ميتالاكسيل-أم و ازوكسي ستروبين).	Prepare a fungicide solution intended for root and seedling rots, active ingredients (metalaxyl-M and azoxystrobin).	Prepare a fungicide solution intended for root and seedling rots, active ingredients (metalaxyl-M and azoxystrobin).
+يتم إضافة المبيد بمقدار # ملي / لتر ماء.	Add the pesticide at # ml / L of water.	Add the pesticide at # ml / L of water.
+ثم تقوم بنقع او ري صواني الشتلات جيدا قبل نزولها لنظام الزراعة.	Then soak or irrigate the seedling trays well before they go into the growing system.	Then soak or irrigate the seedling trays well before they go into the growing system.
+(يمكن إستبدال المواد الفعاله باي مواد أخري مناسبة).	(The active ingredients can be replaced with any other suitable ones).	(The active ingredients can be replaced with any other suitable ones).
+قم بغلق تشغيل مضخة النظام.	Turn off the system pump.	Turn off the system pump.
+ثم قم بفك غطاء الفلتر برفق	Then gently unscrew the filter cover	Then gently unscrew the filter cover
+ثم قم بإزاله مجسم الدسكات الاحمر	Then remove the red disc assembly	Then remove the red disc assembly
+ثم قم بفك حلقات الدسكات الحمراء في جردل به ماء وغسلها جيدا	Then take apart the red disc rings in a bucket of water and wash them well	Then take apart the red disc rings in a bucket of water and wash them well
+بعد ذلك قم بتركيب الحلقات من جديد وركب المجسم بالفلتر واغلق غطاء الفلتر جيدا وبرفق	Then reassemble the rings, fit the assembly into the filter and close the filter cover well and gently	Then reassemble the rings, fit the assembly into the filter and close the filter cover well and gently
+تاكد من غلق غطاء الفلتر جيدا والمحابس كلها مفتوحة ثم اعد تشغيل مضخة النظام	Make sure the filter cover is closed well and all valves are open, then restart the system pump	Make sure the filter cover is closed well and all valves are open, then restart the system pump
+رش ورقي: سجما (#ملي/لتر)	Foliar spray: Sigma (# ml/L)	Foliar spray: Sigma (# ml/L)
+رش ورقي: كيليك بوتاسيوم (# ملل / لتر)	Foliar spray: Kelik Potassium (# ml / L)	Foliar spray: Kelik Potassium (# ml / L)
+رش ورقي: x-factor (# ملي / لتر)	Foliar spray: x-factor (# ml / L)	Foliar spray: x-factor (# ml / L)
+رش ورقي: ليدر أس (# ملي/لتر)	Foliar spray: Leader S (# ml/L)	Foliar spray: Leader S (# ml/L)
+رش ورقي: كاجورا (# ملل / لتر)	Foliar spray: Kajura (# ml / L)	Foliar spray: Kajura (# ml / L)
+رش ورقي: x-factor (#ملي/لتر)	Foliar spray: x-factor (# ml/L)	Foliar spray: x-factor (# ml/L)
+رش ورقي: هيدروفوس (# ملي / لتر)	Foliar spray: Hydrofos (# ml / L)	Foliar spray: Hydrofos (# ml / L)
+رش ورقي: مونتورو (#ملل / لتر)	Foliar spray: Montoro (# ml / L)	Foliar spray: Montoro (# ml / L)
+رش ورقي: سيف-كي (# ملي / لتر)	Foliar spray: Safe-K (# ml / L)	Foliar spray: Safe-K (# ml / L)
+تسميد: vega algeno (# ملل / لتر)	Fertilizing: vega algeno (# ml / L)	Fertilizing: vega algeno (# ml / L)
+تسجيل بيانات المناخ	Log the climate data	Log the climate data
+تركيب الباركود علي الاوردرات	Fit the barcodes on the orders	Fit the barcodes on the orders
+تجهيز الاوردر	Prepare the order	Prepare the order
+ترتيب الاوردر لكل عميل وتجهيز بالثلاجة	Arrange the order for each customer and stage it in the fridge	Arrange the order for each customer and stage it in the fridge
+ادراج الاوردر و الفرز علي السيستم.	Enter the order and the sorting in the system.	Enter the order and the sorting in the system.
+متابعة إطلاقات المفترسات	Follow up on predator releases	Follow up on predator releases
+متابعة وتسجيل الإصابات الحشرية والفطرية	Follow up and log insect and fungal infestations	Follow up and log insect and fungal infestations
+متابعة الإصابات الحشرية والفطرية.	Follow up on insect and fungal infestations.	Follow up on insect and fungal infestations.
+متابعة قراءات جودة المياه لكل الصالات	Follow up on water quality readings for all halls	Follow up on water quality readings for all halls
+غسيل غسيل المواتير	Washing the motors	Washing the motors
+متابعه بيانات المياه	Follow up on the water data	Follow up on the water data
+مهم غسيل باقي التنكات	Important: wash the rest of the tanks	Important: wash the rest of the tanks
+صرف الاسمده لمده ثلاث ايام	Issue the fertilizers for three days	Issue the fertilizers for three days
+متابعه الاوردر	Follow up on the order	Follow up on the order
+تعليق الباركود	Hang the barcode	Hang the barcode
+توزيع الاوردر وتجهيزه	Distribute and prepare the order	Distribute and prepare the order
+بعد الاوردر غسيل المواسير وتنزيل الشتلات	After the order: wash the pipes and move the seedlings down	After the order: wash the pipes and move the seedlings down
+جرد المشتل وصرف باقي البذور لمده ثلاث ايام	Take stock of the nursery and issue the rest of the seeds for three days	Take stock of the nursery and issue the rest of the seeds for three days
+متابعة وتفتيش تطبيق قيم الجودة في الموقع بالكامل.	Follow up on and inspect the application of quality values across the whole site.	Follow up on and inspect the application of quality values across the whole site.
+يالا الشغل اصحي	Let's go, time to work, wake up	Let's go, time to work, wake up
+تطبيق منهجية ال #S في الموقع بالكامل.	Apply the #S methodology across the whole site.	Apply the #S methodology across the whole site.
+نظافة وتعقيم قسم الإنتاج و الثلاجة	Cleaning and sterilizing the production section and the fridge	Cleaning and sterilizing the production section and the fridge
+تسجيل بيانات المشتل بتاعه امس	Log yesterday's nursery data	Log yesterday's nursery data
+نظافه وغسيل خزانات الخس الخاصه بالمحاليل	Cleaning and washing the lettuce tanks for the solutions	Cleaning and washing the lettuce tanks for the solutions
+تحضير محلول الطماطم	Prepare the tomato solution	Prepare the tomato solution
+تقليم باقي اوراق الطماطم	Prune the remaining tomato leaves	Prune the remaining tomato leaves
+نظافة قسم الإنتاج وترتيب الثلاجة عقب إنتهاء الاوردر	Clean the production section and arrange the fridge after finishing the order	Clean the production section and arrange the fridge after finishing the order
+تشيل شتلات	Take out seedlings	Take out seedlings
+تشيل ميكروجرين.	Take out microgreens.	Take out microgreens.
+ادراج بيانات حركة المشتل في النظام.	Enter the nursery movement data in the system.	Enter the nursery movement data in the system.
+جرد الإصابات في الصوب كلها	Take stock of the infestations in all greenhouses	Take stock of the infestations in all greenhouses
+صرف الحديد	Issue the iron	Issue the iron
+ارسال خيار لاميزون بلو	Send cucumbers to Amazon Blue	Send cucumbers to Amazon Blue
+مراجعة تصنيفات الجودة في الموقع بالكامل	Review the quality classifications across the whole site	Review the quality classifications across the whole site
+نظافة الثلاجة وقسم الانتاج	Cleanliness of the fridge and production section	Cleanliness of the fridge and production section
+التأكيد علي النظافة الشخصية للموظفين وتقليم الاظافر	Stress personal hygiene for the employees and nail trimming	Stress personal hygiene for the employees and nail trimming
+عمل إذن شراء لكل المتطلبات الناقصة	Create a purchase order for all missing requirements	Create a purchase order for all missing requirements
+متابعة المشتل وتشتيل شتلات جديدة	Follow up on the nursery and transplant new seedlings	Follow up on the nursery and transplant new seedlings
+بنفكرك بشراء بذور مايكرو جرين	A reminder to buy microgreen seeds	A reminder to buy microgreen seeds
+(غسيل سقف الصوب الزراعية)	(Washing the greenhouse roofs)	(Washing the greenhouse roofs)
+غلق جميع خلايا التبريد لجميع البيوت الساعة # عصرا	Close all cooling pads in all houses at # PM	Close all cooling pads in all houses at # PM
+(غسيل الفلاتر)	(Washing the filters)	(Washing the filters)
+سيف-كي — # ملي / لتر	Safe-K — # ml / L	Safe-K — # ml / L
+هيدروفوس — # ملي / لتر	Hydrofos — # ml / L	Hydrofos — # ml / L
+أفينكس — # ملل / لتر	Afinex — # ml / L	Afinex — # ml / L
+هاسبرو — # ملل / لتر	Hasbro — # ml / L	Hasbro — # ml / L
+نوتس #% — #ملل / لتر	Notes #% — # ml / L	Notes #% — # ml / L
+ميس تربل — # ملل / لتر	Mess Triple — # ml / L	Mess Triple — # ml / L
+مونتورو — #ملل / لتر	Montoro — # ml / L	Montoro — # ml / L
+مايستك — #ملل / لتر	Mystic — # ml / L	Mystic — # ml / L
+مارسا — # ملل / لتر	Marsa — # ml / L	Marsa — # ml / L
+ماجنفكو — # ملل / لتر	Magnifco — # ml / L	Magnifco — # ml / L
+ماجما — # ملل / لتر	Magma — # ml / L	Magma — # ml / L
+ليكس #% — # مل / لتر	Lex #% — # ml / L	Lex #% — # ml / L
+كوفريت — # ملل / لتر	Cuprit — # ml / L	Cuprit — # ml / L
+كفروستار — # ملل / لتر	Cufrostar — # ml / L	Cufrostar — # ml / L
+كت داون # جرام — # مل / لتر	Cut Down # g — # ml / L	Cut Down # g — # ml / L
+كبريو توب — #ملل / لتر	Cabrio Top — # ml / L	Cabrio Top — # ml / L
+كاجورا — # ملل / لتر	Kajura — # ml / L	Kajura — # ml / L
+فورتين — #ملل / لتر	Fortin — # ml / L	Fortin — # ml / L
+فرسيس — # ملل / لتر	Versys — # ml / L	Versys — # ml / L
+فانجو #% — #ملل / لتر	Fango #% — # ml / L	Fango #% — # ml / L
+فانتي #% — #ملل / لتر	Fanti #% — # ml / L	Fanti #% — # ml / L
+سوبر توكس # مللي — # مل /لتر	Super Tox # ml — # ml / L	Super Tox # ml — # ml / L
+سوبر توكس # لتر — # مل / لتر	Super Tox # L — # ml / L	Super Tox # L — # ml / L
+سبيدو #% — # مل / لتر	Speedo #% — # ml / L	Speedo #% — # ml / L
+زووم # — #مل /لتر	Zoom # — # ml / L	Zoom # — # ml / L
+ربنت #% — #مل/ لتر	Rebent #% — # ml / L	Rebent #% — # ml / L
+ران واي #% — #مل/لتر	Ran Way #% — # ml/L	Ran Way #% — # ml/L
+دولف اكس #% — #مل / لتر	Dolf X #% — # ml / L	Dolf X #% — # ml / L
+تيبرو وان #% — # مل / لتر	Tebro One #% — # ml / L	Tebro One #% — # ml / L
+بيليو #% — # مل / لتر	Pelio #% — # ml / L	Pelio #% — # ml / L
+بينون # — # مل/ لتر	Pinon # — # ml / L	Pinon # — # ml / L
+بريفكس N# — # ملل / لتر	Previcur N# — # ml / L	Previcur N# — # ml / L
+باندل — # ملل / لتر	Bundle — # ml / L	Bundle — # ml / L
+ايزو #% — # ملل / لتر	Iso #% — # ml / L	Iso #% — # ml / L
+اورونس سوبر — # ملل / لتر	Orons Super — # ml / L	Orons Super — # ml / L
+اميستار توب — # ملل / لتر	Amistar Top — # ml / L	Amistar Top — # ml / L
+اميستار — # ملل / لتر	Amistar — # ml / L	Amistar — # ml / L
+الفيردى — # ملل / لتر	Verdi — # ml / L	Verdi — # ml / L
+أرجال — # سم / # لتر	Arjal — # cc / # L	Arjal — # cc / # L
+~ملل	ml	ml
+~ملي	ml	ml
+~مل	ml	ml
+~مللي	ml	ml
+~لتر	L	L
+~جم	g	g
+~جرام	g	g
+~سم	cc	cc
+~كجم	kg	kg
+ابلاغ عن العماله المتغيبة الساعة # ص	Report the absent workers at # AM	x
+الطور	Stage	x
+🥬 تكلفة الكيلو لكل منتج	🥬 Cost per kg by product	🥬 Cost per kg by product
+لسه مفيش «مجموعات تحضير». اعمل مجموعة لكل منتج (خس / أعشاب / طماطم) من المعادلات السمادية ← مجموعات التحضير، وحدد الأنظمة ونوع المحصول، عشان التكلفة تتقسم عليهم.	There are no "preparation groups" yet. Create a group for each product (lettuce / herbs / tomato) from Fertilizer equations → Preparation groups, and set the systems and crop type, so the cost can be split between them.	There are no "preparation groups" yet. Create a group for each product (lettuce / herbs / tomato) from Fertilizer equations → Preparation groups, and set the systems and crop type, so the cost can be split between them.
+المنتج = مجموعة التحضير اللي النظام فيها. التكلفة = أسمدة تحضيرات الخزان (بسعر المخزن/المكتبة) + المصروفات المربوطة بنظام + نصيب المنتج من المصروفات العامة (بنسبة كيلوهاته). لا تسجّل الأسمدة كمصروف يدوي كمان عشان ما تتحسبش مرتين.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.
+أسمدة المحاليل	Solution fertilizers	Solution fertilizers
+مصروفات مباشرة	Direct expenses	Direct expenses
+نصيب من العام	Share of general	Share of general
+الإجمالي (ج.م)	Total (EGP)	Total (EGP)
+مفيش بيانات حصاد أو تكاليف في الفترة دي.	No harvest or cost data in this period.	No harvest or cost data in this period.
+⚠️ أسمدة من غير سعر (مش متحسبة):	⚠️ Fertilizers without a price (not counted):	⚠️ Fertilizers without a price (not counted):
+. اكتب «سعر الوحدة» للصنف في المخازن أو سعر السماد في المعادلات.	. Enter the "unit price" for the item in Stock or the fertilizer price in the equations.	. Enter the "unit price" for the item in Stock or the fertilizer price in the equations.
+⚠️ المصروفات العامة (# ج.م) ما اتوزعتش لأن مفيش حصاد بالكيلو في الفترة.	⚠️ General expenses (# EGP) were not distributed because there is no harvest in kg in the period.	⚠️ General expenses (# EGP) were not distributed because there is no harvest in kg in the period.
+⚖️ فيه حصاد بالقطعة أو الصندوق مش داخل في الحساب. اكتب متوسط الوزن بالجرام عشان يتحسب بالكيلو:	⚖️ There is harvest by piece or box that is not included in the calculation. Enter the average weight in grams so it is calculated in kilograms:	⚖️ There is harvest by piece or box that is not included in the calculation. Enter the average weight in grams so it is calculated in kilograms:
+وزن القطعة (جم)	Piece weight (g)	Piece weight (g)
+وزن الصندوق (جم)	Box weight (g)	Box weight (g)
+غير مصنّف	Unclassified	Unclassified
+⚡ تكلفة الكهرباء	⚡ Electricity cost	⚡ Electricity cost
+المضخات: قدرة المضخة × ساعات تشغيلها في اليوم من جدول الري × أيام الفترة. المراوح وخلايا التبريد: بتتحسب من حرارة الصوبة المسجّلة — الحرارة بتتوصّل خطيًا بين القراءات، ولما توصل لحد التشغيل الجهاز بيتسجّل إنه اشتغل لحد ما تنزل. كل ما القراءات أكتر (حساسات) كل ما الحساب أدق.	Pumps: pump power × its daily run hours from the irrigation schedule × days in the period. Fans and cooling pads: calculated from the logged greenhouse temperature — temperature is connected linearly between readings, and when it reaches the on-threshold the device is logged as running until it drops. The more readings (sensors), the more accurate the calculation.	Pumps: pump power × its daily run hours from the irrigation schedule × days in the period. Fans and cooling pads: calculated from the logged greenhouse temperature — temperature is connected linearly between readings, and when it reaches the on-threshold the device is logged as running until it drops. The more readings (sensors), the more accurate the calculation.
+⚠️ اكتب سعر الكيلوواط ساعة في الإعدادات عشان تتحسب التكلفة.	⚠️ Enter the price per kWh in the settings so the cost can be calculated.	⚠️ Enter the price per kWh in the settings so the cost can be calculated.
+كهرباء الفترة	Electricity for the period	Electricity for the period
+الاستهلاك	Consumption	Consumption
+ك.و.س	kWh	kWh
+المضخات	Pumps	Pumps
+المراوح	Fans	Fans
+خلايا التبريد	Cooling pads	Cooling pads
+الفترة: آخر # يوم	Period: last # days	Period: last # days
+قدرة المضخة (ك.و)	Pump power (kW)	Pump power (kW)
+ساعات التشغيل/يوم	Run hours/day	Run hours/day
+الاستهلاك (ك.و.س)	Consumption (kWh)	Consumption (kWh)
+التكلفة (ج.م)	Cost (EGP)	Cost (EGP)
+القدرة (وات)	Power (W)	Power (W)
+حد التشغيل (°م)	On-threshold (°C)	On-threshold (°C)
+ساعات التشغيل	Run hours	Run hours
+لسه ما اتسجّلتش قدرة مضخات. (من الإعدادات)	No pump power logged yet. (from the settings)	No pump power logged yet. (from the settings)
+لسه ما اتضافتش مراوح أو خلايا تبريد. (من الإعدادات)	No fans or cooling pads added yet. (from the settings)	No fans or cooling pads added yet. (from the settings)
+⚠️ مفيش قراءات حرارة مسجّلة للصوبة دي في الفترة.	⚠️ No temperature readings logged for this greenhouse in the period.	⚠️ No temperature readings logged for this greenhouse in the period.
+❓ جهاز ناقصه القدرة أو حد الحرارة.	❓ A device is missing its power or temperature threshold.	❓ A device is missing its power or temperature threshold.
+🕒 سجل التشغيل (محسوب من الحرارة)	🕒 Run log (calculated from temperature)	🕒 Run log (calculated from temperature)
+من → إلى	From → to	From → to
+⚙️ إعدادات الكهرباء (السعر والمضخات والمراوح وخلايا التبريد)	⚙️ Electricity settings (price, pumps, fans and cooling pads)	⚙️ Electricity settings (price, pumps, fans and cooling pads)
+سعر الكيلوواط ساعة (ج.م)	Price per kWh (EGP)	Price per kWh (EGP)
+فرق الإطفاء (°م) — بيقف لما الحرارة تنزل عن حد التشغيل بالقدر ده	Switch-off margin (°C) — it stops when the temperature drops below the on-threshold by this amount	Switch-off margin (°C) — it stops when the temperature drops below the on-threshold by this amount
+💧 مضخات الري (واحدة لكل نظام)	💧 Irrigation pumps (one per system)	💧 Irrigation pumps (one per system)
+🌬️ المراوح وخلايا التبريد	🌬️ Fans and cooling pads	🌬️ Fans and cooling pads
+الاسم / الرقم	Name / number	Name / number
+تشتغل عند حرارة (°م)	Runs at temperature (°C)	Runs at temperature (°C)
+من ساعة (اختياري)	From hour (optional)	From hour (optional)
+لحد ساعة (اختياري)	Until hour (optional)	Until hour (optional)
+مروحة	Fan	Fan
+مروحة #	Fan #	Fan #
+خلايا تبريد	Cooling pads	Cooling pads
+جهاز	Device	Device
+🗑 حذف	🗑 Delete	🗑 Delete
+➕ جهاز	➕ Device	➕ Device
+حفظ إعدادات الكهرباء	Save electricity settings	Save electricity settings
+اتحفظت إعدادات الكهرباء	Electricity settings saved	Electricity settings saved
+⛔ ما اتحفظتش	⛔ Not saved	⛔ Not saved
+⚠️ مفيش جدول ري	⚠️ No irrigation schedule	⚠️ No irrigation schedule
+إعدادات الكهرباء	Electricity settings	Electricity settings
+المنتج = مجموعة التحضير اللي النظام فيها. التكلفة = أسمدة تحضيرات الخزان (بسعر المخزن/المكتبة) + المصروفات المربوطة بنظام + الكهرباء (مضخات الري ومراوح وخلايا تبريد الصوبة) + نصيب المنتج من المصروفات العامة (بنسبة كيلوهاته). لا تسجّل الأسمدة كمصروف يدوي كمان عشان ما تتحسبش مرتين.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.
+مفيش قراءة حرارة حديثة	No recent temperature reading	No recent temperature reading
+شغّالة من #:#	Running since #:#	Running since #:#
+شغّالة	Running	Running
+واقفة — آخر تشغيل #:#	Stopped — last ran at #:#	Stopped — last ran at #:#
+واقفة	Stopped	Stopped
+تشتغل عند #°م	Runs at #°C	Runs at #°C
+· الحرارة الآن #°م	· Temperature now #°C	· Temperature now #°C
+الحرارة الآن #°م	Temperature now #°C	Temperature now #°C
+⚡ أسعار الكهرباء	⚡ Electricity prices	⚡ Electricity prices
+سعر الكيلوواط ساعة بيتحسب بيه كهرباء الري والمراوح وخلايا التبريد في «المخازن ← التكاليف».	The price per kWh is used to calculate the electricity of irrigation, fans and cooling pads in "Stock → Costs".	The price per kWh is used to calculate the electricity of irrigation, fans and cooling pads in "Stock → Costs".
+قدرة مضخة كل نظام بالكيلوواط.	The pump power of each system in kilowatts.	The pump power of each system in kilowatts.
+🌬️ المراوح	🌬️ Fans	🌬️ Fans
+لكل مروحة: الصوبة، والقدرة بالوات، والحرارة اللي تشتغل عندها. بتظهر شغّالة في نظرة عامة الصوبة وبتتحسب كهربتها لما حرارة الصوبة توصل للحد ده.	For each fan: the greenhouse, the power in watts, and the temperature it runs at. It shows as running in the greenhouse overview and its electricity is counted when the greenhouse temperature reaches that limit.	For each fan: the greenhouse, the power in watts, and the temperature it runs at. It shows as running in the greenhouse overview and its electricity is counted when the greenhouse temperature reaches that limit.
+❄️ خلايا التبريد	❄️ Cooling pads	❄️ Cooling pads
+نفس فكرة المراوح: القدرة (مضخة الخلايا) وحرارة التشغيل، وممكن تحدد ساعات اشتغالها (مثلاً من # لـ #).	Same idea as the fans: the power (the pads' pump) and the on-temperature, and you can set its operating hours (for example from # to #).	Same idea as the fans: the power (the pads' pump) and the on-temperature, and you can set its operating hours (for example from # to #).
+المدير بس هو اللي يعدّل إعدادات الكهرباء.	Only the admin can edit the electricity settings.	Only the admin can edit the electricity settings.
+فرق الإطفاء (°م)	Switch-off margin (°C)	Switch-off margin (°C)
+فرق الإطفاء: المروحة أو خلايا التبريد بتقف لما الحرارة تنزل عن حد تشغيلها بالقدر ده (عشان ما تفضلش تشغّل وتطفّي).	Switch-off margin: the fan or cooling pads stop when the temperature drops below their on-threshold by this amount (so they don't keep switching on and off).	Switch-off margin: the fan or cooling pads stop when the temperature drops below their on-threshold by this amount (so they don't keep switching on and off).
+ساعات تشغيل المضخة بتتاخد من جدول الري بتاع كل نظام.	The pump's run hours are taken from each system's irrigation schedule.	The pump's run hours are taken from each system's irrigation schedule.
+لسه ما اتضافتش خلايا تبريد.	No cooling pads added yet.	No cooling pads added yet.
+لسه ما اتضافتش مراوح.	No fans added yet.	No fans added yet.
+➕ خلايا تبريد	➕ Cooling pads	➕ Cooling pads
+➕ مروحة	➕ Fan	➕ Fan
+⚙️ السعر وقدرة المضخات والمراوح وخلايا التبريد بتتعدّل من تبويب	⚙️ The price and the power of the pumps, fans and cooling pads are edited from the	⚙️ The price and the power of the pumps, fans and cooling pads are edited from the
+خلايا تبريد #	Cooling pads #	Cooling pads #
+💧 مضخات الري	💧 Irrigation pumps	x
+# مراوح	# fans	# fans
+# خلايا	# pads	# pads
+غير محددة	Unspecified	Unspecified
+🏠 غير محددة	🏠 Unspecified	🏠 Unspecified
+لسه مفيش صوب مضافة.	No greenhouses added yet.	No greenhouses added yet.
+مضخة الري	Irrigation pump	Irrigation pump
+مفيش جدول ري لتشغيل المضخة	No irrigation schedule to run the pump	No irrigation schedule to run the pump
+شغّالة لحد #:#	Running until #:#	Running until #:#
+واقفة — الريّة الجاية #:#	Stopped — next irrigation #:#	Stopped — next irrigation #:#
+حسب جدول الري	According to the irrigation schedule	According to the irrigation schedule
+حسب جدول الري · # ك.و	According to the irrigation schedule · # kW	According to the irrigation schedule · # kW
+🏠 الأساسي	🏠 Essentials	🏠 Essentials
+🏭 الصوب والأنظمة	🏭 Greenhouses and systems	🏭 Greenhouses and systems
+🌿 الحصاد	🌿 Harvest	🌿 Harvest
+💧 المياه	💧 Water	💧 Water
+🌡️ المناخ	🌡️ Climate	🌡️ Climate
+📦 المخازن والأسمدة	📦 Stock and fertilizers	📦 Stock and fertilizers
+💧 مياه النظام	💧 System water	💧 System water
+🌡️ مناخ الصوبة	🌡️ Greenhouse climate	🌡️ Greenhouse climate
+🧺 حصاد ومهام النظام	🧺 System harvest and tasks	🧺 System harvest and tasks
+📈 الاتجاهات	📈 Trends	📈 Trends
+🍅 خطوط الزراعة	🍅 Planting rows	🍅 Planting rows
+🍅 مخطط خطوط الزراعة	🍅 Planting rows layout	🍅 Planting rows layout
+كل خط فيه عدد نباتات وصنف. الخطوط بتتجمّع في أزواج: مسافة صغيرة جوه الزوج، وممر كبير بين كل زوجين (الخط المنقّط بين الأزواج هو الممر).	Each row has a number of plants and a variety. Rows are grouped in pairs: a small gap inside the pair and a large aisle between pairs (the dotted line between pairs is the aisle).	Each row has a number of plants and a variety. Rows are grouped in pairs: a small gap inside the pair and a large aisle between pairs (the dotted line between pairs is the aisle).
+الخطوط	Rows	Rows
+الأزواج	Pairs	Pairs
+خط	row	row
+زوج	pair	pair
+لسه ما اتضافتش خطوط. ضيف أول خط من النموذج تحت.	No rows added yet. Add the first row from the form below.	No rows added yet. Add the first row from the form below.
+# خط	# rows	# rows
+# نبتة	# plants	# plants
+✏️ تعديل خط	✏️ Edit row	✏️ Edit row
+➕ إضافة خطوط	➕ Add rows	➕ Add rows
+الصنف / النوع	Variety / type	Variety / type
+عدد النباتات في الخط	Number of plants in the row	Number of plants in the row
+عدد الخطوط	Number of rows	Number of rows
+تاريخ الزراعة (اختياري)	Planting date (optional)	Planting date (optional)
+الخط	Row	Row
+الزراعة	Planting	Planting
+تمسح الخط ده؟	Delete this row?	Delete this row?
+اكتب الصنف	Enter the variety	Enter the variety
+اكتب عدد النباتات	Enter the number of plants	Enter the number of plants
+اتضافت الخطوط	Rows added	Rows added
+اتمسح الخط	Row deleted	Row deleted
+⛔ ما اتحفظش	⛔ Not saved	⛔ Not saved
+⛔ ما اتحفظش (مفيش صلاحية)	⛔ Not saved (no permission)	⛔ Not saved (no permission)
+(# يوم)	(# days)	(# days)
+💰 التكاليف	💰 Costs	💰 Costs
+التكاليف وتكلفة الكيلو	Costs and cost per kg	Costs and cost per kg
+💰 ملخص التكاليف وتكلفة الكيلو	💰 Costs and cost per kg summary	💰 Costs and cost per kg summary
+💰 افتح تاب التكاليف	💰 Open the Costs tab	💰 Open the Costs tab
+مناخ الصوبة (للقراءة فقط)	Greenhouse climate (read-only)	Greenhouse climate (read-only)
+🪴 بيئة الشتلات	🪴 Seedling medium	🪴 Seedling medium
+حدد مكونات لتر البيئة وسعر كل مكوّن وحجم البيئة في الصينية، وهنحسب تكلفة بيئة الصينية. بتدخل في تكلفة كل دفعة مشتل وفي تكلفة الكيلو والقطعة.	Set the components of a liter of medium, the price of each component and the medium volume in a tray, and we calculate the tray's medium cost. It is included in the cost of each nursery batch and in the cost per kg and per piece.	Set the components of a liter of medium, the price of each component and the medium volume in a tray, and we calculate the tray's medium cost. It is included in the cost of each nursery batch and in the cost per kg and per piece.
+🌱 تكلفة البذور	🌱 Seed cost	🌱 Seed cost
+سعر البذور لكل صنف (سعر # بذرة وعدد البذور في الخلية). بتتحسب على كل صينية بتتزرع من الصنف ده.	Seed price for each variety (price of # seeds and the number of seeds per cell). It is counted on every tray sown of this variety.	Seed price for each variety (price of # seeds and the number of seeds per cell). It is counted on every tray sown of this variety.
+المدير بس هو اللي يعدّل التكاليف دي.	Only the admin can edit these costs.	Only the admin can edit these costs.
+حجم البيئة في الصينية الواحدة (لتر)	Medium volume in one tray (liters)	Medium volume in one tray (liters)
+مكونات لتر البيئة	Components of a liter of medium	Components of a liter of medium
+المكوّن	Component	Component
+الكمية في لتر البيئة	Quantity in a liter of medium	Quantity in a liter of medium
+سعر الوحدة (ج.م)	Unit price (EGP)	Unit price (EGP)
+بيتموس	Peat moss	Peat moss
+لتر / جم	liter / g	liter / g
+لسه ما اتضافتش مكونات.	No components added yet.	No components added yet.
+مثال: بيتموس # لتر × سعر اللتر، برلايت # لتر، فيرموكليت # لتر، كربونات بوتاسيوم # جم، NPK # جم، سلفات ماغنيسيوم # جم، مادة منشطة للجذور.	Example: peat moss # liter × price per liter, perlite # liter, vermiculite # liter, potassium carbonate # g, NPK # g, magnesium sulfate # g, a root-stimulating substance.	Example: peat moss # liter × price per liter, perlite # liter, vermiculite # liter, potassium carbonate # g, NPK # g, magnesium sulfate # g, a root-stimulating substance.
+تكلفة لتر البيئة	Cost of a liter of medium	Cost of a liter of medium
+تكلفة بيئة الصينية	Medium cost per tray	Medium cost per tray
+➕ مكوّن	➕ Component	➕ Component
+➕ صنف	➕ Variety	➕ Variety
+سعر # بذرة (ج.م)	Price of # seeds (EGP)	Price of # seeds (EGP)
+بذور في الخلية	Seeds per cell	Seeds per cell
+تكلفة بذور الصينية (# خلية):	Seed cost of a tray (# cells):	Seed cost of a tray (# cells):
+لسه ما اتضافتش أصناف.	No varieties added yet.	No varieties added yet.
+اتحفظت	Saved	Saved
+الحصاد (قطعة)	Harvest (pieces)	Harvest (pieces)
+بذور	Seeds	Seeds
+ج.م/قطعة	EGP/piece	EGP/piece
+🌱 رحلة الدفعة من البذرة للحصاد	🌱 Batch journey from seed to harvest	🌱 Batch journey from seed to harvest
+مفيش دفعة مشتل مربوطة بالحصاد ده (لازم الصينية تتنزل في النظام من تبويب المشتل).	No nursery batch is linked to this harvest (the tray must be moved out into the system from the Nursery tab).	No nursery batch is linked to this harvest (the tray must be moved out into the system from the Nursery tab).
+🌱 زراعة البذرة — # صينية — خس — بذور # ج.م + بيئة # ج.م	🌱 Seed sowing — # trays — lettuce — seeds # EGP + medium # EGP	🌱 Seed sowing — # trays — lettuce — seeds # EGP + medium # EGP
+🌱 زراعة البذرة — # صينية — خس	🌱 Seed sowing — # trays — lettuce	🌱 Seed sowing — # trays — lettuce
+🪴 نزلت النظام — LG# — S#	🪴 Moved into the system — LG# — S#	🪴 Moved into the system — LG# — S#
+🪴 نزلت النظام	🪴 Moved into the system	🪴 Moved into the system
+🍃 رش ورقي: هيدروفوس (# ملي / لتر)	🍃 Foliar spray: Hydrofos (# ml / L)	🍃 Foliar spray: Hydrofos (# ml / L)
+🍃 رش ورقي: هيدروفوس (# ملي / لتر) ✓	🍃 Foliar spray: Hydrofos (# ml / L) ✓	🍃 Foliar spray: Hydrofos (# ml / L) ✓
+🧪 معاملة مكافحة: أبامكتين — دودة	🧪 Pest treatment: Abamectin — worm	🧪 Pest treatment: Abamectin — worm
+🧪 معاملة مكافحة: أبامكتين	🧪 Pest treatment: Abamectin	🧪 Pest treatment: Abamectin
+🧴 تحضير خزان: نترات	🧴 Tank preparation: Nitrate	🧴 Tank preparation: Nitrate
+🧺 الحصاد — H#-S#-# — # كجم	🧺 Harvest — H#-S#-# — # kg	🧺 Harvest — H#-S#-# — # kg
+💰 تكلفة النبتة قبل الزراعة: بذرة # + بيئة # = # ج.م (# صينية ≈ # نبتة)	💰 Plant cost before planting: seed # + medium # = # EGP (# trays ≈ # plants)	💰 Plant cost before planting: seed # + medium # = # EGP (# trays ≈ # plants)
+لسه ما اتسجّلتش تكلفة بذور أو بيئة للصنف ده (من الإعدادات).	No seed or medium cost has been logged for this variety yet (from the settings).	No seed or medium cost has been logged for this variety yet (from the settings).
+🥬 متوسط تكلفة القطعة للمنتج «خس» (آخر # يوم): # ج.م	🥬 Average cost per piece of the product «Lettuce» (last # days): # EGP	🥬 Average cost per piece of the product «Lettuce» (last # days): # EGP
+لسه ما اتسجّلتش	Not logged yet	Not logged yet
+🌱 زراعة البذرة	🌱 Seed sowing	🌱 Seed sowing
+بذور # ج.م + بيئة # ج.م	seeds # EGP + medium # EGP	seeds # EGP + medium # EGP
+🍃 رش ورقي	🍃 Foliar spray	🍃 Foliar spray
+🍃 تسميد	🍃 Fertilizing	🍃 Fertilizing
+🧪 معاملة مكافحة	🧪 Pest treatment	🧪 Pest treatment
+🧴 تحضير خزان	🧴 Tank preparation	🧴 Tank preparation
+🧺 الحصاد	🧺 Harvest	🧺 Harvest
+💰 تكلفة النبتة قبل الزراعة: بذرة # + بيئة # =	💰 Plant cost before planting: seed # + medium # =	💰 Plant cost before planting: seed # + medium # =
+# ج.م	# EGP	# EGP
+(# صينية ≈ # نبتة)	(# trays ≈ # plants)	(# trays ≈ # plants)
+🥬 متوسط تكلفة القطعة للمنتج «	🥬 Average cost per piece of the product «	🥬 Average cost per piece of the product «
+» (آخر # يوم):	» (last # days):	» (last # days):
+المنتج = مجموعة التحضير اللي النظام فيها. التكلفة = أسمدة تحضيرات الخزان (بسعر المخزن/المكتبة) + المصروفات المربوطة بنظام + الكهرباء (مضخات الري ومراوح وخلايا تبريد الصوبة) + بذور وبيئة الشتلات (من الصواني اللي نزلت النظام في الفترة، أو لسه في المشتل) + نصيب المنتج من المصروفات العامة (بنسبة كيلوهاته). لا تسجّل الأسمدة كمصروف يدوي كمان عشان ما تتحسبش مرتين.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + seeds and seedling medium (from trays moved into the system in the period, or still in the nursery) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + seeds and seedling medium (from trays moved into the system in the period, or still in the nursery) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.
+📖 ترجمة بياناتي (الاسم بالإنجليزي)	📖 My data translations (English name)	📖 My data translations (English name)
+هنا كل الأسماء والنصوص اللي الفريق بيكتبها بالعربي (الصوب والأنظمة، الأصناف، العملاء، المخزن، الإجراءات، وأي نص ظهر من غير ترجمة). اكتب جنب كل واحد اسمه بالإنجليزي واحفظ، والتطبيق هيعرضه بالإنجليزي لما اللغة تكون EN — من غير ما تبعته لحد.	Here are all the names and texts the team writes in Arabic (greenhouses and systems, varieties, customers, stock, procedures, and any text that appeared without a translation). Write the English name next to each one and save, and the app will show it in English when the language is EN — without sending it to anyone.	Here are all the names and texts the team writes in Arabic (greenhouses and systems, varieties, customers, stock, procedures, and any text that appeared without a translation). Write the English name next to each one and save, and the app will show it in English when the language is EN — without sending it to anyone.
+المدير بس هو اللي يعدّل الترجمات.	Only the admin can edit the translations.	Only the admin can edit the translations.
+متترجم:	Translated:	Translated:
+كل البيانات متترجمة ✅	All data is translated ✅	All data is translated ✅
+عرض أكتر	Show more	Show more
+حفظ الترجمات	Save translations	Save translations
+اتحفظت الترجمات (#)	Translations saved (#)	Translations saved (#)
+🌿 الأصناف والمحاصيل	🌿 Varieties and crops	🌿 Varieties and crops
+👥 العملاء والموظفين	👥 Customers and employees	👥 Customers and employees
+📦 المخزن (الأسمدة والمبيدات)	📦 Stock (fertilizers and pesticides)	📦 Stock (fertilizers and pesticides)
+📖 الإجراءات والمهام	📖 Procedures and tasks	📖 Procedures and tasks
+🔎 نصوص ظهرت من غير ترجمة	🔎 Texts that appeared without a translation	🔎 Texts that appeared without a translation
+✍️ ترجمات محفوظة تانية	✍️ Other saved translations	✍️ Other saved translations
+🌱 تحت الإنتاج:	🌱 Work in progress:	🌱 Work in progress:
+ج.م بذور وبيئة لـ	EGP of seeds and medium for	EGP of seeds and medium for
+صينية لسه ما اتحصدتش (بتدخل في التكلفة لما تتحصد).	trays not harvested yet (they enter the cost when harvested).	trays not harvested yet (they enter the cost when harvested).
+فاقد الفرز: من جلسات الفرز في الجودة (اللي جه − بعد الفرز). «بعد الفاقد» = التكلفة ÷ الكمية اللي فعلاً بتتباع.	Sorting waste: from the sorting sessions in Quality (received − after sorting). "After waste" = cost ÷ the quantity actually sold.	Sorting waste: from the sorting sessions in Quality (received − after sorting). "After waste" = cost ÷ the quantity actually sold.
+ج.م/كجم بعد الفاقد	EGP/kg after waste	EGP/kg after waste
+ج.م/قطعة بعد الفاقد	EGP/piece after waste	EGP/piece after waste
+المنتج = مجموعة التحضير اللي النظام فيها. التكلفة = أسمدة تحضيرات الخزان (بسعر المخزن/المكتبة) + المصروفات المربوطة بنظام + الكهرباء (مضخات الري ومراوح وخلايا تبريد الصوبة) + بذور وبيئة الشتلات (تكلفة كل دفعة بتتقسم على الحصاد اللي اتعمل منها) + نصيب المنتج من المصروفات العامة (بنسبة كيلوهاته). لا تسجّل الأسمدة كمصروف يدوي كمان عشان ما تتحسبش مرتين.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + seeds and seedling medium (each batch's cost is split over the harvests made from it) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.	Product = the preparation group the system belongs to. Cost = fertilizers from tank preparations (at stock/library price) + expenses linked to a system + electricity (irrigation pumps and the greenhouse fans and cooling pads) + seeds and seedling medium (each batch's cost is split over the harvests made from it) + the product's share of general expenses (in proportion to its kilograms). Don't also log fertilizers as a manual expense so they aren't counted twice.
+pH الري # خارج المدى (#–#)	irrigation pH # out of range (#–#)	irrigation pH # out of range (#–#)
+EC الري # خارج المدى (#–#)	irrigation EC # out of range (#–#)	irrigation EC # out of range (#–#)
+حرارة المياه الري # خارج المدى (#–#)	irrigation water temperature # out of range (#–#)	irrigation water temperature # out of range (#–#)
+موجة حر (عظمى #°C)	heat wave (max #°C)	heat wave (max #°C)
+برد (صغرى #°C)	cold (min #°C)	cold (min #°C)
+رياح شديدة (# كم/س)	strong wind (# km/h)	strong wind (# km/h)
+مطر متوقع (# مم)	rain expected (# mm)	rain expected (# mm)
+مناخ	climate	climate
+تربة	soil	soil
+📦 مخزون منخفض	📦 Low stock	📦 Low stock
+📝 لسه ما اتسجلتش قراءات النهارده (#)	📝 Today's readings haven't been logged yet (#)	📝 Today's readings haven't been logged yet (#)
+☀️ ملخص الصبح	☀️ Morning summary	☀️ Morning summary
 ~خزان	Tank	Tank
 ~أي	Any	Beliebiger
 ~سعر	price	Preis
-~كجم	kg	kg
 ~نقاوة	purity	Reinheit
 ~سائل	liquid	flüssig
