@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-CXTS/oLCyUe1caZdfgVm33gJeiV7SIGbEygZpDQpqc8=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IUBySTqLg8O3LVc6bvzIdl5sR1oxhTY5XjaYc7fkAfw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -458,6 +458,7 @@
   .panel[data-sub="instruments"] [data-sub~="instruments"],
   .panel[data-sub="pipes"] [data-sub~="pipes"],
   .panel[data-sub="rows"] [data-sub~="rows"],
+  .panel[data-sub="micro"] [data-sub~="micro"],
   .panel[data-sub="costs"] [data-sub~="costs"],
   .panel[data-sub="bio"] [data-sub~="bio"],
   .panel[data-sub="trend"] [data-sub~="trend"],
@@ -2105,7 +2106,7 @@ function i18nLookup(dict, text){
 }
 /*I18N-END*/
   /*I18N-DATA-BEGIN*/
-var I18N_DICT = {}; var I18N_VER = "e4714194cbd8";
+var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
 /*I18N-DATA-END*/
   /* ---- ترجمة الواجهة: ربط القاموس بالصفحة (الـDOM) ---- */
   var uiLang = (function(){ try{ var v = localStorage.getItem('oroots_lang'); return I18N_LANGS[v] ? v : 'ar'; }catch(e){ return 'ar'; } })();
@@ -8465,7 +8466,7 @@ var I18N_DICT = {}; var I18N_VER = "e4714194cbd8";
       : '<p class="empty-note">لسه مفيش حصاد مسجل للنظام ده.</p>';
 
     inner.innerHTML =
-      '<div data-sub="entry pipes charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — سجل الحصاد</h2></div></div>'+
+      '<div data-sub="entry pipes rows charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — سجل الحصاد</h2></div></div>'+
       '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل حصاد جديد</h2>'+
       '<form class="entry-form" id="harvest-form">'+
         '<div class="form-grid">'+
@@ -8482,7 +8483,7 @@ var I18N_DICT = {}; var I18N_VER = "e4714194cbd8";
         '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الحصاد</button></div>'+
       '</form></div>'+
       '<div data-sub="entry"><p class="hint">🌱 المايكروجرين مش بيتسجل من هنا: من تبويب المشتل دوس «حصاد» على الصينية، وهيتسجل في الحصاد على طول.</p></div>'+
-      '<div data-sub="charts records">'+microHarvestHtml()+'</div>'+
+      (function(){ var mh = microHarvestHtml(); return mh ? '<div data-sub="micro">'+mh+'</div>' : ''; })()+
       '<div data-sub="pipes"><details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 مخطط المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details></div>'+
       '<div data-sub="rows" id="rows-section">'+safeStr(rowInfographicHtml)+'</div>'+
       '<div data-sub="charts">'+statsHtml+
@@ -8663,7 +8664,7 @@ var I18N_DICT = {}; var I18N_VER = "e4714194cbd8";
     water:   {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['schedule','🕒 جدول الري'],['charts','📈 المخططات'],['records','📋 السجلات'],['instruments','🔧 معايرة الأجهزة']]},
     climate: {def:'entry',    tabs:[['entry','📝 إدخال القراءة'],['summary','📊 الملخص'],['charts','📈 المخططات'],['records','📋 السجل']]},
     soil:    {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['charts','📈 المخططات'],['records','📋 السجل']]},
-    harvest: {def:'entry',    tabs:[['entry','📝 تسجيل حصاد'],['pipes','🌿 المواسير'],['rows','🍅 خطوط الزراعة'],['charts','📈 الإنتاج والمخطط'],['records','📋 السجل']]},
+    harvest: {def:'entry',    tabs:[['entry','📝 تسجيل حصاد'],['pipes','🌿 المواسير'],['rows','🍅 خطوط الزراعة'],['micro','🌱 المايكروجرين'],['charts','📈 الإنتاج والمخطط'],['records','📋 السجل']]},
     pests:   {def:'entry',    tabs:[['entry','📝 تسجيل إصابة'],['bio','🐞 المكافحة الحيوية'],['trend','📈 الاتجاه'],['records','📋 السجل']]},
     nursery: {def:'entry',    tabs:[['entry','📝 تسجيل صينية'],['auto','🗓️ خطة الزراعة'],['records','📋 السجل'],['plan','📊 الملخص والخطة']]},
     tasks:   {def:'mine',     tabs:[['mine','✅ مهامّك'],['assign','➕ تعيين مهمة'],['all','📋 كل المهام'],['sops','📖 الإجراءات']]},
