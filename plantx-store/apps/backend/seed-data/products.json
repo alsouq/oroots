@@ -1,0 +1,734 @@
+[
+ {
+  "handle": "plantx-vermicompost",
+  "title": "PlantX Vermicompost",
+  "title_ar": "فيرمي كمبوست PlantX",
+  "collection": "compost",
+  "description": "PlantX\nCompost\nOrganic Soil Amendment & Natural Plant Nutrition\nPlantX Compost\nis a natural organic soil amendment produced through the controlled decomposition of organic materials by earthworms. It is designed to improve soil and growing media properties while providing a natural source of organic matter and plant-supporting nutrients.\nIts rich organic content helps improve soil structure, water-holding capacity, aeration, and root-zone conditions, making it suitable for home gardening, ornamental plants, vegetables, herbs, and a wide range of horticultural applications.\nKey Benefits\nImproves soil structure and growing media quality\nIncreases organic matter in the root zone\nSupports healthy root development\nHelps improve water and nutrient retention\nEnhances soil aeration and drainage\nProvides a natural source of organic nutrients\nSupports beneficial biological activity in the growing medium\nSuitable for organic gardening and sustainable cultivation\nCan be used for indoor plants, outdoor plants, vegetables, herbs, and ornamental crops\nRecommended Applications\nSuitable for:\nIndoor Plants • Ornamental Plants • Vegetables • Herbs • Fruit Crops • Seedlings • Garden Plants • Pots & Containers • Soil & Soilless Growing Media\nApplication\nMix PlantX Compost thoroughly with the growing medium before planting, or apply around the root zone of established plants.\nFor potting mixes:\nMix according to the crop and growing-medium requirements.\nFor established plants:\nApply around the root zone and gently incorporate into the upper layer of the growing medium, then water thoroughly.\nApplication rate may vary depending on plant species, growing medium, and cultivation conditions.\nRecommended Uses\nPotting Mixes | Soil Improvement | Container Plants | Garden Beds | Seedling Production | Root-Zone Amendment\nNote:\nProduct specifications and nutrient analysis should be based on laboratory testing of the final PlantX compost product.\nStorage\nStore in a cool, dry and well-ventilated place. Keep the product protected from excessive moisture and direct sunlight. Keep the package properly sealed when not in use. Keep out of reach of children.\nImportant Information\nFor agricultural and horticultural use\nApplication rates may vary according to crop and growing conditions\nDo not use contaminated or improperly processed organic material\nFor best results, use as part of a balanced plant nutrition and growing program\nProduct Identification\nProduct Name:\nPlantX Compost\nProduct Category:\nOrganic Soil Amendment\nCountry of Origin:\nMade in Egypt\nFor Agricultural & Horticultural Use Only\nPlantX Compost — Naturally Better Soil. Healthier Roots. Sustainable Growth.",
+  "options": [
+   "size"
+  ],
+  "images": [
+   "plantx-vermicompost-0.jpg",
+   "plantx-vermicompost-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "500 gm"
+    ],
+    "sku": "PX-CO-500GM",
+    "price": 50.0,
+    "compare_at": 100.0,
+    "grams": 500
+   },
+   {
+    "options": [
+     "5 KG"
+    ],
+    "sku": "PX-CO-5KG",
+    "price": 300.0,
+    "compare_at": 100.0,
+    "grams": 5000
+   },
+   {
+    "options": [
+     "25 KG"
+    ],
+    "sku": "PX-CO-25KG",
+    "price": 1000.0,
+    "compare_at": 100.0,
+    "grams": 25000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-cucumber-a-b",
+  "title": "PlantX Nutrient Solution for Cucumber A&B",
+  "title_ar": "محلول PlantX المغذي للخيار A&B",
+  "collection": "fruit",
+  "description": "PlantX Cucumber – Hydroponic Nutrient Solution\nPlantX Cucumber is a professional concentrated A+B nutrient solution specially formulated for hydroponic cucumber production. Its two-stage nutrient program is designed to match the changing nutritional requirements of the crop from early vegetative growth through flowering, fruit set, and continuous fruit production.\nThe formulation provides essential macro and micronutrients to support strong root establishment, vigorous vegetative growth, productive flowering, healthy fruit development, and consistent crop performance.\nKey Benefits\nTwo-stage nutrition program for cucumber\nProvides essential macro and micronutrients\nSupports strong root and vegetative development\nSupports healthy flowering and fruit set\nPromotes balanced plant growth throughout the production cycle\nSupports continuous fruit development and production\nSuitable for greenhouse and hydroponic production\nConcentrated and easy-to-use A+B formula\nCompatible with automated fertigation systems\nTwo-Stage Nutrient Program\nStage 1 – Vegetative Growth & Establishment\nDesigned to support strong root establishment, vigorous vegetative growth, healthy foliage, and early plant development.\nUsage:\nFrom transplanting the seedling until it is 14 days old.\nStage 2 – Flowering, Fruit Development & Production\nFormulated to support flowering, fruit set, continuous fruit development, and balanced plant growth during the productive stage.\nUsage:\nFrom 15 days old until the end of the season.\nRecommended Crop\nCucumber\nSuitable for hydroponic production using:\nDutch Bucket | Cocopeat | Rockwool | Soilless Systems | Greenhouse Production\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage for each growth stage.\nMonitor and adjust the final EC and pH according to the crop stage, environmental conditions, and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nHydroponic Cucumber Production | Greenhouses | Soilless Culture | Automated Fertigation\nPlantX Cucumber — Two-Stage Nutrition for Strong Growth and Continuous Production.",
+  "options": [
+   "Size",
+   "Plant stage"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-cucumber-a-b-0.jpg",
+   "plantx-nutrient-solution-for-cucumber-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CU-S1-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CU-S2-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CU-S1-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CU-S2-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CU-S1-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CU-S2-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-sweet-pepper-a-b",
+  "title": "PlantX Nutrient Solution for Sweet pepper A&B",
+  "title_ar": "محلول PlantX المغذي للفلفل A&B",
+  "collection": "fruit",
+  "description": "PlantX Sweet Pepper – Hydroponic Nutrient Solution\nPlantX Sweet Pepper is a professional concentrated A+B nutrient solution specially formulated for hydroponic sweet pepper production. Its three-stage nutrient program is designed to match the changing nutritional requirements of the crop from early vegetative growth through flowering, fruit set, and fruit development.\nThe formulation provides essential macro and micronutrients to support strong root establishment, vigorous plant growth, productive flowering, healthy fruit set, and consistent fruit development throughout the production cycle.\nKey Benefits\nThree-stage nutrition program for sweet peppers\nProvides essential macro and micronutrients\nSupports strong root and vegetative development\nSupports healthy flowering and fruit set\nPromotes balanced plant growth throughout the crop cycle\nSupports fruit development and consistent crop performance\nSuitable for greenhouse and hydroponic production\nConcentrated and easy-to-use A+B formula\nCompatible with automated fertigation systems\nThree-Stage Nutrient Program\nStage 1 – Vegetative Growth\nDesigned to support strong root establishment, vigorous vegetative growth, and healthy foliage during the early development of the crop.\nUsage: From transplanting the seedling until it is 14 days old.\nStage 2 – Flowering & Fruit Set\nFormulated to support flowering, fruit set, and balanced plant development as the crop transitions into reproductive growth.\nUsage: From 15 days old up to 35 days old.\nStage 3 – Fruit Development & Production\nProvides nutrition adapted to the fruit development and production stage, supporting continued fruit growth, plant balance, and consistent crop performance.\nUsage: From 36 days old until the end of the season.\nRecommended Crop\nSweet Pepper | Bell Pepper\nSuitable for hydroponic production using: Dutch Bucket | Cocopeat | Rockwool | Soilless Systems | Greenhouse Production\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage for each growth stage.\nMonitor and adjust the final EC and pH according to the crop stage, environmental conditions, and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nHydroponic Sweet Pepper Production | Greenhouses | Soilless Culture | Automated Fertigation\nPlantX Sweet Pepper — Three-Stage Nutrition for Strong Plants and Quality Fruit.",
+  "options": [
+   "Size",
+   "Plant stage"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-sweet-pepper-a-b-0.jpg",
+   "plantx-nutrient-solution-for-sweet-pepper-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-SP-S1-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-SP-S2-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-SP-S3-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-SP-S1-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-SP-S2-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-SP-S3-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-SP-S1-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-SP-S2-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-SP-S3-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-beef-tomato-a-b",
+  "title": "PlantX Nutrient Solution for Beef Tomato A&B",
+  "title_ar": "محلول PlantX المغذي للطماطم البيف A&B",
+  "collection": "fruit",
+  "description": "PlantX Fruit Beef Tomato is a professional concentrated A+B nutrient solution specially formulated for hydroponic Beef tomato production. The three-stage formulation is designed to provide balanced nutrition according to the changing nutritional requirements of the crop throughout its growth and production cycle.\nThe formulation supports strong vegetative development, healthy flowering, fruit setting, and consistent fruit development and quality.\nKey Benefits\nThree-stage nutrition program for Beef tomatoes\nProvides essential macro and micronutrients\nSupports strong root and vegetative development\nSupports healthy flowering and fruit set\nHelps maintain balanced plant growth during fruit production\nSupports consistent fruit development and crop quality\nSuitable for hydroponic and soilless production\nConcentrated and easy-to-use A+B formula\nCompatible with automated fertigation systems\nThree-Stage Nutrient Program\nStage 1 – Vegetative Growth\nFormulated to support strong root establishment, healthy foliage, and vigorous vegetative growth during the early development of the plant.\nUsage:\nFrom transplanting the seedling until it is 14 days old.\nStage 2 – Flowering & Fruit Set\nDesigned to support flowering, pollination, fruit setting, and balanced plant development as the crop enters reproductive growth.\nUsage:\nFrom 15 days old until the third flower cluster develops.\nStage 3 – Fruit Development & Production\nProvides nutrition adapted to the fruit production stage, supporting continued fruit development, plant balance, and consistent crop performance.\nUsage:\nFrom the growth of the fourth flower cluster until the end of the season.\nRecommended Crop\nBeef Tomato\nSuitable for hydroponic production in:\nNFT | Dutch Bucket | Cocopeat | Rockwool | Soilless Systems\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage for each growth stage.\nMonitor and adjust the final EC and pH according to the crop stage, environmental conditions, and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nHydroponic Beef Tomato Production | Greenhouses | Soilless Culture | Automated Fertigation\nPlantX Beef Tomato — Three-Stage Nutrition for Every Stage of Production.",
+  "options": [
+   "Size",
+   "Plant stage"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-beef-tomato-a-b-0.jpg",
+   "plantx-nutrient-solution-for-beef-tomato-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-BT-S1-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-BT-S2-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-BT-S3-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-BT-S1-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-BT-S2-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-BT-S3-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-BT-S1-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-BT-S2-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-BT-S3-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-cherry-tomato-a-b",
+  "title": "PlantX Nutrient Solution for Cherry Tomato A&B",
+  "title_ar": "محلول PlantX المغذي للطماطم الشيري A&B",
+  "collection": "fruit",
+  "description": "PlantX Fruit Cherry Tomato – Hydroponic Nutrient Solution\nPlantX Cherry Tomato is a professional concentrated A+B nutrient solution specially formulated for hydroponic cherry tomato production. The three-stage formulation is designed to provide balanced nutrition according to the changing nutritional requirements of the crop throughout its growth and production cycle.\nThe formulation supports strong vegetative development, healthy flowering, fruit setting, and consistent fruit development and quality.\nKey Benefits\nThree-stage nutrition program for cherry tomatoes\nProvides essential macro and micronutrients\nSupports strong root and vegetative development\nSupports healthy flowering and fruit set\nHelps maintain balanced plant growth during fruit production\nSupports consistent fruit development and crop quality\nSuitable for hydroponic and soilless production\nConcentrated and easy-to-use A+B formula\nCompatible with automated fertigation systems\nThree-Stage Nutrient Program\nStage 1 – Vegetative Growth\nFormulated to support strong root establishment, healthy foliage, and vigorous vegetative growth during the early development of the plant.\nUsage:\nFrom transplanting the seedling until it is 14 days old.\nStage 2 – Flowering & Fruit Set\nDesigned to support flowering, pollination, fruit setting, and balanced plant development as the crop enters reproductive growth.\nUsage:\nFrom 15 days old until the third flower cluster develops.\nStage 3 – Fruit Development & Production\nProvides nutrition adapted to the fruit production stage, supporting continued fruit development, plant balance, and consistent crop performance.\nUsage:\nFrom the growth of the fourth flower cluster until the end of the season.\nRecommended Crop\nCherry Tomato\nSuitable for hydroponic production in:\nNFT | Dutch Bucket | Cocopeat | Rockwool | Soilless Systems\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage for each growth stage.\nMonitor and adjust the final EC and pH according to the crop stage, environmental conditions, and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nHydroponic Cherry Tomato Production | Greenhouses | Soilless Culture | Automated Fertigation\nPlantX Cherry Tomato — Three-Stage Nutrition for Every Stage of Production.",
+  "options": [
+   "Size",
+   "Plant stage"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-cherry-tomato-a-b-0.jpg",
+   "plantx-nutrient-solution-for-cherry-tomato-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CT-S1-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CT-S2-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-CT-S3-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CT-S1-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CT-S2-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-CT-S3-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-CT-S1-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-CT-S2-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 3"
+    ],
+    "sku": "PX-NS-CT-S3-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-leafy-greens-a-b",
+  "title": "PlantX Nutrient Solution for Leafy Greens",
+  "title_ar": "محلول PlantX المغذي للورقيات A&B",
+  "collection": "leafy",
+  "description": "PlantX Leafy Greens is a concentrated A+B nutrient solution specially formulated for hydroponic leafy green vegetables. Its balanced formulation provides essential macro and micronutrients to support vigorous vegetative growth, strong root development, healthy foliage, and consistent crop quality.\nDesigned for modern hydroponic production, PlantX Leafy Greens is suitable for a wide range of leafy crops and can be used in NFT, DWC, and other hydroponic and soilless growing systems.\nKey Benefits\nBalanced nutrition for leafy green vegetables\nProvides essential macro and micronutrients\nSupports strong root development\nPromotes healthy vegetative growth\nHelps maintain healthy, vibrant foliage\nSupports uniform crop development\nSuitable for different growth stages\nHighly concentrated and easy-to-use A+B formula\nSuitable for hydroponic and automated fertigation systems\nRecommended Crops\nSuitable for:\nArugula • Spinach • Kale • Swiss Chard • Mustard Greens • Pak Choi • Mizuna • Watercress and other leafy green vegetables.\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage. Adjust the final EC and pH according to the crop, growth stage, and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nNFT | DWC | Hydroponic Systems | Soilless Culture | Automated Fertigation\nPlantX Leafy Greens — Complete Nutrition for Healthy Leafy Crops.",
+  "options": [
+   "Size"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-leafy-greens-a-b-0.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml"
+    ],
+    "sku": "PX-NS-GL-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L"
+    ],
+    "sku": "PX-NS-GL-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L"
+    ],
+    "sku": "PX-NS-GL-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-lettuce-a-b",
+  "title": "PlantX Nutrient Solution for Lettuce",
+  "title_ar": "محلول PlantX المغذي للخس A&B",
+  "collection": "leafy",
+  "description": "PlantX Leafy Nutrient Solution for Lettuce is a concentrated A+B nutrient solution specially formulated to provide balanced nutrition for lettuce and a wide range of hydroponically grown vegetables.\nIts complete formulation supplies the essential macro and micronutrients required throughout the crop cycle, supporting strong root development, healthy vegetative growth, and high-quality, vibrant foliage.\nPlantX Leafy is designed for use in NFT, DWC, and other hydroponic and soilless growing systems, providing a practical and easy-to-use nutrient solution for both small-scale growers and professional hydroponic production.\nKey Benefits\nBalanced nutrition for lettuce\nProvides essential macro and micronutrients\nSupports strong root development\nPromotes healthy vegetative growth\nHelps maintain healthy, vibrant foliage\nSuitable for different stages of lettuce growth\nHighly concentrated and easy-to-use A+B formula\nCompatible with hydroponic and automated fertigation systems\nRecommended Crops\nSuitable for: Lettuce • Romaine • Batavia • Iceberg • Lollo Rosso • Endive\nDirections for Use\nDilute Part A and Part B separately in irrigation water according to the recommended dosage. Adjust the final EC and pH according to the crop stage and irrigation water quality.\nImportant: Never mix Part A and Part B concentrates directly together. Add each part separately to the irrigation water while mixing thoroughly.\nSuitable For\nNFT | DWC | Hydroponic Systems | Soilless Culture\nPlantX Leafy — Balanced Nutrition for Better Leafy Growth.",
+  "options": [
+   "Size"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-lettuce-a-b-0.jpg",
+   "plantx-nutrient-solution-for-lettuce-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml"
+    ],
+    "sku": "PX-NS-LT-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L"
+    ],
+    "sku": "PX-NS-LT-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L"
+    ],
+    "sku": "PX-NS-LT-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-strawberry-a-b",
+  "title": "PlantX Nutrient Solution for Strawberry A&B",
+  "title_ar": "محلول PlantX المغذي للفراولة A&B",
+  "collection": "berry",
+  "description": "PlantX Hydroponics Nutrient Solution is a professional, two-stage nutrient program specifically formulated for strawberry plants at every growth phase. Our concentrated A&B formula delivers balanced nutrition tailored to your plant's changing needs, ensuring robust development from seedling to harvest.\nStage 1 (Days 1-45): Establishes a strong root system, encourages balanced vegetative growth, increases healthy leaf development, and prepares plants for flowering.\nStage 2 (Day 46+): Supports continuous flowering, improves fruit set, maximizes fruit size and quality, and sustains production throughout the season.\nEach stage provides essential nutrients in precise ratios, promoting vigorous root development, optimal vegetative growth, and ultimately, exceptional flower and fruit production. Perfect for hydroponic strawberry cultivation.",
+  "options": [
+   "Size",
+   "Plant stage"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-strawberry-a-b-0.jpg",
+   "plantx-nutrient-solution-for-strawberry-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-ST-S1-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "250 ml",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-ST-S2-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-ST-S1-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "1 L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-ST-S2-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 1"
+    ],
+    "sku": "PX-NS-ST-S1-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   },
+   {
+    "options": [
+     "20L",
+     "Stage 2"
+    ],
+    "sku": "PX-NS-ST-S2-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-flowering-ornamental-plants-a-b",
+  "title": "PlantX Nutrient Solution for Flowering Ornamental Plants A&B",
+  "title_ar": "محلول PlantX المغذي لنباتات الزينة المزهرة A&B",
+  "collection": "garden",
+  "description": "PlantX Flowering Ornamental Plant Nutrient Solution A&B is a complete nutrition system of two concentrated solutions, expertly formulated to nourish flowering ornamental plants with precision and stability. The dual-packet design keeps nutrients separated until use, preventing precipitation and ensuring maximum efficiency. This balanced formula delivers essential macronutrients—nitrogen, phosphorus, potassium, calcium, magnesium, and sulfur—alongside vital micronutrients including iron, manganese, zinc, boron, copper, and molybdenum. Together, they support vigorous blooming, vibrant foliage, and sustained plant health. Ideal for a wide range of ornamental varieties, this concentrated solution is economical and easy to use. Simply shake both packets, add solution A to water first, then solution B. Never premix the concentrates.",
+  "options": [
+   "Size"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-flowering-ornamental-plants-a-b-0.jpg",
+   "plantx-nutrient-solution-for-flowering-ornamental-plants-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml"
+    ],
+    "sku": "PX-NS-FR-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L"
+    ],
+    "sku": "PX-NS-FR-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L"
+    ],
+    "sku": "PX-NS-FR-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-indoor-plants",
+  "title": "PlantX Nutrient Solution for Indoor Ornamental Plants and Shade Plants A&B",
+  "title_ar": "محلول PlantX المغذي للنباتات الداخلية ونباتات الظل A&B",
+  "collection": "garden",
+  "description": "PlantX Indoor Plant Nutrient Solution A&B is a complete nutrition system of two concentrated solutions specially developed to meet the nutritional needs of indoor plants, ornamental plants and shade plants. The formula contains a balanced blend of macro and micro nutrients needed to support the natural growth of the plant, maintain leaf vitality, and promote the healthy appearance of plants grown indoors, office or indoor gardens. The A&B system adopts the separation of certain nutrients within two independent packets to help maintain the stability of the solution and prevent precipitation of elements before use, ensuring higher efficiency when preparing the irrigation solution at the recommended dosage.\nFeatures\n✔ Balanced nutritional formula for indoor plants and ornamental plants.\n✔ Contains macroelements: nitrogen (N) phosphorus (P) potassium (K) calcium (Ca) magnesium (Mg) sulfur (S)\n✔ Contains micro elements: iron (Fe) manganese (Mn) zinc (Zn) boron (B) copper (Cu) molybdenum (Mo)\n✔ Helps support normal vegetative growth.\n✔ Contributes to the preservation of green color and vitality of the leaves.\n✔ Suitable for regular use with most houseplants.\n✔ Concentrated and economical formula.\nSuitable for\nPothos, Monstera, Snake Plant, ZZ Plant, Ficus, Dracaena, Philodendron, Aglaonema, and most indoor ornamental plants and shade plants.\nHow to Use\nShake the two packs well before use. Add the required amount of A to the water first and stir. Then add the required amount of B to the same water. Do not mix the two concentrated solutions together before diluting with water. Use the solution after dilution at the recommended dosage.\nStorage\nStore in a cool and dry place away from direct sunlight, sealed after use, and out of reach of children.",
+  "options": [
+   "Size"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-indoor-plants-0.jpg",
+   "plantx-nutrient-solution-for-indoor-plants-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml"
+    ],
+    "sku": "PX-NS-IN-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L"
+    ],
+    "sku": "PX-NS-IN-1L",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L"
+    ],
+    "sku": "PX-NS-IN-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ },
+ {
+  "handle": "plantx-nutrient-solution-for-herbs-medicinal-and-aromatic-plants-a-b",
+  "title": "PlantX Nutrient Solution for Herbs, Medicinal and Aromatic Plants A&B",
+  "title_ar": "محلول PlantX المغذي للأعشاب والنباتات الطبية والعطرية A&B",
+  "collection": "leafy",
+  "description": "PlantX Hydroponics Nutrient Solution is a scientifically integrated and balanced formula, specifically designed to meet the nutritional needs of herbs, medicinal and aromatic plants in hydroponic systems, in particular the NFT system. The product comes in a two-component system (A and B), each of which contains macro and micro nutrients necessary to support the different growth stages of the plant, while maintaining the balance of the solution and enhancing the efficiency of element absorption. This formula helps improve leaf color, plant vitality and support vigorous vegetative growth. Highly concentrated and economical to use, it is enough to dilute solutions A and B with water at recommended rates to get a ready-to-use nutrient solution.",
+  "options": [
+   "Size"
+  ],
+  "images": [
+   "plantx-nutrient-solution-for-herbs-medicinal-and-aromatic-plants-a-b-0.jpg",
+   "plantx-nutrient-solution-for-herbs-medicinal-and-aromatic-plants-a-b-1.jpg"
+  ],
+  "variants": [
+   {
+    "options": [
+     "250 ml"
+    ],
+    "sku": "PX-NS-HB-250ML",
+    "price": 199.99,
+    "compare_at": 220.0,
+    "grams": 550
+   },
+   {
+    "options": [
+     "1 L"
+    ],
+    "sku": "PX-NS-HB-1L-2",
+    "price": 299.99,
+    "compare_at": 320.0,
+    "grams": 2250
+   },
+   {
+    "options": [
+     "20L"
+    ],
+    "sku": "PX-NS-HB-20L",
+    "price": 2699.99,
+    "compare_at": 3300.0,
+    "grams": 20000
+   }
+  ]
+ }
+]

@@ -1,0 +1,46 @@
+{
+  "name": "backend",
+  "private": true,
+  "packageManager": "npm@10.9.9",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "backend:seed": "turbo seed --filter=@dtc/backend",
+    "backend:dev": "turbo dev --filter=@dtc/backend"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.5",
+      "@types/react-dom": "19.0.5",
+      "tsconfig-paths": "^4.2.0"
+    }
+  },
+  "devDependencies": {
+    "@medusajs/eslint-plugin": "2.22.7",
+    "eslint": "^9.39.4",
+    "jiti": "^2.7.0",
+    "prettier": "^3.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "turbo": "^2.0.14",
+    "ajv": "^8.13.0"
+  },
+  "workspaces": [
+    "apps/backend",
+    "!apps/backend/.medusa/**"
+  ],
+  "overrides": {
+    "eslint": {
+      "ajv": "^6.12.4"
+    },
+    "@eslint/eslintrc": {
+      "ajv": "^6.12.4"
+    }
+  }
+}
