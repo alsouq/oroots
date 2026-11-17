@@ -1,0 +1,10 @@
+# بيتولّد أوتوماتيك — مش محتاج يترفع
+node_modules/
+server/public/
+server/data/
+server/backups/
+server/config.json
+i18n/strings.json
+# ملفات النظام
+.DS_Store
+Thumbs.db

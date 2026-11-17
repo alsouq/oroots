@@ -24,7 +24,7 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 أجهزة متأخرة المعايرة	Devices overdue for calibration	Geräte mit überfälliger Kalibrierung
 👁️ عندك صلاحية عرض بس — تسجيل المعايرة لصاحب صلاحية التعديل.	👁️ You have view-only access — calibration logging is for users with edit permission.	👁️ Sie haben nur Leserechte — die Kalibrierung dürfen nur Nutzer mit Bearbeitungsrecht erfassen.
 مناخ صوبة	Greenhouse climate	Gewächshausklima
-قراءة	reading	Messwert
+قراءة	readings	readings
 تمت	done	erledigt
 مخفي	hidden	ausgeblendet
 عرض	view	ansehen
@@ -80,14 +80,14 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 جرعة الاستخدام الموصى بها	Recommended dose	Empfohlene Dosierung
 امتى يُستخدم (اختياري)	When to use (optional)	Wann anzuwenden (optional)
 الكمية المتاحة بالمخزن (اختياري)	Quantity available in stock (optional)	Verfügbare Menge im Lager (optional)
-عبوة	pack	Packung
+عبوة	packs	packs
 مدة الأمان قبل الحصاد PHI (أيام)	Pre-harvest interval PHI (days)	Wartezeit vor der Ernte PHI (Tage)
 الحد الأدنى للتنبيه (اختياري)	Minimum alert level (optional)	Mindestwarnstand (optional)
 سعر الوحدة (ج.م) (اختياري)	Unit price (EGP) (optional)	Stückpreis (EGP) (optional)
 يشتغل على أي طور من أطوار الحشرة	Works on any stage of the insect life cycle	Wirkt auf jedes Entwicklungsstadium des Insekts
 إلغاء	Cancel	Cancel
 ⏳ مدة الأمان:	⏳ Safety interval:	⏳ Wartezeit:
-يوم	day	Tag
+يوم	days	days
 الطور:	Stage:	Stadium:
 لا توجد أصناف بعد. ضيف سماد أو مبيد من النموذج فوق.	No items yet. Add a fertilizer or pesticide from the form above.	Noch keine Artikel. Fügen Sie oben im Formular einen Dünger oder ein Pflanzenschutzmittel hinzu.
 ⚠️ مخزون منخفض (	⚠️ Low stock (	⚠️ Niedriger Bestand (
@@ -235,7 +235,7 @@ service worker مش شغال:	service worker is not running:	Service Worker läu
 تجهز لـ	ready for	bereit für
 — اتقطفت	— cut	— geschnitten
 مرات	times	Mal
-مرة	time	Mal
+مرة	times	times
 (آخر قطفة	(last cut	(letzter Schnitt
 — بتتقطف كل	— cut every	— Schnitt alle
 — مواسير	— pipes	— Rohre
@@ -547,7 +547,7 @@ W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق
 ⏳ برّه فترات الري دلوقتي	⏳ Outside irrigation periods now	⏳ Derzeit außerhalb der Bewässerungszeiten
 (من المعايرة)	(from calibration)	(aus der Kalibrierung)
 وقت التشغيل اليومي	Daily run time	Tägliche Laufzeit
-دقيقة	Minutes	Minutes
+دقيقة	min	min
 كمية الري اليومية	Daily irrigation volume	Tägliche Bewässerungsmenge
 ⚠️ مفيش معايرة للنقاط للنظام ده — سجّل معايرة من «إدخال القياسات» عشان تتحسب الكميات.	⚠️ No emitter calibration for this system — log a calibration from "Enter measurements" so quantities can be calculated.	⚠️ Keine Tropferkalibrierung für dieses System — erfassen Sie eine Kalibrierung unter „Messungen eingeben“, damit Mengen berechnet werden.
 ℹ️ مفيش مواسير مزروعة في إنفوجراف الحصاد للنظام ده	ℹ️ No pipes are planted in the harvest infographic for this system	ℹ️ Für dieses System sind in der Ernte-Infografik keine Rohre bepflanzt
@@ -760,7 +760,6 @@ EC محسوب بنموذج (	EC calculated by a model (	EC per Modell berechnet 
 (ثابت للجاهز)	(fixed for ready-made)	(bei Fertigdüngern fest)
 الكثافة (جم/مل)	Density (g/ml)	Dichte (g/ml)
 ملحوظة: ربط الخصم من المخزن وسعر الجرام بيتم باسم السماد، فلو غيّرت الاسم غيّر اسم الصنف في «المخازن» كمان. سعر السماد هنا بيُستخدم في تكلفة الخلطة وتكلفة الإنتاج لو الصنف مالوش سعر في المخزن.	Note: linking stock deduction and price per gram is done by fertilizer name, so if you change the name, change the item name in "Stock" too. The fertilizer price here is used in the mix cost and production cost if the item has no price in stock.	Hinweis: Die Verknüpfung von Lagerabzug und Grammpreis erfolgt über den Düngernamen; wenn Sie den Namen ändern, ändern Sie auch den Artikelnamen im „Lager“. Der Düngerpreis hier wird für Mischungs- und Produktionskosten verwendet, wenn der Artikel im Lager keinen Preis hat.
-(مفيش صلاحية)	(no permission)	(keine Berechtigung)
 استرجاع سماد للأصل:	Restore fertilizer to original:	Dünger auf Original zurücksetzen:
 الصيغة	Formula	Formel
 التكلفة الإجمالية	Total cost	Gesamtkosten
@@ -857,7 +856,7 @@ EC متوقع mS/cm	Expected EC mS/cm	Erwartete EC mS/cm
 عشان تضيف الكورس لخطة الرش محتاج صلاحية تعديل في تبويب الرش والتسميد.	To add the course to the spraying plan you need edit permission in the Spraying & fertilizing tab.	Um den Plan zum Spritzplan hinzuzufügen, benötigen Sie Bearbeitungsrechte im Tab Spritzen & Düngen.
 بيضيف...	Adding...	Wird hinzugefügt...
 كورس علاج «	Treatment course «	Behandlungsplan «
-رشة	spray	Spritzung
+رشة	sprays	sprays
 — المجموعة:	— group:	— Gruppe:
 كورس علاج مقترح:	Suggested treatment course:	Vorgeschlagener Behandlungsplan:
 رشة (من	sprays (from	Spritzungen (ab
@@ -1553,7 +1552,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 هيوصل	will reach	erreicht
 جم في اليوم	g per day	g pro Tag
 من الشتل، والمرجع	from transplanting, and the reference	ab dem Umpflanzen, und die Referenz
-وزنة	weighing	Wägung
+وزنة	weighings	weighings
 ضيف صوبة ونظام الأول من تبويب بيانات المياه.	Add a greenhouse and system first from the Water data tab.	Fügen Sie zuerst im Tab Wasserdaten ein Gewächshaus und System hinzu.
 وزنة)	weighings)	Wägungen)
 ملخص الدفعة	Batch summary	Chargenübersicht
@@ -1778,7 +1777,7 @@ DLI بيتحسب من الإشعاع الكلي (#% منه PAR). جوه الصو
 موليبدات الصوديوم Sodium Molybdate (#H#O)	Sodium Molybdate (#H#O)	Natriummolybdat (#H#O)
 (خزان B) Zn #% — سعر #/كجم	(Tank B) Zn #% — price #/kg	(Tank B) Zn #% — Preis #/kg
 (خزان B) K #% · S #% — نقاوة #% · سعر #/كجم	(Tank B) K #% · S #% — purity #% · price #/kg	(Tank B) K #% · S #% — Reinheit #% · Preis #/kg
-ماسورة	Pipe	Rohr
+ماسورة	pipes	pipes
 ورقيات	Leafy greens	Blattgemüse
 معامل المحصول Kc	Crop coefficient Kc	Kulturkoeffizient Kc
 (تلقائي للمحصول)	(automatic for the crop)	(automatisch je Kultur)
@@ -2188,7 +2187,7 @@ mol/m²/يوم	mol/m²/day	mol/m²/Tag
 رجّع الوقت لدلوقتي	Reset time to now	Zeit auf jetzt zurücksetzen
 أي ملاحظة	Any note	Beliebige Notiz
 الصواني	Trays	Trays
-مجموعة	Group	Gruppe
+مجموعة	groups	groups
 آخر قطفة #-#-# − # يوم مشتل (افتراضي — حدّده من أسماء الأصناف) = ميعاد الزراعة #-#-#	Last cut #-#-# − # nursery days (default — set from crop names) = sowing date #-#-#	Letzter Schnitt #-#-# − # Anzuchttage (Standard — aus den Kulturnamen festlegen) = Aussaatdatum #-#-#
 ازرع # صينية يوم #-#-# (بعد # يوم)	Sow # trays on #-#-# (in # days)	# Trays am #-#-# aussäen (in # Tagen)
 حصاد ريحان إيطالي (كجم) عبر الزمن	Italian basil harvest (kg) over time	Ernte Italienisches Basilikum (kg) im Zeitverlauf
@@ -2310,7 +2309,7 @@ mol/m²/يوم	mol/m²/day	mol/m²/Tag
 محلولين مركّزين A + B	Two concentrated solutions A + B	Zwei Konzentratlösungen A + B
 حجم المحلول النهائي	Final solution volume	Volumen der fertigen Lösung
 وحدة الحجم	Volume unit	Volumeneinheit
-لتر	Liter	Liter
+لتر	L	L
 جالون	Gallon	Gallone
 متر مكعب	Cubic meter	Kubikmeter
 وحدة الوزن	Weight unit	Gewichtseinheit
@@ -2490,7 +2489,7 @@ LG# — آخر # يوم مقارنةً بالـ # يوم اللي قبلها	LG#
 متأخر عن ميعاد الزراعة	Past the sowing date	Aussaatdatum überschritten
 زراعة خلال # أيام	Sow within # days	Aussaat innerhalb von # Tagen
 صواني مطلوبة دلوقتي	Trays needed now	Jetzt benötigte Trays
-صينية	tray	Tray
+صينية	trays	trays
 آخر قطفة #-#-# − # يوم مشتل = ميعاد الزراعة #-#-#	Last cut #-#-# − # nursery days = sowing date #-#-#	Letzter Schnitt #-#-# − # Anzuchttage = Aussaatdatum #-#-#
 كان لازم تزرع # صينية من # يوم (#-#-#) — لو زرعت النهارده المواسير هتفضل فاضية حوالين # يوم بعد القطفة الأخيرة	You should have sown # trays # days ago (#-#-#) — if you sow today the pipes will stay empty for about # days after the last cut	Sie hätten vor # Tagen # Trays aussäen sollen (#-#-#) — säen Sie heute, bleiben die Rohre nach dem letzten Schnitt etwa # Tage leer
 ملخص المشتل (اللي لسه فيه)	Nursery summary (what is still in it)	Anzucht-Zusammenfassung (was noch darin ist)
@@ -4099,7 +4098,7 @@ vega algeno — # ملل / لتر	vega algeno — # ml / L	vega algeno — # ml 
 كل خط فيه عدد نباتات وصنف. الخطوط بتتجمّع في أزواج: مسافة صغيرة جوه الزوج، وممر كبير بين كل زوجين (الخط المنقّط بين الأزواج هو الممر).	Each row has a number of plants and a variety. Rows are grouped in pairs: a small gap inside the pair and a large aisle between pairs (the dotted line between pairs is the aisle).	Each row has a number of plants and a variety. Rows are grouped in pairs: a small gap inside the pair and a large aisle between pairs (the dotted line between pairs is the aisle).
 الخطوط	Rows	Rows
 الأزواج	Pairs	Pairs
-خط	row	row
+خط	rows	rows
 زوج	pair	pair
 لسه ما اتضافتش خطوط. ضيف أول خط من النموذج تحت.	No rows added yet. Add the first row from the form below.	No rows added yet. Add the first row from the form below.
 # خط	# rows	# rows
@@ -4214,8 +4213,1045 @@ EC الري # خارج المدى (#–#)	irrigation EC # out of range (#–#)	i
 📝 لسه ما اتسجلتش قراءات النهارده (#)	📝 Today's readings haven't been logged yet (#)	📝 Today's readings haven't been logged yet (#)
 ☀️ ملخص الصبح	☀️ Morning summary	☀️ Morning summary
 🌱 المايكروجرين	🌱 Microgreens	🌱 Microgreens
+كلّم المدير عشان يعملك كلمة سر جديدة	Ask the admin to create a new password for you	Ask the admin to create a new password for you
+🔑 اختار كلمة سر جديدة	🔑 Choose a new password	🔑 Choose a new password
+إنت داخل بكلمة سر مؤقتة. اختار كلمة سر خاصة بيك (# حروف على الأقل).	You are signed in with a temporary password. Choose your own password (at least # characters).	You are signed in with a temporary password. Choose your own password (at least # characters).
+كلمة السر الجديدة	New password	New password
+أكّد كلمة السر	Confirm the password	Confirm the password
+كلمة السر لازم # حروف على الأقل	The password must be at least # characters	The password must be at least # characters
+كلمتين السر مش زي بعض	The two passwords don't match	The two passwords don't match
+ما اتحفظتش — جرّب تاني	Not saved — try again	Not saved — try again
+🔒 كلمة مرور جديدة	🔒 New password	🔒 New password
+كلمة مرور جديدة	New password	New password
+تعمل كلمة مرور مؤقتة جديدة للموظف ده؟ كلمته القديمة هتبطل ويخرج من كل الأجهزة.	Create a new temporary password for this employee? Their old password will stop working and they will be signed out of all devices.	Create a new temporary password for this employee? Their old password will stop working and they will be signed out of all devices.
+نبعت للموظف رابط تغيير كلمة المرور على الإيميل بتاعه؟	Send the employee a password-reset link by email?	Send the employee a password-reset link by email?
+كلمة السر المؤقتة الجديدة:	New temporary password:	New temporary password:
+ابعتها للموظف — أول ما يدخل بيها هيختار كلمة سر خاصة بيه.	Send it to the employee — when they sign in with it they will choose their own password.	Send it to the employee — when they sign in with it they will choose their own password.
+دي آخر قطفة — فضّي المواسير (مثلاً لو هتشيلها بدري)	This is the last cut — empty the pipes (e.g. if you are removing the plants early)	This is the last cut — empty the pipes (e.g. if you are removing the plants early)
+✂️ دي آخر قطفة — المواسير هتفضى بعدها	✂️ This is the last cut — the pipes will be empty after it	✂️ This is the last cut — the pipes will be empty after it
+اتحذف — والمواسير رجعت زي ما كانت	Deleted — and the pipes were restored to how they were	Deleted — and the pipes were restored to how they were
+اتحذف — المواسير ما رجعتش لأنها اتغيّرت بعد الحصاد ده	Deleted — the pipes were not restored because they changed after this harvest	Deleted — the pipes were not restored because they changed after this harvest
+اتحذف، بس المواسير ما رجعتش — عدّلها من «تعديل»	Deleted, but the pipes were not restored — fix them with “Edit”	Deleted, but the pipes were not restored — fix them with “Edit”
+🧺 تسجيل الحصاد بالصنف	🧺 Harvest by variety	🧺 Harvest by variety
+لسه ما اتقطفش	Not picked yet	Not picked yet
+اختار خط واحد على الأقل	Choose at least one row	Choose at least one row
+التاريخ ده لسه ما جاش	That date is in the future	That date is in the future
+المواسير اتغيّرت من جهاز تاني — افتحها تاني	The pipes were changed from another device — open them again	The pipes were changed from another device — open them again
+المجموعة دي لسه ما اتزرعتش (#-#-#)	This group has not been planted yet (#-#-#)	This group has not been planted yet (#-#-#)
+تم حفظ الحصاد، بس مخطط المواسير ما اتحدّثش — عدّله من «تعديل»	Harvest saved, but the pipe map was not updated — fix it with “Edit”	Harvest saved, but the pipe map was not updated — fix it with “Edit”
+اتقفلت بدري	ended early	ended early
+(قطفة #/#)	(cut #/#)	(cut #/#)
+(قطفة #/# — أخيرة)	(cut #/# — last)	(cut #/# — last)
+⏳ لسه فاضل # يوم على ميعادها	⏳ # more days until it is due	⏳ # more days until it is due
+✅ جاهزة	✅ Ready	✅ Ready
+مواسير #–# (# ماسورة)	Pipes #–# (# pipes)	Pipes #–# (# pipes)
+زراعة #-#-#	Planted #-#-#	Planted #-#-#
+✂️ قطفة # من #	✂️ Cut # of #	✂️ Cut # of #
+🧺 حصاد	🧺 Harvest	🧺 Harvest
+🍅 قطفة	🍅 Pick	🍅 Pick
+خط # (# نبتة)	Row # (# plants)	Row # (# plants)
+من # لحد #	from # to #	from # to #
+آخر قطفة #-#-# (# كجم)	last pick #-#-# (# kg)	last pick #-#-# (# kg)
+#) الهدف الغذائي ({} في المحلول النهائي)	#) Nutrient target ({} in the final solution)	#) Nutrient target ({} in the final solution)
+#) قراءات المناخ المستخدمة — صوبة «{}»	#) Climate readings used — greenhouse “{}”	#) Climate readings used — greenhouse “{}”
+#) مكتبة الأسمدة ({})	#) Fertilizer library ({})	#) Fertilizer library ({})
+% (آخر {} يوم)	% (last {} days)	% (last {} days)
+(+{} تانية)	(+{} more)	(+{} more)
+({} استخدام)	({} uses)	({} uses)
+({} رشة/تسميد)	({} sprays/fertigations)	({} sprays/fertigations)
+({} صينية ≈ {} نبتة)	({} trays ≈ {} plants)	({} trays ≈ {} plants)
+({} قراءة{}): إشعاع الصوبة ÷ إشعاع برّه.{}	({} readings{}): greenhouse radiation ÷ outside radiation.{}	({} readings{}): greenhouse radiation ÷ outside radiation.{}
+({} كجم)	({} kg)	({} kg)
+({} لتر للنظام)	({} L for the system)	({} L for the system)
+({} لتر/س)	({} L/h)	({} L/h)
+({} متأخرة)	({} overdue)	({} overdue)
+({} نبات)	({} plants)	({} plants)
+({} يوم)	({} days)	({} days)
+({} — {} مرة)	({} — {} times)	({} — {} times)
+(اسمه الأصلي: {})	(original name: {})	(original name: {})
+(افتراضي)	(default)	(default)
+(الحجم هيبقى {} لتر، تأكد إن الخزان يسع).	(The volume will be {} L — make sure the tank can hold it).	(The volume will be {} L — make sure the tank can hold it).
+(المعروض محدود بآخر {} يوم محمّلين — لو عايز أقدم من كده زوّد «مدة البيانات المحمّلة» من الإعدادات)	(Shown data is limited to the last {} loaded days — to see older data, increase “Loaded data period” in Settings)	(Shown data is limited to the last {} loaded days — to see older data, increase “Loaded data period” in Settings)
+(النهارده)	(today)	(today)
+(خزان {})	(tank {})	(tank {})
+(غير متاح) {}	(unavailable) {}	(unavailable) {}
+(قطفة {}/{}{})	(cut {}/{}{})	(cut {}/{}{})
+(متأخرة {})	({} overdue)	({} overdue)
+(متأخرة)	(overdue)	(overdue)
+(متزرع منها {})	({} of them planted)	({} of them planted)
+(مستخدم في {} سجل، السجلات هتفضل بالاسم ده)	(used in {} records — those records keep this name)	(used in {} records — those records keep this name)
+(من إمبارح)	(since yesterday)	(since yesterday)
+(موعد زراعة الدفعة الجاية: {})	(next batch sowing date: {})	(next batch sowing date: {})
+(مياه الري{} ليوم فيه قراءات مناخ) عشان يتحسب Kc من استهلاك نباتك الفعلي. دلوقتي: {} يوم صالح.	(irrigation water{} for a day with climate readings) so Kc can be calculated from your plants' actual use. Now: {} valid days.	(irrigation water{} for a day with climate readings) so Kc can be calculated from your plants' actual use. Now: {} valid days.
+(وهتتمسح من مهام {} كمان)	(and it will also be removed from {}'s tasks)	(and it will also be removed from {}'s tasks)
+*تقرير O'Roots* — من {} إلى {}	*O'Roots report* — from {} to {}	*O'Roots report* — from {} to {}
++ طلبات بوحدة تانية ({})	+ orders in another unit ({})	+ orders in another unit ({})
++{} تانية	+{} more	+{} more
++{} تنبيه إضافي — راجع تبويبات المهام والمكافحة.	+{} more alerts — check the Tasks and Pest control tabs.	+{} more alerts — check the Tasks and Pest control tabs.
++{} مهمة تانية ليك	+{} more tasks for you	+{} more tasks for you
+= ETc ÷ الكثافة ({} نبات/م²) × #{}	= ETc ÷ density ({} plants/m²) × #{}	= ETc ÷ density ({} plants/m²) × #{}
+= {} دقيقة تشغيل	= {} minutes of running	= {} minutes of running
+= {} لتر للنظام ({} نبتة)	= {} L for the system ({} plants)	= {} L for the system ({} plants)
+= نفاذية الغطاء ({}%) × إشعاع برّه الصوبة بالساعة	= cover transmittance ({}%) × outside radiation per hour	= cover transmittance ({}%) × outside radiation per hour
+DLI إمبارح	DLI yesterday	DLI yesterday
+EC إلى	EC to	EC to
+EC محسوب بنموذج ({}). تقدير للتخطيط — أكّده دايمًا بجهاز EC حقيقي. GE = بُعد النتيجة عن الهدف، IE = أثر دقة الميزان والحجم.	EC calculated with the ({}) model. A planning estimate — always confirm with a real EC meter. GE = distance of the result from the target, IE = effect of scale and volume accuracy.	EC calculated with the ({}) model. A planning estimate — always confirm with a real EC meter. GE = distance of the result from the target, IE = effect of scale and volume accuracy.
+EC من (mS/cm)	EC from (mS/cm)	EC from (mS/cm)
+FRAC NM-بيروكسيد	FRAC NM-peroxide	FRAC NM-peroxide
+FRAC NM-بيكربونات	FRAC NM-bicarbonate	FRAC NM-bicarbonate
+Firebase بلّغ النهارده (الساعة {}) إن الحصة المجانية خلصت، والتسجيل واقف لحد التجديد (حوالي {} بتوقيت القاهرة). الأرقام تحت تقدير ناقص: الحقيقي أعلى منها، لأن فيه استهلاك مش بيتعدّ (فتح الـConsole، وسكربتات لسه ما اتحدّثتش، وقراءات الـlisteners بعد غياب طويل).	Firebase reported today (at {}) that the free quota ran out, and saving is paused until it renews (around {} Cairo time). The numbers below are an underestimate: the real usage is higher, because some usage isn't counted (opening the Console, scripts not yet updated, and listener reads after a long absence).	Firebase reported today (at {}) that the free quota ran out, and saving is paused until it renews (around {} Cairo time). The numbers below are an underestimate: the real usage is higher, because some usage isn't counted (opening the Console, scripts not yet updated, and listener reads after a long absence).
+IRAC NM-زيت	IRAC NM-oil	IRAC NM-oil
+IRAC NM-صابون	IRAC NM-soap	IRAC NM-soap
+Kc المعايَر من {} يوم (الوسيط):	Calibrated Kc from {} days (median):	Calibrated Kc from {} days (median):
+Kc اليوم	Kc today	Kc today
+Kc هو معامل المحصول في معادلة الاحتياج. القيمة الافتراضية مرجعية عامة، لكن نباتك الفعلي ممكن يستهلك أكتر أو أقل. سجّل كل يوم كام لتر ميّه {}، والنظام بيقارنه بالاحتياج المحسوب (بـ Kc = #) ويطلّع Kc لكل يوم، والوسيط هو المقترح. محتاج «عدد النباتات» في الإعدادات، وقراءات مناخ لنفس اليوم. الأيام الشاذة (عطل في الري، مطر...) ما بتأثرش كتير لأننا بنستخدم الوسيط.	Kc is the crop coefficient in the water-need equation. The default is a general reference, but your actual plants may use more or less. Record every day how many litres of water {}, and the system compares it with the calculated need (with Kc = #) and works out Kc for each day; the median is the suggestion. It needs “Number of plants” in Settings, and climate readings for the same day. Odd days (irrigation fault, rain...) don't affect it much because we use the median.	Kc is the crop coefficient in the water-need equation. The default is a general reference, but your actual plants may use more or less. Record every day how many litres of water {}, and the system compares it with the calculated need (with Kc = #) and works out Kc for each day; the median is the suggestion. It needs “Number of plants” in Settings, and climate readings for the same day. Odd days (irrigation fault, rain...) don't affect it much because we use the median.
+mol/m² لحد دلوقتي{}	mol/m² so far{}	mol/m² so far{}
+pH إلى	pH to	pH to
+pH من	pH from	pH from
+pH: محتاج {} بمقدار {} — احفظ معايرة ال{} فوق عشان تتحسب الكمية.	pH: needs {} by {} — save the {} calibration above so the amount can be calculated.	pH: needs {} by {} — save the {} calibration above so the amount can be calculated.
+{} ({} {} = {} جم)	{} ({} {} = {} g)	{} ({} {} = {} g)
+{} ({} × {} جم)	{} ({} × {} g)	{} ({} × {} g)
+{} ({} نظام)	{} ({} systems)	{} ({} systems)
+{} (ابدأ بنص الكمية ≈ {} مل، ودوّر، وقيس تاني).	{} (start with half the amount ≈ {} ml, circulate, and measure again).	{} (start with half the amount ≈ {} ml, circulate, and measure again).
+{} (اسم قديم — مش في القايمة)	{} (old name — not in the list)	{} (old name — not in the list)
+{} (اسم قديم)	{} (old name)	{} (old name)
+{} (تربة): {}	{} (soil): {}	{} (soil): {}
+{} (غير مربوط بحساب)	{} (not linked to an account)	{} (not linked to an account)
+{} (مناخ): {}	{} (climate): {}	{} (climate): {}
+{} (نسخة)	{} (copy)	{} (copy)
+{} (وحدة {})	{} (unit {})	{} (unit {})
+{} (وحدة المخزون {} — يحتاج تحويل يدوي)	{} (stock unit {} — needs manual conversion)	{} (stock unit {} — needs manual conversion)
+{} {} (آخر قراءة {})	{} {} (last reading {})	{} {} (last reading {})
+{} {}جم	{} {}g	{} {}g
+{} · {} بوفورت	{} · {} Beaufort	{} · {} Beaufort
+{} اتعمل {} (مدة الأمان {} يوم) ← آمن للحصاد من {}	{} applied {} (pre-harvest interval {} days) ← safe to harvest from {}	{} applied {} (pre-harvest interval {} days) ← safe to harvest from {}
+{} استخدام	{} uses	{} uses
+{} السوائل بتتحسب دايمًا بالمل. درجة الحرية الافتراضية S (الكبريت) الافتراضي: بيتحسب كناتج مش كهدف.	{} Liquids are always calculated in ml. Default degree of freedom S (sulphur) by default: calculated as an output, not a target.	{} Liquids are always calculated in ml. Default degree of freedom S (sulphur) by default: calculated as an output, not a target.
+{} بتتحرك في اتجاه واحد {} {} أيام (من {} لـ {})	{} moving in one direction {} {} days (from {} to {})	{} moving in one direction {} {} days (from {} to {})
+{} ثابتة على {} في آخر {} قراءات — اتأكد من الحساس أو إن القراءة مش بتتنسخ	{} stuck at {} in the last {} readings — check the sensor or whether the reading is being copied	{} stuck at {} in the last {} readings — check the sensor or whether the reading is being copied
+{} ج.م	{} EGP	{} EGP
+{} جديد ليك	{} new for you	{} new for you
+{} جديدة	{} new	{} new
+{} جم	{} g	{} g
+{} جم{}	{} g{}	{} g{}
+{} خط	{} rows	{} rows
+{} خط — {} نبتة	{} rows — {} plants	{} rows — {} plants
+{} خط — {} نبتة{}	{} rows — {} plants{}	{} rows — {} plants{}
+{} د	{} min	{} min
+{} دقيقة تشغيل	{} minutes of running	{} minutes of running
+{} رش/تسميد النهارده ومش معيّن لحد	{} sprays/fertigations today with no one assigned	{} sprays/fertigations today with no one assigned
+{} رش/تسميد متأخر وملهوش حد	{} sprays/fertigations overdue with no one assigned	{} sprays/fertigations overdue with no one assigned
+{} ريّة	{} irrigations	{} irrigations
+{} زراعة {} صينية حسب الخطة	{} sowing of {} trays per the plan	{} sowing of {} trays per the plan
+{} شكوى جديدة محتاجة مراجعة	{} new complaints need review	{} new complaints need review
+{} شكوى عالية الخطورة لسه مفتوحة	{} high-severity complaints still open	{} high-severity complaints still open
+{} شكوى — مفتوحة: {}{}	{} complaints — open: {}{}	{} complaints — open: {}{}
+{} صنف اسمه جديد (مش في القايمة).	{} items with a new name (not in the list).	{} items with a new name (not in the list).
+{} صنف محتاج تأكيد.	{} items need confirmation.	{} items need confirmation.
+{} صورة محفوظة	{} saved photos	{} saved photos
+{} صينية {} جاهزة للشتل	{} trays of {} ready for transplanting	{} trays of {} ready for transplanting
+{} صينية × {} = {} نبتة ÷ {} نبتة/ماسورة ≈ {} ماسورة. الفاضي في النظام: {}{}.	{} trays × {} = {} plants ÷ {} plants/pipe ≈ {} pipes. Free in the system: {}{}.	{} trays × {} = {} plants ÷ {} plants/pipe ≈ {} pipes. Free in the system: {}{}.
+{} صينية ≈ {} نبتة{}	{} trays ≈ {} plants{}	{} trays ≈ {} plants{}
+{} طلب موجود قبل كده.	{} orders already exist.	{} orders already exist.
+{} عبوة	{} packs	{} packs
+{} عملية{}	{} actions{}	{} actions{}
+{} عنصر	{} items	{} items
+{} قراءة وقتها قبل الشروق أو بعد الغروب فمش محسوبة في الـ DLI (الحساب بيعتمد على ضوء الشمس بس). المحسوب: {} قراءة.	{} readings were taken before sunrise or after sunset, so they are not counted in the DLI (it only uses sunlight). Counted: {} readings.	{} readings were taken before sunrise or after sunset, so they are not counted in the DLI (it only uses sunlight). Counted: {} readings.
+{} قطفات كل {} يوم	{} cuts every {} days	{} cuts every {} days
+{} قطفة — إجمالي {} {}	{} picks — total {} {}	{} picks — total {} {}
+{} كجم	{} kg	{} kg
+{} لتر	{} L	{} L
+{} لتر ماء	{} L water	{} L water
+{} لتر محلول مركّز	{} L concentrated solution	{} L concentrated solution
+{} م³	{} m³	{} m³
+{} ماسورة جاهزة للحصاد النهارده	{} pipes ready to harvest today	{} pipes ready to harvest today
+{} ماسورة عدّت ميعاد الحصاد بأكتر من {} أيام — احصدها بسرعة قبل ما الورق يطول ويمرّ.	{} pipes are more than {} days past harvest time — harvest them quickly before the leaves get long and bitter.	{} pipes are more than {} days past harvest time — harvest them quickly before the leaves get long and bitter.
+{} ماسورة عدّت ميعاد الحصاد/القطفة	{} pipes past harvest/cut time	{} pipes past harvest/cut time
+{} ماسورة ≈ {} نبتة	{} pipes ≈ {} plants	{} pipes ≈ {} plants
+{} مجدول ليك	{} scheduled for you	{} scheduled for you
+{} مجموعة مواسير: {} — {} ماسورة	{} pipe groups: {} — {} pipes	{} pipe groups: {} — {} pipes
+{} معايرة — المتوسط {} {} — أقل {} — أعلى {}	{} calibrations — average {} {} — min {} — max {}	{} calibrations — average {} {} — min {} — max {}
+{} مل	{} ml	{} ml
+{} مل/# لتر لكل # pH	{} ml/# L per # pH	{} ml/# L per # pH
+{} مل/نبتة	{} ml/plant	{} ml/plant
+{} من {} قراءة يومية مطلوبة	{} of {} required daily readings	{} of {} required daily readings
+{} مهمة	{} tasks	{} tasks
+{} مهمة ليك{}	{} tasks for you{}	{} tasks for you{}
+{} مهمة متأخرة على الفريق	{} tasks overdue for the team	{} tasks overdue for the team
+{} مهمة معلّقة خلال إجازتك ({} → {}) اتحوّلت لـ {}	{} pending tasks during your leave ({} → {}) were moved to {}	{} pending tasks during your leave ({} → {}) were moved to {}
+{} نوع	{} types	{} types
+{} يوم	{} days	{} days
+{} يوم فيهم انحراف كبير بين الصرف والري (الحد: EC ±{} وpH ±{}). EC الصرف الأعلى غالبًا معناه تراكم أملاح؛ وpH مختلف كتير معناه راجع المحلول.	{} days with a large drift between drainage and irrigation (limit: EC ±{} and pH ±{}). Higher drainage EC usually means salt build-up; a very different pH means check the solution.	{} days with a large drift between drainage and irrigation (limit: EC ±{} and pH ±{}). Higher drainage EC usually means salt build-up; a very different pH means check the solution.
+{} يوم من {} لحد {} — {} — {}	{} days from {} to {} — {} — {}	{} days from {} to {} — {} — {}
+{} — {} (كان {})	{} — {} (was {})	{} — {} (was {})
+{} — {} (كانت {})	{} — {} (was {})	{} — {} (was {})
+{} — {} خط — {} نبتة	{} — {} rows — {} plants	{} — {} rows — {} plants
+{} — {} صنف {} {}	{} — {} items {} {}	{} — {} items {} {}
+{} — {} طلب	{} — {} orders	{} — {} orders
+{} — {} مادة خام	{} — {} raw materials	{} — {} raw materials
+{} — {} مرة	{} — {} times	{} — {} times
+{} — {} — السبب: {} — بواسطة {}	{} — {} — reason: {} — by {}	{} — {} — reason: {} — by {}
+{} — {} — بواسطة {}	{} — {} — by {}	{} — {} — by {}
+{} — آخر {} يوم مقارنةً بالـ {} يوم اللي قبلها	{} — last {} days compared with the {} days before	{} — last {} days compared with the {} days before
+{} — سجل الحصاد	{} — harvest log	{} — harvest log
+{} — قدرة المضخة (ك.و)	{} — pump power (kW)	{} — pump power (kW)
+{} — مناخ الصوبة (للقراءة فقط)	{} — greenhouse climate (read-only)	{} — greenhouse climate (read-only)
+{} — مواسير {}	{} — pipes {}	{} — pipes {}
+{} — نظرة تفصيلية (للقراءة فقط)	{} — detailed view (read-only)	{} — detailed view (read-only)
+{} — وزن ال{} (جم)	{} — {} weight (g)	{} — {} weight (g)
+{}% من اللي جه	{}% of what came in	{}% of what came in
+{}/{} {} — فاقد {} ({}%)	{}/{} {} — loss {} ({}%)	{}/{} {} — loss {} ({}%)
+{}: {} لتر/دقيقة للنقطة	{}: {} L/min per dripper	{}: {} L/min per dripper
+{}: {} ماسورة جاهزة للحصاد {} (≈ {} نبتة)	{}: {} pipes ready to harvest {} (≈ {} plants)	{}: {} pipes ready to harvest {} (≈ {} plants)
+{}: {} — خصم {} {} (المتبقي {})	{}: {} — deducted {} {} (remaining {})	{}: {} — deducted {} {} (remaining {})
+{}: برد — صغرى {}°C. غطّي/دفّي الصوب وراجع حرارة المحلول.	{}: cold — min {}°C. Cover/heat the greenhouses and check the solution temperature.	{}: cold — min {}°C. Cover/heat the greenhouses and check the solution temperature.
+{}: خطر {} ({} — {} ساعة ظروف مناسبة في آخر # ساعة). {}	{}: {} risk ({} — {} hours of favourable conditions in the last # hours). {}	{}: {} risk ({} — {} hours of favourable conditions in the last # hours). {}
+{}: رياح شديدة — لحد {} كم/س. اتأكد من تثبيت الأغطية والأبواب.	{}: strong wind — up to {} km/h. Make sure covers and doors are secured.	{}: strong wind — up to {} km/h. Make sure covers and doors are secured.
+{}: مطر متوقع {} مم. أجّل الرش وراجع التصريف.	{}: rain expected {} mm. Postpone spraying and check drainage.	{}: rain expected {} mm. Postpone spraying and check drainage.
+{}: مطلوب {} {} — اتفرز {} ({}%)	{}: required {} {} — sorted {} ({}%)	{}: required {} {} — sorted {} ({}%)
+{}: مطلوب {} صينية، الموجود في المشتل {}، الناقص {}.	{}: {} trays needed, {} in the nursery, {} short.	{}: {} trays needed, {} in the nursery, {} short.
+{}: من {} إلى {}	{}: from {} to {}	{}: from {} to {}
+{}: موجة حر — عظمى {}°C. جهّز التظليل والتهوية وزوّد الري.	{}: heat wave — max {}°C. Prepare shading and ventilation and increase irrigation.	{}: heat wave — max {}°C. Prepare shading and ventilation and increase irrigation.
+{}{} ({} نظام)	{}{} ({} systems)	{}{} ({} systems)
+{}{} افتح التطبيق واضغط "تم " عشان التنبيه يقف.	{}{} Open the app and tap "Done" to stop the alert.	{}{} Open the app and tap "Done" to stop the alert.
+{}{} رسالة جديدة	{}{} new messages	{}{} new messages
+{}{} من {} — باقي {} في المشتل	{}{} of {} — {} left in the nursery	{}{} of {} — {} left in the nursery
+{}{}% عن الفترة اللي قبلها	{}{}% vs the previous period	{}{}% vs the previous period
+{}{}. وأوقات الريات بتتوزّع بحيث كل ريّة تغطي نفس الحصة من احتياج النهار (فبتتزاحم وقت الذروة)، من #% لـ #% من احتياج ساعات النهار — يعني بعد الشروق بشوية وقبل الغروب بشوية. ساعات الليل (احتياجها قليل جدًا) بتتجمّع في إجمالي اليوم وبتتوزّع على ريات النهار.	{}{}. Irrigation times are spread so each irrigation covers the same share of the day's need (so they crowd at the peak), from #% to #% of the daylight-hours need — i.e. a little after sunrise and a little before sunset. Night hours (very low need) are added to the day total and spread over the daytime irrigations.	{}{}. Irrigation times are spread so each irrigation covers the same share of the day's need (so they crowd at the peak), from #% to #% of the daylight-hours need — i.e. a little after sunrise and a little before sunset. Night hours (very low need) are added to the day total and spread over the daytime irrigations.
+{}{}°م	{}{}°C	{}{}°C
+{}بدل {} (إجازة)	{}instead of {} (leave)	{}instead of {} (leave)
+{}تجهز لـ {} بعد {} يوم ({})	{}ready for {} in {} days ({})	{}ready for {} in {} days ({})
+{}ماسورة {}	{}pipe {}	{}pipe {}
+«{}» مش مستخدم في الحل النهائي — شيله من الاختيار تحصل على حل أحسن.	“{}” isn't used in the final solution — remove it from the selection to get a better solution.	“{}” isn't used in the final solution — remove it from the selection to get a better solution.
+«الأدنى» لازم يكون أقل من «الأعلى» في: {}	“Min” must be lower than “Max” in: {}	“Min” must be lower than “Max” in: {}
+· {} ك.و	· {} kW	· {} kW
+· الأطوار: {}	· Stages: {}	· Stages: {}
+· الحرارة الآن {}°م	· Temperature now {}°C	· Temperature now {}°C
+· الشدة: {}	· Severity: {}	· Severity: {}
+· اليوم {}	· Today {}	· Today {}
+· بيتحسب على: {}	· Calculated on: {}	· Calculated on: {}
+· وزن الكيس المكتوب {} جم	· Bag weight as written {} g	· Bag weight as written {} g
+× إشعاع برّه الصوبة في نفس الساعة (من Open-Meteo). τ = متوسط (إشعاع الصوبة ÷ إشعاع برّه) من {} قراءة لوكس (اللوكس ÷ # → W/م²) وقت ما برّه فوق # W/م²{}	× outside radiation at the same hour (from Open-Meteo). τ = average (greenhouse radiation ÷ outside radiation) from {} lux readings (lux ÷ # → W/m²) when outside is above # W/m²{}	× outside radiation at the same hour (from Open-Meteo). τ = average (greenhouse radiation ÷ outside radiation) from {} lux readings (lux ÷ # → W/m²) when outside is above # W/m²{}
+÷ (# − الغسيل {}%)	÷ (# − leaching {}%)	÷ (# − leaching {}%)
+÷ تصرف النظام {} لتر/د =	÷ system flow {} L/min =	÷ system flow {} L/min =
+، {}	, {}	, {}
+، {} باركود	, {} barcodes	, {} barcodes
+، {} ميكس هيتغيّر اسمه للاسم الإنجليزي (والاسم القديم بيفضل شغال)	, {} mixes will be renamed to the English name (the old name keeps working)	, {} mixes will be renamed to the English name (the old name keeps working)
+، الريّة حوالي {} مل/نبتة{}{}.	, each irrigation about {} ml/plant{}{}.	, each irrigation about {} ml/plant{}{}.
+، وباقي {} في المشتل	, and {} left in the nursery	, and {} left in the nursery
+آخر قراءة — {}	Last reading — {}	Last reading — {}
+آخر قطفة {} − {} يوم مشتل{} = ميعاد الزراعة {}	Last cut {} − {} nursery days{} = sowing date {}	Last cut {} − {} nursery days{} = sowing date {}
+آخر معايرة — {}	Last calibration — {}	Last calibration — {}
+آخر ميعاد لشتل الدفعة الجاية: {}.	Latest transplant date for the next batch: {}.	Latest transplant date for the next batch: {}.
+آخر نسخة من {} يوم	Last backup {} days ago	Last backup {} days ago
+آخر وزنة {} جم، المتوقع {} جم (أقل بـ {}%)	Last weighing {} g, expected {} g ({}% lower)	Last weighing {} g, expected {} g ({}% lower)
+أخرى: {}	Other: {}	Other: {}
+أسباب الفاقد ({}) — إجمالي {}	Loss reasons ({}) — total {}	Loss reasons ({}) — total {}
+أسباب الفاقد أكتر من الفاقد في {}	Loss reasons exceed the loss in {}	Loss reasons exceed the loss in {}
+أسبوع من {} إلى {}	Week from {} to {}	Week from {} to {}
+أصناف بدون ربط بمكوّن: {}	Items not linked to an ingredient: {}	Items not linked to an ingredient: {}
+أضاف {} صور لإطلاق حيوي{}	Added {} photos to a biological release{}	Added {} photos to a biological release{}
+أضف{}	Add{}	Add{}
+أعلى حرارة	Max temperature	Max temperature
+أعلى من حد التنبيه ({}). افحص الصوبة وقرّر المعالجة.	Above the alert threshold ({}). Inspect the greenhouse and decide on treatment.	Above the alert threshold ({}). Inspect the greenhouse and decide on treatment.
+أقرب ريّة: {}	Next irrigation: {}	Next irrigation: {}
+أقصى عدد {} صور هنا (تقدر تضيف غيرها بعد الحفظ)	Maximum {} photos here (you can add more after saving)	Maximum {} photos here (you can add more after saving)
+أقصى عدد خطوط {}	Maximum number of lines {}	Maximum number of lines {}
+أقصى عدد صور {}	Maximum number of photos {}	Maximum number of photos {}
+أقصى عدد صور للإطلاق {}	Maximum photos per release {}	Maximum photos per release {}
+أهلاً، {}	Hello, {}	Hello, {}
+أي خزان	Any tank	Any tank
+إجازة {} ({} → {}) — البديل {}	Leave {} ({} → {}) — substitute {}	Leave {} ({} → {}) — substitute {}
+إجازة {} من {} إلى {} — راجع المهام	Leave of {} from {} to {} — review the tasks	Leave of {} from {} to {} — review the tasks
+إجراء (SOP): {}	Procedure (SOP): {}	Procedure (SOP): {}
+إجمالي المعروض ({} سجل{}): {}{}	Total shown ({} records{}): {}{}	Total shown ({} records{}): {}{}
+إجمالي الملف {}	File total {}	File total {}
+إجمالي النباتات	Total plants	Total plants
+إجمالي النباتات ({} / صينية)	Total plants ({} / tray)	Total plants ({} / tray)
+إزالة من القايمة	Remove from the list	Remove from the list
+إصابات مسجّلة: {}{}	Pests recorded: {}{}	Pests recorded: {}{}
+إصابة نشطة: {}	Active infestation: {}	Active infestation: {}
+إضافة {} اسم لقايمة أصناف الطلبات	Add {} names to the order items list	Add {} names to the order items list
+إضافة {} عميل	Add {} customers	Add {} customers
+إضافة حساب: {} ({})	Account added: {} ({})	Account added: {} ({})
+إضافة صنف للقايمة: {}	Item added to the list: {}	Item added to the list: {}
+إضافة نظام: {}	System added: {}	System added: {}
+إطلاق حيوي {}	Biological release {}	Biological release {}
+إطلاق حيوي: {} ضد {} — {}{}{}	Biological release: {} against {} — {}{}{}	Biological release: {} against {} — {}{}{}
+إطلاق حيوي: {} — {}	Biological release: {} — {}	Biological release: {} — {}
+إظهار المخططات المخفية ({})	Show hidden charts ({})	Show hidden charts ({})
+إلغاء رش/تسميد: {} ({}) — السبب: {}	Spray/fertigation cancelled: {} ({}) — reason: {}	Spray/fertigation cancelled: {} ({}) — reason: {}
+إمبارح ({} قراءة)	Yesterday ({} readings)	Yesterday ({} readings)
+اتحدّثت الحالة: {}	Status updated: {}	Status updated: {}
+اتحصدت {} صينية {}: {} عبوة × {} جم = {}، واتسجلت في الحصاد{}.	Harvested {} trays of {}: {} packs × {} g = {}, and recorded in the harvest{}.	Harvested {} trays of {}: {} packs × {} g = {}, and recorded in the harvest{}.
+اتحصدت {} ماسورة {}{}	Harvested {} pipes of {}{}	Harvested {} pipes of {}{}
+اتحصدت {} — {} عبوة = {}	Harvested {} — {} packs = {}	Harvested {} — {} packs = {}
+اتحفظ السماد	Fertilizer saved	Fertilizer saved
+اتحفظ جدول الري	Irrigation schedule saved	Irrigation schedule saved
+اتحفظت الترجمات ({})	Translations saved ({})	Translations saved ({})
+اتحوّلتلك {} مهمة بدل {}	{} tasks were moved to you instead of {}	{} tasks were moved to you instead of {}
+اتخصم: {}	Deducted: {}	Deducted: {}
+اتدّت للنظام وكام نزل صرف (المستهلك الفعلي = الري − الصرف)	went into the system and how much drained (actual use = irrigation − drainage)	went into the system and how much drained (actual use = irrigation − drainage)
+اتسجّل {} طلب{}	{} orders saved{}	{} orders saved{}
+اتسجّل التحضير{}{}	Preparation saved{}{}	Preparation saved{}{}
+اتسجّل الطلب	Order saved	Order saved
+اتسجّل الفرز	Sorting saved	Sorting saved
+اتسجّل من ملف	Imported from file	Imported from file
+اتسجّلت الشكوى{}	Complaint saved{}	Complaint saved{}
+اتسجّلت قطفة {} من {} لـ {} ماسورة {} — هتجهز تاني بعد {} يوم ({})	Cut {} of {} recorded for {} pipes of {} — ready again in {} days ({})	Cut {} of {} recorded for {} pipes of {} — ready again in {} days ({})
+اتضاف {} رشة لخطة الرش والتسميد (تبويب "الرش والتسميد")	{} sprays added to the spray & fertigation plan (“Spray & fertigation” tab)	{} sprays added to the spray & fertigation plan (“Spray & fertigation” tab)
+اتضاف برنامج الري	Irrigation program added	Irrigation program added
+اتضاف للجدول{}	Added to the schedule{}	Added to the schedule{}
+اتضاف للخزان تعويضًا	Added to the tank as top-up	Added to the tank as top-up
+اتضافوا {} صنف	{} items added	{} items added
+اتضافوا {} عميل	{} customers added	{} customers added
+اتغيّر في {} سجل	Changed in {} records	Changed in {} records
+اتقضي عليها بواسطة	Eradicated by	Eradicated by
+اتنقلت {}{}{}	Moved {}{}{}	Moved {}{}{}
+اتنقلت بعد {} يوم	Moved after {} days	Moved after {} days
+اتنقلت بيانات {} طلب لقسم الفرز	Data of {} orders moved to the sorting section	Data of {} orders moved to the sorting section
+اتوحّد في {} سجل	Unified in {} records	Unified in {} records
+احتمال {}%	{}% chance	{}% chance
+احفظ {} طلب	Save {} orders	Save {} orders
+ازرع {} صينية {} ({})	Sow {} trays of {} ({})	Sow {} trays of {} ({})
+ازرع {} صينية دلوقتي — هتجهز للنقل {} وأول حصاد حوالين {}	Sow {} trays now — ready to transplant {} and first harvest around {}	Sow {} trays now — ready to transplant {} and first harvest around {}
+ازرع {} صينية يوم {} (بعد {} يوم)	Sow {} trays on {} (in {} days)	Sow {} trays on {} (in {} days)
+استرجاع سماد للأصل: {}	Fertilizer reset to original: {}	Fertilizer reset to original: {}
+استرجاع من السلة: {}{}	Restored from the bin: {}{}	Restored from the bin: {}{}
+استعادة نسخة احتياطية كاملة (بتاريخ التصدير: {})	Restore a full backup (export date: {})	Restore a full backup (export date: {})
+استلمها: {}	Received by: {}	Received by: {}
+استيراد {} صنف للقايمة	Import {} items into the list	Import {} items into the list
+استيراد {} صنف من حاسبة الأكياس لقايمة الطلبات	Import {} items from the bag calculator into the order list	Import {} items from the bag calculator into the order list
+استيراد {} طلب من ملف ({} صنف)	Import {} orders from a file ({} items)	Import {} orders from a file ({} items)
+استيراد {} عميل من ملف العملاء	Import {} customers from the customers file	Import {} customers from the customers file
+استيراد كل الأسماء الموجودة ({})	Import all existing names ({})	Import all existing names ({})
+استيرادهم ({})	Import them ({})	Import them ({})
+اسم المادة الخام	Raw material name	Raw material name
+اسم صوبة موجودة أو جديدة	Existing or new greenhouse name	Existing or new greenhouse name
+اعتمد Kc ده	Use this Kc	Use this Kc
+اقتراح استرشادي مبني على قواعد زراعية (مجموعات IRAC/FRAC وأطوار الآفة) ومخزنك. راجعه مع المهندس الزراعي، واتأكد من الجرعة وفترة الأمان قبل الحصاد من الملصق، وإن المنتج مسجّل لمحصولك. دقة الاقتراح بتعتمد على اكتمال خانات «يستهدف» و«المادة الفعالة» و«الطور» في المخزن.	A guidance suggestion based on agronomic rules (IRAC/FRAC groups and pest stages) and your stock. Review it with the agronomist, and check the dose and pre-harvest interval on the label, and that the product is registered for your crop. Accuracy depends on filling the “Targets”, “Active ingredient” and “Stage” fields in the stock.	A guidance suggestion based on agronomic rules (IRAC/FRAC groups and pest stages) and your stock. Review it with the agronomist, and check the dose and pre-harvest interval on the label, and that the product is registered for your crop. Accuracy depends on filling the “Targets”, “Active ingredient” and “Stage” fields in the stock.
+اكتب السبب	Write the reason	Write the reason
+اكتب الكمية المطلوبة لـ {}	Enter the required quantity for {}	Enter the required quantity for {}
+اكتب حجم الخزان.	Enter the tank volume.	Enter the tank volume.
+اكتب رقم من # لحد {}	Enter a number from # to {}	Enter a number from # to {}
+اكتب لكل نظام الصنف وعدد المواسير وعدد نباتات الماسورة، والبرنامج يحسب الصواني المطلوبة = (المواسير × النباتات) ÷ {} مقرّبة لفوق. "في المشتل" = صواني الصنف اللي لسه ما اتنقلتش للنظام ده، والصواني اللي من غير نظام محدد بتتوزّع على الصفوف الناقصة.	For each system, enter the crop, number of pipes and plants per pipe, and the app calculates the trays needed = (pipes × plants) ÷ {} rounded up. "In the nursery" = trays of the crop not yet moved to this system; trays without a specific system are spread over the rows that are short.	For each system, enter the crop, number of pipes and plants per pipe, and the app calculates the trays needed = (pipes × plants) ÷ {} rounded up. "In the nursery" = trays of the crop not yet moved to this system; trays without a specific system are spread over the rows that are short.
+الأسباب أكتر من الفاقد بـ {}	Reasons exceed the loss by {}	Reasons exceed the loss by {}
+الأوزان بتطلع للمحلولين المركّزين. استخدم {} مل من A ومن B لكل لتر محلول نهائي.	Weights are for the two concentrated stock solutions. Use {} ml of A and of B per litre of final solution.	Weights are for the two concentrated stock solutions. Use {} ml of A and of B per litre of final solution.
+الأيام = من الشتل لأول جني.	Days = from transplanting to first harvest.	Days = from transplanting to first harvest.
+الأيام = من الشتل لأول جني. EC بيزيد تدريجيًا مع الإثمار.	Days = from transplanting to first harvest. EC rises gradually during fruiting.	Days = from transplanting to first harvest. EC rises gradually during fruiting.
+الأيام = من الشتل لأول جني. التسميد بيتزوّد وقت الإثمار.	Days = from transplanting to first harvest. Feeding increases during fruiting.	Days = from transplanting to first harvest. Feeding increases during fruiting.
+الإجراء المرجعي: {}	Reference procedure: {}	Reference procedure: {}
+الإجراء: {}	Action: {}	Action: {}
+الإشعاع W/m#	Radiation W/m#	Radiation W/m#
+الإشعاع الداخلي = اللوكس ÷ # (تحويل الضوء النهاري)؛ ولأن القراءات قليلة بيتوزّع على اليوم بشكل جيب الشمس: Rs(ساعة) = {} W/م² × sin(π·(الساعة − الشروق)/(الغروب − الشروق))، والمعامل متوسط قراءات {} اللي بعد الشروق بشوية	Inside radiation = lux ÷ # (daylight conversion); and since readings are few, it is spread over the day as a sine curve: Rs(hour) = {} W/m² × sin(π·(hour − sunrise)/(sunset − sunrise)), and the factor is the average of {} readings taken a while after sunrise	Inside radiation = lux ÷ # (daylight conversion); and since readings are few, it is spread over the day as a sine curve: Rs(hour) = {} W/m² × sin(π·(hour − sunrise)/(sunset − sunrise)), and the factor is the average of {} readings taken a while after sunrise
+الإصابات المسجلة في الفترة ({})	Pests recorded in the period ({})	Pests recorded in the period ({})
+الاسم الجديد لـ "{}":	New name for "{}":	New name for "{}":
+التالي ›	Next ›	Next ›
+التحضير ما اتحفظش{}	Preparation not saved{}	Preparation not saved{}
+التصنيف: {}{}	Classification: {}{}	Classification: {}{}
+التطبيق محمّل بيانات آخر {} يوم بس، فالمقارنة بالفترة اللي قبلها ممكن تبقى ناقصة. زوّد «مدة البيانات المحمّلة» من الإعدادات.	The app has only loaded the last {} days of data, so the comparison with the previous period may be incomplete. Increase “Loaded data period” in Settings.	The app has only loaded the last {} days of data, so the comparison with the previous period may be incomplete. Increase “Loaded data period” in Settings.
+التعديل ما اتحفظش{}	Edit not saved{}	Edit not saved{}
+التكاليف: {} ج.م{}	Costs: {} EGP{}	Costs: {} EGP{}
+التنفيذ %	Fulfilment %	Fulfilment %
+الجاهزية = تاريخ الزراعة + {} يوم تحضين.{}{} الصواني اللي ما اتحددلهاش نظام بتتحسب لكل خطة بنفس المحصول.	Readiness = sowing date + {} days of incubation.{}{} Trays without an assigned system are counted for every plan with the same crop.	Readiness = sowing date + {} days of incubation.{}{} Trays without an assigned system are counted for every plan with the same crop.
+الجرعة الموصى بها: {}	Recommended dose: {}	Recommended dose: {}
+الجرعة:	Dose:	Dose:
+الجرعة: {}	Dose: {}	Dose: {}
+الحجم الأصلي	Original size	Original size
+الحرارة °C	Temperature °C	Temperature °C
+الحرارة اليوم	Temperature today	Temperature today
+الحساب بمعادلة FAO-# Penman-Monteith بالساعة (الحرارة والرطوبة من قراءات {}{}، والباقي من بروفايل إمبارح) والإشعاع {}، × معامل المحصول Kc{}. تقدير استرشادي من قراءات مسجّلة (مش قياس مباشر): كل ما القراءات أكتر وأدق (حساسات) كل ما اتحسّن، وراقب النبات والصرف وعدّل الكمية.	Calculated with the hourly FAO-# Penman-Monteith equation (temperature and humidity from the readings of {}, the rest from yesterday's profile) and radiation {}, × crop coefficient Kc{}. A guidance estimate from recorded readings (not a direct measurement): the more and the more accurate the readings (sensors), the better it gets — watch the plants and the drainage and adjust the amount.	Calculated with the hourly FAO-# Penman-Monteith equation (temperature and humidity from the readings of {}, the rest from yesterday's profile) and radiation {}, × crop coefficient Kc{}. A guidance estimate from recorded readings (not a direct measurement): the more and the more accurate the readings (sensors), the better it gets — watch the plants and the drainage and adjust the amount.
+الحصاد — {} — {} {}	Harvest — {} — {} {}	Harvest — {} — {} {}
+الحصاد:	Harvest:	Harvest:
+الحصة بتتجدد الساعة {} بتوقيت القاهرة. ده تقدير لجهازك بس؛ الحصة مشتركة بين كل المستخدمين وسكربتات GitHub، والرقم الفعلي في Firebase Console ← Firestore ← Usage.	The quota renews at {} Cairo time. This is an estimate for your device only; the quota is shared by all users and the GitHub scripts, and the real number is in Firebase Console ← Firestore ← Usage.	The quota renews at {} Cairo time. This is an estimate for your device only; the quota is shared by all users and the GitHub scripts, and the real number is in Firebase Console ← Firestore ← Usage.
+الحصة قربت تخلص ({}% من الأعلى) — قلّل الاستخدام أو رقّي الخطة	The quota is almost used up ({}% of the maximum) — reduce usage or upgrade the plan	The quota is almost used up ({}% of the maximum) — reduce usage or upgrade the plan
+الخطأ الإجمالي في {} عالي (فوق #%) — غالبًا مفيش مجموعة أسمدة مناسبة، جرّب أسمدة تانية.	The total error in {} is high (above #%) — probably no suitable fertilizer set; try other fertilizers.	The total error in {} is high (above #%) — probably no suitable fertilizer set; try other fertilizers.
+الخطة مكتملة: نزل {} من {} صينية.	Plan complete: {} of {} trays transplanted.	Plan complete: {} of {} trays transplanted.
+الرطوبة %	Humidity %	Humidity %
+الرقم = عدد الإصابات في آخر {} يوم — ↑ زيادة عن الفترة اللي قبلها، ↓ نقص، ＝ ثابتة، ظهرت جديدة.	The number = infestations in the last {} days — ↑ increase vs the previous period, ↓ decrease, ＝ stable, new appeared.	The number = infestations in the last {} days — ↑ increase vs the previous period, ↓ decrease, ＝ stable, new appeared.
+الري شغّال دلوقتي لحد {}	Irrigation is running now until {}	Irrigation is running now until {}
+الري مقفول دلوقتي لحد {}	Irrigation is off now until {}	Irrigation is off now until {}
+السبب: {}	Reason: {}	Reason: {}
+السماد «{}» مش مناسب للمحاليل المركّزة (A+B) — شيله أو اشتغل بوضع الإضافة المباشرة.	The fertilizer “{}” isn't suitable for concentrated solutions (A+B) — remove it or work in direct-addition mode.	The fertilizer “{}” isn't suitable for concentrated solutions (A+B) — remove it or work in direct-addition mode.
+الشخص المكلّف	Assigned to	Assigned to
+الشروق بعد {}س {}د	Sunrise in {}h {}m	Sunrise in {}h {}m
+الشكاوى في الفترة ({} — مفتوحة: {})	Complaints in the period ({} — open: {})	Complaints in the period ({} — open: {})
+الصنف المطلوب	Requested item	Requested item
+الصنف:	Item:	Item:
+الصواني متزرعة ({} صينية{})	Trays sown ({} trays{})	Trays sown ({} trays{})
+الصوبة موجودة: نوعها {} (مش بيتغيّر من هنا).	The greenhouse exists: its type is {} (can't be changed here).	The greenhouse exists: its type is {} (can't be changed here).
+الصور ({})	Photos ({})	Photos ({})
+الصورة الحالية	Current photo	Current photo
+الطلبات ({})	Orders ({})	Orders ({})
+الطلبات في الفترة ({})	Orders in the period ({})	Orders in the period ({})
+الطور: {}	Stage: {}	Stage: {}
+العدد أكبر من إجمالي المواسير ({})	The number is more than the total pipes ({})	The number is more than the total pipes ({})
+العدد لازم يكون من # لحد {}	The number must be from # to {}	The number must be from # to {}
+العذارى غالبًا مش بتتأثر بالرش — عشان كده الرشات بتتكرر بفاصل {} أيام لحد ما تفقس.	Pupae usually aren't affected by spraying — that's why sprays are repeated every {} days until they hatch.	Pupae usually aren't affected by spraying — that's why sprays are repeated every {} days until they hatch.
+العناصر ({})	Items ({})	Items ({})
+الغروب بعد {}س {}د	Sunset in {}h {}m	Sunset in {}h {}m
+الفترة: {} إلى {}	Period: {} to {}	Period: {} to {}
+الفترة: آخر {} يوم	Period: last {} days	Period: last {} days
+القطفة {}	Cut {}	Cut {}
+القياس ده يساوي {} مل/دقيقة للنقطة (اضغط حفظ لتطبيقه).	This measurement equals {} ml/min per dripper (press Save to apply it).	This measurement equals {} ml/min per dripper (press Save to apply it).
+القيم دي مدى مرجعي عام لزراعة الأصناف الشائعة في الزراعة المائية والبيوت المحمية (من الأدبيات والإرشادات الشائعة)، وبتختلف بالصنف والموسم والنظام — راجع نشرة شركة البذور لصنفك. EC وpH وحرارة المحلول بتتأثر بتعديلات المدير في «مراجع المحاصيل». مقارنة الصوبة محسوبة من قراءات المناخ ({} قراءة).	These values are a general reference range for common crops in hydroponics and greenhouses (from the literature and common guidelines), and they vary by variety, season and system — check the seed company's sheet for your variety. EC, pH and solution temperature follow the admin's edits in “Crop references”. The greenhouse comparison is calculated from climate readings ({} readings).	These values are a general reference range for common crops in hydroponics and greenhouses (from the literature and common guidelines), and they vary by variety, season and system — check the seed company's sheet for your variety. EC, pH and solution temperature follow the admin's edits in “Crop references”. The greenhouse comparison is calculated from climate readings ({} readings).
+الكل ({})	All ({})	All ({})
+الكمية المستخدمة من المخزون ({}) — اختياري	Quantity used from stock ({}) — optional	Quantity used from stock ({}) — optional
+الكمية من المخزون ({}) — اختياري	Quantity from stock ({}) — optional	Quantity from stock ({}) — optional
+الماء ppm	Water ppm	Water ppm
+المادة الفعالة:	Active ingredient:	Active ingredient:
+المادة الفعالة: {}	Active ingredient: {}	Active ingredient: {}
+الماسورة {}{} مشغولة بمجموعة تانية	Pipe {}{} is taken by another group	Pipe {}{} is taken by another group
+المتاح بالمخزن: {} {}	Available in stock: {} {}	Available in stock: {} {}
+المتاح: {} {}	Available: {} {}	Available: {} {}
+المتوقع = المواسير الجاهزة دلوقتي + اللي هتجهز في الفترة، مضروبة في متوسط إنتاج الماسورة من حصادك السابق (لازم تكون سجّلت حصاد بعدد مواسير). المطلوب = طلبات العملاء اللي تاريخها في الفترة بوحدة كجم أو جرام. الأحمر = عجز.	Expected = pipes ready now + pipes that become ready during the period, multiplied by the average yield per pipe from your past harvests (you need harvests recorded with a number of pipes). Required = customer orders dated within the period in kg or grams. Red = shortfall.	Expected = pipes ready now + pipes that become ready during the period, multiplied by the average yield per pipe from your past harvests (you need harvests recorded with a number of pipes). Required = customer orders dated within the period in kg or grams. Red = shortfall.
+المجموعة دي لسه ما اتزرعتش ({})	This group has not been planted yet ({})	This group has not been planted yet ({})
+المحلول{} فيه كالسيوم وكبريت مع بعض (مشكلة كبيرة — ترسيب جبس). متحضّرش كده.	Solution{} has calcium and sulphur together (a big problem — gypsum precipitation). Don't prepare it like this.	Solution{} has calcium and sulphur together (a big problem — gypsum precipitation). Don't prepare it like this.
+المحلول{} ممكن يكون مركّز زيادة — اعمل اختبار ذوبان قبل أي دفعة كبيرة.	Solution{} may be too concentrated — do a solubility test before any large batch.	Solution{} may be too concentrated — do a solubility test before any large batch.
+المختار: {}	Selected: {}	Selected: {}
+المخزن مش بيكفي لـ {} رشات من غير تكرار مادة فعالة أو مجموعة ورا بعض — الكورس اتقصّر لـ {} رشة.	The stock isn't enough for {} sprays without repeating an active ingredient or group back to back — the course was shortened to {} sprays.	The stock isn't enough for {} sprays without repeating an active ingredient or group back to back — the course was shortened to {} sprays.
+المساهمة ({})	Contribution ({})	Contribution ({})
+المصروف ما اتحفظش{}	Expense not saved{}	Expense not saved{}
+المصروفات العامة ({} ج.م) ما اتوزعتش لأن مفيش حصاد بالكيلو في الفترة.	General expenses ({} EGP) were not allocated because there was no harvest in kg in the period.	General expenses ({} EGP) were not allocated because there was no harvest in kg in the period.
+المطلوب في الطلب {}:	Required in order {}:	Required in order {}:
+المعايير المثلى — {}	Optimal parameters — {}	Optimal parameters — {}
+الملاحظة ما اتحفظتش{}	Note not saved{}	Note not saved{}
+الملف مفيهوش {}	The file doesn't contain {}	The file doesn't contain {}
+المهام: تمّت {}{}	Tasks: done {}{}	Tasks: done {}{}
+المواسير دي بتعدّي آخر ماسورة ({})	These pipes go past the last pipe ({})	These pipes go past the last pipe ({})
+المياه المعلّمة (~) محسوبة من معايرة الري: {} لتر/دقيقة (معايرة {}{}{}) × {} دقيقة/يوم × عدد الأيام.	Water marked (~) is calculated from the irrigation calibration: {} L/min (calibration {}{}{}) × {} min/day × number of days.	Water marked (~) is calculated from the irrigation calibration: {} L/min (calibration {}{}{}) × {} min/day × number of days.
+النتيجة ({})	Result ({})	Result ({})
+النتيجة: {} لتر/دقيقة للنقطة ({} مل/دقيقة){}	Result: {} L/min per dripper ({} ml/min){}	Result: {} L/min per dripper ({} ml/min){}
+النزول محسوب من {}.	Transplanting is calculated from {}.	Transplanting is calculated from {}.
+النسب هنا = % وزن العنصر نفسه (مش الأكسيد) في السماد. لو الكيس مكتوب عليه P#O# أو K#O أو SiO# اختار من القوايم تحت وهنحوّلها.	The percentages here = % by weight of the element itself (not the oxide) in the fertilizer. If the bag says P#O#, K#O or SiO#, choose from the lists below and we will convert it.	The percentages here = % by weight of the element itself (not the oxide) in the fertilizer. If the bag says P#O#, K#O or SiO#, choose from the lists below and we will convert it.
+النموذج: {} — دقة التوفيق R² = {} — {}.	Model: {} — fit R² = {} — {}.	Model: {} — fit R² = {} — {}.
+النهاردة — {}	Today — {}	Today — {}
+النهارده ({} قراءة)	Today ({} readings)	Today ({} readings)
+الهدف ({})	Target ({})	Target ({})
+الوزن الكلي: {} عبوة × {} جم = {} — هيتسجل في الحصاد على طول.	Total weight: {} packs × {} g = {} — it will be recorded in the harvest right away.	Total weight: {} packs × {} g = {} — it will be recorded in the harvest right away.
+الوزن المتوقع بعد {} يوم	Expected weight after {} days	Expected weight after {} days
+الوزن نزل من {} لـ {} جم	Weight dropped from {} to {} g	Weight dropped from {} to {} g
+الوضع تمام ({}% من الأعلى)	All good ({}% of the maximum)	All good ({}% of the maximum)
+اليوم ({} قراءة)	Today ({} readings)	Today ({} readings)
+اليوم المفتوح ({})	Open day ({})	Open day ({})
+امسح الصورة	Delete the photo	Delete the photo
+بتزيد +{} (+{}%)	Rising +{} (+{}%)	Rising +{} (+{}%)
+بتزيد/جديدة: {}	Rising/new: {}	Rising/new: {}
+بتقل: {}	Falling: {}	Falling: {}
+بدل {}	Instead of {}	Instead of {}
+بس (من الشروق {} لحد الغروب {}): أول ريّة الساعة	only (from sunrise {} to sunset {}): first irrigation at	only (from sunrise {} to sunset {}): first irrigation at
+بعد {} يوم	In {} days	In {} days
+بعد {} يوم — {}	In {} days — {}	In {} days — {}
+بعد الفرز أكبر من اللي جه في {}	After sorting is more than what came in, in {}	After sorting is more than what came in, in {}
+بواسطة {}{}	By {}{}	By {}{}
+بواسطة: {}{}	By: {}{}	By: {}{}
+بيضرب: {}	Targets: {}	Targets: {}
+بيفكّرك بمهامك اللي لسه ما خلصتهاش كل ساعة (من {} لـ {}) لحد ما تدوس "تم ".	Reminds you every hour (from {} to {}) of your unfinished tasks until you tap "Done".	Reminds you every hour (from {} to {}) of your unfinished tasks until you tap "Done".
+تأكيد الحفظ {}تحفظ البيانات دي؟	Confirm save {}Save this data?	Confirm save {}Save this data?
+تجهز بعد {} يوم	Ready in {} days	Ready in {} days
+تحديث أصناف الطلبات من ملف الأصناف: {} جديد، {} اسم اتغير، {} باركود	Order items updated from the items file: {} new, {} renamed, {} barcodes	Order items updated from the items file: {} new, {} renamed, {} barcodes
+تحذف "{}" من الجدول؟	Delete "{}" from the table?	Delete "{}" from the table?
+تحذف "{}" من القايمة؟{}	Delete "{}" from the list?{}	Delete "{}" from the list?{}
+تحذف "{}" من قايمة الطلبات؟ (الطلبات القديمة هتفضل بالاسم ده)	Delete "{}" from the order items list? (old orders keep this name)	Delete "{}" from the order items list? (old orders keep this name)
+تحذف "{}" من قايمة العملاء؟ (الطلبات القديمة هتفضل بالاسم ده)	Delete "{}" from the customers list? (old orders keep this name)	Delete "{}" from the customers list? (old orders keep this name)
+تحذف حساب {}؟	Delete the account {}?	Delete the account {}?
+تحذير مدة الأمان (PHI): {} متأكد إنك عايز تسجّل الحصاد ده؟	Pre-harvest interval (PHI) warning: {} Are you sure you want to record this harvest?	Pre-harvest interval (PHI) warning: {} Are you sure you want to record this harvest?
+تحضير خزان: {}	Tank preparation: {}	Tank preparation: {}
+تحضير خزان: {} — {} لتر — {} جم أسمدة	Tank preparation: {} — {} L — {} g fertilizers	Tank preparation: {} — {} L — {} g fertilizers
+تحويل {} مهمة من {} إلى {} بسبب الإجازة	Moved {} tasks from {} to {} because of leave	Moved {} tasks from {} to {} because of leave
+ترجمة البيانات: {}	Data translation: {}	Data translation: {}
+تسجيل دخول ({})	Sign in ({})	Sign in ({})
+تشتغل عند {}°م	Turns on at {}°C	Turns on at {}°C
+تشيل "{}" من نظرة عامة؟ (تقدر ترجّعه من زر "إظهار المخططات المخفية")	Remove "{}" from the Overview? (you can bring it back with the "Show hidden charts" button)	Remove "{}" from the Overview? (you can bring it back with the "Show hidden charts" button)
+تصدير الطلبات CSV	Export orders CSV	Export orders CSV
+تصدير الفرز CSV	Export sorting CSV	Export sorting CSV
+تصدير ملف: {}	File export: {}	File export: {}
+تصدير نسخة احتياطية كاملة	Export a full backup	Export a full backup
+تعتمد Kc = {} لنظام ده؟ (تقدر ترجّعه فاضي من الإعدادات عشان يبقى تلقائي)	Use Kc = {} for this system? (you can clear it in Settings to make it automatic again)	Use Kc = {} for this system? (you can clear it in Settings to make it automatic again)
+تعديل المخطط	Edit chart	Edit chart
+تعديل المهمة	Edit task	Edit task
+تعديل خط زراعة: {} — {} نبتة	Planting row edited: {} — {} plants	Planting row edited: {} — {} plants
+تعديل رش/تسميد: {}	Spray/fertigation edited: {}	Spray/fertigation edited: {}
+تعديل سماد	Edit fertilizer	Edit fertilizer
+تعديل في {} ليك	Change in {} for you	Change in {} for you
+تعديل كامل	Full edit	Full edit
+تعديل مخطط	Edit chart	Edit chart
+تعديل مشكلة: {}{}	Problem edited: {}{}	Problem edited: {}{}
+تعديل مهمة: {} — {}{}	Task edited: {} — {}{}	Task edited: {} — {}{}
+تعديل وصفة: {}	Recipe edited: {}	Recipe edited: {}
+تعذّر قراءة الملف: {}	Couldn't read the file: {}	Couldn't read the file: {}
+تغيير اسم صنف: {} ← {} ({} سجل)	Item renamed: {} ← {} ({} records)	Item renamed: {} ← {} ({} records)
+تغيّر نوع الصوبة "{}" من {} إلى {}؟ البيانات المسجلة قبل كده مش بتتمسح.	Change the type of greenhouse "{}" from {} to {}? Data recorded before is not deleted.	Change the type of greenhouse "{}" from {} to {}? Data recorded before is not deleted.
+تكرار المخطط	Duplicate chart	Duplicate chart
+تكلفة السماد ما اتحسبتش لأن مفيش سعر في المخزن لـ: {} (اكتب «سعر الوحدة» للصنف بنفس الاسم، بوحدة كجم أو جم).	Fertilizer cost wasn't calculated because there's no price in stock for: {} (enter a “Unit price” for the item with the same name, in kg or g).	Fertilizer cost wasn't calculated because there's no price in stock for: {} (enter a “Unit price” for the item with the same name, in kg or g).
+تكلفة النبتة قبل الزراعة: بذرة {} + بيئة {} =	Plant cost before planting: seed {} + medium {} =	Plant cost before planting: seed {} + medium {} =
+تكلفة بذور الصينية ({} خلية):	Seed cost per tray ({} cells):	Seed cost per tray ({} cells):
+تكلفة بيئة الشتلات/البذور	Nursery medium/seed cost	Nursery medium/seed cost
+تكلفة: {} — {} ج.م	Cost: {} — {} EGP	Cost: {} — {} EGP
+تلقائي {}	Automatic {}	Automatic {}
+تم القضاء على الإصابة{}	Infestation eradicated{}	Infestation eradicated{}
+تم حفظ الحصاد ({} {}) — {}	Harvest saved ({} {}) — {}	Harvest saved ({} {}) — {}
+تم حفظ الحصاد: {} — {} {} — {} خط	Harvest saved: {} — {} {} — {} rows	Harvest saved: {} — {} {} — {} rows
+تم حفظ قراءة {}{}	Reading saved: {}	Reading saved: {}
+تمت الاستعادة من نسخة بتاريخ {}.	Restored from a backup dated {}.	Restored from a backup dated {}.
+تمسح "{}" من التبويب؟	Delete "{}" from the tab?	Delete "{}" from the tab?
+تمسح "{}" من الجدول؟{}	Delete "{}" from the schedule?{}	Delete "{}" from the schedule?{}
+تمسح {} وصوره؟	Delete {} and its photos?	Delete {} and its photos?
+تمسح التبويب "{}" بكل اللي فيه؟	Delete the tab "{}" with everything in it?	Delete the tab "{}" with everything in it?
+تمسح الطلب {}؟ (جلسات الفرز المرتبطة بيه هتفضل زي ما هي)	Delete order {}? (its linked sorting sessions stay as they are)	Delete order {}? (its linked sorting sessions stay as they are)
+تمسح المخطط "{}"؟	Delete the chart "{}"?	Delete the chart "{}"?
+تمسح شكوى {} وصورها؟	Delete complaint {} and its photos?	Delete complaint {} and its photos?
+تمسح مجموعة "{}" ({} ماسورة)؟ المواسير هتبقى فاضية.	Delete the group "{}" ({} pipes)? The pipes will become empty.	Delete the group "{}" ({} pipes)? The pipes will become empty.
+تنبيه المهام كل ساعة: {}	Hourly task reminder: {}	Hourly task reminder: {}
+تنبيه لما الكمية توصل له	Alert when the quantity reaches	Alert when the quantity reaches
+تنبيهات متأخرة ({})	Overdue alerts ({})	Overdue alerts ({})
+تنفيذ {}%	Fulfilment {}%	Fulfilment {}%
+توحيد اسم صنف: {} ← {} ({} سجل)	Item names unified: {} ← {} ({} records)	Item names unified: {} ← {} ({} records)
+توقيت جهازك ({}) مختلف عن القاهرة — التواريخ والتقارير هتتسجل بتوقيته	Your device time zone ({}) is different from Cairo — dates and reports will be recorded in its time	Your device time zone ({}) is different from Cairo — dates and reports will be recorded in its time
+جاهز عندك {} صنف من حاسبة الأكياس (# مكسات بوصفاتها وباقي الأصناف المنفردة).	{} items from the bag calculator are ready (# mixes with their recipes and the remaining single items).	{} items from the bag calculator are ready (# mixes with their recipes and the remaining single items).
+جاهز عندك {} عميل من ملف العملاء.	{} customers from the customers file are ready.	{} customers from the customers file are ready.
+جاهزة النهارده	Ready today	Ready today
+جاهزة للحصاد {}	Ready to harvest {}	Ready to harvest {}
+جاهزة للقطفة {} من {}	Ready for cut {} of {}	Ready for cut {} of {}
+جاهزة من {} يوم	Ready for {} days	Ready for {} days
+جدول القيم المثلى: {}	Optimal values table: {}	Optimal values table: {}
+جدول رش/تسميد: {} — {} يوم{}	Spray/fertigation schedule: {} — {} days{}	Spray/fertigation schedule: {} — {} days{}
+جلسات الفرز ({})	Sorting sessions ({})	Sorting sessions ({})
+جم/mol	g/mol	g/mol
+جم/جم سماد	g/g fertilizer	g/g fertilizer
+جم/لتر	g/L	g/L
+جهازك استهلك {}% من حصة {} المجانية اليومية. لو الحصة خلصت التسجيل هيقف لحد التجديد.	Your device has used {}% of the free daily {} quota. If the quota runs out, saving will stop until it renews.	Your device has used {}% of the free daily {} quota. If the quota runs out, saving will stop until it renews.
+جولة كشف آفات — {}	Pest scouting round — {}	Pest scouting round — {}
+حدّث الأصناف ({})	Update items ({})	Update items ({})
+حذف المخطط	Delete chart	Delete chart
+حذف حساب: {}	Account deleted: {}	Account deleted: {}
+حذف صنف من القايمة: {}	Item deleted from the list: {}	Item deleted from the list: {}
+حذف صنف من جدول القيم المثلى: {}	Item deleted from the optimal values table: {}	Item deleted from the optimal values table: {}
+حذف عميل: {}	Customer deleted: {}	Customer deleted: {}
+حذف معاملة من: {}	Treatment deleted from: {}	Treatment deleted from: {}
+حذف من قايمة أصناف الطلبات: {}	Deleted from the order items list: {}	Deleted from the order items list: {}
+حذف نظام: {}	System deleted: {}	System deleted: {}
+حرارة المحلول إلى	Solution temperature to	Solution temperature to
+حرارة المحلول من (°C)	Solution temperature from (°C)	Solution temperature from (°C)
+حساب {}: {}	Account {}: {}	Account {}: {}
+حسب الخطة التلقائية — {} ماسورة	Per the automatic plan — {} pipes	Per the automatic plan — {} pipes
+حسب جدول الري{}	Per the irrigation schedule{}	Per the irrigation schedule{}
+حصاد {} عبر الزمن	{} harvest over time	{} harvest over time
+حصاد {}{} عبر الزمن	{}{} harvest over time	{}{} harvest over time
+حصاد: {} — {} {} — {}	Harvest: {} — {} {} — {}	Harvest: {} — {} {} — {}
+حصاد: {} — {} {}{} — {}	Harvest: {} — {} {}{} — {}	Harvest: {} — {} {}{} — {}
+حصة Firebase اليومية المجانية خلصت (Quota exceeded). التسجيل هيشتغل تاني لما الحصة تتجدد (حوالي {} بتوقيت القاهرة)، أو بترقية الخطة. اللي حاولت تسجّله دلوقتي ما اتحفظش.	The free daily Firebase quota has run out (Quota exceeded). Saving will work again when the quota renews (around {} Cairo time), or by upgrading the plan. What you just tried to save was not saved.	The free daily Firebase quota has run out (Quota exceeded). Saving will work again when the quota renews (around {} Cairo time), or by upgrading the plan. What you just tried to save was not saved.
+حصل خطأ: {}	An error occurred: {}	An error occurred: {}
+حصلت مشكلة في التسجيل ({})	A recording problem occurred ({})	A recording problem occurred ({})
+حفظ السماد	Save fertilizer	Save fertilizer
+حفظ الصنف	Save item	Save item
+حفظ الفرز	Save sorting	Save sorting
+حفظ المخطط	Save chart	Save chart
+حفظ جدول الري	Save irrigation schedule	Save irrigation schedule
+حفظ خطة مشتل للنظام: {}	Nursery plan saved for the system: {}	Nursery plan saved for the system: {}
+حفظ خلطة سمادية: {}	Fertilizer mix saved: {}	Fertilizer mix saved: {}
+حفظ قراءة {}	Save {} reading	Save {} reading
+حفظ هدف غذائي: {}	Nutrient target saved: {}	Nutrient target saved: {}
+خزان {}	Tank {}	Tank {}
+خزان {} لتر — {} جم	Tank {} L — {} g	Tank {} L — {} g
+خس / أعشاب / طماطم…	Lettuce / herbs / tomatoes…	Lettuce / herbs / tomatoes…
+خط {}{} ({} نبتة)	Row {}{} ({} plants)	Row {}{} ({} plants)
+خطأ دقة الأجهزة في {} عالي (فوق #%) — حضّر حجم أكبر أو محلول أكثر تركيزًا.	Instrument accuracy error in {} is high (above #%) — prepare a larger volume or a more concentrated solution.	Instrument accuracy error in {} is high (above #%) — prepare a larger volume or a more concentrated solution.
+خطوط زراعة: {} — {} خط × {} نبتة	Planting rows: {} — {} rows × {} plants	Planting rows: {} — {} rows × {} plants
+خلايا	Pads	Pads
+خلطة سمادية: {}	Fertilizer mix: {}	Fertilizer mix: {}
+دفعة {} ({} وزنة)	Batch {} ({} weighings)	Batch {} ({} weighings)
+دورة {}: {}{}{}{}	Cycle {}: {}{}{}{}	Cycle {}: {}{}{}{}
+ديسمبر	December	December
+رجوع {} ماسورة {} بعد مسح سجل الحصاد	Restored {} pipes of {} after deleting the harvest record	Restored {} pipes of {} after deleting the harvest record
+رجوع للأصل	Reset to original	Reset to original
+رجّع رش/تسميد للجدول: {} ({})	Spray/fertigation returned to the schedule: {} ({})	Spray/fertigation returned to the schedule: {} ({})
+رشة {}	Spray {}	Spray {}
+رشة {} من {}	Spray {} of {}	Spray {} of {}
+رطوبة التربة (%)	Soil moisture (%)	Soil moisture (%)
+زراعة البذرة — {} صينية — {}{}	Seed sowing — {} trays — {}{}	Seed sowing — {} trays — {}{}
+سائل	Liquid	Liquid
+سبتمبر	September	September
+سجل {}	{} log	{} log
+سجل المعاملات ({})	Treatment log ({})	Treatment log ({})
+سجّل إطلاقات الأعداء الحيوية والإضافات زي اللاصقات الملونة والمصائد الفيرمونية لصوبة «{}».	Record releases of biological enemies and additions like coloured sticky traps and pheromone traps for greenhouse “{}”.	Record releases of biological enemies and additions like coloured sticky traps and pheromone traps for greenhouse “{}”.
+سجّل المهمة	Save the task	Save the task
+سجّل زراعة {} صينية	Record sowing of {} trays	Record sowing of {} trays
+سعر {}/كجم	price {}/kg	price {}/kg
+سماد (جم)	Fertilizer (g)	Fertilizer (g)
+سماد سائل{}	Liquid fertilizer{}	Liquid fertilizer{}
+سماد: {}	Fertilizer: {}	Fertilizer: {}
+سمعت: «{}»	I heard: “{}”	I heard: “{}”
+شال مخطط من نظرة عامة: {}	Removed a chart from the Overview: {}	Removed a chart from the Overview: {}
+شغّالة لحد {}	Running until {}	Running until {}
+شغّالة من {}	Running since {}	Running since {}
+شغّل/اقفل أي خط من المفتاح في الجدول، واسحب صباعك على المخطط تشوف القيم في الوقت ده.{}	Turn any line on/off from its switch in the table, and slide your finger on the chart to see the values at that time.{}	Turn any line on/off from its switch in the table, and slide your finger on the chart to see the values at that time.{}
+شكوى {} ليك	{} complaint for you	{} complaint for you
+شكوى {} ← {}	Complaint {} ← {}	Complaint {} ← {}
+شكوى: {} — {} — {}	Complaint: {} — {} — {}	Complaint: {} — {} — {}
+شكوى: {}{}	Complaint: {}{}	Complaint: {}{}
+شهر {} {} ({} إلى {})	Month of {} {} ({} to {})	Month of {} {} ({} to {})
+شيل الخط	Remove line	Remove line
+شيل الصنف	Remove item	Remove item
+شيل الصورة	Remove photo	Remove photo
+شيل المادة	Remove material	Remove material
+شيل من الوصفة	Remove from the recipe	Remove from the recipe
+ص	AM	AM
+صباح الخير يا {} مهامك ليوم {}: {} ربنا يوفقك — O'Roots	Good morning {} — your tasks for {}: {} Good luck — O'Roots	Good morning {} — your tasks for {}: {} Good luck — O'Roots
+صنف {}{}	Item {}{}	Item {}{}
+صنف منفرد · وحدة {} جم{}	Single item · unit {} g{}	Single item · unit {} g{}
+صواني في المشتل زيادة عن احتياج الخطة (من غير نظام محدد): {}	Nursery trays beyond the plan's need (no specific system): {}	Nursery trays beyond the plan's need (no specific system): {}
+صواني في المشتل لأصناف مش في الخطة: {}	Nursery trays for crops not in the plan: {}	Nursery trays for crops not in the plan: {}
+صور أسباب الفاقد — {}	Loss reason photos — {}	Loss reason photos — {}
+صور الإجراء (اختياري — لحد {} صور)	Procedure photos (optional — up to {} photos)	Procedure photos (optional — up to {} photos)
+صور الإطلاق (اختياري — لحد {} صور، وتقدر تضيف غيرها بعد الحفظ)	Release photos (optional — up to {} photos, and you can add more after saving)	Release photos (optional — up to {} photos, and you can add more after saving)
+صورة	Photo	Photo
+صورة الإصابة (اختياري){}	Infestation photo (optional){}	Infestation photo (optional){}
+صورة الإطلاق	Release photo	Release photo
+صينية (عمرها {})	Tray (age {})	Tray (age {})
+صينية: {}	Tray: {}	Tray: {}
+صينية: {}{}	Tray: {}{}	Tray: {}{}
+ضغط آفات — لاصقات {} عدد {}	Pest pressure — {} sticky trap count {}	Pest pressure — {} sticky trap count {}
+طباعة {}	Print {}	Print {}
+طباعة تقرير الجودة — {}	Print quality report — {}	Print quality report — {}
+طباعة تقرير الطلبات — {} ({} طلب)	Print orders report — {} ({} orders)	Print orders report — {} ({} orders)
+طباعة جدول الرش والتسميد: {}{} ({} عنصر)	Print spray & fertigation schedule: {}{} ({} items)	Print spray & fertigation schedule: {}{} ({} items)
+طباعة طلب {}	Print order {}	Print order {}
+طلب #{}	Order #{}	Order #{}
+طلب #{} — {}	Order #{} — {}	Order #{} — {}
+طلب {} — {} صنف	Order {} — {} items	Order {} — {} items
+طُبع بتاريخ {} بواسطة {}	Printed on {} by {}	Printed on {} by {}
+عدد الصواني (كل صينية = {} نبات)	Number of trays (each tray = {} plants)	Number of trays (each tray = {} plants)
+عدد الصواني لازم يكون من # لحد {}	The number of trays must be from # to {}	The number of trays must be from # to {}
+عدد اللاصقة {} (الحد {}) — اتعملت مهمة معالجة	Sticky trap count {} (limit {}) — a treatment task was created	Sticky trap count {} (limit {}) — a treatment task was created
+عدّت ميعاد {} بـ {} يوم	{} overdue by {} days	{} overdue by {} days
+عدّل الصلاحيات ({})	Permissions edited ({})	Permissions edited ({})
+عدّيت النص ({}%)	You passed half ({}%)	You passed half ({}%)
+عرض فترة أطول من # يوم هيحمّل حوالي {} مستند قراءات من Firebase (الحصة المجانية اليومية #٬# قراءة للفريق كله). تكمّل؟	Showing a period longer than # days will load about {} reading documents from Firebase (free daily quota #,# reads for the whole team). Continue?	Showing a period longer than # days will load about {} reading documents from Firebase (free daily quota #,# reads for the whole team). Continue?
+عمر النبات {} يوم من {} — أول حصاد بعد {} يوم	Plant age {} days since {} — first harvest after {} days	Plant age {} days since {} — first harvest after {} days
+عندك {} صينية جاهزة للشتل دلوقتي.	You have {} trays ready to transplant now.	You have {} trays ready to transplant now.
+عندك {} مهام لسه ما خلصتهاش	You have {} unfinished tasks	You have {} unfinished tasks
+غير مقروءة ({})	Unread ({})	Unread ({})
+غير مقروءة: {} • مقروءة: {}	Unread: {} • Read: {}	Unread: {} • Read: {}
+غير موزّع: {}	Unallocated: {}	Unallocated: {}
+غيّر اسم المستخدم من {} إلى {}	Changed the username from {} to {}	Changed the username from {} to {}
+غيّر اسم مخطط: {}	Renamed a chart: {}	Renamed a chart: {}
+غيّر اسم مخطط: {} ← {}	Renamed a chart: {} ← {}	Renamed a chart: {} ← {}
+غيّر الدور إلى {}	Changed the role to {}	Changed the role to {}
+فاقد الفرز (# أيام) — {}	Sorting loss (# days) — {}	Sorting loss (# days) — {}
+فايف ستار ميكس #	Five Star Mix #	Five Star Mix #
+فبراير	February	February
+فرز {}{}	Sorting {}{}	Sorting {}{}
+في {}	In {}	In {}
+في {} سجل	In {} records	In {} records
+في تبويب: {}	In tab: {}	In tab: {}
+فيه {} بند في قايمة الفحص لسه ما اتعلّمش. تخلّص المهمة برضه؟	There are {} checklist items not ticked yet. Finish the task anyway?	There are {} checklist items not ticked yet. Finish the task anyway?
+فيه {} طلب فيه بيانات فرز قديمة (جه / بعد الفرز / فاقد / صور) كانت متسجلة جوه الطلب.	{} orders have old sorting data (received / after sorting / loss / photos) that was recorded inside the order.	{} orders have old sorting data (received / after sorting / loss / photos) that was recorded inside the order.
+فيه مجموعات بتوصل لماسورة {}، قلّل المجموعات الأول	Some groups reach pipe {} — reduce the groups first	Some groups reach pipe {} — reduce the groups first
+قراءة {} — {} — pH {} / EC {} / حرارة {}° (وقت القراءة {})	{} reading — {} — pH {} / EC {} / temperature {}° (reading time {})	{} reading — {} — pH {} / EC {} / temperature {}° (reading time {})
+قراءة التربة ما اتحفظتش{}	Soil reading not saved{}	Soil reading not saved{}
+قريب — بعد {} يوم ({})	Soon — in {} days ({})	Soon — in {} days ({})
+قطفات كل {} يوم	Cuts every {} days	Cuts every {} days
+قطفة {} من {}	Cut {} of {}	Cut {} of {}
+قطفة {} من {}{} — بتتقطف كل {} يوم	Cut {} of {}{} — cut every {} days	Cut {} of {}{} — cut every {} days
+قطفة {}{} من {} — باقي {}: {}{}	Cut {}{} of {} — {} left: {}{}	Cut {}{} of {} — {} left: {}{}
+قطفة — {}	Pick — {}	Pick — {}
+قيم مرجعية عامة للزراعة المائية، وممكن تختلف حسب الصنف والموسم وتوصية المورد. EC بوحدة mS/cm. "هواء" = حرارة جو الصوبة، و"محلول" = حرارة مياه الري/الخزان.{}	General reference values for hydroponics; they may vary by variety, season and supplier recommendation. EC in mS/cm. "Air" = greenhouse air temperature, and "Solution" = irrigation water/tank temperature.{}	General reference values for hydroponics; they may vary by variety, season and supplier recommendation. EC in mS/cm. "Air" = greenhouse air temperature, and "Solution" = irrigation water/tank temperature.{}
+قيمة "من" أكبر من "إلى" في {}	The "from" value is greater than "to" in {}	The "from" value is greater than "to" in {}
+كان لازم تزرع {} صينية من {} يوم ({}){}	You should have sown {} trays {} days ago ({}){}	You should have sown {} trays {} days ago ({}){}
+كل الأيام اللي تحت في الحدود (EC ±{} وpH ±{}). الحدود بتتغير من الإعدادات.	All the days below are within the limits (EC ±{} and pH ±{}). The limits can be changed in Settings.	All the days below are within the limits (EC ±{} and pH ±{}). The limits can be changed in Settings.
+كل خط = أي مقياس من أي مكان (مناخ/مياه/حصاد/مكافحة...). المحور اليمين مفيد لو القيم مختلفة في الحجم، والمعامل × بيصغّر أو يكبّر الخط على الرسم بس (زي ×#) من غير ما يغيّر الأرقام في الجدول.	Each line = any measurement from anywhere (climate/water/harvest/pests...). The right axis helps when values differ in size, and the × factor only shrinks or enlarges the line on the chart (like ×#) without changing the numbers in the table.	Each line = any measurement from anywhere (climate/water/harvest/pests...). The right axis helps when values differ in size, and the × factor only shrinks or enlarges the line on the chart (like ×#) without changing the numbers in the table.
+كلمة مرور مؤقتة{}	Temporary password{}	Temporary password{}
+كما في الملف: {}	As in the file: {}	As in the file: {}
+كورس علاج «{}» — {}{}	Treatment course “{}” — {}{}	Treatment course “{}” — {}{}
+كورس علاج مخطَّط: {}	Planned treatment course: {}	Planned treatment course: {}
+كورس علاج مقترح: {} — {} — {} رشة (من {})	Suggested treatment course: {} — {} — {} sprays (from {})	Suggested treatment course: {} — {} — {} sprays (from {})
+لازم تختار سماد واحد على الأقل فيه العنصر {} (الهدف مكتوب أكبر من صفر).	You must choose at least one fertilizer containing {} (its target is above zero).	You must choose at least one fertilizer containing {} (its target is above zero).
+لاصقة {} — {}	Sticky trap {} — {}	Sticky trap {} — {}
+لاصقة {} — عدد {} — {}	Sticky trap {} — count {} — {}	Sticky trap {} — count {} — {}
+لتر ({} مل)	L ({} ml)	L ({} ml)
+لتر ({} نبتة)	L ({} plants)	L ({} plants)
+لحساب تكلفة الكيلو	For the cost per kg	For the cost per kg
+لسه فاضل {} يوم على ميعادها	{} more days until it is due	{} more days until it is due
+لسه ما اتزرعتش (هتتزرع {})	Not planted yet (will be planted {})	Not planted yet (will be planted {})
+لسه محتاج تزرع {} صينية إضافية عشان تكمل الخطة{}.	You still need to sow {} more trays to complete the plan{}.	You still need to sow {} more trays to complete the plan{}.
+لقيت {} طلب و{} صنف.	Found {} orders and {} items.	Found {} orders and {} items.
+لو كتبتها بيحذّرك عند الحصاد بعد الرش	If you fill it in, you get a warning when harvesting after a spray	If you fill it in, you get a warning when harvesting after a spray
+لوجستي (النمو بيهدّى قرب وزن الحصاد، السقف {} جم)	Logistic (growth slows near harvest weight, ceiling {} g)	Logistic (growth slows near harvest weight, ceiling {} g)
+لوحة مؤشرات: {}	Dashboard: {}	Dashboard: {}
+ليف #	Leaf #	Leaf #
+مؤشرات آخر {}	Indicators for the last {}	Indicators for the last {}
+ما اتحفظتش{}	Not saved{}	Not saved{}
+ما اتحفظش{}	Not saved{}	Not saved{}
+ما فهمتش المهمة — جرّب تاني. سمعت: «{}»	I didn't understand the task — try again. I heard: “{}”	I didn't understand the task — try again. I heard: “{}”
+ما لقيتش طلبات في {}. المفروض كل طلب يكون إما فاتورة (سطر فيه "طلبية عميل" والتاريخ والأصناف بباركود)، أو اسم العميل في سطر وتحته أصنافه (كمية ثم صنف). لو الملف مختلف ابعتهولي.	No orders found in {}. Each order should be either an invoice (a line with "customer order", the date and items with barcodes), or the customer name on a line with their items below it (quantity then item). If the file is different, send it to me.	No orders found in {}. Each order should be either an invoice (a line with "customer order", the date and items with barcodes), or the customer name on a line with their items below it (quantity then item). If the file is different, send it to me.
+مادة خام {}{}	Raw material {}{}	Raw material {}{}
+مارس	March	March
+ماسورة {}{} — {} — {} نبتة — عمر {} يوم{} — {}{}	Pipe {}{} — {} — {} plants — age {} days{} — {}{}	Pipe {}{} — {} — {} plants — age {} days{} — {}{}
+ماسورة {}{} — {} — عمر {} يوم{}	Pipe {}{} — {} — age {} days{}	Pipe {}{} — {} — age {} days{}
+ماسورة {}{} — فاضية	Pipe {}{} — empty	Pipe {}{} — empty
+ماسورة {}{}: فاضية.{}	Pipe {}{}: empty.{}	Pipe {}{}: empty.{}
+ماسورة ≈ {} نبتة	Pipe ≈ {} plants	Pipe ≈ {} plants
+مايو	May	May
+متأخر {} يوم	{} days late	{} days late
+متأخر {} يوم — {}	{} days late — {}	{} days late — {}
+متأخرة {} يوم{}	{} days overdue{}	{} days overdue{}
+متوسط الرطوبة	Average humidity	Average humidity
+مثال: أحمد	e.g. Ahmed	e.g. Ahmed
+مثال: البياض الدقيقي، المن	e.g. powdery mildew, aphids	e.g. powdery mildew, aphids
+مثال: رشة تانية بعد # أيام	e.g. second spray after # days	e.g. second spray after # days
+مثال: ريح شديدة / فترة أمان / المنتج مش متوفر	e.g. strong wind / pre-harvest interval / product not available	e.g. strong wind / pre-harvest interval / product not available
+مثال: صباحًا بعيد عن الإزهار	e.g. in the morning, away from flowering	e.g. in the morning, away from flowering
+مثال: لوحة المناخ	e.g. Climate board	e.g. Climate board
+مثلًا: كل أنظمة الخس	e.g. all lettuce systems	e.g. all lettuce systems
+مجموع الأصناف {} مش زي إجمالي الملف {}	The items' sum {} doesn't match the file total {}	The items' sum {} doesn't match the file total {}
+مجموع الوصفة: {} جم{}	Recipe total: {} g{}	Recipe total: {} g{}
+مجموعة {} اتستخدمت من {} يوم على نفس الصوبة	Group {} was used {} days ago on the same greenhouse	Group {} was used {} days ago on the same greenhouse
+مجموعة تحضير: {}	Preparation group: {}	Preparation group: {}
+محتاج قراءات مناخ (حرارة ورطوبة وإضاءة) للصوبة «{}» النهارده أو إمبارح عشان يتحسب الاحتياج.	Climate readings (temperature, humidity and light) are needed for greenhouse “{}” today or yesterday to calculate the need.	Climate readings (temperature, humidity and light) are needed for greenhouse “{}” today or yesterday to calculate the need.
+محسوب بـ Kc=# (مل/نبتة)	Calculated with Kc=# (ml/plant)	Calculated with Kc=# (ml/plant)
+مخزون منخفض ({}): {}{}	Low stock ({}): {}{}	Low stock ({}): {}{}
+مخطط في لوحة: {}	Chart on a dashboard: {}	Chart on a dashboard: {}
+مخطط: {} ({} خط)	Chart: {} ({} lines)	Chart: {} ({} lines)
+مدة الأمان: {} يوم	Pre-harvest interval: {} days	Pre-harvest interval: {} days
+مراوح	Fans	Fans
+مرتبط بـ {} جلسة فرز	Linked to {} sorting sessions	Linked to {} sorting sessions
+مسح {}	Delete {}	Delete {}
+مسح شكوى {}	Delete complaint {}	Delete complaint {}
+مسح طلب {}	Delete order {}	Delete order {}
+مسح عنصر من لوحة: {}	Deleted an item from a dashboard: {}	Deleted an item from a dashboard: {}
+مسح مجموعة مواسير {}	Deleted pipe group {}	Deleted pipe group {}
+مسح مخطط: {}	Deleted chart: {}	Deleted chart: {}
+مسح من جدول الرش/التسميد: {}	Deleted from the spray/fertigation schedule: {}	Deleted from the spray/fertigation schedule: {}
+مشتل {} يوم{}	Nursery {} days{}	Nursery {} days{}
+مشتل: {} ({} صينية)	Nursery: {} ({} trays)	Nursery: {} ({} trays)
+مشكلة: {}	Problem: {}	Problem: {}
+مشكلة: {}{}{}{}	Problem: {}{}{}{}	Problem: {}{}{}{}
+مصيدة فيرمونية ضد {} — عدد {} — {}	Pheromone trap against {} — count {} — {}	Pheromone trap against {} — count {} — {}
+مصيدة فيرمونية — {}	Pheromone trap — {}	Pheromone trap — {}
+مضخة الري — {}	Irrigation pump — {}	Irrigation pump — {}
+مطلوب ({})	Required ({})	Required ({})
+مع: {}	With: {}	With: {}
+معاملة جديدة على: {} — {}{}	New treatment on: {} — {}{}	New treatment on: {} — {}{}
+معاملة مكافحة: {}{}	Pest treatment: {}{}	Pest treatment: {}{}
+معاها: {}	Together with: {}	Together with: {}
+معايرة {} — {}	Calibration {} — {}	Calibration {} — {}
+معايرة {} — {}{}	Calibration {} — {}{}	Calibration {} — {}{}
+معايرة ري — {}	Irrigation calibration — {}	Irrigation calibration — {}
+معايرة ري — {}: {} لتر/دقيقة للنقطة ({} نقاط، {} مل في {} ث)	Irrigation calibration — {}: {} L/min per dripper ({} drippers, {} ml in {} s)	Irrigation calibration — {}: {} L/min per dripper ({} drippers, {} ml in {} s)
+معايرة محفوظة — حمض: {} — قاعدة: {}	Saved calibration — acid: {} — base: {}	Saved calibration — acid: {} — base: {}
+معروض {} من {}	Showing {} of {}	Showing {} of {}
+معروض {} من {}{}	Showing {} of {}{}	Showing {} of {}{}
+مفيش {} مواسير فاضية ورا بعض	No {} consecutive empty pipes	No {} consecutive empty pipes
+مفيش {} مواسير فاضية ورا بعض في مخطط النظام، ضيفهم يدوي	No {} consecutive empty pipes in the system map — add them manually	No {} consecutive empty pipes in the system map — add them manually
+مفيش أرقام لسه.	No numbers yet.	No numbers yet.
+مفيش أسباب متسجلة.	No reasons recorded.	No reasons recorded.
+مفيش أصناف متطابقة بالاسم في المخزون (بوحدة تناسب الصنف) لخصمها. تأكد إن اسم السماد هنا مطابق لاسمه في تبويب المخازن.	No matching items by name in stock (in a suitable unit) to deduct. Make sure the fertilizer name here matches its name in the Stock tab.	No matching items by name in stock (in a suitable unit) to deduct. Make sure the fertilizer name here matches its name in the Stock tab.
+مفيش بيانات إنتاج للماسورة لـ: {} — سجّل حصاد بعدد مواسير عشان يتحسب التوقّع.	No per-pipe yield data for: {} — record a harvest with a number of pipes so the forecast can be calculated.	No per-pipe yield data for: {} — record a harvest with a number of pipes so the forecast can be calculated.
+مفيش بيانات في الفترة دي (أو كل الخطوط مقفولة)	No data in this period (or all lines are hidden)	No data in this period (or all lines are hidden)
+مفيش بيانات لموسم {} لنفس المحصول للمقارنة.	No data for the {} season for the same crop to compare.	No data for the {} season for the same crop to compare.
+مفيش بيانات مسجلة لسه للعنصر ده.	No data recorded yet for this item.	No data recorded yet for this item.
+مفيش بيانات.	No data.	No data.
+مفيش تكاليف أو حصاد في الفترة دي.	No costs or harvest in this period.	No costs or harvest in this period.
+مفيش تنبيهات غير مقروءة	No unread alerts	No unread alerts
+مفيش حاجة مسجلة لسه في القسم ده.	Nothing recorded yet in this section.	Nothing recorded yet in this section.
+مفيش رش أو تسميد مجدول.	No spraying or fertigation scheduled.	No spraying or fertigation scheduled.
+مفيش رشة في الكورس بتغطي: {} — الكورس مش هيغطي دورة الحياة كاملة، كمّله بمنتج مناسب.	No spray in the course covers: {} — the course won't cover the full life cycle; complete it with a suitable product.	No spray in the course covers: {} — the course won't cover the full life cycle; complete it with a suitable product.
+مفيش رقم واتساب — سجّله من الإعدادات ← حسابات الموظفين	No WhatsApp number — add it from Settings ← Staff accounts	No WhatsApp number — add it from Settings ← Staff accounts
+مفيش شرح لسه للقسم ده.	No help yet for this section.	No help yet for this section.
+مفيش شكاوى {}.	No {} complaints.	No {} complaints.
+مفيش شكاوى في الفترة دي.	No complaints in this period.	No complaints in this period.
+مفيش صلاحية للميكروفون	No microphone permission	No microphone permission
+مفيش صلاحية للميكروفون — فعّلها من إعدادات المتصفح للموقع ده	No microphone permission — allow it in the browser settings for this site	No microphone permission — allow it in the browser settings for this site
+مفيش صواني في المشتل دلوقتي.	No trays in the nursery right now.	No trays in the nursery right now.
+مفيش صواني في المشتل متخصصة للخطة دي دلوقتي.	No nursery trays assigned to this plan right now.	No nursery trays assigned to this plan right now.
+مفيش صوب ثمريات لسه.	No fruit greenhouses yet.	No fruit greenhouses yet.
+مفيش صور لسه.	No photos yet.	No photos yet.
+مفيش صور.	No photos.	No photos.
+مفيش طلبات في الفترة دي.	No orders in this period.	No orders in this period.
+مفيش طلبات للحفظ	No orders to save	No orders to save
+مفيش فرز في الفترة دي.	No sorting in this period.	No sorting in this period.
+مفيش في المخزن مبيد مناسب لـ «{}» (حسب خانة «يستهدف» والمادة الفعالة). ضيف مبيد للمخزن أو راجع خانة «يستهدف» لأصنافك.	No suitable pesticide in stock for “{}” (based on the “Targets” field and the active ingredient). Add a pesticide to stock or check the “Targets” field of your items.	No suitable pesticide in stock for “{}” (based on the “Targets” field and the active ingredient). Add a pesticide to stock or check the “Targets” field of your items.
+مفيش قراءات	No readings	No readings
+مفيش قراءات مسجلة في اليوم ده.	No readings recorded on this day.	No readings recorded on this day.
+مفيش قراءات مناخ	No climate readings	No climate readings
+مفيش قراءات مناخ للصوبة دي.	No climate readings for this greenhouse.	No climate readings for this greenhouse.
+مفيش قراءات.	No readings.	No readings.
+مفيش قراءة ري مسجّلة في اليوم ده.	No irrigation reading recorded on this day.	No irrigation reading recorded on this day.
+مفيش معايير مرجعية للمحصول ده. المحاصيل المتاحة: {}.	No reference parameters for this crop. Available crops: {}.	No reference parameters for this crop. Available crops: {}.
+مفيش منتج صالح لرشة النظافة في المخزن. {} اتحطت كرشة نظافة فاضية تختار منتجها بنفسك.	No product in stock suitable for a clean-up spray. {} was added as an empty clean-up spray — choose its product yourself.	No product in stock suitable for a clean-up spray. {} was added as an empty clean-up spray — choose its product yourself.
+مفيش منتج مختار.	No product selected.	No product selected.
+مفيش مهام في آخر # يوم.	No tasks in the last # days.	No tasks in the last # days.
+مفيش مهام ليك النهاردة.	No tasks for you today.	No tasks for you today.
+مفيش مواسير جاهزة للحصاد {}.	No pipes ready to harvest {}.	No pipes ready to harvest {}.
+مفيش مواسير مسجلة لسه. سجّل المحصول في مخطط المواسير (تبويب الحصاد) وهتظهر الخطة هنا.	No pipes recorded yet. Add the crop to the pipe map (Harvest tab) and the plan will appear here.	No pipes recorded yet. Add the crop to the pipe map (Harvest tab) and the plan will appear here.
+مفيش ميكروفون متوصل	No microphone connected	No microphone connected
+مفيش نتائج — جرّب اسم تاني أو اكتب الإحداثيات.	No results — try another name or enter the coordinates.	No results — try another name or enter the coordinates.
+مفيش نتايج للبحث ده.	No results for this search.	No results for this search.
+مفيش نشاط مسجّل في النطاق ده.	No activity recorded in this range.	No activity recorded in this range.
+مقروءة ({})	Read ({})	Read ({})
+مكتبة الأسمدة الجاهزة ({} سماد بنسبها ونقاوتها وأسعارها المرجعية) + الأسمدة الافتراضية القديمة + اللي تضيفه. لو عندك سماد من مورد بنسبة مختلفة، ضيفه كسماد مخصّص بالنسبة المطبوعة على عبوتك.	The ready-made fertilizer library ({} fertilizers with their ratios, purity and reference prices) + the old default fertilizers + the ones you add. If you have a fertilizer from a supplier with a different ratio, add it as a custom fertilizer with the ratio printed on your bag.	The ready-made fertilizer library ({} fertilizers with their ratios, purity and reference prices) + the old default fertilizers + the ones you add. If you have a fertilizer from a supplier with a different ratio, add it as a custom fertilizer with the ratio printed on your bag.
+مل/د{}	ml/min{}	ml/min{}
+مل/ساعة (الساعة {}:#)	ml/hour (at {}:#)	ml/hour (at {}:#)
+ملاحظات تسليم الوردية{}	Shift handover notes{}	Shift handover notes{}
+ملاحظة النتيجة	Result note	Result note
+ملاحظة: {}	Note: {}	Note: {}
+ملف الأصناف الجديد: {} صنف جديد{}{}.	New items file: {} new items{}{}.	New items file: {} new items{}{}.
+ممكن يزوّد الأكاروس	May increase mites	May increase mites
+من # لحد {}	from # to {}	from # to {}
+من {} إلى {}	from {} to {}	from {} to {}
+من {} صينية	of {} trays	of {} trays
+من إمبارح	Since yesterday	Since yesterday
+من طلب {}	From order {}	From order {}
+مناخ {}	{} climate	{} climate
+مناخ صوبة {} — حرارة {}° / رطوبة {}% / إضاءة {} Lux (وقت القراءة {})	Greenhouse {} climate — temperature {}° / humidity {}% / light {} lux (reading time {})	Greenhouse {} climate — temperature {}° / humidity {}% / light {} lux (reading time {})
+منتجات مناسبة بس كميتها صفر في المخزن: {}	Suitable products, but their stock quantity is zero: {}	Suitable products, but their stock quantity is zero: {}
+منحنى نمو {} (جم/نبات)	{} growth curve (g/plant)	{} growth curve (g/plant)
+منظم نمو: بيمنع البيض والحوريات من اكتمال النمو	Growth regulator: stops eggs and nymphs from developing	Growth regulator: stops eggs and nymphs from developing
+منهم {} صينية من غير نظام محدد.	{} of them are trays with no specific system.	{} of them are trays with no specific system.
+مهامك اتحوّلت لـ {}	Your tasks were moved to {}	Your tasks were moved to {}
+مهمة النهارده: {}	Today's task: {}	Today's task: {}
+مهمة بكرة: {}	Tomorrow's task: {}	Tomorrow's task: {}
+مهمة متأخرة: {}	Overdue task: {}	Overdue task: {}
+مهمة: {}{}{}	Task: {}{}{}	Task: {}{}{}
+مواسير {} ({} ماسورة) — زراعة {} — {}	Pipes {} ({} pipes) — planted {} — {}	Pipes {} ({} pipes) — planted {} — {}
+مواعيد الري: {}	Irrigation times: {}	Irrigation times: {}
+موسم {}	{} season	{} season
+موسم {}: {} — موسم {}: {}{}{}	{} season: {} — {} season: {}{}{}	{} season: {} — {} season: {}{}{}
+مياه (جم/لتر)	Water (g/L)	Water (g/L)
+مياه (لتر)	Water (L)	Water (L)
+مياه {}	{} water	{} water
+ميكس · وصفة {} جم · {} مكوّن{}	Mix · recipe {} g · {} ingredients{}	Mix · recipe {} g · {} ingredients{}
+مَنّ	Aphids	Aphids
+ناقص {} صينية	{} trays short	{} trays short
+نزل {} صينية من {}{} بتاريخ {}، وباقي {} في المشتل.	{} trays of {}{} transplanted on {}, and {} left in the nursery.	{} trays of {}{} transplanted on {}, and {} left in the nursery.
+نزلت النظام — {}	Moved into the system — {}	Moved into the system — {}
+نزلت كل الصواني ({}) من {}{} بتاريخ {}، ومفيش حاجة باقية من الصنف ده في المشتل.	All trays ({}) of {}{} transplanted on {}, and nothing of this item is left in the nursery.	All trays ({}) of {}{} transplanted on {}, and nothing of this item is left in the nursery.
+نسخ مخطط: {}	Duplicated chart: {}	Duplicated chart: {}
+نفاذية الغطاء τ = {}	Cover transmittance τ = {}	Cover transmittance τ = {}
+نفاذية الغطاء ≈ {}%	Cover transmittance ≈ {}%	Cover transmittance ≈ {}%
+نقاوة {}%	Purity {}%	Purity {}%
+نقل {} صينية	Transplanted {} trays	Transplanted {} trays
+نقل بيانات فرز قديمة من {} طلب إلى قسم الفرز	Moved old sorting data from {} orders to the sorting section	Moved old sorting data from {} orders to the sorting section
+نمو يومي (متوسط)	Daily growth (average)	Daily growth (average)
+نوفمبر	November	November
+هتتكرر تلقائي كل {} بعد ما تعلّم عليها "تم" — من غير ما تكتبها تاني.	It will repeat automatically every {} after you tick "Done" — without writing it again.	It will repeat automatically every {} after you tick "Done" — without writing it again.
+هتجهز بعد {} يوم	Ready in {} days	Ready in {} days
+هتغيّر "{}" إلى "{}" في {} سجل؟	Change "{}" to "{}" in {} records?	Change "{}" to "{}" in {} records?
+هتغيّر "{}" إلى "{}"{}؟	Change "{}" to "{}"{}?	Change "{}" to "{}"{}?
+هتنزل كل الصواني ({}) ومش هيفضل حاجة في المشتل.	All trays ({}) will be transplanted and nothing will be left in the nursery.	All trays ({}) will be transplanted and nothing will be left in the nursery.
+هدف غذائي: {}	Nutrient target: {}	Nutrient target: {}
+هنضيف أول {} صور بس	We'll add only the first {} photos	We'll add only the first {} photos
+هيتعمل مهمة «جولة كشف آفات» لكل صوبة ({}) ليك النهارده بقايمة فحص. تكمل؟	A “Pest scouting round” task will be created for each greenhouse ({}) for you today with a checklist. Continue?	A “Pest scouting round” task will be created for each greenhouse ({}) for you today with a checklist. Continue?
+هيتغيّر جدول الري لـ: من {} لحد {}، كل {} دقيقة، تشغيل {} دقيقة. (الجدول الثابت بيقرّب الأوقات المقترحة). تكمّل؟	The irrigation schedule will change to: from {} to {}, every {} minutes, running {} minutes. (The fixed schedule approximates the suggested times.) Continue?	The irrigation schedule will change to: from {} to {}, every {} minutes, running {} minutes. (The fixed schedule approximates the suggested times.) Continue?
+هيتم {} كل البيانات الحالية ببيانات الملف ده (حوالي {} سجل أو أكتر). {} متأكد إنك عايز تكمل؟	All current data will be {} with the data in this file (about {} records or more). {} Are you sure you want to continue?	All current data will be {} with the data in this file (about {} records or more). {} Are you sure you want to continue?
+هيتم خصم: {} متأكد؟	This will be deducted: {} Are you sure?	This will be deducted: {} Are you sure?
+هينزل {} ويفضل {} في المشتل.	{} will be transplanted and {} will stay in the nursery.	{} will be transplanted and {} will stay in the nursery.
+هيوصل {} جم في اليوم {} من الشتل، والمرجع {}–{} يوم	It will reach {} g on day {} after transplanting, and the reference is {}–{} days	It will reach {} g on day {} after transplanting, and the reference is {}–{} days
+واتبعت لـ {}	and sent to {}	and sent to {}
+واتبعتت لـ {}	and sent to {}	and sent to {}
+واتخصم من المخزن ({} صنف)	and deducted from stock ({} items)	and deducted from stock ({} items)
+واتساب: {}	WhatsApp: {}	WhatsApp: {}
+واتضافت {} ماسورة في مخطط النظام (مواسير {}{}–{}{})	and {} pipes were added to the system map (pipes {}{}–{}{})	and {} pipes were added to the system map (pipes {}{}–{}{})
+واقفة — آخر تشغيل {}	Off — last run {}	Off — last run {}
+واقفة — الريّة الجاية {}	Off — next irrigation {}	Off — next irrigation {}
+وزن الحصاد {} جم	Harvest weight {} g	Harvest weight {} g
+وزنة {} — {} — {} جم	Weighing {} — {} — {} g	Weighing {} — {} — {} g
+وزنة {} — {} — {} — {} جم	Weighing {} — {} — {} — {} g	Weighing {} — {} — {} — {} g
+وعد مرفوض: {}	Unhandled rejection: {}	Unhandled rejection: {}
+يستهدف: {}	Targets: {}	Targets: {}
+يشتغل على: {}	Works on: {}	Works on: {}
+يناير	January	January
+يوصل {} جم بعد	Reaches {} g after	Reaches {} g after
+يوليو	July	July
+يوم {}	Day {}	Day {}
+يوم حصاد، من {} لحد النهارده.{}	harvest days, from {} until today.{}	harvest days, from {} until today.{}
+يونيو	June	June
+— {} صور	— {} photos	— {} photos
+— {} ماسورة	— {} pipes	— {} pipes
+— {} ماسورة (من {}{} لـ {}{})	— {} pipes (from {}{} to {}{})	— {} pipes (from {}{} to {}{})
+— {} ماسورة فاضية	— {} empty pipes	— {} empty pipes
+— {}/م²	— {}/m²	— {}/m²
+— آخر قطفة {} ({} {})	— last pick {} ({} {})	— last pick {} ({} {})
+— أخيرة	— last	— last
+— أول حصاد بعد {} يوم	— first harvest after {} days	— first harvest after {} days
+— إجمالي الصواني: {}	— total trays: {}	— total trays: {}
+— إجمالي النظام: {} لتر/دقيقة	— system total: {} L/min	— system total: {} L/min
+— اتقطفت {}{} (آخر قطفة {})	— cut {}{} (last cut {})	— cut {}{} (last cut {})
+— اتقفلت بدري	— ended early	— ended early
+— اتنفّذ {}	— done {}	— done {}
+— اسم جديد: {} —	— new name: {} —	— new name: {} —
+— الحالة: {}	— status: {}	— status: {}
+— السبب: {}	— reason: {}	— reason: {}
+— الشدة: {}	— severity: {}	— severity: {}
+— الصنف المطلوب —	— Requested item —	— Requested item —
+— الصنف —	— Item —	— Item —
+— الفرق: {}{}%	— difference: {}{}%	— difference: {}{}%
+— القادمة: {}	— next: {}	— next: {}
+— القطفة الأخيرة ({} من {}){}	— last cut ({} of {}){}	— last cut ({} of {}){}
+— الكمية {}	— quantity {}	— quantity {}
+— المجموعة: {}	— group: {}	— group: {}
+— المنتج —	— Product —	— Product —
+— المواسير: {}	— pipes: {}	— pipes: {}
+— بذور {} ج.م + بيئة {} ج.م	— seeds {} EGP + medium {} EGP	— seeds {} EGP + medium {} EGP
+— بعيدة عن آخر قراءة: {} (لو غلط امسحها)	— far from the last reading: {} (delete it if wrong)	— far from the last reading: {} (delete it if wrong)
+— تكلفة الكيلو {} ج.م	— cost per kg {} EGP	— cost per kg {} EGP
+— طلب #{} {}	— order #{} {}	— order #{} {}
+— على {}	— on {}	— on {}
+— فاضل {}	— {} left	— {} left
+— قطفة {} من {}	— cut {} of {}	— cut {} of {}
+— كل الصالات	— All halls	— All halls
+— لحد {}	— until {}	— until {}
+— لسه ما اتقطفش	— Not picked yet	— Not picked yet
+— لـ {}	— for {}	— for {}
+— لو زرعت النهارده المواسير هتفضل فاضية حوالين {} يوم بعد القطفة الأخيرة	— if you sow today, the pipes will stay empty for about {} days after the last cut	— if you sow today, the pipes will stay empty for about {} days after the last cut
+— محتاج تخصم يدوي: {}	— needs manual deduction: {}	— needs manual deduction: {}
+— مختلف عن وزن الكيس المكتوب ({} جم)	— different from the bag weight written ({} g)	— different from the bag weight written ({} g)
+— مشتل {} يوم	— nursery {} days	— nursery {} days
+— معلّقة {}{}	— pending {}{}	— pending {}{}
+— من {}	— from {}	— from {}
+— من {} إلى {}	— from {} to {}	— from {} to {}
+— من غير خصم: {}	— without deduction: {}	— without deduction: {}
+— ميعادها {}	— due {}	— due {}
+— وتخطّيت {} موجودين	— and skipped {} existing	— and skipped {} existing
+• {} اتعمل {} ← آمن من {}	• {} applied {} ← safe from {}	• {} applied {} ← safe from {}
+‹ السابق	‹ Previous	‹ Previous
+ℹ مفيش مواسير مزروعة في إنفوجراف الحصاد للنظام ده{}.	ℹ No planted pipes in the harvest infographic for this system{}.	ℹ No planted pipes in the harvest infographic for this system{}.
+↑ أعلى	↑ Top	↑ Top
+≈ {} كجم	≈ {} kg	≈ {} kg
+≈ {} مل/نبتة	≈ {} ml/plant	≈ {} ml/plant
+" عشان التنبيه يقف.	" so the alert stops.	" so the alert stops.
+(المهمة تمت	(task done	(task done
+(بتشتغل والتطبيق مفتوح)	(works while the app is open)	(works while the app is open)
+(بيشتغل والتطبيق مفتوح)	(works while the app is open)	(works while the app is open)
+(حتى لو التطبيق مقفول)	(even if the app is closed)	(even if the app is closed)
+(هتوصلك حتى لو التطبيق مقفول)	(you'll get them even if the app is closed)	(you'll get them even if the app is closed)
+{} افتح التطبيق واضغط "تم	{} Open the app and tap "Done	{} Open the app and tap "Done
+إضافة" وضيف لوحة مؤشرات أو مخطط.	Add" and add a dashboard or chart.	Add" and add a dashboard or chart.
+ابعت تاني	Send again	Send again
+اتبعت	Sent	Sent
+اتفعّل التنبيه كل ساعة	Hourly alert turned on	Hourly alert turned on
+اتفعّلت إشعارات الجهاز	Device notifications turned on	Device notifications turned on
+التبويب فاضي. دوس "	The tab is empty. Tap "	The tab is empty. Tap "
+الرقم = عدد الإصابات في آخر {} يوم — ↑ زيادة عن الفترة اللي قبلها، ↓ نقص، ＝ ثابتة	The number = infestations in the last {} days — ↑ increase vs the previous period, ↓ decrease, ＝ stable	The number = infestations in the last {} days — ↑ increase vs the previous period, ↓ decrease, ＝ stable
+الموظف بيستلم إشعار بالمهمة، والتذكير بيفضل كل ساعة لحد ما يدوس "تم	The employee gets a notification for the task, and the reminder repeats every hour until they tap "Done	The employee gets a notification for the task, and the reminder repeats every hour until they tap "Done
+بيفكّرك بمهامك اللي لسه ما خلصتهاش كل ساعة (من {} لـ {}) لحد ما تدوس "تم	Reminds you every hour (from {} to {}) of your unfinished tasks until you tap "Done	Reminds you every hour (from {} to {}) of your unfinished tasks until you tap "Done
+صباح الخير يا {}	Good morning {}	Good morning {}
+ظهرت جديدة.	newly appeared.	newly appeared.
+مهامك ليوم {}: {} ربنا يوفقك — O'Roots	Your tasks for {}: {} Good luck — O'Roots	Your tasks for {}: {} Good luck — O'Roots
+طلب ＃{}	Order ＃{}	Order ＃{}
+طلب ＃{} — {}	Order ＃{} — {}	Order ＃{} — {}
+— طلب ＃{} {}	— order ＃{} {}	— order ＃{} {}
+(زي Gemini أو DeepSeek أو LM Studio على جهاز تاني): العنوان والمفتاح واسم الموديل من صفحة الخدمة.	(like Gemini, DeepSeek or LM Studio on another computer): the address, key and model name are on the service's page.	(like Gemini, DeepSeek or LM Studio on another computer): the address, key and model name are on the service's page.
+(مش متظبط)	(not set up)	(not set up)
+)، واكتب اسمه هنا. البيانات ما بتخرجش من الجهاز. الجودة أقل من النماذج اللي برّه، وبيحتاج كمبيوتر قوي (كارت شاشة) عشان يبقى سريع.	), and enter its name here. The data never leaves the computer. Quality is lower than the online models, and it needs a powerful computer (graphics card) to be fast.	), and enter its name here. The data never leaves the computer. Quality is lower than the online models, and it needs a powerful computer (graphics card) to be fast.
+. الدفع بالاستخدام: التقرير الشامل تقريبًا #–# دولار.	. Pay per use: a comprehensive report costs roughly #–# dollars.	. Pay per use: a comprehensive report costs roughly #–# dollars.
+{} ث	{} s	{} s
+{} د {} ث	{} min {} s	{} min {} s
+، واكتب اسم الموديل زي ما هو في حسابك.	, and enter the model name exactly as in your account.	, and enter the model name exactly as in your account.
+آخر {} يوم	Last {} days	Last {} days
+أقصى (أغلى)	Maximum (most expensive)	Maximum (most expensive)
+أقصى عدد تحليلات في اليوم	Maximum analyses per day	Maximum analyses per day
+أي خدمة بواجهة	Any service with an	Any service with an
+إعدادات المحلّل الذكي	AI analyst settings	AI analyst settings
+ابدأ التحليل	Start the analysis	Start the analysis
+ابدأ تحليل من «تحليل جديد».	Start one from “New analysis”.	Start one from “New analysis”.
+ابعت بيانات التكاليف وتكلفة الكيلو كمان	Also send cost and cost-per-kg data	Also send cost and cost-per-kg data
+اتحفظت إعدادات المحلّل	Analyst settings saved	Analyst settings saved
+اتنسخ	Copied	Copied
+اختبار	Test	Test
+اخفي البيانات	Hide the data	Hide the data
+استخدمت النهارده:	Used today:	Used today:
+اسم الموديل	Model name	Model name
+اسم الموديل مش موجود عند المزوّد (أو مش متحمّل على الجهاز للمحلي)	The model name doesn't exist at the provider (or isn't downloaded on the computer, for local)	The model name doesn't exist at the provider (or isn't downloaded on the computer, for local)
+الإعدادات دي بتظهر لما البرنامج يشتغل على السيرفر المحلي (كمبيوتر المزرعة).	These settings appear when the app runs on the local server (the farm computer).	These settings appear when the app runs on the local server (the farm computer).
+الاسم اللي يظهر	Display name	Display name
+الافتراضي نموذج محلي على كمبيوتر المزرعة (البيانات ما بتخرجش)، وتقدر تحوّل لـ Claude أو ChatGPT أو أي مزوّد تاني من زرار في تاب المحلّل. التاب للمدير بس، وتقدر تفتحه لموظف معيّن من «حسابات الموظفين» (صلاحية «المحلّل الذكي»).	The default is a local model on the farm computer (the data never leaves it), and you can switch to Claude, ChatGPT or any other provider with a button in the analyst tab. The tab is for the admin only, and you can open it for specific employees from “Staff accounts” (the “AI analyst” permission).	The default is a local model on the farm computer (the data never leaves it), and you can switch to Claude, ChatGPT or any other provider with a button in the analyst tab. The tab is for the admin only, and you can open it for specific employees from “Staff accounts” (the “AI analyst” permission).
+البيانات اللي اتبعتت للمزوّد	Data sent to the provider	Data sent to the provider
+البيانات هتتبعت لـ {} على الإنترنت. تكمّل؟	The data will be sent to {} over the internet. Continue?	The data will be sent to {} over the internet. Continue?
+التحليل خد وقت أطول من اللازم واتلغى	The analysis took too long and was cancelled	The analysis took too long and was cancelled
+التحليل خلص: {}	Analysis finished: {}	Analysis finished: {}
+السؤال:	Question:	Question:
+السيرفر وقف أثناء التحليل — شغّله تاني	The server stopped during the analysis — start it again	The server stopped during the analysis — start it again
+الصق المفتاح هنا	Paste the key here	Paste the key here
+المحلّل الذكي	AI analyst	AI analyst
+المحلّل الذكي (الذكاء الاصطناعي)	AI analyst (artificial intelligence)	AI analyst (artificial intelligence)
+المحلّل الذكي شغّال على السيرفر المحلي (كمبيوتر المزرعة) بس، عشان مفاتيح مزوّدي الذكاء الاصطناعي تفضل عندك.	The AI analyst works on the local server (the farm computer) only, so the AI providers' keys stay with you.	The AI analyst works on the local server (the farm computer) only, so the AI providers' keys stay with you.
+المزوّد	Provider	Provider
+المزوّد الافتراضي	Default provider	Default provider
+المزوّد المحلي: البيانات ما بتخرجش من كمبيوتر المزرعة.	Local provider: the data never leaves the farm computer.	Local provider: the data never leaves the farm computer.
+المزوّد ده برّه المزرعة: البيانات دي هتتبعت له على الإنترنت.	This provider is outside the farm: this data will be sent to it over the internet.	This provider is outside the farm: this data will be sent to it over the internet.
+المزوّد ده مش متظبط — ظبطه من الإعدادات ← المحلّل الذكي	This provider isn't set up — set it up in Settings ← AI analyst	This provider isn't set up — set it up in Settings ← AI analyst
+المزوّد رافض مؤقتًا (كتر الطلبات أو الرصيد خلص) — جرّب بعدين	The provider is refusing for now (too many requests or out of credit) — try later	The provider is refusing for now (too many requests or out of credit) — try later
+المفاتيح بتتحفظ على كمبيوتر المزرعة بس، ومش بتظهر لحد ولا بتتبعت للمتصفح.	Keys are saved on the farm computer only, and are never shown to anyone or sent to the browser.	Keys are saved on the farm computer only, and are never shown to anyone or sent to the browser.
+المفتاح من	Get the key from	Get the key from
+الموديل	Model	Model
+النموذج رجّع رد فاضي	The model returned an empty reply	The model returned an empty reply
+النموذج رفض الطلب	The model refused the request	The model refused the request
+امسح المفتاح	Delete the key	Delete the key
+بدأ التحليل	Analysis started	Analysis started
+بيتبعت: أرقام وقراءات ونتايج حسابات البرنامج — من غير أسماء العملاء ولا الإيميلات ولا التليفونات.{}	What's sent: numbers, readings and the results of the app's calculations — without customer names, emails or phone numbers.{}	What's sent: numbers, readings and the results of the app's calculations — without customer names, emails or phone numbers.{}
+بيحلّل	Analyzing	Analyzing
+بيحلّل… التقرير هيظهر هنا أول ما يخلص.	Analyzing… the report will appear here as soon as it's done.	Analyzing… the report will appear here as soon as it's done.
+بيحمّل الإعدادات…	Loading settings…	Loading settings…
+بيحمّل…	Loading…	Loading…
+بيختبر…	Testing…	Testing…
+بيقرا أرقام المزرعة ونتايج حسابات البرنامج (الري، الخلطات، المخاطر، الرش، الحصاد) ويكتبلك تقرير بالوضع والمميزات والعيوب والمخاطر والتوصيات. ده رأي استشاري: الكميات والجرعات بتيجي من حاسبات البرنامج والملصق والمهندس.	Reads the farm's numbers and the results of the app's calculations (irrigation, mixes, risks, spraying, harvest) and writes you a report on the status, strengths, weaknesses, risks and recommendations. It's advisory: amounts and doses come from the app's calculators, the label and the agronomist.	Reads the farm's numbers and the results of the app's calculations (irrigation, mixes, risks, spraying, harvest) and writes you a report on the status, strengths, weaknesses, risks and recommendations. It's advisory: amounts and doses come from the app's calculators, the label and the agronomist.
+تحذف التقرير ده؟	Delete this report?	Delete this report?
+تحليل جديد	New analysis	New analysis
+تحليل. النموذج المحلي على كمبيوتر عادي ممكن ياخد كذا دقيقة — التقرير بيظهر في «التقارير» أول ما يخلص.	analyses. A local model on an ordinary computer can take several minutes — the report appears in “Reports” as soon as it's done.	analyses. A local model on an ordinary computer can take several minutes — the report appears in “Reports” as soon as it's done.
+تقرير شامل للمزرعة	Comprehensive farm report	Comprehensive farm report
+حصلت مشكلة: {}	A problem occurred: {}	A problem occurred: {}
+حفظ إعدادات المحلّل	Save analyst settings	Save analyst settings
+حلّل بالذكاء الاصطناعي	Analyze with AI	Analyze with AI
+سؤال محدد (اختياري)	Specific question (optional)	Specific question (optional)
+سطّب برنامج	Install	Install
+شغّال ({} — {})	Working ({} — {})	Working ({} — {})
+شوف اللي هيتبعت	See what will be sent	See what will be sent
+عالي (المُستحسن)	High (recommended)	High (recommended)
+عالي جدًا	Very high	Very high
+على كمبيوتر المزرعة، وحمّل موديل بيفهم عربي (مثلاً من cmd:	on the farm computer, and download a model that understands Arabic (e.g. from cmd:	on the farm computer, and download a model that understands Arabic (e.g. from cmd:
+عمق التفكير	Thinking depth	Thinking depth
+فشل	Failed	Failed
+فيه تحليلين شغّالين دلوقتي — استنى لما يخلصوا	Two analyses are running now — wait for them to finish	Two analyses are running now — wait for them to finish
+لسه مفيش تقارير.{}	No reports yet.{}	No reports yet.{}
+لسه مفيش مزوّد متظبط — ظبطه من الإعدادات ← المحلّل الذكي.	No provider is set up yet — set one up in Settings ← AI analyst.	No provider is set up yet — set one up in Settings ← AI analyst.
+لسه مفيش مزوّد متظبط — كلّم المدير.	No provider is set up yet — ask the admin.	No provider is set up yet — ask the admin.
+ما قدرتش أجهّز البيانات	Couldn't prepare the data	Couldn't prepare the data
+مثلاً: ليه الـ EC في الصرف عالي في S#؟	e.g. why is the drainage EC high in S#?	e.g. why is the drainage EC high in S#?
+محفوظ {} — اكتب جديد لو عايز تغيّره	Saved {} — type a new one if you want to change it	Saved {} — type a new one if you want to change it
+محلي (على كمبيوتر المزرعة)	Local (on the farm computer)	Local (on the farm computer)
+مراجعة الخلطة السمادية	Fertilizer mix review	Fertilizer mix review
+مراجعة الري	Irrigation review	Irrigation review
+مراجعة جدول الرش والتسميد	Spray & fertigation schedule review	Spray & fertigation schedule review
+مزوّد تاني	Another provider	Another provider
+مزوّد تاني (أي خدمة متوافقة مع OpenAI)	Another provider (any OpenAI-compatible service)	Another provider (any OpenAI-compatible service)
+مش قادر أوصل للمزوّد — للمحلي اتأكد إن برنامج Ollama شغّال على الكمبيوتر	Can't reach the provider — for local, make sure the Ollama program is running on the computer	Can't reach the provider — for local, make sure the Ollama program is running on the computer
+مفتاح الـ API	API key	API key
+مفتاح المزوّد غلط أو منتهي	The provider key is wrong or expired	The provider key is wrong or expired
+مفيش صلاحية	No permission	No permission
+مكتبة Claude مش موجودة جنب السيرفر	The Claude library is missing next to the server	The Claude library is missing next to the server
+منخفض (أرخص وأسرع)	Low (cheaper and faster)	Low (cheaper and faster)
+نسخ	Copy	Copy
+وصلت للحد اليومي للتحليلات — زوّده من الإعدادات لو محتاج	You reached the daily analysis limit — raise it in Settings if needed	You reached the daily analysis limit — raise it in Settings if needed
+‹ كل التقارير	‹ All reports	‹ All reports
 ~خزان	Tank	Tank
 ~أي	Any	Beliebiger
 ~سعر	price	Preis
 ~نقاوة	purity	Reinheit
 ~سائل	liquid	flüssig
+من غير نت — {} مستنية تتبعت للسيرفر	Offline — {} waiting to be sent to the server	Offline — {} waiting to be sent to the server
+من غير نت — بتشوف آخر بيانات محفوظة على الجهاز	Offline — showing the last data saved on this device	Offline — showing the last data saved on this device
+بيبعت {} للسيرفر…	Sending {} to the server…	Sending {} to the server…
+فيه # حاجة اتسجّلت من غير نت ولسه ما اتبعتتش للسيرفر. لو خرجت دلوقتي هتضيع. تخرج برضه؟	# item(s) were recorded offline and haven't been sent to the server yet. If you sign out now they will be lost. Sign out anyway?	# item(s) were recorded offline and haven't been sent to the server yet. If you sign out now they will be lost. Sign out anyway?
+اتبعت للسيرفر كل اللي اتسجّل من غير نت.	Everything recorded offline has been sent to the server.	Everything recorded offline has been sent to the server.
+المساحة على جهاز السيرفر قربت تخلص	Disk space on the server PC is running low	Disk space on the server PC is running low
+فاضل # ميجا بس على الهارد. امسح حاجات مش محتاجها أو انقل النسخ الاحتياطية لهارد تاني.	Only # MB left on the disk. Delete things you don't need or move the backups to another drive.	Only # MB left on the disk. Delete things you don't need or move the backups to another drive.
+النسخة الاحتياطية فشلت	The backup failed	The backup failed
+النسخة الاحتياطية اليومية ما اتعملتش: {} — راجع فولدر النسخ الاحتياطية والمساحة.	The daily backup was not made: {} — check the backups folder and disk space.	The daily backup was not made: {} — check the backups folder and disk space.
+مفيش نسخة احتياطية جديدة	No recent backup	No recent backup
+آخر نسخة احتياطية من # ساعة. اتأكد إن السيرفر شغال وإن فولدر النسخ موجود.	The last backup was # hours ago. Make sure the server is running and the backups folder exists.	The last backup was # hours ago. Make sure the server is running and the backups folder exists.
+فيه # حاجة اتسجّلت من غير نت وما اتحفظتش على السيرفر — راجعها وسجّلها تاني	# item(s) recorded offline were not saved on the server — review and record them again	# item(s) recorded offline were not saved on the server — review and record them again
+فيه # حاجة اتسجّلت من غير نت وما اتحفظتش على السيرفر لأن مفيش صلاحية — راجعها وسجّلها تاني	# item(s) recorded offline were not saved on the server because you don't have permission — review and record them again	# item(s) recorded offline were not saved on the server because you don't have permission — review and record them again
+فيه # حاجة اتسجّلت من غير نت وما اتحفظتش على السيرفر لأنها اتمسحت من جهاز تاني — راجعها وسجّلها تاني	# item(s) recorded offline were not saved on the server because they were deleted from another device — review and record them again	# item(s) recorded offline were not saved on the server because they were deleted from another device — review and record them again
+(مفيش صلاحية)	(no permission)	(keine Berechtigung)

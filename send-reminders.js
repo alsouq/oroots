@@ -248,11 +248,13 @@ async function main(){
   const db = admin.firestore();
   try{ await mainBody(admin, db); } finally { if(U) await U.report(db, admin.firestore.FieldValue, 'task-reminders', c); }
 }
-async function mainBody(admin, db){
-  const now = cairoNow(new Date());
+async function mainBody(admin, db){ return runAll({db, messaging: admin.messaging()}); }
+/* كل تذكيرات الساعة (الملخص + القراءات الناقصة + المهام المعلّقة) — من غير Firebase Admin عشان السيرفر المحلي يشغّلها كمان */
+async function runAll({db, messaging, date = new Date()}){
+  const now = cairoNow(date);
   const cfgSnap = await db.doc('settings/config').get();
   const cfg = cfgSnap.exists ? cfgSnap.data() : {};
-  try{ const r = await runDaily({db, messaging: admin.messaging(), now, cfg}); console.log('تنبيهات يومية:', r); }
+  try{ const r = await runDaily({db, messaging, now, cfg}); console.log('تنبيهات يومية:', r); }
   catch(e){ console.error('تنبيهات يومية فشلت (مش بتوقف تذكير المهام):', e.message); }
   const win = resolveWindow(cfg);
   if(now.hour < win.from || now.hour >= win.to){ console.log('خارج ساعات التنبيه:', now, win); return; }
@@ -270,7 +272,7 @@ async function mainBody(admin, db){
     if(!tokens.length){ console.log('مفيش جهاز مسجّل لـ', email); continue; }
     const m = buildMessage(list, now.date), dict = await trf(email);
     if(dict){ m.title = PI.trText(m.title, dict); m.body = PI.trText(m.body, dict); }
-    const res = await admin.messaging().sendEachForMulticast({
+    const res = await messaging.sendEachForMulticast({
       tokens,
       data: {title: m.title, body: m.body, tag: 'oroots-tasks', url: APP_URL},
       webpush: {headers: {Urgency: 'high', TTL: '3300'}}
@@ -283,5 +285,5 @@ async function mainBody(admin, db){
   }
 }
 
-module.exports = {trFactory, farmInsights, resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
+module.exports = {runAll, trFactory, farmInsights, resolveWindow, cairoNow, lastDates, groupPending, buildMessage, weatherAlerts, expectedTargets, findMissing, waterIssues, lowStock, digestFor, runDaily, recipientsFor, canEditTab, rid};
 if(require.main === module) main().catch(e => { console.error(e); process.exit(1); });

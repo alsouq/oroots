@@ -1,0 +1,9 @@
+{
+  "minIntervalMin": 10,
+  "maxWritesPerDay": 400,
+  "devices": {
+    "lg1-climate": {"type": "climate", "greenhouse": "LG1"},
+    "s1-irrigation": {"type": "water", "source": "irrigation", "systemId": "S1"},
+    "s1-drainage": {"type": "water", "source": "drainage", "systemId": "S1"}
+  }
+}

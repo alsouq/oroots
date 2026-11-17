@@ -1,0 +1,8 @@
+{
+  "name": "oroots-local-server",
+  "private": true,
+  "description": "O'Roots local server (Node 22.13+ / 24). node_modules ships with the package — no npm install needed on the farm PC.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.9.0"
+  }
+}

@@ -89,5 +89,18 @@
     }
     return {rows:rows, dailyMl:tot, dayMl:dayTot, peak:peak, n:n, start:lgHHMM(first), end:lgHHMM(last), events:events};
   }
+
+  /* ===== نفاذية الغطاء τ = إشعاع جوه ÷ إشعاع برّه (بس لما برّه فوق 150 W/م² عشان الصبح والعصر ما يبوّظوش النسبة) ===== */
+  function lgTau(pairs){
+    var v = (pairs || []).filter(function(p){ return p.rsOut > 150 && p.rsIn >= 0; }).map(function(p){ return Math.min(1.2, p.rsIn / p.rsOut); });
+    return v.length ? {tau:v.reduce(function(a, b){ return a + b; }, 0) / v.length, n:v.length} : null;
+  }
+  /* ===== معايرة Kc من استهلاك فعلي: Kc اليوم = المستهلك الفعلي (مل/نبتة) ÷ الاحتياج المرجعي بـ Kc = 1؛ المعتمد = الوسيط (مقاوم للقيم الشاذة) ===== */
+  function lgKcCalibrate(items){
+    var rows = (items || []).map(function(x){ return {measuredMl:x.measuredMl, baseMl:x.baseMl, kc:(x.baseMl >= 50 && x.measuredMl > 0) ? x.measuredMl / x.baseMl : null}; });
+    var ks = rows.map(function(r){ return r.kc; }).filter(function(k){ return k !== null; }).sort(function(a, b){ return a - b; });
+    var med = ks.length ? (ks.length % 2 ? ks[(ks.length - 1) / 2] : (ks[ks.length / 2 - 1] + ks[ks.length / 2]) / 2) : null;
+    return {rows:rows, n:ks.length, kc:(med === null || ks.length < 3) ? null : Math.min(1.8, Math.max(0.2, med)), median:med, spread:ks.length ? ks[ks.length - 1] - ks[0] : null};
+  }
 /*LOGIC-END*/
-module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies, lgEt0: lgEt0, lgIrrigPlan: lgIrrigPlan, lgHHMM: lgHHMM}; })();
+module.exports = (function(){ return {lgTs: lgTs, lgRiskHours: lgRiskHours, lgDiseaseRisks: lgDiseaseRisks, lgDiseaseCfg: lgDiseaseCfg, LG_DISEASES: LG_DISEASES, lgAnomalies: lgAnomalies, lgEt0: lgEt0, lgIrrigPlan: lgIrrigPlan, lgHHMM: lgHHMM, lgTau: lgTau, lgKcCalibrate: lgKcCalibrate}; })();

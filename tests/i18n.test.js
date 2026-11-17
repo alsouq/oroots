@@ -27,7 +27,7 @@ assert.strictEqual(L('en', '24 ساعة'), '24 hours'); assert.strictEqual(L('en
 assert.strictEqual(L('en', '  آخر 30 يوم '), '  Last 30 days ');
 assert.strictEqual(L('en', '60 من 60 قراءة يومية مطلوبة'), '60 of 60 daily readings required');
 assert.strictEqual(L('en', 'حذف:'), 'Delete:');                                // علامة ترقيم في الآخر
-assert.strictEqual(L('en', 'تحذف حساب a@b.com؟'), 'Delete account a@b.com?');   // بداية جملة + اسم
+assert.strictEqual(L('en', 'تحذف حساب a@b.com؟'), 'Delete the account a@b.com?');   // قالب من الكود: جملة + اسم
 assert.strictEqual(L('en', '(خزان B) K 40% · S 18% — سعر 12/كجم'), '(Tank B) K 40% · S 18% — price 12/kg');   // كلمات
 assert.strictEqual(L('en', 'نص مش في القاموس xyz'), null);
 assert.strictEqual(L('en', 'LG1 — S1'), null);                                   // مفيش عربي: ما بيتلمسش

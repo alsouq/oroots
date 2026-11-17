@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IUBySTqLg8O3LVc6bvzIdl5sR1oxhTY5XjaYc7fkAfw=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-k5rB5GFgssXIiD0gmZZ0Z8CKL4TEDr34zNAjGJFl5Hs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -477,7 +477,12 @@
   .panel[data-sub="so"] [data-sub~="so"],
   .panel[data-sub="trend"] [data-sub~="trend"],
   .panel[data-sub="stock"] [data-sub~="stock"],
-  .panel[data-sub="ref"] [data-sub~="ref"]{display:block;}
+  .panel[data-sub="ref"] [data-sub~="ref"],
+  .panel[data-sub="new"] [data-sub~="new"],
+  .panel[data-sub="reports"] [data-sub~="reports"]{display:block;}
+  .ai-report{line-height:1.9;font-size:.93rem;} .ai-report h3.ai-h{margin:14px 0 4px;font-size:1rem;color:var(--brand-strong);} .ai-report h3.ai-h:first-child{margin-top:0;}
+  .ai-report ul,.ai-report ol{margin:4px 0 8px;padding-inline-start:22px;} .ai-report li{margin:3px 0;} .ai-report p{margin:6px 0;}
+  .ai-json{max-height:340px;overflow:auto;font-size:.72rem;background:var(--surface-2,rgba(0,0,0,.04));padding:8px;border-radius:10px;white-space:pre-wrap;word-break:break-word;}
   #panel-water[data-sub="instruments"] .system-picker{display:none;}
   .tp-pop{position:fixed;inset:0;z-index:5200;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;}
   .tp-card{background:var(--surface);color:var(--ink);width:100%;max-width:660px;max-height:94vh;display:flex;flex-direction:column;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.28);}
@@ -1088,6 +1093,7 @@
     <button class="tab-btn" data-tab="quality" style="--tab-color:var(--alert)">✅ الجودة</button>
     <button class="tab-btn" data-tab="inventory" style="--tab-color:var(--water)">📦 المخازن</button>
     <button class="tab-btn" data-tab="costs" style="--tab-color:var(--tank)">💰 التكاليف</button>
+    <button class="tab-btn" data-tab="ai" style="--tab-color:var(--water)">✨ المحلّل الذكي</button>
     <button class="tab-btn" data-tab="settings">⚙ الإعدادات</button>
   </nav>
   <div id="notif-bar" class="notif-bar hidden"></div>
@@ -1217,6 +1223,12 @@
       <div id="cost-body"></div>
     </section>
 
+    <section class="panel" id="panel-ai">
+      <h1 class="page-title">المحلّل الذكي</h1>
+      <p class="hint help-note">بيقرا أرقام المزرعة ونتايج حسابات البرنامج (الري، الخلطات، المخاطر، الرش، الحصاد) ويكتبلك تقرير بالوضع والمميزات والعيوب والمخاطر والتوصيات. ده رأي استشاري: الكميات والجرعات بتيجي من حاسبات البرنامج والملصق والمهندس.</p>
+      <div id="ai-body"></div>
+    </section>
+
     <section class="panel" id="panel-quality">
       <h1 class="page-title">الجودة</h1>
       <div id="quality-body"></div>
@@ -1289,6 +1301,12 @@
         <h3>📖 ترجمة بياناتي (الاسم بالإنجليزي)</h3>
         <p class="hint help-note">هنا كل الأسماء والنصوص اللي الفريق بيكتبها بالعربي (الصوب والأنظمة، الأصناف، العملاء، المخزن، الإجراءات، وأي نص ظهر من غير ترجمة). اكتب جنب كل واحد اسمه بالإنجليزي واحفظ، والتطبيق هيعرضه بالإنجليزي لما اللغة تكون EN — من غير ما تبعته لحد.</p>
         <div id="ud-set"></div>
+      </div>
+
+      <div class="settings-card" id="ai-card">
+        <h3>✨ المحلّل الذكي (الذكاء الاصطناعي)</h3>
+        <p class="hint help-note">الافتراضي نموذج محلي على كمبيوتر المزرعة (البيانات ما بتخرجش)، وتقدر تحوّل لـ Claude أو ChatGPT أو أي مزوّد تاني من زرار في تاب المحلّل. التاب للمدير بس، وتقدر تفتحه لموظف معيّن من «حسابات الموظفين» (صلاحية «المحلّل الذكي»).</p>
+        <div id="ai-set"></div>
       </div>
 
       <div class="settings-card" id="nc-card-medium">
@@ -1605,7 +1623,7 @@
     '🐛':'bug','🐞':'bug','🏭':'factory','🗓':'calendar','📅':'calendar','⛔':'ban','📦':'package',
     '☀':'sun','🌅':'sunrise','🌇':'sunset','🌤':'cloud-sun','☁':'cloud','🌫':'cloud-fog','🌦':'cloud-drizzle','🌧':'cloud-rain','❄':'snowflake','⛈':'cloud-lightning',
     '⚙':'settings','▾':'chevron-down','⌄':'chevron-down','⌃':'chevron-up','‹':'chevron-left','›':'chevron-right',
-    '🍄':'mushroom','🆕':'sparkles','🧮':'calculator','🌬':'wind','◐':'contrast','⎋':'log-out','👁':'eye',
+    '🍄':'mushroom','🆕':'sparkles', '✨':'sparkles','🧮':'calculator','🌬':'wind','◐':'contrast','⎋':'log-out','👁':'eye',
     '⏩':'fast-forward','⚡':'zap','🧪':'flask','🔴':'circle-dot','🟡':'circle','🪤':'funnel','💬':'message-circle',
     '🔧':'wrench','🛠':'wrench','💾':'save','📲':'smartphone','👋':'hand','🗑':'trash','🔎':'search','🔍':'search','🔒':'lock','🏷':'tag','⋮':'more-vertical','🏠':'home','🟫':'soil','🎨':'palette','🧴':'spray','💰':'coins','🍅':'tomato','🪴':'potted'
   };
@@ -1737,7 +1755,6 @@
   var ION_ATOMIC_WEIGHT = {N_NH4:14.007, K:39.098, Ca:40.078, Mg:24.305, N_NO3:14.007, P:30.974, S:32.06, Cl:35.45};
   /* Limiting molar ionic conductivities at 25°C (S·cm²/mol) — standard physical-chemistry
      constants (Atkins). H2PO4- and SO4(2-) referenced per mole of P / S respectively. */
-  var ION_LAMBDA = {N_NH4:73.5, K:73.5, Ca:119.0, Mg:106.0, N_NO3:71.4, P:33, S:160.0, Cl:76.3};
 
   /* Guaranteed-analysis % by weight. Macros use standard commercial label values;
      simple-hydrate micros (sulfates, boric acid, sodium molybdate) computed from
@@ -2023,27 +2040,145 @@ var HB_WATERS=[{"n":"Fish Water Quality","w":{"N_NO3":17.3,"N_NH4":0.17,"K":14.2
 var I18N_LANGS = {ar:{dir:'rtl', name:'العربية'}, en:{dir:'ltr', name:'English'}};
 var I18N_NUM = /[0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?/g;
 var I18N_AR = /[؀-ۿ]/;
+var I18N_ARW = /[\u0600-\u06FF]+/g;
+/* إيموجي ورموز الأيقونات (مش الأسهم ولا علامات الترقيم) */
+var I18N_EMO = /(?:[\u231A-\u23FF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF])+/g;
+var I18N_EMO1 = new RegExp(I18N_EMO.source);
 var I18N_DIGITS = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.'};
 function i18nAsciiNum(n){ return String(n).replace(/[٠-٩٫]/g, function(c){ return I18N_DIGITS[c]; }); }
-/* المفتاح: النص بعد ما كل رقم يتحوّل لـ # */
-function i18nKey(core){ return core.replace(I18N_NUM, '#').replace(/\u066A/g, '%'); }
+/* المفتاح: النص بعد ما كل رقم يتحوّل لـ # والمسافات تتوحّد */
+function i18nKey(core){ return String(core).replace(/\s+/g, ' ').replace(I18N_NUM, '#').replace(/\u066A/g, '%'); }
+function i18nNoEmo(s){ return String(s).replace(I18N_EMO, ' ').replace(/\s+/g, ' ').trim(); }
 function i18nFill(tr, nums){ var i = 0; return tr.replace(/#/g, function(){ return i < nums.length ? i18nAsciiNum(nums[i++]) : '#'; }); }
+
+/* ---- القوالب: بتتجمّع مرة واحدة من القاموس (أي مفتاح فيه {}) ---- */
+function i18nEsc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+'); }
+function i18nTemplates(dict){
+  if(dict['\u0001tc']) return dict['\u0001tc'];
+  var byWord = {}, loose = [], n = 0, ARL = /[\u0621-\u064A]/;
+  Object.keys(dict).forEach(function(k){
+    if(k.charAt(0) === '\u0001' || k.indexOf('{}') < 0 || typeof dict[k] !== 'string') return;
+    var parts = k.split(/(\{\}|#)/), re = '', kinds = [], glue = [], fixed = 0, words = [];
+    // قيمة في أول أو آخر الجملة ممكن تيجي فاضية: لو فيها أيقونة الصفحة بتقسم الجملة عندها (زي «— زراعة X — ✅ جاهزة»)
+    var lastI = parts.length - 1; while(lastI > 0 && parts[lastI] === '') lastI--;
+    var firstI = 0; while(firstI < parts.length - 1 && parts[firstI] === '') firstI++;
+    parts.forEach(function(p, i){
+      if(p === '{}' || p === '#'){
+        var sepB = /[—–·:،,(|•]\s*$/.test(parts[i - 1] || ''), sepA = /^\s*[—–·:،,)|•]/.test(parts[i + 1] || '');
+        var opt = p === '{}' && parts.length > 3 && ((i === lastI && sepB) || (i === firstI && sepA));
+        if(opt && i === lastI) re = re.replace(/\\s\+$/, '\\s*');
+        re += p === '{}' ? (opt ? '([\\s\\S]*?)' : '([\\s\\S]+?)') : '([0-9٠-٩]+(?:[.,٫][0-9٠-٩]+)?)'; kinds.push(p === '{}' ? 's' : 'n');
+        // القيمة لازقة في حرف عربي ثابت قبلها أو بعدها (زي «ال{}» أو «{}جم»)
+        var prev = parts[i - 1] || '', next = parts[i + 1] || '';
+        glue.push({b: ARL.test(prev.slice(-1)) ? prev : '', a: ARL.test(next.charAt(0))});
+        return;
+      }
+      if(!p) return;
+      var ep = i18nEsc(p).replace(/\uFF03/g, '#');   // ＃ في القالب = علامة # عادية (مش رقم)
+      if(i === firstI + 1 && parts[firstI] === '{}' && parts.length > 3 && /^\s*[—–·:،,)|•]/.test(p)) ep = ep.replace(/^\\s\+/, '\\s*');
+      re += ep; fixed += p.replace(/\s/g, '').length;
+      // كلمات كاملة (مش لازقة في قيمة) تنفع فهرس
+      var ws = p.match(/[\u0600-\u06FF]{2,}/g) || [];
+      ws.forEach(function(w, j){
+        if(j === 0 && i > 0 && p.indexOf(w) === 0) return;
+        if(j === ws.length - 1 && i < parts.length - 1 && p.slice(-w.length) === w) return;
+        words.push(w);
+      });
+    });
+    if(!fixed) return;
+    var t = {k:k, re:new RegExp('^' + re + '$'), kinds:kinds, glue:glue, fixed:fixed};
+    if(words.length){ words.sort(function(a, b){ return b.length - a.length; }); (byWord[words[0]] = byWord[words[0]] || []).push(t); }
+    else loose.push(t);
+    n++;
+  });
+  var tc = {byWord:byWord, loose:loose, n:n};
+  try{ Object.defineProperty(dict, '\u0001tc', {value:tc, enumerable:false, configurable:true}); }catch(e){ dict['\u0001tc'] = tc; }
+  return tc;
+}
+/* القيمة اللازقة في حرف عربي ثابت ما ينفعش تقطع كلمة: «{}جم» ما يطابقش «كجم»، و«ال{}» بس قبل كلمة */
+var I18N_PFX = /(^|[\s(«"'\/])(ال|لل|بال|وال|فال|كال|و|ب|ل|ف|ك|بـ|لـ)$/;
+function i18nGlueOk(t, m){
+  var ARL = /[\u0621-\u064A]/;
+  for(var j = 0; j < t.kinds.length; j++){
+    var g = t.glue[j], v = m[j + 1];
+    if(g.a && ARL.test(v.slice(-1))) return false;
+    if(g.b && ARL.test(v.charAt(0)) && !I18N_PFX.test(g.b)) return false;
+  }
+  return true;
+}
+/* الترجمة: {} بالترتيب أو {0} {1} حسب الرقم، و # للأرقام بالترتيب */
+function i18nApplyTpl(tr, slots, nums){
+  var si = 0, ni = 0;
+  return tr.replace(/\{(\d*)\}|#/g, function(m, d){
+    if(m === '#') return ni < nums.length ? i18nAsciiNum(nums[ni++]) : '#';
+    var v = d !== '' ? slots[+d] : slots[si++];
+    return v == null ? '' : v;
+  }).replace(/\uFF03/g, '#');
+}
+function i18nTplLookup(dict, core, depth){
+  if(depth > 3) return null;
+  var tc = i18nTemplates(dict); if(!tc.n) return null;
+  var seen = {}, cands = [], w = core.match(I18N_ARW) || [];
+  w.forEach(function(x){ if(seen[x]) return; seen[x] = 1; var l = tc.byWord[x]; if(l) cands = cands.concat(l); });
+  cands = cands.concat(tc.loose);
+  if(!cands.length) return null;
+  cands.sort(function(a, b){ return b.fixed - a.fixed; });
+  for(var i = 0; i < cands.length; i++){
+    var t = cands[i], m = t.re.exec(core);
+    if(!m || !i18nGlueOk(t, m)) continue;
+    var slots = [], nums = [];
+    for(var j = 0; j < t.kinds.length; j++){
+      var v = m[j + 1];
+      if(t.kinds[j] === 'n'){ nums.push(v); continue; }
+      var vt = v;
+      if(I18N_AR.test(v)){ var r = i18nLookupCore(dict, v.trim(), depth + 1); if(r != null) vt = v.replace(v.trim(), r); }
+      slots.push(vt);
+    }
+    var out = i18nApplyTpl(dict[t.k], slots, nums);
+    if(t.kinds.length && t.kinds[t.kinds.length - 1] === 's' && slots[slots.length - 1] === '') out = out.replace(/\s+$/, '');
+    if(t.kinds.length && t.kinds[0] === 's' && slots[0] === '') out = out.replace(/^\s+/, '');
+    return out;
+  }
+  return null;
+}
+
 /* dict: {نص عربي: ترجمة}. بيرجّع الترجمة أو null لو مفيش. بيحافظ على المسافات اللي في الأطراف. */
 function i18nLookup(dict, text){
   if(!text || !I18N_AR.test(text)) return null;
   var m = /^(\s*)([\s\S]*?)(\s*)$/.exec(text), lead = m[1], core = m[2], tail = m[3];
   if(!core) return null;
+  var r = i18nLookupCore(dict, core, 0);
+  return r == null ? null : lead + i18nOne(r) + tail;
+}
+/* «1 rows» ← «1 row»: العربي بيستخدم المفرد بعد الأرقام، فالترجمة بتبقى جمع — رقم 1 لوحده بيرجع مفرد */
+var I18N_ONE = /(^|[^\d.,])1 (rows|pipes|trays|plants|days|readings|items|orders|tasks|times|sprays|packs|groups|photos|hours|minutes|records|systems|customers|complaints|cuts|weighings|uses|irrigations|alerts|messages|lines|types|ingredients|batches|greenhouses|fertilizers|barcodes|weeks|months|years|actions|accounts|drippers|sessions)\b/g;
+function i18nOne(s){ return s.indexOf('1 ') < 0 ? s : s.replace(I18N_ONE, function(m, a, w){ return a + '1 ' + (w === 'batches' ? 'batch' : w.slice(0, -1)); }); }
+function i18nLookupCore(dict, core, depth){
   var nums = core.match(I18N_NUM) || [], key = i18nKey(core), tr = dict[key];
+  if(tr != null) return i18nFill(tr, nums);
+  // إيموجي جوه النص: بندوّر من غيرها (والترجمة من غيرها برضه عشان الأيقونة ما تتكررش)
+  if(I18N_EMO1.test(core)){
+    var se = /^([^\u0600-\u06FFA-Za-z0-9(«"'#]+)([\s\S]*)$/.exec(core), ee = /^([\s\S]*?[\u0600-\u06FFA-Za-z0-9)»"'%.؟?!:])([^\u0600-\u06FFA-Za-z0-9)»"'%]+)$/.exec(core);
+    var pre = se ? se[1] : '', rest = se ? se[2] : core, suf = '';
+    if(ee && rest.length > ee[2].length && rest.slice(-ee[2].length) === ee[2]){ suf = ee[2]; rest = rest.slice(0, -suf.length); }
+    if(pre || suf){ var rr = i18nLookupCore(dict, rest, depth); if(rr != null) return pre + rr + suf; }
+    var c2 = i18nNoEmo(core);
+    if(c2 && c2 !== core){ var r2 = i18nLookupCore(dict, c2, depth); if(r2 != null) return r2; }
+    return null;
+  }
   if(tr == null){
     // علامة ترقيم في الآخر (: ؟ ! .) بنتجاهلها ونرجّعها
     var pm = /^([\s\S]*?)([:؟!.…،]+)$/.exec(key);
-    if(pm && dict[pm[1]] != null){ tr = dict[pm[1]] + pm[2].replace('؟', '?').replace('،', ','); }
+    if(pm && dict[pm[1]] != null){ return i18nFill(dict[pm[1]] + pm[2].replace('؟', '?').replace('،', ','), nums); }
   }
+  // قالب من الكود: الأجزاء الثابتة معروفة والقيم بتتحسب وقت التشغيل
+  var tp = i18nTplLookup(dict, core, depth);
+  if(tp != null) return tp;
   if(tr == null){
     // عنوان: قيمة — بنترجم كل واحد لوحده (القيمة كلها مرة واحدة، فتقدر تكون قايمة فيها فواصل)
     var lv = /^([^:]{1,40}):\s([\s\S]+)$/.exec(key);
     if(lv){
-      var tx = function(x){ return !I18N_AR.test(x) ? x : (dict[x] != null ? dict[x] : i18nLookup(dict, x)); };   // الجزء اللي مفيهوش عربي (زي LG1 — S1) بيفضل زي ما هو
+      var tx = function(x){ return !I18N_AR.test(x) ? x : (dict[x] != null ? dict[x] : i18nLookupCore(dict, x, depth + 1)); };   // الجزء اللي مفيهوش عربي (زي LG1 — S1) بيفضل زي ما هو
       var l1 = tx(lv[1]), v1 = tx(lv[2]);
       if(l1 != null && v1 != null) tr = String(l1).trim().replace(/:$/, '') + ': ' + String(v1).trim();
     }
@@ -2056,7 +2191,7 @@ function i18nLookup(dict, text){
         if(i % 2) return p.replace('،', ',');
         if(!I18N_AR.test(p)) return p;
         var pt = p.trim(), t2 = dict[pt];
-        if(t2 == null && pt){ t2 = i18nLookup(dict, pt); if(t2 != null) t2 = t2.trim(); }   // كل جزء ممكن يتترجم بالقواعد التانية كمان
+        if(t2 == null && pt && depth < 4){ t2 = i18nLookupCore(dict, pt, depth + 1); if(t2 != null) t2 = t2.trim(); }   // كل جزء ممكن يتترجم بالقواعد التانية كمان
         if(t2 == null){ ok = false; return p; }
         return p.replace(p.trim(), t2);
       });
@@ -2069,7 +2204,7 @@ function i18nLookup(dict, text){
     if(P){ for(var q = 0; q < P.length; q++){ if(key.indexOf(P[q][0]) === 0){ tr = P[q][1] + key.slice(P[q][0].length).replace(/\u061F/g, '?').replace(/\u060C/g, ','); break; } } }
   }
   if(tr == null){
-    // تركيب من عبارات/كلمات: أطول عبارة (لحد ٦ كلمات) ليها ترجمة، وإلا الكلمة لوحدها من قاموس الكلمات. لازم كل الكلمات العربية تتغطّى.
+    // آخر حل (للبيانات اللي الفريق بيكتبها): عبارات/كلمات معروفة — أطول عبارة (لحد ٦ كلمات) ليها ترجمة، وإلا الكلمة لوحدها من قاموس الكلمات. لازم كل الكلمات العربية تتغطّى.
     var W = dict['\u0001w'] || {};
     var seg = key.split(/([\u0600-\u06FF]+)/), idx = [], z, y;
     for(z = 1; z < seg.length; z += 2) idx.push(z);
@@ -2083,7 +2218,7 @@ function i18nLookup(dict, text){
           if(!okSep) continue;
           var hit = dict[ph];
           if(hit == null && L === 1) hit = W[ph];
-          if(hit != null && typeof hit === 'string'){
+          if(hit != null && typeof hit === 'string' && hit.indexOf('{') < 0){
             res[idx[pos]] = hit;
             for(y = 1; y < L; y++){ res[idx[pos + y]] = ''; res[idx[pos + y] - 1] = ''; }
             pos += L; found = true;
@@ -2095,18 +2230,18 @@ function i18nLookup(dict, text){
     }
   }
   if(tr == null){
-    // رموز/إيموجي في الأول أو الآخر (🏷 ⏱️ ...): بنترجم النص اللي جواها ونرجّعها
+    // رموز في الأول أو الآخر (• ← ...): بنترجم النص اللي جواها ونرجّعها
     var sm = /^([^\u0600-\u06FFA-Za-z0-9(«"']+)([\s\S]*)$/.exec(core);
-    if(sm && sm[2]){ var r1 = i18nLookup(dict, sm[2]); if(r1 != null) return lead + sm[1] + r1 + tail; }
+    if(sm && sm[2]){ var r1 = i18nLookupCore(dict, sm[2], depth); if(r1 != null) return sm[1] + r1; }
     var em = /^([\s\S]*[\u0600-\u06FF])([^\u0600-\u06FFA-Za-z0-9)»"']+)$/.exec(core);
-    if(em){ var r2 = i18nLookup(dict, em[1]); if(r2 != null) return lead + r2 + em[2] + tail; }
+    if(em){ var r3 = i18nLookupCore(dict, em[1], depth); if(r3 != null) return r3 + em[2]; }
     return null;
   }
-  return lead + i18nFill(tr, nums) + tail;
+  return i18nFill(tr, nums);
 }
 /*I18N-END*/
   /*I18N-DATA-BEGIN*/
-var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
+var I18N_DICT = {}; var I18N_VER = "4f7704ef3837";
 /*I18N-DATA-END*/
   /* ---- ترجمة الواجهة: ربط القاموس بالصفحة (الـDOM) ---- */
   var uiLang = (function(){ try{ var v = localStorage.getItem('oroots_lang'); return I18N_LANGS[v] ? v : 'ar'; }catch(e){ return 'ar'; } })();
@@ -2140,6 +2275,15 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     s = String(s);
     if(!(s in i18nCache)){ var r = i18nLookup(i18nDict, s); i18nCache[s] = r == null ? s : r; if(r == null && I18N_AR.test(s) && s.length < 300) i18nMiss[s] = 1; }
     return i18nCache[s];
+  }
+  /* رسالة من كذا سطر (alert / confirm): لو مفيش ترجمة للرسالة كلها بنترجم كل سطر لوحده */
+  function trLines(m){
+    if(uiLang === 'ar' || m == null) return m;
+    m = String(m);
+    if(m.indexOf('\n') < 0) return tr(m);
+    var byLine = m.split('\n').map(function(l){ return l.trim() ? tr(l) : l; }).join('\n');
+    if(!I18N_AR.test(byLine)) return byLine;
+    var w = tr(m); return I18N_AR.test(w) ? byLine : w;
   }
   function i18nText(n){
     var v = n.nodeValue, pe = n.parentNode;
@@ -2202,22 +2346,31 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     document.title = uiLang === 'ar' ? document.__arTitle : tr(document.__arTitle);
     try{ ['btn-lang','btn-lang-login'].forEach(function(id){ var bl = document.getElementById(id); if(bl) bl.textContent = uiLang.toUpperCase(); }); }catch(e){}
   }
-  function setUiLang(l){
+  /* srvTs: لو اللغة جاية من حساب المستخدم (جهاز تاني) بنحفظ نفس وقت اختيارها؛ غير كده ده اختيار جديد على الجهاز ده */
+  function setUiLang(l, srvTs){
     if(!I18N_LANGS[l]) return;
     i18nLoad(l, function(){
-      uiLang = l; try{ localStorage.setItem('oroots_lang', l); }catch(e){}
-      i18nSetDict(); i18nApplyAll();
-      try{ safe(renderAll); }catch(e){}
-      i18nSaveUserLang();
+      var same = l === uiLang;
+      uiLang = l; try{ localStorage.setItem('oroots_lang', l); localStorage.setItem('oroots_lang_ts', String(srvTs || Date.now())); }catch(e){}
+      if(!same){ i18nSetDict(); i18nApplyAll(); try{ safe(renderAll); }catch(e){} }
+      if(!srvTs) i18nSaveUserLang();
     });
   }
-  /* لغة المستخدم بتتحفظ في بياناته الخاصة عشان إشعارات السيرفر توصله بنفس اللغة */
-  function i18nSaveUserLang(){ try{ if(db && currentUser) db.doc('userData/'+myMail()).set({lang:uiLang}, {merge:true}).catch(function(){}); }catch(e){} }
+  function i18nLocalTs(){ try{ return parseInt(localStorage.getItem('oroots_lang_ts'), 10) || 0; }catch(e){ return 0; } }
+  /* لغة المستخدم بتتحفظ في بياناته الخاصة: كل أجهزته بتمشي على آخر لغة اختارها، وإشعارات السيرفر بتوصله بيها */
+  function i18nSaveUserLang(){ try{ if(db && currentUser) db.doc('userData/'+myMail()).set({lang:uiLang, langTs:i18nLocalTs() || Date.now()}, {merge:true}).catch(function(){}); }catch(e){} }
+  /* لما بيانات المستخدم توصل: الأحدث يكسب (اختيار على الجهاز ده ولا على جهاز تاني) */
+  function i18nSyncUserLang(ud){
+    var sl = ud && I18N_LANGS[ud.lang] ? ud.lang : null, st = (ud && parseInt(ud.langTs, 10)) || 0, lt = i18nLocalTs();
+    if(!sl){ i18nSaveUserLang(); return; }
+    if(sl === uiLang){ if(st !== lt && lt > st) i18nSaveUserLang(); return; }
+    if(st > lt) setUiLang(sl, st); else i18nSaveUserLang();
+  }
   /* رسائل التأكيد والتنبيه بتتترجم كمان */
   (function(){
     ['confirm', 'alert', 'prompt'].forEach(function(k){
       var o = window[k]; if(!o || o.__i18n) return;
-      window[k] = function(m, d){ return o.call(window, tr(m), d); };
+      window[k] = function(m, d){ return o.call(window, trLines(m), d); };
       window[k].__i18n = true;
     });
   })();
@@ -2243,7 +2396,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     appId: "1:13683880196:web:b762c627c841ab561de051"
   };
   var BOOTSTRAP_ADMIN = 'dragoncool3330@gmail.com';
-  var fbAuth = null, fbStorage = null, appEntered = false;
+  var fbAuth = null, appEntered = false;
   var settings = { accessCode:'', ph:[5.5,6.5], ec:[1.2,3.0], temp:[18,26], remindFrom:7, remindTo:19 };
   var settingsLoaded = false;
   var readingsDocs = [];
@@ -2265,8 +2418,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   var inventoryQuery = '';
   function invNorm(t){ return String(t==null?'':t).toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim(); }
   var harvestFilterCrop = '';
-  var harvestFrom = '';
-  var harvestTo = '';
   function harvestInRange(h){
     return lfInRange('harvest', String(h.ts||'').slice(0,10));
   }
@@ -2326,7 +2477,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   var pipeSel = -1;
   var pipeLastDay = '';
   var pipeWatcher = null;
-  var nurseryPlanCropInput = '';
   var nurseryPlanSystemId = null;
   var currentMix = [];
   var currentTargets = {N_NO3:140, N_NH4:10, P:50, K:200, Ca:170, Mg:50, S:70, Cl:0, Fe:2.5, Mn:0.5, Zn:0.3, Cu:0.05, B:0.3, Mo:0.05};
@@ -2335,7 +2485,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   var currentVolUnit = 'L', currentMassUnit = 'g';
   var VOL_TO_L = {L:1, gal:3.785411784, m3:1000};
   var G_PER_UNIT = {g:1, oz:28.349523125};
-  var currentPrecision = 0.01, currentLiquidMl = false;
+  var currentLiquidMl = false;
   var PRESETS = [{name:'Hoagland', t:{N_NO3:260,P:31,K:235,Mg:48,Ca:200,S:64,Fe:2.5,Zn:0.05,B:0.5,Mn:0.5,Cu:0.02,Mo:0.01}}];
   var targetProfiles = [];
   function isMl(f){ return currentLiquidMl && f && f.liquid && !f.ml; }
@@ -2350,10 +2500,9 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   var currentUser = null;
   var currentUserRole = null;
   var currentUserPermissions = {};
-  var TAB_KEYS = ['water','soil','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory'];
-  var TAB_LABELS = {water:'بيانات المياه', soil:'بيانات التربة', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
+  var TAB_KEYS = ['water','soil','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory','ai'];
+  var TAB_LABELS = {ai:'المحلّل الذكي', water:'بيانات المياه', soil:'بيانات التربة', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
   var appUsers = [];
-  var localMode = false;
   var sourceVisibility = {irrigation:true, drainage:false, tank:false};
   var climateVisibility = {ah:true, hd:false};
   var chartRangeDays = 30;
@@ -2675,9 +2824,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       logAudit(isNew?'add':'edit', 'nursery', 'صينية: '+(batch.cropName||'—')+(batch.quantity?(' — الكمية '+batch.quantity):''));
       return r;
     });
-  }
-  function saveNurseryPlan(plan){
-    return saveNurseryPlanRaw(plan).then(function(r){ logAudit('edit', 'nursery', 'حفظ خطة مشتل للنظام: '+auditSysName(plan.systemId)); return r; });
   }
   function addIrrigCalib(systemId, data){
     return addIrrigCalibRaw(systemId, data).then(function(r){
@@ -3074,8 +3220,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     renderAll(); return Promise.resolve();
   }
   function elecPeriodDays(){ return costDays > 0 ? costDays : 90; }
-  /* دقايق تشغيل المضخة في اليوم من جدول الري (ثمريات: كل X لمدة Y — ورقيات: برامج تشغيل/إيقاف) */
-  function elecPumpDailyMin(sysId){ try{ return clPumpDailyMin(getIrrigPlan(sysId), isFruitSys(sysId)); }catch(e){ return 0; } }
   function elecDayList(days){ var out = [], t = todayStr(); for(var i = days - 1; i >= 0; i--) out.push(planAddDays(t, -i)); return out; }
   /* كل يوم بالجدول اللي كان ساري فيه (من تاريخ جدول الري) */
   function elecPumpRows(days, cfg){
@@ -3504,8 +3648,9 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     var day = String(h.ts || '').slice(0,10), key = cropKey(h.cropName), sid = h.systemId || '';
     var cand = nurseryLog.filter(function(n){ return n.transplantDate && n.transplantDate <= day && cropKey(n.cropName) === key && (!sid || n.systemId === sid); });
     if(!cand.length) return [];
-    var grp = sid ? getPipeMap(sid).groups.filter(function(g){ return cropKey(g.crop) === key && g.plantDate && g.plantDate <= day; }).sort(function(a, b){ return String(b.plantDate).localeCompare(String(a.plantDate)); })[0] : null;
-    var pick = grp ? cand.filter(function(n){ return Math.abs(dayDiff(n.transplantDate, grp.plantDate)) <= 3; }) : [];
+    var grp = (sid && !h.plantDate) ? getPipeMap(sid).groups.filter(function(g){ return cropKey(g.crop) === key && g.plantDate && g.plantDate <= day; }).sort(function(a, b){ return String(b.plantDate).localeCompare(String(a.plantDate)); })[0] : null;
+    var ref = h.plantDate || (grp ? grp.plantDate : '');   // الحصاد من كارت المواسير بيتسجّل معاه تاريخ زراعة مجموعته
+    var pick = ref ? cand.filter(function(n){ return Math.abs(dayDiff(n.transplantDate, ref)) <= 3; }) : [];
     if(!pick.length){ var mx = cand.reduce(function(m, n){ return n.transplantDate > m ? n.transplantDate : m; }, ''); pick = cand.filter(function(n){ return n.transplantDate === mx; }); }
     return pick;
   }
@@ -3593,13 +3738,19 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     if(!confirm('تحذف سجل الحصاد ده؟')) return;
     var h = harvestLog.filter(function(x){ return x.id===id; })[0];
     if(h) logAudit('delete', 'harvest', 'حصاد: '+h.cropName+' — '+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+' — '+auditSysName(h.systemId));
+    var undo = null; try{ undo = pipeUndoPlan(h); }catch(e){ console.error(e); }
+    var after = function(){
+      if(!undo){ toast(h && h.pipeUndo ? 'اتحذف — المواسير ما رجعتش لأنها اتغيّرت بعد الحصاد ده' : 'اتحذف'); return; }
+      savePipeMap(undo).then(function(){ logAudit('edit','nursery','رجوع '+h.pipeUndo.before.pipes+' ماسورة '+h.cropName+' بعد مسح سجل الحصاد'); toast('اتحذف — والمواسير رجعت زي ما كانت'); renderHarvestPanel(); },
+        function(e){ console.error(e); toast('اتحذف، بس المواسير ما رجعتش — عدّلها من «تعديل»'); });
+    };
     if(db){
-      trashDelete('harvest', id).then(function(){ toast('اتحذف'); });
+      trashDelete('harvest', id).then(after);
     } else {
       harvestLog = harvestLog.filter(function(x){ return x.id!==id; });
       persistLocalHarvest();
       renderAll();
-      toast('اتحذف');
+      after();
     }
   }
   function harvestForSystem(systemId){
@@ -3643,13 +3794,19 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   }
 
   /* كتابة آمنة من التعارض: بنقارن اللي كان عندنا (base) باللي المستخدم عدّله (next) ونطبّق الفرق بس على أحدث نسخة من السيرفر جوه transaction، فلو موظفين كتبوا في نفس المستند مفيش قراءة بتضيع. لو مفيش نت بنرجع للكتابة العادية (بتتخزّن وتتبعت لما النت يرجع). */
-  function txMerge(ref, field, base, next, keyOf, extra, sortFn){
+  /* opts = {key, sort}: اسم حقل المفتاح والترتيب — عشان من غير نت تتحفظ كـ«دمج» على السيرفر المحلي بدل ما تستبدل اللي اتضاف من أجهزة تانية */
+  function txMerge(ref, field, base, next, keyOf, extra, sortFn, opts){
     var baseMap = {}, nextMap = {}, added = [], changed = [], removed = [];
     (base || []).forEach(function(x){ baseMap[keyOf(x)] = x; });
     (next || []).forEach(function(x){ nextMap[keyOf(x)] = x; });
     Object.keys(nextMap).forEach(function(k){ if(!(k in baseMap)) added.push(k); else if(JSON.stringify(baseMap[k]) !== JSON.stringify(nextMap[k])) changed.push(k); });
     Object.keys(baseMap).forEach(function(k){ if(!(k in nextMap)) removed.push(k); });
-    function plain(){ var d = Object.assign({}, extra); d[field] = next; return ref.set(d); }
+    function plain(){
+      if(opts && opts.key && window.firebase && firebase.__queueMerge)
+        return firebase.__queueMerge({path:ref.path, field:field, key:opts.key, sort:opts.sort || '', extra:extra || {}, remove:removed,
+          add:added.map(function(k){ return nextMap[k]; }), change:changed.map(function(k){ return nextMap[k]; })});
+      var d = Object.assign({}, extra); d[field] = next; return ref.set(d);
+    }
     if(!db || !db.runTransaction || (typeof navigator !== 'undefined' && navigator.onLine === false)) return plain();
     return db.runTransaction(function(tx){
       return tx.get(ref).then(function(snap){
@@ -3678,7 +3835,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     if(db){
       var baseDoc = findDoc(sourceKey, dateKey, systemId), extra = {source:sourceKey, date:dateKey};
       if(systemId) extra.systemId = systemId;
-      return txMerge(db.collection('readings').doc(id), 'entries', baseDoc ? baseDoc.entries : [], entries, function(x){ return x && x.id ? x.id : JSON.stringify(x); }, extra, function(a, b){ return String(a.ts || '').localeCompare(String(b.ts || '')); });
+      return txMerge(db.collection('readings').doc(id), 'entries', baseDoc ? baseDoc.entries : [], entries, function(x){ return x && x.id ? x.id : JSON.stringify(x); }, extra, function(a, b){ return String(a.ts || '').localeCompare(String(b.ts || '')); }, {key:'id', sort:'ts'});
     }
     var idx = -1;
     for(var i=0;i<readingsDocs.length;i++){
@@ -3757,7 +3914,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     var baseSys = systems.slice();
     systems = list;
     if(db){
-      return txMerge(db.doc('settings/systems'), 'list', baseSys, list, function(x){ return x.id; }, {});
+      return txMerge(db.doc('settings/systems'), 'list', baseSys, list, function(x){ return x.id; }, {}, null, {key:'id'});
     }
     persistLocalSystems();
     renderAll();
@@ -3950,7 +4107,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       (backup.inventoryItems||[]).length + (backup.sops||[]).length;
     if(!confirm('هيتم '+(db?'كتابة':'استبدال')+' كل البيانات الحالية ببيانات الملف ده (حوالي '+countApprox+' سجل أو أكتر). '+
       (db ? 'في وضع البيانات المشتركة، السجلات اللي في الملف هتتكتب/تتحدّث، لكن أي سجل موجود دلوقتي ومش في الملف هيفضل موجود (مش هيتمسح).' : 'هيستبدل كل البيانات المحلية على الجهاز ده.')+
-      '\\n\\nمتأكد إنك عايز تكمل؟')) return Promise.resolve();
+      '\n\nمتأكد إنك عايز تكمل؟')) return Promise.resolve();
     var applyFn = db ? applyBackupDb(backup) : applyBackupLocal(backup);
     return Promise.resolve(applyFn).then(function(){
       logAudit('edit', 'admin', 'استعادة نسخة احتياطية كاملة (بتاريخ التصدير: '+(backup.exportedAt||'—')+')');
@@ -3969,7 +4126,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   }
   var MUTATION_SELECTOR = '.bio-add-files, #bio-files, .del-btn, .task-done-btn, .task-toggle-btn, .task-edit-btn, .task-delete-btn, .sop-edit-btn, .sop-delete-btn, '+
     '.fert-delete-btn, .mix-remove-btn, .nursery-edit-btn, .nursery-transplant-btn, .nursery-delete-btn, .pest-delete-btn, .inv-edit-btn, .inv-delete-btn, .btn-danger-ghost, '+
-    '#btn-plan-snapshot, .q-edit, .q-del, .q-add-item, .q-status-btn, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-erad-btn, .pest-uneradicate-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
+    '#btn-plan-snapshot, .q-edit, .q-del, .q-add-item, .q-status-btn, .sp-edit, .sp-del, .sp-done, .sp-undo, .pest-edit-btn, .pest-treat-btn, .pest-erad-btn, .pest-uneradicate-btn, .pest-treat-del, #pt-form button, .pipe-grp-edit, .pipe-grp-harvest, .pipe-grp-del, .rw-hv, #btn-add-system, #quick-add-system-btn, [data-role="add-pill"], #btn-new-sop, #btn-new-fert, #btn-new-inventory, '+
     '#btn-save-recipe, #btn-load-recipe, #btn-delete-recipe, #btn-save-target-profile, #btn-delete-target-profile, #btn-auto-solve, #btn-add-to-mix, '+
     '#btn-save-ranges, #btn-seed-demo, #btn-clear-all';
   var DELETE_ONLY_SELECTOR = '.del-btn:not(.mix-remove-btn), .btn-danger-ghost:not(#btn-reset-weights)';
@@ -4002,8 +4159,10 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       if(tab==='overview' || tab==='charts' || btn.hasAttribute('data-dash')){ btn.classList.remove('hidden'); return; }
       if(tab==='settings'){ btn.classList.toggle('hidden', currentUserRole!=='admin'); return; }
       if(tab==='costs'){ btn.classList.toggle('hidden', !canView('inventory')); return; }
+      if(tab==='ai'){ btn.classList.toggle('hidden', aiLevel()==='none'); return; }
       btn.classList.toggle('hidden', !canView(tab));
     });
+    try{ aiQuickButtons(); }catch(e){}
     if(typeof SUBTABS !== 'undefined') Object.keys(SUBTABS).forEach(function(k){ try{ panelSubRefresh(k); }catch(e){} });
   }
   function setGhType(ghName, type){
@@ -4699,21 +4858,8 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     }
   }
 
-  /* ---------- nursery planning calculator (per-system saved plan + on-the-fly checks) ---------- */
-  function persistLocalNurseryPlans(){
-    try{ localStorage.setItem('oroots_local_nursery_plans', JSON.stringify(nurseryPlans)); }catch(e){}
-  }
   function getNurseryPlan(systemId){
     return nurseryPlans.filter(function(p){ return p.systemId===systemId; })[0] || null;
-  }
-  function saveNurseryPlanRaw(plan){
-    if(db){
-      return txMerge(db.doc('settings/nurseryPlans'), 'list', nurseryPlans.slice(), nurseryPlans.filter(function(p){return p.systemId!==plan.systemId;}).concat([plan]), function(x){ return x.systemId; }, {});
-    }
-    nurseryPlans = nurseryPlans.filter(function(p){ return p.systemId!==plan.systemId; }).concat([plan]);
-    persistLocalNurseryPlans();
-    renderAll();
-    return Promise.resolve();
   }
 
   /* ---------- تقدّم الخطة: نازلة / جاهزة / محتاجين نشتلها بالتاريخ ---------- */
@@ -4789,73 +4935,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     rec.date = date || rec.date;
     return saveNurseryPlanLogRec(rec);
   }
-  function deleteNurseryPlanLog(id){
-    if(!requireAdminForDelete()) return;
-    if(!confirm('تحذف السجل ده؟')) return;
-    if(db){ trashDelete('nurseryPlanLog', id).then(function(){ toast('اتحذف'); }); }
-    else { nurseryPlanLog = nurseryPlanLog.filter(function(x){ return x.id!==id; }); renderAll(); toast('اتحذف'); }
-  }
-  function exportPlanLogCSV(){
-    if(!downloadsCap){ toast('التصدير غير متاح دلوقتي'); return; }
-    var list = nurseryPlanLog.filter(function(x){ return x.systemId===nurseryPlanSystemId && lfInRange('planlog', x.date); });
-    if(!list.length){ toast('لا توجد بيانات للتصدير'); return; }
-    var lines = [['التاريخ','النوع','النظام','المحصول','صواني منقولة','نزل (إجمالي)','المطلوب','جاهزة','بتحضّن','متبقي للشتل','لسه ما اتزرعش','بواسطة'].map(csvEscape).join(',')];
-    list.forEach(function(x){
-      lines.push([x.date, x.kind==='transplant'?'نقل':'لقطة', x.systemName, x.cropName, x.moved, x.transplanted, x.target, x.ready, x.growing, x.remaining, x.toSow, x.by].map(csvEscape).join(','));
-    });
-    downloadsCap.save({filename:'oroots-nursery-plan-log-'+todayStr()+'.csv', data:'\uFEFF'+lines.join('\r\n')}).then(function(){ toast('تم حفظ الملف'); })
-      .catch(function(err){ if(err && err.code==='declined') return; toast('تعذر حفظ الملف'); });
-  }
-  function planStatusText(row){
-    if(row.ready) return row.days===0 ? 'جاهزة النهارده' : ('جاهزة من '+(-row.days)+' يوم');
-    return 'هتجهز بعد '+row.days+' يوم';
-  }
-  function planProgressHtml(plan){
-    if(!plan || !plan.cropName) return '';
-    var pr = computePlanProgress(plan);
-    var chips = '<div class="climate-stats" style="margin-top:14px;">'+
-      climateStatChip('نزل في النظام', pr.transplanted, 'من '+pr.target+' صينية')+
-      climateStatChip('جاهزة للشتل', pr.ready, 'صينية')+
-      climateStatChip('لسه بتحضّن', pr.growing, 'صينية')+
-      climateStatChip('متبقي للشتل', pr.remaining, 'صينية')+
-    '</div>';
-    var banner = '';
-    if(pr.target>0 && pr.remaining===0) banner = '<div class="view-only-banner" style="background:var(--good-soft);color:var(--good);">✅ الخطة مكتملة: نزل '+pr.transplanted+' من '+pr.target+' صينية.</div>';
-    else if(pr.toSow>0) banner = '<div class="view-only-banner" style="background:var(--alert-soft);color:var(--alert);">⚠️ لسه محتاج تزرع '+pr.toSow+' صينية إضافية عشان تكمل الخطة'+(pr.idealNextSowDate?(' (موعد زراعة الدفعة الجاية: '+pr.idealNextSowDate+')'):'')+'.</div>';
-    else if(pr.ready>0) banner = '<div class="view-only-banner" style="background:var(--tank-soft);color:var(--tank);">🌱 عندك '+pr.ready+' صينية جاهزة للشتل دلوقتي.</div>';
-    var sched = pr.schedule.length
-      ? '<div class="table-wrap cropref-wrap"><table><thead><tr><th>تاريخ الجاهزية للشتل</th><th>الصواني</th><th>الحالة</th></tr></thead><tbody>'+
-        pr.schedule.map(function(r){
-          return '<tr><td class="ltr num">'+r.date+'</td><td class="num">'+r.trays+'</td><td><span class="status-pill '+(r.ready?'good':'alert')+'">'+planStatusText(r)+'</span></td></tr>';
-        }).join('')+'</tbody></table></div>'
-      : '<p class="empty-note">مفيش صواني في المشتل متخصصة للخطة دي دلوقتي.</p>';
-    var note = '<p class="hint help-note">الجاهزية = تاريخ الزراعة + '+pr.nurseryDays+' يوم تحضين.'+
-      (pr.cycleStart?(' النزول محسوب من '+pr.cycleStart+'.'):'')+
-      (pr.deadline?(' آخر ميعاد لشتل الدفعة الجاية: '+pr.deadline+'.'):'')+
-      ' الصواني اللي ما اتحددلهاش نظام بتتحسب لكل خطة بنفس المحصول.</p>';
-    return '<h3 class="section-title">الصواني والشتل بالتاريخ</h3>'+chips+banner+sched+note;
-  }
-  function planLogHtml(){
-    var plan = getNurseryPlan(nurseryPlanSystemId);
-    if(!plan || !plan.cropName) return '';
-    var list = nurseryPlanLog.filter(function(x){ return x.systemId===nurseryPlanSystemId; })
-      .sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
-    var rows = list.map(function(x){
-      return '<tr data-id="'+escH(x.id)+'"'+lfAttr('planlog', x.date)+'>'+
-        '<td class="ltr num">'+escH(x.date)+'</td>'+
-        '<td>'+(x.kind==='transplant' ? ('نقل '+x.moved+' صينية') : 'لقطة للوضع')+'</td>'+
-        '<td class="num">'+x.transplanted+' / '+x.target+'</td>'+
-        '<td class="num">'+x.ready+'</td><td class="num">'+x.growing+'</td><td class="num">'+x.remaining+'</td>'+
-        '<td>'+escH(x.by||'—')+'</td>'+
-        '<td><button class="del-btn planlog-del" title="حذف">✕</button></td></tr>';
-    }).join('');
-    return '<div class="table-toolbar"><h3 class="section-title" style="margin:0;">سجل الخطة</h3>'+
-        '<span><button type="button" class="btn btn-primary btn-sm" id="btn-plan-snapshot">📌 سجّل وضع الخطة</button> <button type="button" class="btn btn-ghost btn-sm" id="btn-planlog-export">تصدير CSV</button></span></div>'+
-      '<p class="hint help-note">بيتسجل تلقائي كل ما صواني تنزل في النظام ده، وتقدر تسجّل لقطة للوضع في أي وقت.</p>'+
-      lfBarHtml('planlog')+
-      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحدث</th><th>نزل / المطلوب</th><th>جاهزة</th><th>بتحضّن</th><th>متبقي</th><th>بواسطة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-      (list.length ? '' : '<p class="empty-note">لسه مفيش سجل للخطة دي.</p>');
-  }
   
 
   /* ---------- مخطط المواسير: كل ماسورة بتتلوّن وتكبر حسب عمر النبات ---------- */
@@ -4876,7 +4955,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   function savePipeMap(map){
     var basePm = pipeMaps.slice(), list = pipeMaps.filter(function(x){ return x.systemId!==map.systemId; }).concat([map]);
     pipeMaps = list;
-    if(db) return txMerge(db.doc('settings/pipeMaps'), 'list', basePm, list, function(x){ return x.systemId; }, {});
+    if(db) return txMerge(db.doc('settings/pipeMaps'), 'list', basePm, list, function(x){ return x.systemId; }, {}, null, {key:'systemId'});
     renderAll(); return Promise.resolve();
   }
   function pipeAgeDays(g, sim){ return dayDiff(g.plantDate, planAddDays(todayStr(), sim||0)); }
@@ -4924,13 +5003,14 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     return out;
   }
   /* بيطبّق قطفة على m ماسورة من المجموعة: لو لسه فيه قطفات بتتجدد، لو القطفة الأخيرة بتفضى */
-  function pipeCutRaw(groups, gid, m, today){
+  function pipeCutRaw(groups, gid, m, today, forceFinal){
     var out = [], info = null;
     groups.forEach(function(g){
       if(g.id!==gid){ out.push(g); return; }
-      var max = Math.max(1, parseInt(g.maxCuts,10)||1), done = parseInt(g.cuts,10)||0, no = done+1, fin = no>=max;
+      var max = Math.max(1, parseInt(g.maxCuts,10)||1), done = parseInt(g.cuts,10)||0, no = done+1, fin = no>=max || !!forceFinal;
       var take = Math.min(m, g.pipes);
-      info = {crop:g.crop, pipes:take, no:no, max:max, final:fin, regrow:parseFloat(g.regrowDays)||parseFloat(g.harvestDays)||0};
+      info = {crop:g.crop, pipes:take, no:no, max:max, final:fin, early:fin && no<max, regrow:parseFloat(g.regrowDays)||parseFloat(g.harvestDays)||0,
+        before:Object.assign({}, g, {pipes:take})};   // المواسير اللي اتقطفت زي ما كانت قبل القطفة
       if(take>=g.pipes){
         if(!fin) out.push(Object.assign({}, g, {cuts:no, lastCutDate:today}));
       } else if(fin){
@@ -4944,7 +5024,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   }
   function pipeCutText(info, today){
     if(!info) return '';
-    if(info.final) return 'اتحصدت '+info.pipes+' ماسورة '+info.crop+(info.max>1?(' — القطفة الأخيرة ('+info.no+' من '+info.max+')'):'');
+    if(info.final) return 'اتحصدت '+info.pipes+' ماسورة '+info.crop+(info.max>1?(' — القطفة الأخيرة ('+info.no+' من '+info.max+')'+(info.early?' — اتقفلت بدري':'')):'');
     return 'اتسجّلت قطفة '+info.no+' من '+info.max+' لـ '+info.pipes+' ماسورة '+info.crop+' — هتجهز تاني بعد '+info.regrow+' يوم ('+planAddDays(today, info.regrow)+')';
   }
 
@@ -5279,30 +5359,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       text:'واتضافت '+want+' ماسورة في مخطط النظام (مواسير '+(startUsed+1)+'–'+(startUsed+want)+')'};
   }
 
-  function pipeHarvestFromLog(sysId, crop, n, dateStr){
-    var map = getPipeMap(sysId), key = cropKey(crop), day = dateStr || todayStr();
-    function rank(g){ var r = pipeStageOf(g, 0), ready = (r.st==='ready' || r.st==='over'); return {ready:ready, v: ready ? (r.clock.age - r.clock.target) : r.p}; }
-    var cands = map.groups.filter(function(g){ return cropKey(g.crop)===key; }).sort(function(a,b){
-      var x = rank(a), y = rank(b);
-      if(x.ready!==y.ready) return x.ready ? -1 : 1;
-      return y.v - x.v;
-    });
-    var avail = cands.reduce(function(sum,g){ return sum + g.pipes; }, 0);
-    if(!avail) return {deducted:0, job:null, text:'مفيش مواسير '+crop+' في مخطط النظام عشان تتخصم'};
-    var left = n, groups = map.groups, cutPipes = 0, finalPipes = 0, lastInfo = null;
-    cands.forEach(function(g){
-      if(left<=0) return;
-      var take = Math.min(left, g.pipes), res = pipeCutRaw(groups, g.id, take, day);
-      groups = res.groups; left -= take; lastInfo = res.info;
-      if(res.info.final) finalPipes += take; else cutPipes += take;
-    });
-    var deducted = n - left, parts = [];
-    if(cutPipes) parts.push('اتسجّلت قطفة لـ '+cutPipes+' ماسورة وهتتجدد'+(lastInfo && !lastInfo.final ? (' (قطفة '+lastInfo.no+' من '+lastInfo.max+'، تجهز تاني بعد '+lastInfo.regrow+' يوم)') : ''));
-    if(finalPipes) parts.push('واتخصم '+finalPipes+' ماسورة فضيت');
-    return {deducted:deducted, job:savePipeMap(Object.assign({}, map, {groups: pipeMergeGroups(groups)})),
-      text:parts.join(' و')+' في مخطط النظام'+(left>0?(' (طلبت '+n+' بس الموجود '+avail+')'):'')};
-  }
-
   /* ---------- خطوط الزراعة في صوبة الثمريات (طماطم...): أزواج خطوط — مسافة صغيرة جوه الزوج وممر كبير بين الأزواج ---------- */
   var rowEditId = null;
   var ROW_COLORS = ['#2C8C6F', '#D8543A', '#C9932F', '#2C7A8C', '#8C6FA2', '#6FA22E', '#C0577F', '#7A8C2C', '#B5651D', '#3F7CAC'];
@@ -5344,7 +5400,15 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
         '<div class="field-sm"><label>تاريخ الزراعة (اختياري)</label><input type="date" class="ltr" id="rw-date" value="'+escH(editing ? (editing.plantDate || '') : '')+'"></div>'+
         '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="120" id="rw-note" value="'+escH(editing ? (editing.note || '') : '')+'"></div>'+
       '</div><div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(editing ? 'حفظ التعديل' : 'إضافة')+'</button>'+(editing ? ' <button type="button" class="btn btn-ghost btn-sm" id="rw-cancel">إلغاء</button>' : '')+'</div></form>' : '';
-    return '<h2 class="section-title" style="margin-top:0;">🍅 مخطط خطوط الزراعة</h2>'+
+    var hvCards = keys.map(function(k, i){
+      var rs = rows.filter(function(r){ return cropKey(r.crop) === k; }), pl = rs.reduce(function(a, r){ return a + (parseInt(r.plants, 10) || 0); }, 0), last = harvestLastOf(sysId, rs[0].crop);
+      return '<div class="stat-card" style="margin:8px 0;border-inline-start:5px solid '+ROW_COLORS[i % ROW_COLORS.length]+';display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">'+
+        '<div><strong>'+escH(rs[0].crop || '—')+'</strong><div class="hint" style="margin:2px 0 0;">'+rs.length+' خط — '+pl+' نبتة'+(last ? (' — آخر قطفة '+escH(String(last.ts).slice(0,10))+' ('+escH(last.quantity)+' '+escH(HARVEST_UNIT_LABELS[last.unit] || last.unit)+')') : ' — لسه ما اتقطفش')+'</div></div>'+
+        (edit ? '<button type="button" class="btn btn-primary btn-sm rw-hv" data-k="'+escH(k)+'">🍅 قطفة</button>' : '')+
+      '</div>';
+    }).join('');
+    return (hvCards ? '<h2 class="section-title" style="margin-top:0;">🧺 تسجيل الحصاد بالصنف</h2>'+hvCards : '')+
+      '<h2 class="section-title"'+(hvCards ? '' : ' style="margin-top:0;"')+'>🍅 مخطط خطوط الزراعة</h2>'+
       '<p class="hint help-note">كل خط فيه عدد نباتات وصنف. الخطوط بتتجمّع في أزواج: مسافة صغيرة جوه الزوج، وممر كبير بين كل زوجين (الخط المنقّط بين الأزواج هو الممر).</p>'+
       '<div class="climate-stats">'+climateStatChip('الخطوط', rows.length, 'خط')+climateStatChip('الأزواج', Math.ceil(rows.length/2), 'زوج')+climateStatChip('إجمالي النباتات', totalPlants, 'نبتة')+'</div>'+
       (rows.length ? '<div class="chart-card" style="margin-top:10px;">'+rowsSvg(rows)+'<div style="text-align:center;">'+legend+'</div></div>' : '<p class="empty-note">لسه ما اتضافتش خطوط. ضيف أول خط من النموذج تحت.</p>')+
@@ -5369,6 +5433,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       rowSave(sysId, rows).then(function(){ logAudit('add', 'harvest', 'خطوط زراعة: '+crop+' — '+cnt+' خط × '+plants+' نبتة'); done('اتضافت الخطوط'); }).catch(fail);
     });
     var cancel = $('#rw-cancel', box); if(cancel) cancel.addEventListener('click', function(){ rowEditId = null; renderHarvestPanel(); });
+    $all('.rw-hv', box).forEach(function(b){ b.addEventListener('click', function(){ rowHarvestCrop(b.getAttribute('data-k')); }); });
     $all('tbody tr', box).forEach(function(tr){
       var id = tr.getAttribute('data-id'), q = function(c){ return tr.querySelector(c); };
       var move = function(d){ var rows = rowListOf(sysId).slice(), i = rows.findIndex(function(r){ return r.id === id; }), j = i + d; if(i < 0 || j < 0 || j >= rows.length) return; var t = rows[i]; rows[i] = rows[j]; rows[j] = t; rowSave(sysId, rows).then(function(){ renderHarvestPanel(); }).catch(fail); };
@@ -5380,9 +5445,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   }
   function pipeInfographicHtml(){
     if(!systems.length) return '';
-    var sysOptions = systems.map(function(sy){
-      return '<option value="'+escH(sy.id)+'"'+(sy.id===selectedSystemId?' selected':'')+'>'+escH(systemLabel(sy))+'</option>';
-    }).join('');
     var map = getPipeMap(selectedSystemId);
     var editing = pipeEditId ? map.groups.filter(function(g){ return g.id===pipeEditId; })[0] : null;
     var plan = getNurseryPlan(selectedSystemId);
@@ -5390,7 +5452,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     var defAge = editing ? Math.max(0, pipeAgeDays(editing, 0)) : 0;
     var defMax = editing ? (parseInt(editing.maxCuts,10)||1) : 1, defRegrow = editing ? (parseFloat(editing.regrowDays)||'') : '';
     var defCuts = editing ? (parseInt(editing.cuts,10)||0) : 0, defLast = editing ? (editing.lastCutDate||'') : '';
-    var cropsList = pipeKnownCrops().map(function(c){ return '<option value="'+escH(c)+'"></option>'; }).join('');
     return '<p class="hint help-note">كل ماسورة بتتعرض كنبتة واحدة بشكل المحصول (خس أو ريحان أو جرجير...) وهي بتكبر ويتغير لونها حسب عمره (شتلة ← بتكبر ← قربت ← جاهزة ✓ ← متأخرة)، والجاهزة بتنوّر. بتتعرض للنظام المختار فوق، وتقدر تكبّر أو تصغّر الشكل.</p>'+
       '<div id="pipe-summary">'+pipeSummaryHtml(map, pipeSimDays)+'</div>'+
       '<div class="pipe-sim"><label for="pipe-sim">⏩ شوف الوضع بعد: <strong id="pipe-sim-val">'+pipeDayLabel(pipeSimDays)+'</strong> <span class="hint" id="pipe-sim-date" style="margin:0;"></span></label>'+
@@ -5458,21 +5519,148 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       var dl = card.querySelector('.pipe-grp-del'); if(dl) dl.addEventListener('click', function(){ pipeDeleteGroup(id); });
     });
   }
-  function pipeHarvestGroup(id){
-    var map = getPipeMap(selectedSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
-    if(!g) return;
-    var max = Math.max(1, parseInt(g.maxCuts,10)||1), no = (parseInt(g.cuts,10)||0)+1;
-    var ans = prompt('كام ماسورة اتحصدت من "'+g.crop+'"'+(max>1?(' (قطفة '+no+' من '+max+')'):'')+'؟ (من 1 لحد '+g.pipes+')', String(g.pipes));
-    if(ans===null) return;
-    var m = parseInt(ans,10);
-    if(!(m>=1) || m>g.pipes){ toast('اكتب رقم من 1 لحد '+g.pipes); return; }
-    var today = todayStr(), res = pipeCutRaw(map.groups, id, m, today);
-    var text = pipeCutText(res.info, today) + (res.info && res.info.final ? (m<g.pipes ? (' — فاضل '+(g.pipes-m)) : ' — المواسير فضيت') : '');
-    savePipeMap(Object.assign({}, map, {groups: pipeMergeGroups(res.groups)})).then(function(){
-      logAudit('edit','nursery',text+' — '+(getSystem(map.systemId)?systemLabel(getSystem(map.systemId)):''));
-      toast(text);
-      renderHarvestPanel();
+  /* ---------- تسجيل الحصاد: من كارت المواسير (قطفة/حصاد) أو من صنف الطماطم — ضغطة واحدة بتسجّل الكمية وبتحدّث المخطط ---------- */
+  function harvestLastUnit(crop){
+    var k = cropKey(crop), last = null;
+    harvestLog.forEach(function(h){ if(cropKey(h.cropName)===k && (!last || String(h.ts||'') > String(last.ts||''))) last = h; });
+    return last && HARVEST_UNITS.indexOf(last.unit) >= 0 ? last.unit : 'kg';
+  }
+  function harvestLastOf(sysId, crop){
+    var k = cropKey(crop), last = null;
+    harvestLog.forEach(function(h){ if(h.systemId===sysId && cropKey(h.cropName)===k && (!last || String(h.ts||'') > String(last.ts||''))) last = h; });
+    return last;
+  }
+  /* o: {title, info (HTML), sysId, crop, pipes:{max, def, multi, lastCut} | null, rows:[{id, label, plants}] | null, onSave(v) → Promise} */
+  function harvestDialogOpen(o){
+    helpClose();
+    var unit = harvestLastUnit(o.crop), p = o.pipes;
+    var pop = document.createElement('div'); pop.id = 'help-pop'; pop.className = 'help-pop'; pop.setAttribute('role', 'dialog');
+    pop.innerHTML = '<div class="hp-card"><div class="hp-head"><strong>'+o.title+'</strong><button type="button" class="hp-close" aria-label="إغلاق">✕</button></div>'+
+      '<form class="entry-form hp-body" id="hvd-form" style="margin:0;border:0;box-shadow:none;">'+
+        '<p class="hint" style="margin:0 0 6px;">'+o.info+'</p>'+
+        '<div id="hvd-phi"></div>'+
+        '<div class="form-grid">'+
+          (p ? '<div class="field-sm"><label>عدد المواسير</label><input type="number" step="1" min="1" max="'+p.max+'" class="ltr" id="hvd-pipes" required value="'+p.def+'"><p class="hint" style="margin:2px 0 0;">من 1 لحد '+p.max+'</p></div>' : '')+
+          (p && p.multi ? (p.lastCut ? '<p class="hint full" style="margin:0;">✂️ دي آخر قطفة — المواسير هتفضى بعدها</p>' :
+            '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="hvd-final" style="width:auto;"> دي آخر قطفة — فضّي المواسير (مثلاً لو هتشيلها بدري)</label></div>') : '')+
+          (o.rows ? '<div class="field-sm full"><label>الخطوط</label><div id="hvd-rows" style="display:flex;flex-wrap:wrap;gap:6px 14px;">'+o.rows.map(function(r){
+              return '<label style="display:flex;align-items:center;gap:6px;margin:0;font-weight:400;"><input type="checkbox" class="hvd-row" value="'+escH(r.id)+'" checked style="width:auto;"> '+escH(r.label)+'</label>'; }).join('')+'</div></div>' : '')+
+          '<div class="field-sm"><label>الكمية</label><input type="number" step="any" min="0.001" class="ltr" id="hvd-qty" required inputmode="decimal"></div>'+
+          '<div class="field-sm"><label>الوحدة</label><select id="hvd-unit">'+HARVEST_UNITS.map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+HARVEST_UNIT_LABELS[u]+'</option>'; }).join('')+'</select></div>'+
+          '<div class="field-sm full"><label>التاريخ والوقت</label><input type="datetime-local" class="ltr" id="hvd-ts" required></div>'+
+          '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="hvd-note"></div>'+
+        '</div>'+
+        '<div class="form-actions" style="display:flex;gap:8px;"><button type="submit" class="btn btn-primary btn-sm" id="hvd-save" style="flex:2;width:auto;">حفظ الحصاد</button><button type="button" class="btn btn-ghost btn-sm hp-close" style="flex:1;width:auto;">إلغاء</button></div>'+
+      '</form></div>';
+    document.body.appendChild(pop);
+    pop.addEventListener('click', function(ev){ if(ev.target===pop || (ev.target.closest && ev.target.closest('.hp-close'))) helpClose(); });
+    var q = function(sel){ return pop.querySelector(sel); };
+    q('#hvd-ts').value = nowLocalInputValue();
+    var phi = function(){ q('#hvd-phi').innerHTML = phiWarnHtml(phiRisks(o.sysId, String(q('#hvd-ts').value||'').slice(0,10) || todayStr())); };
+    q('#hvd-ts').addEventListener('change', phi); phi();
+    setTimeout(function(){ try{ q('#hvd-qty').focus(); }catch(e){} }, 50);
+    var busy = false;
+    q('#hvd-form').addEventListener('submit', function(ev){
+      ev.preventDefault(); if(busy) return;
+      var qty = parseFloat(q('#hvd-qty').value), ts = q('#hvd-ts').value || nowLocalInputValue(), v = {qty:qty, unit:q('#hvd-unit').value, ts:ts, day:ts.slice(0,10), note:(q('#hvd-note').value||'').trim()};
+      if(!(qty > 0)){ toast('اكتب كمية صحيحة'); return; }
+      if(p){
+        v.pipes = parseInt(q('#hvd-pipes').value, 10);
+        if(!(v.pipes >= 1 && v.pipes <= p.max)){ toast('اكتب رقم من 1 لحد '+p.max); return; }
+        v.final = !!(q('#hvd-final') && q('#hvd-final').checked);
+      }
+      if(o.rows){
+        v.rowIds = Array.prototype.slice.call(pop.querySelectorAll('.hvd-row')).filter(function(c){ return c.checked; }).map(function(c){ return c.value; });
+        if(!v.rowIds.length){ toast('اختار خط واحد على الأقل'); return; }
+      }
+      if(v.day > todayStr()){ toast('التاريخ ده لسه ما جاش'); return; }
+      var phiR = phiRisks(o.sysId, v.day);
+      if(phiR.length && !confirm('⚠️ تحذير مدة الأمان (PHI):\n'+phiR.map(function(r){ return '• '+r.product+' اتعمل '+r.applied+' ← آمن من '+r.safe; }).join('\n')+'\n\nمتأكد إنك عايز تسجّل الحصاد ده؟')) return;
+      busy = true; q('#hvd-save').disabled = true;
+      Promise.resolve().then(function(){ return o.onSave(v); }).then(function(msg){
+        helpClose(); if(msg) toast(msg); renderHarvestPanel();
+      }, function(e){
+        busy = false; q('#hvd-save').disabled = false;
+        if(e && e.message === 'stale'){ helpClose(); toast('المواسير اتغيّرت من جهاز تاني — افتحها تاني'); renderHarvestPanel(); return; }
+        console.error(e); toast('⛔ ما اتحفظش'+(e && e.code === 'permission-denied' ? ' (مفيش صلاحية)' : ''));
+      });
     });
+  }
+  function pipeHarvestGroup(id){
+    var sysId = selectedSystemId, map = getPipeMap(sysId), g = map.groups.filter(function(x){ return x.id===id; })[0];
+    if(!g) return;
+    var r = pipeStageOf(g, 0), c = r.clock, no = c.done+1, multi = c.max>1, left = c.target - c.age;
+    if(r.st==='future'){ toast('المجموعة دي لسه ما اتزرعتش ('+g.plantDate+')'); return; }
+    var rng = (g.start+1)+(g.pipes>1?('–'+(g.start+g.pipes)):'');
+    var state = (r.st==='ready' || r.st==='over') ? '✅ جاهزة' : ('⏳ لسه فاضل '+left+' يوم على ميعادها');
+    harvestDialogOpen({
+      sysId: sysId, crop: g.crop,
+      title: (multi ? '✂️ قطفة '+no+' من '+c.max : '🧺 حصاد')+' — '+escH(g.crop),
+      info: 'مواسير '+rng+' ('+g.pipes+' ماسورة) — زراعة '+escH(g.plantDate)+' — '+state,
+      pipes: {max:g.pipes, def:g.pipes, multi:multi, lastCut:multi && no>=c.max},
+      onSave: function(v){
+        var cur = getPipeMap(sysId), now = cur.groups.filter(function(x){ return x.id===id; })[0];
+        if(!now || now.pipes < v.pipes || (parseInt(now.cuts,10)||0) !== c.done) throw new Error('stale');
+        var res = pipeCutRaw(cur.groups, id, v.pipes, v.day, v.final), info = res.info;
+        var rec = {id:genId(), systemId:sysId, ts:v.ts, lot:harvestLotFor(sysId, v.ts), cropName:now.crop, quantity:v.qty, unit:v.unit, pipes:info.pipes,
+          cut:info.no, maxCuts:info.max, final:info.final, plantDate:now.plantDate || '',
+          pipeUndo:{before:info.before, no:info.no, day:v.day, final:info.final}, note:v.note, by:currentUser||'', createdAt:Date.now()};
+        var text = pipeCutText(info, v.day) + (info.final ? (v.pipes<now.pipes ? (' — فاضل '+(now.pipes-v.pipes)) : ' — المواسير فضيت') : '');
+        return saveHarvest(rec).then(function(){
+          return savePipeMap(Object.assign({}, cur, {groups: pipeMergeGroups(res.groups)})).then(function(){
+            logAudit('edit','nursery',text+' — '+(getSystem(sysId)?systemLabel(getSystem(sysId)):''));
+            return 'تم حفظ الحصاد ('+v.qty+' '+HARVEST_UNIT_LABELS[v.unit]+') — '+text;
+          }, function(e){ console.error(e); return 'تم حفظ الحصاد، بس مخطط المواسير ما اتحدّثش — عدّله من «تعديل»'; });
+        });
+      }
+    });
+  }
+  /* الطماطم: الحصاد بالصنف (كل خطوط الصنف مرة واحدة، وتقدر تشيل خطوط معيّنة) */
+  function rowHarvestCrop(key){
+    var sysId = selectedSystemId, all = rowListOf(sysId), lines = [];
+    all.forEach(function(r, i){ if(cropKey(r.crop)===key) lines.push({id:r.id, label:'خط '+(i+1)+' ('+(parseInt(r.plants,10)||0)+' نبتة)', plants:parseInt(r.plants,10)||0, crop:r.crop}); });
+    if(!lines.length) return;
+    var crop = lines[0].crop, plants = lines.reduce(function(a, l){ return a + l.plants; }, 0);
+    harvestDialogOpen({
+      sysId: sysId, crop: crop,
+      title: '🍅 قطفة — '+escH(crop),
+      info: lines.length+' خط — '+plants+' نبتة',
+      rows: lines,
+      onSave: function(v){
+        var pick = lines.filter(function(l){ return v.rowIds.indexOf(l.id) >= 0; });
+        var rec = {id:genId(), systemId:sysId, ts:v.ts, lot:harvestLotFor(sysId, v.ts), cropName:crop, quantity:v.qty, unit:v.unit,
+          rows:pick.length, rowIds:v.rowIds, plants:pick.reduce(function(a, l){ return a + l.plants; }, 0), note:v.note, by:currentUser||'', createdAt:Date.now()};
+        return saveHarvest(rec).then(function(){ return 'تم حفظ الحصاد: '+crop+' — '+v.qty+' '+HARVEST_UNIT_LABELS[v.unit]+' — '+pick.length+' خط'; });
+      }
+    });
+  }
+  /* لما سجل حصاد من المواسير يتمسح: المواسير بترجع زي ما كانت قبله — بس لو محدش غيّرها بعده (قطفة أحدث أو زراعة جديدة) */
+  function pipeUndoPlan(h){
+    var u = h && h.pipeUndo; if(!u || !u.before || !h.systemId) return null;
+    var map = getPipeMap(h.systemId), s0 = u.before.start, e0 = u.before.start + u.before.pipes;
+    var hit = function(st, n){ return st < e0 && st + n > s0; };
+    var later = harvestLog.some(function(x){ return x.id!==h.id && x.systemId===h.systemId && x.pipeUndo && x.pipeUndo.before && (x.createdAt||0) > (h.createdAt||0) && hit(x.pipeUndo.before.start, x.pipeUndo.before.pipes); });
+    if(later) return null;
+    var over = map.groups.filter(function(g){ return hit(g.start, g.pipes); });
+    if(u.final){ if(over.length) return null; }
+    else {
+      var cov = 0;
+      for(var i = 0; i < over.length; i++){
+        var g = over[i];
+        if(cropKey(g.crop)!==cropKey(u.before.crop) || (g.plantDate||'')!==(u.before.plantDate||'') || (parseInt(g.cuts,10)||0)!==u.no || (g.lastCutDate||'')!==u.day) return null;
+        cov += Math.min(e0, g.start+g.pipes) - Math.max(s0, g.start);
+      }
+      if(cov !== e0 - s0) return null;
+    }
+    var out = [];
+    map.groups.forEach(function(g){
+      var gs = g.start, ge = g.start + g.pipes;
+      if(ge <= s0 || gs >= e0){ out.push(g); return; }
+      if(gs < s0) out.push(Object.assign({}, g, {pipes:s0 - gs}));
+      if(ge > e0) out.push(Object.assign({}, g, {id:genId(), start:e0, pipes:ge - e0}));
+    });
+    out.push(Object.assign({}, u.before, {id:genId()}));
+    return Object.assign({}, map, {groups:pipeMergeGroups(out)});
   }
   function pipeDeleteGroup(id){
     var map = getPipeMap(selectedSystemId), g = map.groups.filter(function(x){ return x.id===id; })[0];
@@ -5664,30 +5852,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   /* ---------- calculation engine ----------
      ppm (mg/L) contributed by X grams of a fertilizer (in V liters) for element with
      weight-% pct = (X_grams * pct/100 * 1000) / V_liters  */
-  function ppmFromGrams(grams, pct, volumeL){
-    if(!volumeL) return 0;
-    return (grams * (pct||0) / 100 * 1000) / volumeL;
-  }
-  function computeStockPpm(mix, volumeL){
-    var totals = {};
-    NUTRIENT_ELEMENTS.forEach(function(e){ totals[e.key]=0; });
-    mix.forEach(function(item){
-      var fert = getFertilizer(item.fertilizerId);
-      if(!fert) return;
-      NUTRIENT_ELEMENTS.forEach(function(e){
-        var pct = fert.comp[e.key];
-        if(pct) totals[e.key] += ppmFromGrams(item.grams, pct * (fert.purity > 0 ? fert.purity : 1), volumeL);
-      });
-    });
-    return totals;
-  }
-  function computeAchieved(mix, volumeL, dilutionRatio){
-    var stock = computeStockPpm(mix, volumeL);
-    var d = dilutionRatio || 1;
-    var final = {};
-    NUTRIENT_ELEMENTS.forEach(function(e){ final[e.key] = stock[e.key]/d + (currentWater[e.key]||0); });
-    return final;
-  }
 
   /* ---------- charge balance (macro ions only — micros are meq-negligible) ---------- */
   function computeChargeBalance(finalPpm){
@@ -5700,132 +5864,12 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   /* ---------- EC estimate (Kohlrausch's law, ideal-dilution limiting conductivities,
      with an empirical 0.9 factor for ion-interaction effects at real fertigation
      strength — always confirm against a real EC meter). ---------- */
-  function estimateEC(finalPpm){
-    var sum = 0;
-    CATION_KEYS.concat(ANION_KEYS).forEach(function(k){
-      var mmolL = (finalPpm[k]||0)/ION_ATOMIC_WEIGHT[k];
-      sum += (mmolL/1000) * ION_LAMBDA[k];
-    });
-    return sum*0.9;
-  }
 
-  /* ---------- small linear algebra helpers (Gaussian elimination with partial pivoting) ---------- */
-  function solveLinearSystem(A, b){
-    var n = A.length;
-    var M = A.map(function(row,i){ return row.concat([b[i]]); });
-    for(var col=0; col<n; col++){
-      var maxRow = col;
-      for(var r=col+1; r<n; r++){ if(Math.abs(M[r][col])>Math.abs(M[maxRow][col])) maxRow=r; }
-      var tmp = M[col]; M[col]=M[maxRow]; M[maxRow]=tmp;
-      var pivot = M[col][col];
-      if(Math.abs(pivot)<1e-12) continue;
-      for(var r2=0;r2<n;r2++){
-        if(r2===col) continue;
-        var factor = M[r2][col]/pivot;
-        for(var c=col;c<=n;c++){ M[r2][c] -= factor*M[col][c]; }
-      }
-    }
-    var x = [];
-    for(var i2=0;i2<n;i2++){
-      x[i2] = Math.abs(M[i2][i2])<1e-12 ? 0 : M[i2][n]/M[i2][i2];
-    }
-    return x;
-  }
 
   /* Lawson-Hanson Non-Negative Least Squares: solves min ||Ax-b|| subject to x>=0.
      Standard, well-established numerical method for exactly this kind of mixture/
      blend problem (n fertilizers, m target elements, amounts can't be negative). */
-  function nnls(A, b){
-    var m = A.length, n = A[0].length;
-    var x = new Array(n).fill(0);
-    var P = []; // passive set (allowed to be positive)
-    var R = []; for(var i=0;i<n;i++) R.push(i);
 
-    function colsOf(idxList){ return idxList.map(function(j){ return A.map(function(row){ return row[j]; }); }); }
-    function AtA_sub(idxList){
-      var cols = colsOf(idxList);
-      var k = idxList.length;
-      var out = [];
-      for(var a=0;a<k;a++){ out.push([]); for(var bI=0;bI<k;bI++){
-        var s=0; for(var r=0;r<m;r++){ s+=cols[a][r]*cols[bI][r]; } out[a].push(s);
-      }}
-      return out;
-    }
-    function Atb_sub(idxList){
-      var cols = colsOf(idxList);
-      return cols.map(function(col){ var s=0; for(var r=0;r<m;r++){ s+=col[r]*b[r]; } return s; });
-    }
-    function computeW(){
-      var w = new Array(n).fill(0);
-      var Ax = new Array(m).fill(0);
-      for(var r=0;r<m;r++){ var s=0; for(var c=0;c<n;c++){ s+=A[r][c]*x[c]; } Ax[r]=s; }
-      var resid = b.map(function(v,r){ return v-Ax[r]; });
-      for(var c2=0;c2<n;c2++){
-        var s2=0; for(var r2=0;r2<m;r2++){ s2+=A[r2][c2]*resid[r2]; }
-        w[c2]=s2;
-      }
-      return w;
-    }
-
-    var maxOuter = n*3+10, outer=0;
-    while(outer++<maxOuter){
-      var w = computeW();
-      var candidates = R.filter(function(j){ return w[j]>1e-8; });
-      if(!candidates.length) break;
-      candidates.sort(function(j1,j2){ return w[j2]-w[j1]; });
-      var jStar = candidates[0];
-      P.push(jStar);
-      R = R.filter(function(j){ return j!==jStar; });
-
-      var innerGuard = 0;
-      while(innerGuard++<n*2){
-        var Psorted = P.slice().sort(function(a2,b2){return a2-b2;});
-        var zSub = solveLinearSystem(AtA_sub(Psorted), Atb_sub(Psorted));
-        var zFull = new Array(n).fill(0);
-        Psorted.forEach(function(j,idx){ zFull[j]=zSub[idx]; });
-
-        var negOnes = Psorted.filter(function(j){ return zFull[j]<=1e-10; });
-        if(!negOnes.length){
-          Psorted.forEach(function(j){ x[j]=zFull[j]; });
-          R.forEach(function(j){ x[j]=0; });
-          break;
-        }
-        var alpha = Infinity, qMove=-1;
-        Psorted.forEach(function(j){
-          if(zFull[j]<=1e-10){
-            var denom = x[j]-zFull[j];
-            if(denom>1e-12){
-              var a3 = x[j]/denom;
-              if(a3<alpha){ alpha=a3; qMove=j; }
-            }
-          }
-        });
-        if(!isFinite(alpha)) alpha=0;
-        for(var c3=0;c3<n;c3++){ x[c3] = x[c3] + alpha*(zFull[c3]-x[c3]); }
-        var moveBack = P.filter(function(j){ return x[j]<=1e-9; });
-        P = P.filter(function(j){ return x[j]>1e-9; });
-        moveBack.forEach(function(j){ x[j]=0; R.push(j); });
-        if(!P.length) break;
-      }
-    }
-    return x;
-  }
-
-  function autoSolveMix(fertIds, targets, volumeL, dilutionRatio){
-    var d = dilutionRatio||1;
-    var elementsUsed = NUTRIENT_ELEMENTS.filter(function(e){ return (targets[e.key]||0)>0; }).map(function(e){ return e.key; });
-    if(!elementsUsed.length || !fertIds.length) return [];
-    var A = elementsUsed.map(function(elKey){
-      return fertIds.map(function(fid){
-        var f = getFertilizer(fid);
-        var pct = f && f.comp[elKey] ? f.comp[elKey] : 0;
-        return (pct/100*1000/volumeL)/d;
-      });
-    });
-    var bVec = elementsUsed.map(function(elKey){ return targets[elKey]||0; });
-    var x = nnls(A, bVec);
-    return fertIds.map(function(fid,idx){ return {fertilizerId:fid, grams:+x[idx].toFixed(3)}; }).filter(function(m){ return m.grams>0.0005; });
-  }
 
   /* ---------- tasks (reuse the generic date-keyed readings pattern, source='tasks', no systemId) ---------- */
   function escH(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -5909,7 +5953,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   }
   function leaveSweepSoon(){ clearTimeout(leaveTimer); leaveTimer = setTimeout(leaveSweep, 1500); }
   function leaveSweep(){
-    if(!currentUser || leaveSweeping || !leaves.length || !appUsers.length) return;
+    if(!currentUser || leaveSweeping || !leaves.length || !appUsers.length || !canEdit('tasks')) return;   // تحويل مهام الناس لصاحب صلاحية المهام بس
     if(db && !bootAllSeen) return;
     var today = todayStr(), jobs = [], moved = {};
     leaves.forEach(function(lv){
@@ -6783,6 +6827,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     return L.join('\n');
   }
   function shareReportText(text){
+    text = trLines(text);   // التقرير بلغة الواجهة
     if(navigator.share){ navigator.share({text: text}).catch(function(){}); return; }
     window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank', 'noopener');
   }
@@ -7648,13 +7693,22 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
           '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="user-is-admin" style="width:auto;"'+(isAdminNow?' checked':'')+'> مدير (كل الصلاحيات + تبويب الإعدادات)</label></div>'+
         '</div>'+
         '<div id="user-perm-rows" style="'+(isAdminNow?'display:none;':'')+'">'+permRowsHtml+'</div>'+
-        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(existingUser?'حفظ التعديل':'إضافة الحساب')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="user-cancel-btn">إلغاء</button></div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">'+(existingUser?'حفظ التعديل':'إضافة الحساب')+'</button> <button type="button" class="btn btn-ghost btn-sm" id="user-cancel-btn">إلغاء</button>'+
+          (existingUser && (!currentUser || existingUser.username.toLowerCase()!==currentUser.toLowerCase()) ? ' <button type="button" class="btn btn-ghost btn-sm" id="user-reset-pw">🔒 كلمة مرور جديدة</button>' : '')+'</div>'+
       '</form>';
 
     $('#user-is-admin').addEventListener('change', function(){
       $('#user-perm-rows').style.display = this.checked ? 'none' : 'block';
     });
     $('#user-cancel-btn').addEventListener('click', function(){ holder.innerHTML=''; });
+    /* كلمة مرور جديدة للموظف: على Firebase بيوصله رابط على الإيميل، وعلى السيرفر المحلي بتظهر للمدير كلمة مؤقتة يديهاله */
+    var rpw = $('#user-reset-pw');
+    if(rpw) rpw.addEventListener('click', function(){
+      var em = existingUser.username, local = !!(window.firebase && firebase.__local);
+      if(!confirm(local ? 'تعمل كلمة مرور مؤقتة جديدة للموظف ده؟ كلمته القديمة هتبطل ويخرج من كل الأجهزة.' : 'نبعت للموظف رابط تغيير كلمة المرور على الإيميل بتاعه؟')) return;
+      if(!fbAuth) return;
+      fbAuth.sendPasswordResetEmail(em).then(function(){ if(!local) toast('بعتنا للموظف رابط تغيير كلمة المرور'); }, function(e){ toast(friendlyAuthError(e)); });
+    });
     $('#user-form').addEventListener('submit', function(ev){
       ev.preventDefault();
       var username = $('#user-username').value.trim();
@@ -8466,23 +8520,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       : '<p class="empty-note">لسه مفيش حصاد مسجل للنظام ده.</p>';
 
     inner.innerHTML =
-      '<div data-sub="entry pipes rows charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — سجل الحصاد</h2></div></div>'+
-      '<div data-sub="entry"><h2 class="section-title" style="margin-top:0;">تسجيل حصاد جديد</h2>'+
-      '<form class="entry-form" id="harvest-form">'+
-        '<div class="form-grid">'+
-          '<div class="field-sm full" id="hv-phi"></div>'+
-          '<div class="field-sm full"><label>التاريخ والوقت</label><input type="datetime-local" class="ltr" id="hv-ts" required></div>'+
-          '<div class="field-sm"><label>الصنف / المحصول</label>'+cropFieldHtml('hv-crop','',true)+'</div>'+
-          '<div class="field-sm"><label>الكمية</label><input type="number" step="any" min="0.001" class="ltr" id="hv-qty" required></div>'+
-          '<div class="field-sm"><label>الوحدة</label><select id="hv-unit">'+HARVEST_UNITS.map(function(u){ return '<option value="'+u+'">'+HARVEST_UNIT_LABELS[u]+'</option>'; }).join('')+'</select></div>'+
-          '<div class="field-sm"'+(isFruitSys(selectedSystemId) ? ' style="display:none;"' : '')+'><label>عدد المواسير اللي اتحصدت (اختياري)</label><input type="number" step="1" min="1" class="ltr" id="hv-pipes"></div>'+
-          '<div class="field-sm"'+(isFruitSys(selectedSystemId) ? ' style="display:none;"' : '')+'><label>المخطط</label><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="hv-pipes-deduct" checked style="width:auto;"> اخصمها من مخطط المواسير</label></div>'+
-          '<p class="hint full" id="hv-pipes-hint" style="margin:0;"></p>'+
-          '<div class="field-sm full"><label>ملاحظة (اختياري)</label><input type="text" maxlength="200" id="hv-note"></div>'+
-        '</div>'+
-        '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm">حفظ الحصاد</button></div>'+
-      '</form></div>'+
-      '<div data-sub="entry"><p class="hint">🌱 المايكروجرين مش بيتسجل من هنا: من تبويب المشتل دوس «حصاد» على الصينية، وهيتسجل في الحصاد على طول.</p></div>'+
+      '<div data-sub="pipes rows charts records"><div class="system-header"><h2>'+escH(systemLabel(sys))+' — سجل الحصاد</h2></div></div>'+
       (function(){ var mh = microHarvestHtml(); return mh ? '<div data-sub="micro">'+mh+'</div>' : ''; })()+
       '<div data-sub="pipes"><details class="chart-card" id="pipe-section"'+(pipeSectionClosed?'':' open')+' style="margin-bottom:14px;"><summary style="cursor:pointer;font-weight:700;">🌿 مخطط المواسير</summary><div style="margin-top:10px;">'+pipeInfographicHtml()+'</div></details></div>'+
       '<div data-sub="rows" id="rows-section">'+safeStr(rowInfographicHtml)+'</div>'+
@@ -8491,69 +8529,19 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
         '<h2 class="section-title">مخطط المحصول</h2>'+
         '<div class="range-filter" id="harvest-crop-pills">'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-crop-pill'+(c===harvestChartCrop?' active':'')+'" data-crop="'+escH(c)+'">'+escH(c)+'</button>'; }).join('')+'</div>'+
         '<label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0;"><input type="checkbox" id="harvest-compare-season" style="width:auto;"'+(harvestCompareLastSeason?' checked':'')+'> قارن بنفس الفترة من الموسم اللي فات (سنة قبل كده)</label>'+
-        '<div class="chart-card"><h3>حصاد '+(harvestChartCrop||'')+' عبر الزمن</h3><div class="chart-wrap"><div id="harvest-chart" class="svg-chart-holder"></div></div><p class="hint" id="harvest-chart-total" style="margin:6px 0 0;"></p></div>'
+        '<div class="chart-card"><h3>حصاد '+escH(harvestChartCrop||'')+' عبر الزمن</h3><div class="chart-wrap"><div id="harvest-chart" class="svg-chart-holder"></div></div><p class="hint" id="harvest-chart-total" style="margin:6px 0 0;"></p></div>'
       : '')+'</div>'+
       '<div data-sub="records"><div class="table-toolbar"><h2 class="section-title" style="margin:0;">سجل الحصاد</h2><button class="btn btn-ghost btn-sm" id="harvest-export">تصدير CSV</button></div>'+
       (crops.length ? '<div class="range-filter" id="harvest-filter-pills"><button type="button" class="range-pill harvest-filter-pill'+(!harvestFilterCrop?' active':'')+'" data-crop="">كل الأصناف</button>'+crops.map(function(c){ return '<button type="button" class="range-pill harvest-filter-pill'+(c===harvestFilterCrop?' active':'')+'" data-crop="'+escH(c)+'">'+escH(c)+'</button>'; }).join('')+'</div>' : '')+
       lfBarHtml('harvest')+
       '<div class="hint" id="harvest-log-totals" style="margin:0 0 8px;"></div>'+
-      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الدفعة</th><th>الصنف</th><th>الكمية</th><th>المواسير</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الدفعة</th><th>الصنف</th><th>الكمية</th><th>المصدر</th><th>بواسطة</th><th>ملاحظة</th><th></th></tr></thead><tbody id="harvest-tbody"></tbody></table></div>'+
       '<p class="empty-note" id="harvest-empty" style="display:none;">لا توجد سجلات.</p></div>';
 
-    $('#hv-ts', inner).value = nowLocalInputValue();
     $all('.mh-del', inner).forEach(function(b){ b.addEventListener('click', function(){ deleteHarvest(b.getAttribute('data-id')); }); });
     var pipeDet = $('#pipe-section', inner); if(pipeDet) pipeDet.addEventListener('toggle', function(){ pipeSectionClosed = !pipeDet.open; });
     wirePipeInfographic();
     safe(wireRowInfographic);
-
-    function updateHvPipesHint(){
-      var crop = $('#hv-crop', inner).value.trim(), hint = $('#hv-pipes-hint', inner);
-      if(!hint) return;
-      if(!crop){ hint.textContent = ''; return; }
-      var map = getPipeMap(selectedSystemId), key = cropKey(crop), tot = 0, ready = 0;
-      map.groups.forEach(function(g){
-        if(cropKey(g.crop)!==key) return;
-        tot += g.pipes;
-        var st = pipeStageOf(g, 0).st;
-        if(st==='ready' || st==='over') ready += g.pipes;
-      });
-      hint.textContent = tot ? ('في مخطط النظام: '+tot+' ماسورة '+crop+' ('+ready+' جاهزة للحصاد).') : ('مفيش مواسير '+crop+' في مخطط النظام.');
-    }
-    function updateHvPhi(){ var box = $('#hv-phi', inner); if(box) box.innerHTML = phiWarnHtml(phiRisks(selectedSystemId, String($('#hv-ts', inner).value||'').slice(0,10) || todayStr())); }
-    $('#hv-ts', inner).addEventListener('change', updateHvPhi); updateHvPhi();
-    $('#hv-crop', inner).addEventListener('input', updateHvPipesHint);
-    $('#hv-crop', inner).addEventListener('change', updateHvPipesHint);
-    updateHvPipesHint();
-
-    $('#harvest-form', inner).addEventListener('submit', function(ev){
-      ev.preventDefault();
-      var crop = $('#hv-crop', inner).value.trim();
-      var qty = parseFloat($('#hv-qty', inner).value);
-      var pipesRaw = $('#hv-pipes', inner).value.trim();
-      var pipes = pipesRaw==='' ? 0 : parseFloat(pipesRaw);
-      var deduct = $('#hv-pipes-deduct', inner).checked;
-      if(!crop){ toast('اكتب اسم الصنف'); return; }
-      if(!(qty>0)){ toast('اكتب كمية صحيحة'); return; }
-      if(pipesRaw!=='' && !(pipes>=1 && Math.floor(pipes)===pipes)){ toast('عدد المواسير لازم يكون رقم صحيح من 1 فوق'); return; }
-      var pipeRes = null;
-      var hvTs = $('#hv-ts', inner).value || nowLocalInputValue(), phiR = phiRisks(selectedSystemId, hvTs.slice(0,10));
-      if(phiR.length && !confirm('⚠️ تحذير مدة الأمان (PHI):\n'+phiR.map(function(r){ return '• '+r.product+' اتعمل '+r.applied+' ← آمن من '+r.safe; }).join('\n')+'\n\nمتأكد إنك عايز تسجّل الحصاد ده؟')) return;
-      saveHarvest({
-        id: genId(), systemId: selectedSystemId, ts: hvTs, lot: harvestLotFor(selectedSystemId, hvTs),
-        cropName: crop, quantity: qty, unit: $('#hv-unit', inner).value, pipes: pipes||0,
-        note: $('#hv-note', inner).value||'', by: currentUser||'', createdAt: Date.now()
-      }).then(function(){
-        if(pipes>0 && deduct){
-          pipeRes = pipeHarvestFromLog(selectedSystemId, crop, pipes, String($('#hv-ts', inner).value||'').slice(0,10) || todayStr());
-          return pipeRes.job;
-        }
-      }).then(function(){
-        if(pipeRes && pipeRes.deducted>0) logAudit('edit','nursery','خصم '+pipeRes.deducted+' ماسورة '+crop+' من المخطط بعد الحصاد');
-        toast('تم حفظ الحصاد'+(pipeRes?('، '+pipeRes.text):''));
-        harvestChartCrop = crop;
-        renderHarvestPanel();
-      });
-    });
 
     var compareChk = $('#harvest-compare-season', inner);
     if(compareChk) compareChk.addEventListener('change', function(){ harvestCompareLastSeason = this.checked; renderHarvestPanel(); });
@@ -8616,7 +8604,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
           '<td class="ltr num" style="font-size:.74rem;">'+escH(h.lot||'—')+'</td>'+
           '<td>'+escH(h.cropName)+'</td>'+
           '<td class="num ltr">'+h.quantity+' '+HARVEST_UNIT_LABELS[h.unit]+'</td>'+
-          '<td class="num">'+(h.pipes>0 ? h.pipes : '—')+'</td>'+
+          '<td class="num">'+(h.pipes>0 ? (h.pipes+(h.maxCuts>1 && h.cut ? ' <span class="hint" style="margin:0;">(قطفة '+h.cut+'/'+h.maxCuts+(h.final ? ' — أخيرة' : '')+')</span>' : '')) : (h.rows>0 ? h.rows+' خط' : '—'))+'</td>'+
           '<td>'+escH(h.by||'—')+'</td>'+
           '<td>'+escH(h.note||'—')+'</td>'+
           '<td><button class="del-btn hv-trace" title="تتبّع المصدر">🔎</button> <button class="del-btn hv-del" title="حذف">✕</button></td>';
@@ -8657,19 +8645,19 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     });
     return msgs;
   }
-  var qeSource = 'irrigation';
   /* ====================== التبويبات الفرعية (محرك واحد لكل التبويبات اللي ينفع تتقسم) ======================
      كل تبويب فيه أغلفة data-sub="اسم القسم"؛ والمحرك بيعرض القسم المختار بس وبيحفظ آخر قسم على الجهاز. */
   var SUBTABS = {
     water:   {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['schedule','🕒 جدول الري'],['charts','📈 المخططات'],['records','📋 السجلات'],['instruments','🔧 معايرة الأجهزة']]},
     climate: {def:'entry',    tabs:[['entry','📝 إدخال القراءة'],['summary','📊 الملخص'],['charts','📈 المخططات'],['records','📋 السجل']]},
     soil:    {def:'entry',    tabs:[['entry','📝 إدخال القياسات'],['charts','📈 المخططات'],['records','📋 السجل']]},
-    harvest: {def:'entry',    tabs:[['entry','📝 تسجيل حصاد'],['pipes','🌿 المواسير'],['rows','🍅 خطوط الزراعة'],['micro','🌱 المايكروجرين'],['charts','📈 الإنتاج والمخطط'],['records','📋 السجل']]},
+    harvest: {def:'pipes',    tabs:[['pipes','🌿 المواسير'],['rows','🍅 خطوط الزراعة'],['micro','🌱 المايكروجرين'],['charts','📈 الإنتاج والمخطط'],['records','📋 السجل']]},
     pests:   {def:'entry',    tabs:[['entry','📝 تسجيل إصابة'],['bio','🐞 المكافحة الحيوية'],['trend','📈 الاتجاه'],['records','📋 السجل']]},
     nursery: {def:'entry',    tabs:[['entry','📝 تسجيل صينية'],['auto','🗓️ خطة الزراعة'],['records','📋 السجل'],['plan','📊 الملخص والخطة']]},
     tasks:   {def:'mine',     tabs:[['mine','✅ مهامّك'],['assign','➕ تعيين مهمة'],['all','📋 كل المهام'],['sops','📖 الإجراءات']]},
     spray:   {def:'schedule', tabs:[['schedule','📅 الجدول'],['entry','➕ إضافة رش/تسميد']]},
     overview:{def:'main',     tabs:[['main','🏠 الأساسي'],['harvest','🌿 الحصاد'],['sw','💧 مياه النظام'],['sc','🌡️ مناخ الصوبة'],['so','🧺 حصاد ومهام النظام'],['trend','📈 الاتجاهات'],['costs','💰 التكاليف'],['stock','📦 المخازن والأسمدة']]},
+    ai:      {def:'new',      tabs:[['new','✨ تحليل جديد'],['reports','📋 التقارير']]},
     growth:  {def:'entry',    tabs:[['entry','📝 إدخال وزنة'],['summary','📊 الملخص والتنبؤ'],['records','📋 السجل'],['ref','🌿 المعايير المثلى']]}
   };
   /* قسم "إدخال/تسجيل" بيظهر بس للي عنده صلاحية تعديل على التاب (المدير أو صلاحية "تعديل") */
@@ -9287,7 +9275,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       myTasksHtml = myTasks.map(function(t){
         var dateKey = t.ts.slice(0,10);
         var dateLabel = dateKey===today ? 'النهاردة' : fmtTs(t.ts).split(' ')[0];
-        return '<div class="task-card" data-taskid="'+t.id+'" data-datekey="'+dateKey+'">'+
+        return '<div class="task-card my-task" data-taskid="'+t.id+'" data-datekey="'+dateKey+'">'+
           '<div class="task-card-head"><span class="task-date-badge">'+dateLabel+'</span>'+(t.greenhouse?('<span class="task-gh">'+escH(t.greenhouse)+'</span>'):'')+'</div>'+
           '<div class="task-title">'+escH(t.title)+(t.recur&&t.recur.weekdays&&t.recur.weekdays.length?' <span class="hint" style="font-weight:400;">🔁 '+recurDaysLabel(t.recur)+'</span>':'')+'</div>'+
           (t.note ? '<div class="task-note">'+escH(t.note)+'</div>' : '')+
@@ -9487,6 +9475,8 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       });
     });
     applyPermissionLock($('#tasks-body'), 'tasks');
+    // مهامك انت: تقدر تخلّصها حتى لو صلاحيتك على المهام عرض بس
+    $all('.my-task .task-done-btn', body).forEach(function(b){ b.disabled = false; b.style.opacity = ''; b.style.pointerEvents = ''; });
   }
 
   /* ---------- صور الإجراءات (SOP) ---------- */
@@ -9573,11 +9563,6 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       toast('تعذر حفظ الملف');
     });
   }
-
-  /* ---------- Fertilizer Equations panel ---------- */
-  function fmtPpm(v){ return fmtNum(v); }
-
-
 
   /* ---------- سجل تحضير الخزان: كل مرة بتتحضّر فيها خلطة تسميد (النظام، الحجم، الأسمدة بالجرام) ---------- */
   var tlDraft = null, tlOpen = false;
@@ -14106,9 +14091,9 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     var sevCls = c.severity==='high' ? 'alert' : (c.severity==='med' ? 'warn' : 'good');
     var late = c.due && c.status!=='resolved' && c.status!=='closed' && c.due < todayStr();
     var next = {new:'review', review:'resolved', resolved:'closed'}[c.status];
-    return '<div class="q-comp st-'+c.status+'" data-id="'+escH(c.id)+'"'+lfAttr('qcomp', c.date)+'>'+
+    return '<div class="q-comp st-'+escH(c.status||'')+'" data-id="'+escH(c.id)+'"'+lfAttr('qcomp', c.date)+'>'+
       '<div class="q-order-head"><strong>'+escH(c.customer)+(c.orderRef?(' — #'+escH(c.orderRef)):'')+'</strong><span class="hint" style="margin:0;">'+escH(c.date)+'</span></div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;"><span class="status-pill '+(c.status==='closed'||c.status==='resolved'?'good':'alert')+'">'+Q_STATUS[c.status]+'</span><span class="status-pill '+sevCls+'">'+Q_SEV[c.severity]+'</span><span class="status-pill">'+escH(c.type||'')+'</span>'+(late?'<span class="status-pill alert">متأخرة</span>':'')+'</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;"><span class="status-pill '+(c.status==='closed'||c.status==='resolved'?'good':'alert')+'">'+escH(Q_STATUS[c.status]||c.status||'')+'</span><span class="status-pill '+sevCls+'">'+escH(Q_SEV[c.severity]||c.severity||'')+'</span><span class="status-pill">'+escH(c.type||'')+'</span>'+(late?'<span class="status-pill alert">متأخرة</span>':'')+'</div>'+
       (c.product?('<div><strong>'+escH(c.product)+'</strong>'+(c.qty?(' — '+qFmt(qNum(c.qty))+' '+Q_UNITS[c.unit||'kg']):'')+'</div>'):'')+
       '<div style="margin:4px 0;">'+escH(c.description)+'</div>'+
       (c.rootCause?('<div class="hint" style="margin:2px 0;">🔎 السبب: '+escH(c.rootCause)+'</div>'):'')+(c.action?('<div class="hint" style="margin:2px 0;">🛠️ الإجراء: '+escH(c.action)+'</div>'):'')+
@@ -14365,7 +14350,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
       db.collection('trash').doc(id).delete().then(function(){ toast('اتمسح'); }).catch(function(){ toast('تعذر المسح'); });
     }); });
   }
-  function renderSettingsPanels(){ safe(renderReadStats); safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderElecSettings); safe(renderNurseryCostSettings); safe(renderUserDictSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
+  function renderSettingsPanels(){ safe(renderReadStats); safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderElecSettings); safe(renderNurseryCostSettings); safe(renderUserDictSettings); safe(renderAiSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
   function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
   /* بيرسم التبويب المفتوح بس — باقي التبويبات بتترسم أول ما تفتحها (setupTabs) */
   /* ====================== المخططات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + مخططات مخصصة ====================== */
@@ -16141,6 +16126,362 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     }).catch(function(){ box.innerHTML = '<p class="hint">تعذر البحث — تأكد من النت.</p>'; });
   }
 
+  /* ================= المحلّل الذكي (المرحلة الأولى) =================
+     المتصفح بيجهّز «ملخص بيانات» من حسابات البرنامج نفسه (من غير أسماء عملاء ولا إيميلات ولا تليفونات)،
+     والسيرفر المحلي بيبعته للمزوّد اللي اخترته (محلي / Claude / ChatGPT / غيره) ويحفظ التقرير في aiReports. */
+  var AI_KINDS = {farm:'تقرير شامل للمزرعة', mix:'مراجعة الخلطة السمادية', spray:'مراجعة جدول الرش والتسميد', irrigation:'مراجعة الري'};
+  var AI_PROV = {local:'محلي (على كمبيوتر المزرعة)', claude:'Claude', chatgpt:'ChatGPT', custom:'مزوّد تاني'};
+  var AI_ERR = {
+    'not-ready':'المزوّد ده مش متظبط — ظبطه من الإعدادات ← المحلّل الذكي', 'daily-limit':'وصلت للحد اليومي للتحليلات — زوّده من الإعدادات لو محتاج',
+    'busy':'فيه تحليلين شغّالين دلوقتي — استنى لما يخلصوا', 'auth':'مفتاح المزوّد غلط أو منتهي', 'rate':'المزوّد رافض مؤقتًا (كتر الطلبات أو الرصيد خلص) — جرّب بعدين',
+    'model':'اسم الموديل مش موجود عند المزوّد (أو مش متحمّل على الجهاز للمحلي)', 'network':'مش قادر أوصل للمزوّد — للمحلي اتأكد إن برنامج Ollama شغّال على الكمبيوتر',
+    'timeout':'التحليل خد وقت أطول من اللازم واتلغى', 'refusal':'النموذج رفض الطلب', 'interrupted':'السيرفر وقف أثناء التحليل — شغّله تاني',
+    'empty':'النموذج رجّع رد فاضي', 'sdk-missing':'مكتبة Claude مش موجودة جنب السيرفر', 'permission-denied':'مفيش صلاحية'
+  };
+  var aiCfg = null, aiCfgBusy = false, aiCfgErr = '', aiKind = 'farm', aiDays = 7, aiCosts = false, aiProv = '', aiQ = '', aiOpen = null, aiPreview = false, aiBusy = false;
+  var aiReports = [], aiUnsub = null, aiSetMsg = {}, aiSeen = {};
+  function aiLocal(){ return !!(window.firebase && firebase.__local && firebase.__api); }
+  function aiLevel(){ if(currentUserRole === 'admin') return 'edit'; var v = currentUserPermissions && currentUserPermissions.ai; return (v === 'view' || v === 'edit') ? v : 'none'; }
+  function aiErrText(code, detail){ return AI_ERR[code] || ('حصلت مشكلة: '+(detail || code || '')); }
+  function aiLoadCfg(force){
+    if(!aiLocal() || aiLevel() === 'none' || aiCfgBusy || (aiCfg && !force)) return;
+    aiCfgBusy = true;
+    firebase.__api('GET', '/ai/config').then(function(c){ aiCfg = c; aiCfgErr = ''; if(!aiProv) aiProv = c.default; }, function(e){ aiCfgErr = (e && e.code) || 'error'; })
+      .then(function(){ aiCfgBusy = false; if(panelOn('panel-ai')) renderAiPanel(); if(panelOn('panel-settings')) renderAiSettings(); });
+  }
+  /* التقارير بتوصل بالتحديث اللحظي: لما تحليل يخلص وانت في تاب تاني بيظهرلك تنبيه */
+  function aiListen(){
+    if(aiUnsub || !db || !aiLocal() || aiLevel() === 'none') return;
+    aiUnsub = db.collection('aiReports').orderBy('createdAt', 'desc').limit(40).onSnapshot(function(snap){
+      var first = !aiReports.length && !Object.keys(aiSeen).length;
+      aiReports = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      aiReports.forEach(function(r){
+        var was = aiSeen[r.id]; aiSeen[r.id] = r.status;
+        if(!first && was === 'running' && r.status !== 'running' && r.by === currentUser) toast(r.status === 'done' ? '✨ التحليل خلص: '+(AI_KINDS[r.kind] || '') : '⛔ '+aiErrText(r.error, r.detail), 6000);
+      });
+      if(panelOn('panel-ai')) renderAiPanel();
+    }, function(err){ console.error('aiReports', err); });
+  }
+
+  /* ---------- ملخص البيانات اللي بيتبعت ---------- */
+  function aiR(v, d){ v = parseFloat(v); if(!isFinite(v)) return null; var m = Math.pow(10, d == null ? 2 : d); return Math.round(v*m)/m; }
+  function aiStats(entries, keys, fromMs){
+    var list = (entries || []).filter(function(e){ var t = lgTs(e.ts); return isFinite(t) && t >= fromMs; }).sort(function(a, b){ return String(a.ts).localeCompare(String(b.ts)); });
+    if(!list.length) return null;
+    var out = {readings:list.length, last:String(list[list.length-1].ts || '').replace('T', ' ')};
+    keys.forEach(function(k){
+      var vals = list.map(function(e){ return parseFloat(e[k]); }).filter(function(v){ return isFinite(v); });
+      if(!vals.length) return;
+      var s = vals.reduce(function(a, b){ return a + b; }, 0);
+      out[k] = {avg:aiR(s/vals.length), min:aiR(Math.min.apply(null, vals)), max:aiR(Math.max.apply(null, vals)), last:aiR(vals[vals.length-1])};
+    });
+    return out;
+  }
+  function aiIrrOf(sysId){
+    var sys = getSystem(sysId); if(!sys) return null;
+    var fruit = isFruitSys(sysId), plan = getIrrigPlan(sysId), a = irrAdvGet(plan, fruit), e = irrAdvEff(a, fruit);
+    var leafy = !fruit ? irrLeafyCalc(sysId, plan) : null, fr = fruit ? irrFruitCalc(plan) : null;
+    var plants = e.plants > 0 ? e.plants : (leafy ? leafy.plants : 0), totalLpm = fruit ? fr.totalLpm : leafy.totalLpm;
+    var prof = irrHourlyProfile(ghNameOf(sys)), res = prof ? lgIrrigPlan(prof.hours, {kc:e.kc, density:e.density, leach:e.leach, plants:plants, eventMl:e.eventMl, totalLpm:totalLpm, u2:e.wind}) : null;
+    var sched = {}; Object.keys(plan || {}).forEach(function(k){ if(k !== 'hist' && k !== 'systemId' && k !== 'updatedAt' && k !== 'by') sched[k] = plan[k]; });
+    var o = {crop:a.crop, stage:a.stage, kc:aiR(e.kc, 3), plantsPerM2:aiR(e.density, 2), leachPct:e.leach, plants:plants, systemFlowLpm:aiR(totalLpm, 2), schedule:sched};
+    if(res){
+      o.needPerPlantLitersToday = aiR(res.dailyMl/1000, 3); o.needSystemLitersToday = plants > 0 ? aiR(res.dailyMl*plants/1000, 1) : null;
+      o.peak = {hour:res.peak.h, mlPerPlantPerHour:aiR(res.peak.ml, 1)};
+      if(prof.noRad) o.warning = 'no lux readings — need underestimated';
+      if(res.events && res.events.length) o.suggestedIrrigations = res.events.slice(0, 30).map(function(ev){ return {time:ev.t, mlPerPlant:aiR(ev.ml, 0), minutes:aiR(ev.minutes, 1)}; });
+    } else o.need = 'not calculated — no climate readings today/yesterday';
+    return o;
+  }
+  function aiPipesOf(sysId){
+    var map = getPipeMap(sysId), out = {};
+    if(map.groups && map.groups.length){
+      out.totalPipes = map.totalPipes; out.plantsPerPipe = map.plantsPerPipe;
+      out.groups = map.groups.map(function(g){ var r = pipeStageOf(g, 0), c = r.clock; return {crop:g.crop, pipes:g.pipes, planted:g.plantDate, stage:r.st, cutsDone:c.done, maxCuts:c.max, daysToReady:Math.max(0, aiR(c.target - c.age, 0))}; });
+    }
+    var rows = Array.isArray(map.rows) ? map.rows : [];
+    if(rows.length){ var by = {}; rows.forEach(function(r){ var k = r.crop || '—'; by[k] = by[k] || {crop:k, rows:0, plants:0, planted:r.plantDate || ''}; by[k].rows++; by[k].plants += parseInt(r.plants, 10) || 0; }); out.tomatoRows = Object.keys(by).map(function(k){ return by[k]; }); }
+    return Object.keys(out).length ? out : null;
+  }
+  function aiHarvestOf(fromStr){
+    var by = {};
+    harvestLog.forEach(function(h){
+      if(String(h.ts || '').slice(0, 10) < fromStr) return;
+      var k = (h.cropName || '—')+'|'+(h.unit || ''); by[k] = by[k] || {crop:h.cropName || '—', unit:HARVEST_UNIT_LABELS[h.unit] || h.unit || '', quantity:0, records:0, pipes:0};
+      by[k].quantity += parseFloat(h.quantity) || 0; by[k].records++; by[k].pipes += parseInt(h.pipes, 10) || 0;
+    });
+    return Object.keys(by).map(function(k){ by[k].quantity = aiR(by[k].quantity, 2); return by[k]; });
+  }
+  function aiPesticideInfo(name){
+    var it = inventoryItems.filter(function(x){ return x.type === 'pesticide' && cropKey(x.name) === cropKey(name); })[0];
+    return it ? {activeIngredient:it.activeIngredient || '', targets:it.targets || '', phiDays:it.phiDays || null, stock:(it.quantity != null ? it.quantity+' '+(it.unit || '') : '')} : null;
+  }
+  function aiSprayOf(fromStr, toStr){
+    return sprayPlan.filter(function(e){ return e.date >= fromStr && e.date <= toStr; }).sort(function(a, b){ return String(a.date).localeCompare(String(b.date)); }).slice(0, 80).map(function(e){
+      var o = {date:e.date, kind:(SPRAY_KINDS[e.kind] || SPRAY_KINDS.foliar).label, product:e.product || '', dose:e.dose || '', greenhouses:e.halls || [], state:sprayState(e)};
+      var pi = e.kind !== 'fertilizer' ? aiPesticideInfo(e.product || '') : null; if(pi) o.product_info = pi;
+      if(e.skipped && e.reason) o.skipReason = e.reason;
+      return o;
+    });
+  }
+  function aiPestsOf(fromStr){
+    return pestLog.filter(function(p){ return !p.eradicated || String(p.ts || '').slice(0, 10) >= fromStr; }).slice(-40).map(function(p){
+      var tr = pestTreatmentsOf(p) || [];
+      return {problem:p.problemName || '', greenhouse:p.greenhouse || '', severity:p.severity || '', date:String(p.ts || '').slice(0, 10), eradicated:!!p.eradicated, treated:!!p.treated || tr.length > 0,
+        treatments:tr.slice(-5).map(function(t){ return {date:String(t.ts || '').slice(0, 10), product:t.pesticideName || '', dose:t.dose || ''}; }).concat(p.pesticideName ? [{date:String(p.ts || '').slice(0, 10), product:p.pesticideName, dose:p.dose || ''}] : [])};
+    });
+  }
+  function aiCommon(S){
+    var part = function(name, fn){ try{ var v = fn(); if(v != null && !(Array.isArray(v) && !v.length)) S[name] = v; }catch(e){ console.error('ai snapshot', name, e); } };
+    return part;
+  }
+  function aiSnapFarm(days, withCosts){
+    var fromMs = Date.now() - days*86400000, fromStr = planAddDays(todayStr(), -days), S = {kind:'farm', date:todayStr(), periodDays:days, targetRanges:{ph:settings.ph, ec:settings.ec, solutionTemp:settings.temp}};
+    var part = aiCommon(S);
+    part('greenhouses', function(){ return greenhouseGroups().map(function(g){ return {name:g.name, type:ghTypeByName(g.name) === 'fruit' ? 'fruit' : 'leafy', climate:aiStats(flattenEntries('climate', g.name), ['temp', 'rh', 'lux'], fromMs)}; }); });
+    part('systems', function(){ return systems.map(function(sy){
+      var fruit = sysGType(sy) === 'fruit', o = {name:sy.name, greenhouse:ghNameOf(sy), type:fruit ? 'fruit' : 'leafy'};
+      if(fruit) o.soil = aiStats(flattenEntries('soil', sy.id), ['ph', 'ec', 'moist', 'temp'], fromMs);
+      else { o.water = {}; ['irrigation', 'drainage', 'tank'].forEach(function(src){ var st = aiStats(flattenEntries(src, sy.id), ['ph', 'ec', 'temp'], fromMs); if(st) o.water[src] = st; }); }
+      try{ o.irrigation = aiIrrOf(sy.id); }catch(e){}
+      try{ o.pipesAndRows = aiPipesOf(sy.id); }catch(e){}
+      return o;
+    }); });
+    part('appAlerts', function(){ return farmInsightLines().map(function(x){ return x.t; }); });
+    part('weatherAlerts', function(){ var x = wxSame(wxExtra) ? wxExtra : null; return x ? wxAlertList(x, wxThr()).map(function(a){ return a.t; }) : null; });
+    part('harvest', function(){ return aiHarvestOf(fromStr); });
+    part('pests', function(){ return aiPestsOf(fromStr); });
+    part('sprayPlan', function(){ return aiSprayOf(fromStr, planAddDays(todayStr(), 14)); });
+    part('preHarvestIntervalToday', function(){ var out = []; systems.forEach(function(sy){ var r = phiRisks(sy.id, todayStr()); if(r.length) out.push({system:sy.name, items:r.map(function(x){ return {product:x.product, applied:x.applied, safeFrom:x.safe}; })}); }); return out; });
+    part('lowStock', function(){ return inventoryItems.filter(invIsLow).map(function(x){ return {name:x.name, type:x.type, quantity:x.quantity, unit:x.unit || '', alertAt:x.minQty}; }); });
+    part('tasks', function(){
+      var t = flattenTasks(), today = todayStr(), pend = t.filter(function(x){ return x.status === 'pending'; });
+      return {open:pend.length, overdue:pend.filter(function(x){ return String(x.ts).slice(0, 10) < today; }).length, doneInPeriod:t.filter(function(x){ return x.status === 'done' && String(x.ts).slice(0, 10) >= fromStr; }).length,
+        overdueTitles:pend.filter(function(x){ return String(x.ts).slice(0, 10) < today; }).slice(-10).map(function(x){ return x.title || x.sopTitle || ''; })};
+    });
+    if(withCosts){ S.costs = true; part('costPerProduct', function(){ var c = costByProduct(days); return c.rows.map(function(r){ return {product:r.name, kg:aiR(r.kg, 1), pieces:r.pieces, totalEGP:aiR(r.total, 0), perKgEGP:aiR(r.perKg, 2), perPieceEGP:aiR(r.perPiece, 2), fertilizer:aiR(r.fert, 0), electricity:aiR(r.elec, 0), seedAndMedium:aiR(r.seed + r.medium, 0), sortingLossKg:aiR(r.waste, 1)}; }); }); }
+    return S;
+  }
+  function aiSnapMix(){
+    var S = {kind:'mix', date:todayStr()}, part = aiCommon(S);
+    part('mix', function(){
+      var r = hbEval(), el = HB_EL, byKey = {};
+      el.forEach(function(e, j){ byKey[e.k] = j; });
+      var rows = Object.keys(currentTargets).map(function(k){ var j = byKey[k]; if(j == null) return null; return {element:el[j].n, target:currentTargets[k], achieved:r.ppm ? aiR(r.ppm[j], 2) : null, water:currentWater && currentWater[k] != null ? currentWater[k] : undefined}; }).filter(Boolean);
+      return {tankVolumeL:currentTankVolume, mode:hbCfg.mode === 'ab' ? 'A+B concentrated stock tanks' : 'direct addition', concentrationFactor:hbFactor(),
+        fertilizers:(r.items || []).map(function(m, i){ var f = getFertilizer(m.fertilizerId) || {}; return {name:f.name || '', amount:aiR(r.dispAmounts ? r.dispAmounts[i] : m.grams, 2), unit:f.liquid ? 'ml' : 'g', tank:f.tank || f.conc || '-'}; }),
+        elementsPpm:rows, ecEstimate:r.ec, ratios:r.ratios, totalCost:r.totalCost,
+        calculatorWarnings:(r.warnings || []).map(function(w){ try{ return hbWarnText(w); }catch(e){ return w.code; } })};
+    });
+    return S;
+  }
+  function aiSnapSpray(days){
+    var fromStr = planAddDays(todayStr(), -days), S = {kind:'spray', date:todayStr(), periodDays:days}, part = aiCommon(S);
+    part('sprayPlan', function(){ return aiSprayOf(fromStr, planAddDays(todayStr(), 30)); });
+    part('pests', function(){ return aiPestsOf(fromStr); });
+    part('pesticideStock', function(){ return inventoryItems.filter(function(x){ return x.type === 'pesticide'; }).map(function(x){ return {name:x.name, activeIngredient:x.activeIngredient || '', targets:x.targets || '', stages:x.stages || '', phiDays:x.phiDays || null, quantity:x.quantity, unit:x.unit || ''}; }); });
+    part('preHarvestIntervalToday', function(){ var out = []; systems.forEach(function(sy){ var r = phiRisks(sy.id, todayStr()); if(r.length) out.push({system:sy.name, items:r.map(function(x){ return {product:x.product, applied:x.applied, safeFrom:x.safe}; })}); }); return out; });
+    part('upcomingHarvest', function(){ return systems.map(function(sy){ var p = aiPipesOf(sy.id); return p ? {system:sy.name, greenhouse:ghNameOf(sy), pipes:p.groups, rows:p.tomatoRows} : null; }).filter(Boolean); });
+    part('weatherAlerts', function(){ var x = wxSame(wxExtra) ? wxExtra : null; return x ? wxAlertList(x, wxThr()).map(function(a){ return a.t; }) : null; });
+    part('diseaseRiskAlerts', function(){ return farmInsightLines().map(function(x){ return x.t; }); });
+    return S;
+  }
+  function aiSnapIrrig(days){
+    var fromMs = Date.now() - days*86400000, S = {kind:'irrigation', date:todayStr(), periodDays:days, targetRanges:{ph:settings.ph, ec:settings.ec, solutionTemp:settings.temp}}, part = aiCommon(S);
+    part('systems', function(){ return systems.map(function(sy){
+      var fruit = sysGType(sy) === 'fruit', o = {name:sy.name, greenhouse:ghNameOf(sy), type:fruit ? 'fruit' : 'leafy'};
+      try{ o.irrigation = aiIrrOf(sy.id); }catch(e){}
+      if(fruit) o.soil = aiStats(flattenEntries('soil', sy.id), ['ph', 'ec', 'moist', 'temp'], fromMs);
+      else { o.water = {}; ['irrigation', 'drainage', 'tank'].forEach(function(src){ var st = aiStats(flattenEntries(src, sy.id), ['ph', 'ec', 'temp'], fromMs); if(st) o.water[src] = st; }); }
+      return o;
+    }); });
+    part('greenhouseClimate', function(){ return greenhouseGroups().map(function(g){ return {name:g.name, climate:aiStats(flattenEntries('climate', g.name), ['temp', 'rh', 'lux'], fromMs)}; }); });
+    part('weatherAlerts', function(){ var x = wxSame(wxExtra) ? wxExtra : null; return x ? wxAlertList(x, wxThr()).map(function(a){ return a.t; }) : null; });
+    return S;
+  }
+  function aiSnapshot(){
+    if(aiKind === 'mix') return aiSnapMix();
+    if(aiKind === 'spray') return aiSnapSpray(aiDays);
+    if(aiKind === 'irrigation') return aiSnapIrrig(aiDays);
+    return aiSnapFarm(aiDays, aiCosts);
+  }
+
+  /* ---------- عرض التقرير (Markdown بسيط) ---------- */
+  function aiMd(text){
+    var out = [], list = '', inline = function(s){ return escH(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); };
+    var close = function(){ if(list){ out.push('</'+list+'>'); list = ''; } };
+    String(text || '').split('\n').forEach(function(l){
+      var t = l.trim(), m;
+      if(!t){ close(); return; }
+      if((m = /^#{1,4}\s+(.*)$/.exec(t))){ close(); out.push('<h3 class="ai-h">'+inline(m[1])+'</h3>'); return; }
+      if((m = /^[-*•]\s+(.*)$/.exec(t))){ if(list !== 'ul'){ close(); out.push('<ul>'); list = 'ul'; } out.push('<li>'+inline(m[1])+'</li>'); return; }
+      if((m = /^\d+[.)]\s+(.*)$/.exec(t))){ if(list !== 'ol'){ close(); out.push('<ol>'); list = 'ol'; } out.push('<li>'+inline(m[1])+'</li>'); return; }
+      close(); out.push('<p>'+inline(t)+'</p>');
+    });
+    close();
+    return out.join('');
+  }
+  function aiProvLabel(id){ var p = aiCfg && aiCfg.providers ? aiCfg.providers.filter(function(x){ return x.id === id; })[0] : null; return (id === 'custom' && p && p.label) ? p.label : (AI_PROV[id] || id || ''); }
+  function aiLocalTs(ms){ var d = new Date(ms || 0), p = function(n){ return (n < 10 ? '0' : '')+n; }; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes()); }
+  function aiDur(ms){ ms = parseInt(ms, 10) || 0; var s = Math.round(ms/1000); return s < 60 ? s+' ث' : Math.floor(s/60)+' د '+(s%60)+' ث'; }
+
+  function aiNewHtml(){
+    if(!aiCfg) return aiCfgErr ? '<p class="empty-note">'+escH(aiErrText(aiCfgErr))+'</p>' : '<p class="hint">⏳ بيحمّل الإعدادات…</p>';
+    var provs = aiCfg.providers || [], anyReady = provs.some(function(p){ return p.ready; });
+    var pills = Object.keys(AI_KINDS).map(function(k){ return '<button type="button" class="range-pill ai-kind'+(k === aiKind ? ' active' : '')+'" data-k="'+k+'">'+AI_KINDS[k]+'</button>'; }).join('');
+    var provOpts = provs.map(function(p){ return '<option value="'+p.id+'"'+(p.id === aiProv ? ' selected' : '')+(p.ready ? '' : ' disabled')+'>'+escH(aiProvLabel(p.id))+(p.model ? ' — '+escH(p.model) : '')+(p.ready ? '' : ' (مش متظبط)')+'</option>'; }).join('');
+    var cur = provs.filter(function(p){ return p.id === aiProv; })[0];
+    return '<div class="range-filter" style="margin-bottom:10px;">'+pills+'</div>'+
+      '<form class="entry-form" id="ai-form"><div class="form-grid">'+
+        (aiKind !== 'mix' ? '<div class="field-sm"><label>الفترة</label><select id="ai-days">'+[7, 14, 30].map(function(d){ return '<option value="'+d+'"'+(d === aiDays ? ' selected' : '')+'>آخر '+d+' يوم</option>'; }).join('')+'</select></div>' : '')+
+        '<div class="field-sm"><label>المزوّد</label><select id="ai-prov">'+provOpts+'</select></div>'+
+        (aiKind === 'farm' ? '<div class="field-sm full"><label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:400;min-height:44px;"><input type="checkbox" id="ai-costs" style="width:auto;"'+(aiCosts ? ' checked' : '')+'> ابعت بيانات التكاليف وتكلفة الكيلو كمان</label></div>' : '')+
+        '<div class="field-sm full"><label>سؤال محدد (اختياري)</label><textarea id="ai-q" rows="2" maxlength="2000" placeholder="مثلاً: ليه الـ EC في الصرف عالي في S2؟">'+escH(aiQ)+'</textarea></div>'+
+      '</div>'+
+      '<p class="hint" style="margin:6px 0;">بيتبعت: أرقام وقراءات ونتايج حسابات البرنامج — من غير أسماء العملاء ولا الإيميلات ولا التليفونات.'+(cur && cur.id !== 'local' ? ' <b>⚠️ المزوّد ده برّه المزرعة: البيانات دي هتتبعت له على الإنترنت.</b>' : ' المزوّد المحلي: البيانات ما بتخرجش من كمبيوتر المزرعة.')+'</p>'+
+      (!anyReady ? '<p class="view-only-banner" style="display:block;">'+(currentUserRole === 'admin' ? 'لسه مفيش مزوّد متظبط — ظبطه من الإعدادات ← المحلّل الذكي.' : 'لسه مفيش مزوّد متظبط — كلّم المدير.')+'</p>' : '')+
+      '<div class="form-actions"><button type="submit" class="btn btn-primary btn-sm" id="ai-run"'+(anyReady && !aiBusy ? '' : ' disabled')+'>✨ ابدأ التحليل</button> <button type="button" class="btn btn-ghost btn-sm" id="ai-prev">'+(aiPreview ? 'اخفي البيانات' : 'شوف اللي هيتبعت')+'</button></div>'+
+      '<p class="hint" style="margin:6px 0 0;">استخدمت النهارده: <b class="ltr">'+(aiCfg.usedToday || 0)+'</b> من <b class="ltr">'+(aiCfg.perDay || 0)+'</b> تحليل. النموذج المحلي على كمبيوتر عادي ممكن ياخد كذا دقيقة — التقرير بيظهر في «التقارير» أول ما يخلص.</p>'+
+      '</form>'+
+      (aiPreview ? '<pre class="ai-json" data-noi18n="1" dir="ltr">'+escH(JSON.stringify(aiSnapshot(), null, 1))+'</pre>' : '');
+  }
+  function aiReportsHtml(){
+    var lv = aiLevel();
+    if(aiOpen){
+      var r = aiReports.filter(function(x){ return x.id === aiOpen; })[0];
+      if(!r && aiSeen[aiOpen]) aiOpen = null;   // اتمسح
+      else if(!r) return '<p class="hint">⏳ بيحلّل… التقرير هيظهر هنا أول ما يخلص.</p>';   // لسه ما وصلش من السيرفر
+      else {
+        var meta = escH(fmtTs(aiLocalTs(r.createdAt)))+' — <span>'+escH(aiProvLabel(r.provider))+'</span>'+(r.servedModel || r.model ? ' ('+escH(r.servedModel || r.model)+')' : '')+(r.ms ? ' — '+escH(aiDur(r.ms)) : '');
+        var body = r.status === 'running' ? '<p class="hint">⏳ بيحلّل… التقرير هيظهر هنا أول ما يخلص.</p>' :
+          r.status === 'error' ? '<p class="view-only-banner" style="display:block;background:var(--alert-soft);color:var(--alert);">⛔ '+escH(aiErrText(r.error, r.detail))+'</p>' :
+          '<div class="ai-report" data-noi18n="1" dir="'+(r.lang === 'en' ? 'ltr' : 'rtl')+'">'+aiMd(r.text)+'</div>';
+        return '<div class="form-actions" style="margin:0 0 10px;"><button type="button" class="btn btn-ghost btn-sm" id="ai-back">‹ كل التقارير</button>'+
+            (r.status === 'done' ? ' <button type="button" class="btn btn-ghost btn-sm" id="ai-copy">📋 نسخ</button>' : '')+
+            (currentUserRole === 'admin' ? ' <button type="button" class="del-btn" id="ai-del" title="حذف">✕</button>' : '')+'</div>'+
+          '<h2 class="section-title" style="margin-top:0;">'+escH(AI_KINDS[r.kind] || '')+'</h2><p class="hint" style="margin:0 0 8px;">'+meta+'</p>'+
+          (r.question ? '<p class="hint"><b>السؤال:</b> <span data-noi18n="1">'+escH(r.question)+'</span></p>' : '')+
+          '<div class="chart-card">'+body+'</div>'+
+          '<details class="chart-card" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:700;">البيانات اللي اتبعتت للمزوّد</summary><pre class="ai-json" data-noi18n="1" dir="ltr">'+escH(JSON.stringify(r.sent || {}, null, 1))+'</pre></details>';
+      }
+    }
+    if(!aiReports.length) return '<p class="empty-note">لسه مفيش تقارير.'+(lv === 'edit' ? ' ابدأ تحليل من «تحليل جديد».' : '')+'</p>';
+    return aiReports.map(function(r){
+      var st = r.status === 'running' ? '<span class="status-pill">⏳ بيحلّل</span>' : r.status === 'error' ? '<span class="status-pill" style="color:var(--alert);">⛔ فشل</span>' : '<span class="status-pill" style="color:var(--good);">✅ جاهز</span>';
+      return '<div class="stat-card ai-item" data-id="'+escH(r.id)+'" style="margin:8px 0;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">'+
+        '<div><strong>'+escH(AI_KINDS[r.kind] || '')+'</strong><div class="hint" style="margin:2px 0 0;">'+escH(fmtTs(aiLocalTs(r.createdAt)))+' — <span>'+escH(aiProvLabel(r.provider))+'</span></div></div>'+st+'</div>';
+    }).join('');
+  }
+  function renderAiPanel(){
+    var box = $('#ai-body'); if(!box) return;
+    if(!aiLocal()){ box.innerHTML = '<div data-sub="new reports"><p class="empty-note">المحلّل الذكي شغّال على السيرفر المحلي (كمبيوتر المزرعة) بس، عشان مفاتيح مزوّدي الذكاء الاصطناعي تفضل عندك.</p></div>'; return; }
+    var lv = aiLevel(); if(lv === 'none'){ box.innerHTML = ''; return; }
+    aiLoadCfg(); aiListen();
+    var keepQ = $('#ai-q', box); if(keepQ) aiQ = keepQ.value;
+    box.innerHTML = (lv === 'edit' ? '<div data-sub="new">'+aiNewHtml()+'</div>' : '')+'<div data-sub="reports">'+aiReportsHtml()+'</div>';
+    $all('.ai-kind', box).forEach(function(b){ b.addEventListener('click', function(){ aiKind = b.getAttribute('data-k'); aiPreview = false; renderAiPanel(); }); });
+    var dd = $('#ai-days', box); if(dd) dd.addEventListener('change', function(){ aiDays = parseInt(dd.value, 10) || 7; if(aiPreview) renderAiPanel(); });
+    var pv = $('#ai-prov', box); if(pv) pv.addEventListener('change', function(){ aiProv = pv.value; renderAiPanel(); });
+    var ck = $('#ai-costs', box); if(ck) ck.addEventListener('change', function(){ aiCosts = ck.checked; if(aiPreview) renderAiPanel(); });
+    var qq = $('#ai-q', box); if(qq) qq.addEventListener('input', function(){ aiQ = qq.value; });
+    var pr = $('#ai-prev', box); if(pr) pr.addEventListener('click', function(){ aiPreview = !aiPreview; renderAiPanel(); });
+    var fm = $('#ai-form', box); if(fm){ fm.setAttribute('data-noconfirm', '1'); fm.addEventListener('submit', function(ev){ ev.preventDefault(); aiRun(); }); }
+    $all('.ai-item', box).forEach(function(it){ it.addEventListener('click', function(){ aiOpen = it.getAttribute('data-id'); renderAiPanel(); }); });
+    var bk = $('#ai-back', box); if(bk) bk.addEventListener('click', function(){ aiOpen = null; renderAiPanel(); });
+    var cp = $('#ai-copy', box); if(cp) cp.addEventListener('click', function(){ var r = aiReports.filter(function(x){ return x.id === aiOpen; })[0]; if(r && navigator.clipboard) navigator.clipboard.writeText(r.text || '').then(function(){ toast('اتنسخ'); }, function(){}); });
+    var dl = $('#ai-del', box); if(dl) dl.addEventListener('click', function(){
+      if(!confirm('تحذف التقرير ده؟')) return;
+      db.collection('aiReports').doc(aiOpen).delete().then(function(){ aiOpen = null; toast('اتحذف'); }, function(e){ toast('⛔ '+aiErrText(e && e.code)); });
+    });
+  }
+  function aiRun(){
+    if(aiBusy) return;
+    var snap; try{ snap = aiSnapshot(); }catch(e){ console.error(e); toast('⛔ ما قدرتش أجهّز البيانات'); return; }
+    var prov = aiProv || (aiCfg && aiCfg.default);
+    var cur = aiCfg && aiCfg.providers ? aiCfg.providers.filter(function(p){ return p.id === prov; })[0] : null;
+    if(cur && cur.id !== 'local' && !confirm('البيانات هتتبعت لـ '+aiProvLabel(prov)+' على الإنترنت. تكمّل؟')) return;
+    aiBusy = true; renderAiPanel();
+    firebase.__api('POST', '/ai/run', {kind:aiKind, lang:uiLang, provider:prov, title:AI_KINDS[aiKind], question:aiQ.trim(), snapshot:snap}).then(function(j){
+      aiOpen = j.id; aiQ = ''; aiCfg && (aiCfg.usedToday = (aiCfg.usedToday || 0) + 1);
+      panelSubSet('ai', 'reports', 'temp'); toast('✨ بدأ التحليل');
+    }, function(e){ toast('⛔ '+aiErrText(e && e.code, e && e.message), 6000); }).then(function(){ aiBusy = false; renderAiPanel(); });
+  }
+  /* زرار «حلّل» في الخلطة والرش والري: بيفتح المحلّل على النوع ده */
+  function aiGo(kind){
+    aiKind = kind; aiOpen = null; aiPreview = false;
+    var tb = document.querySelector('.tab-btn[data-tab="ai"]'); if(tb) tb.click();
+    setTimeout(function(){ panelSubSet('ai', 'new', 'temp'); renderAiPanel(); }, 50);
+  }
+  function aiQuickButtons(){
+    var show = aiLocal() && aiLevel() === 'edit';
+    [['panel-nutrients', 'mix'], ['panel-spray', 'spray'], ['panel-water', 'irrigation']].forEach(function(x){
+      var p = document.getElementById(x[0]); if(!p) return;
+      var b = p.querySelector('.ai-quick');
+      if(!b){
+        var h1 = p.querySelector('h1.page-title'); if(!h1) return;
+        b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-ghost btn-sm ai-quick'; b.style.margin = '0 0 8px';
+        b.textContent = '✨ حلّل بالذكاء الاصطناعي';
+        b.addEventListener('click', function(){ aiGo(x[1]); });
+        h1.parentNode.insertBefore(b, h1.nextSibling);
+      }
+      b.style.display = show ? '' : 'none';
+    });
+  }
+
+  /* ---------- الإعدادات (المدير بس) ---------- */
+  function renderAiSettings(){
+    var box = $('#ai-set'); if(!box) return;
+    if(!aiLocal()){ box.innerHTML = '<p class="hint">الإعدادات دي بتظهر لما البرنامج يشتغل على السيرفر المحلي (كمبيوتر المزرعة).</p>'; return; }
+    if(currentUserRole !== 'admin'){ box.innerHTML = ''; return; }
+    if(!aiCfg){ aiLoadCfg(); box.innerHTML = aiCfgErr ? '<p class="hint">'+escH(aiErrText(aiCfgErr))+'</p>' : '<p class="hint">⏳ بيحمّل…</p>'; return; }
+    var P = {}; (aiCfg.providers || []).forEach(function(p){ P[p.id] = p; });
+    var keyIn = function(id){ var p = P[id] || {}; return '<div class="field-sm"><label>مفتاح الـ API</label><input type="password" class="ltr ai-key" data-p="'+id+'" autocomplete="off" placeholder="'+(p.hasKey ? 'محفوظ '+escH(p.keyHint || '')+' — اكتب جديد لو عايز تغيّره' : 'الصق المفتاح هنا')+'">'+(p.hasKey ? '<label style="display:flex;align-items:center;gap:6px;margin:4px 0 0;font-weight:400;"><input type="checkbox" class="ai-clear" data-p="'+id+'" style="width:auto;"> امسح المفتاح</label>' : '')+'</div>'; };
+    var val = function(id, f){ return escH((P[id] || {})[f] || ''); };
+    var test = function(id){ return '<div class="form-actions" style="margin-top:6px;"><button type="button" class="btn btn-ghost btn-sm ai-test" data-p="'+id+'">اختبار</button> <span class="hint ai-test-out" data-p="'+id+'" style="margin:0;">'+escH(aiSetMsg[id] || '')+'</span></div>'; };
+    var sec = function(id, title, inner){ return '<details class="chart-card" style="margin:8px 0;"'+(id === aiCfg.default ? ' open' : '')+'><summary style="cursor:pointer;font-weight:700;">'+title+(P[id] && P[id].ready ? ' ✅' : '')+'</summary><div class="form-grid" style="margin-top:8px;">'+inner+'</div>'+test(id)+'</details>'; };
+    box.innerHTML =
+      '<div class="form-grid"><div class="field-sm"><label>المزوّد الافتراضي</label><select id="ai-def">'+['local', 'claude', 'chatgpt', 'custom'].map(function(id){ return '<option value="'+id+'"'+(id === aiCfg.default ? ' selected' : '')+'>'+escH(aiProvLabel(id))+'</option>'; }).join('')+'</select></div>'+
+        '<div class="field-sm"><label>أقصى عدد تحليلات في اليوم</label><input type="number" min="1" max="500" step="1" class="ltr" id="ai-perday" value="'+escH(aiCfg.perDay)+'"></div></div>'+
+      sec('local', 'محلي (على كمبيوتر المزرعة)',
+        '<div class="field-sm full"><p class="hint" style="margin:0;">سطّب برنامج <b>Ollama</b> على كمبيوتر المزرعة، وحمّل موديل بيفهم عربي (مثلاً من cmd: <span class="ltr">ollama pull qwen2.5:7b</span>)، واكتب اسمه هنا. البيانات ما بتخرجش من الجهاز. الجودة أقل من النماذج اللي برّه، وبيحتاج كمبيوتر قوي (كارت شاشة) عشان يبقى سريع.</p></div>'+
+        '<div class="field-sm"><label>العنوان</label><input type="text" class="ltr" id="ai-local-url" value="'+val('local', 'baseUrl')+'" placeholder="http://127.0.0.1:11434/v1"></div>'+
+        '<div class="field-sm"><label>اسم الموديل</label><input type="text" class="ltr" id="ai-local-model" value="'+val('local', 'model')+'" placeholder="qwen2.5:7b"></div>')+
+      sec('claude', 'Claude (Anthropic)',
+        '<div class="field-sm full"><p class="hint" style="margin:0;">المفتاح من <span class="ltr">platform.claude.com</span>. الدفع بالاستخدام: التقرير الشامل تقريبًا 0.3–0.6 دولار.</p></div>'+
+        keyIn('claude')+
+        '<div class="field-sm"><label>الموديل</label><input type="text" class="ltr" id="ai-claude-model" value="'+val('claude', 'model')+'" placeholder="claude-opus-5-5"></div>'+
+        '<div class="field-sm"><label>عمق التفكير</label><select id="ai-claude-effort">'+[['low', 'منخفض (أرخص وأسرع)'], ['medium', 'متوسط'], ['high', 'عالي (المُستحسن)'], ['xhigh', 'عالي جدًا'], ['max', 'أقصى (أغلى)']].map(function(o){ return '<option value="'+o[0]+'"'+(o[0] === ((P.claude || {}).effort || 'high') ? ' selected' : '')+'>'+o[1]+'</option>'; }).join('')+'</select></div>')+
+      sec('chatgpt', 'ChatGPT (OpenAI)',
+        '<div class="field-sm full"><p class="hint" style="margin:0;">المفتاح من <span class="ltr">platform.openai.com</span>، واكتب اسم الموديل زي ما هو في حسابك.</p></div>'+
+        keyIn('chatgpt')+
+        '<div class="field-sm"><label>اسم الموديل</label><input type="text" class="ltr" id="ai-chatgpt-model" value="'+val('chatgpt', 'model')+'"></div>')+
+      sec('custom', 'مزوّد تاني (أي خدمة متوافقة مع OpenAI)',
+        '<div class="field-sm full"><p class="hint" style="margin:0;">أي خدمة بواجهة <span class="ltr">/chat/completions</span> (زي Gemini أو DeepSeek أو LM Studio على جهاز تاني): العنوان والمفتاح واسم الموديل من صفحة الخدمة.</p></div>'+
+        '<div class="field-sm"><label>الاسم اللي يظهر</label><input type="text" id="ai-custom-label" maxlength="40" value="'+val('custom', 'label')+'"></div>'+
+        '<div class="field-sm"><label>العنوان</label><input type="text" class="ltr" id="ai-custom-url" value="'+val('custom', 'baseUrl')+'" placeholder="https://…/v1"></div>'+
+        keyIn('custom')+
+        '<div class="field-sm"><label>اسم الموديل</label><input type="text" class="ltr" id="ai-custom-model" value="'+val('custom', 'model')+'"></div>')+
+      '<p class="hint">المفاتيح بتتحفظ على كمبيوتر المزرعة بس، ومش بتظهر لحد ولا بتتبعت للمتصفح.</p>'+
+      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="ai-save">حفظ إعدادات المحلّل</button></div>';
+    var v = function(id){ var e = $('#'+id, box); return e ? e.value.trim() : undefined; };
+    $('#ai-save', box).addEventListener('click', function(){
+      var body = {default:v('ai-def'), perDay:parseInt(v('ai-perday'), 10) || 30, providers:{
+        local:{baseUrl:v('ai-local-url'), model:v('ai-local-model')},
+        claude:{model:v('ai-claude-model') || 'claude-opus-5-5', effort:v('ai-claude-effort')},
+        chatgpt:{model:v('ai-chatgpt-model'), baseUrl:'https://api.openai.com/v1'},
+        custom:{label:v('ai-custom-label'), baseUrl:v('ai-custom-url'), model:v('ai-custom-model')}}};
+      $all('.ai-key', box).forEach(function(k){ if(k.value.trim()) body.providers[k.getAttribute('data-p')].apiKey = k.value.trim(); });
+      $all('.ai-clear', box).forEach(function(k){ if(k.checked) body.providers[k.getAttribute('data-p')].clearKey = true; });
+      firebase.__api('POST', '/ai/config', body).then(function(c){ aiCfg = c; aiProv = c.default; logAudit('edit', 'settings', 'إعدادات المحلّل الذكي'); toast('اتحفظت إعدادات المحلّل'); renderAiSettings(); }, function(e){ toast('⛔ ما اتحفظتش'+(e && e.message ? ' ('+e.message+')' : '')); });
+    });
+    $all('.ai-test', box).forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.getAttribute('data-p'); aiSetMsg[id] = '⏳ بيختبر…'; var out = box.querySelector('.ai-test-out[data-p="'+id+'"]'); if(out) out.textContent = aiSetMsg[id];
+      firebase.__api('POST', '/ai/test', {provider:id}).then(function(r){
+        aiSetMsg[id] = r.ok ? '✅ شغّال ('+(r.model || '')+' — '+aiDur(r.ms)+')' : '⛔ '+aiErrText(r.error, r.detail);
+      }, function(e){ aiSetMsg[id] = '⛔ '+aiErrText(e && e.code, e && e.message); }).then(function(){ var o2 = box.querySelector('.ai-test-out[data-p="'+id+'"]'); if(o2) o2.textContent = aiSetMsg[id]; });
+    }); });
+  }
+
   function renderAll(){
     safe(applyTabVisibility);
     if(panelOn('panel-settings')){ lazyAdminSubs(); renderSettingsPanels(); }
@@ -16161,13 +16502,21 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     if(panelOn('panel-growth')) safe(renderGrowthPanel);
     if(panelOn('panel-inventory')) safe(renderInventoryPanel);
     if(panelOn('panel-costs')) safe(renderCostsSection);
+    if(panelOn('panel-ai')) safe(renderAiPanel);
     if(!panelOn('panel-overview')) safe(ovDecorate);   // زرار ⋮ / تكبير على مخططات التبويبات كمان
     safe(renderNotifBar);
     safe(updateSyncBadge);
   }
 
+  window.addEventListener('oroots-sync', function(){ try{ updateSyncBadge(); }catch(e){} });
   function updateSyncBadge(){
     var dot = $('#sync-dot'), txt = $('#sync-text');
+    var st = (db && window.firebase && firebase.__syncStatus) ? firebase.__syncStatus() : null;   // السيرفر المحلي: حالة الاتصال الحقيقية
+    if(st && (!st.online || st.pending)){
+      dot.classList.add('off');
+      txt.textContent = !st.online ? (st.pending ? '📴 من غير نت — '+st.pending+' مستنية تتبعت للسيرفر' : '📴 من غير نت — بتشوف آخر بيانات محفوظة على الجهاز') : '⏳ بيبعت '+st.pending+' للسيرفر…';
+      return;
+    }
     if(db){
       dot.classList.remove('off');
       txt.textContent = 'متصل — البيانات متزامنة لكل الفريق';
@@ -16781,12 +17130,12 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
   function setupTabs(){
     var panelMap = {
       overview:'#panel-overview', charts:'#panel-charts', water:'#panel-water', soil:'#panel-soil', climate:'#panel-climate',
-      tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', growth:'#panel-growth', inventory:'#panel-inventory', costs:'#panel-costs', settings:'#panel-settings'
+      tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', growth:'#panel-growth', inventory:'#panel-inventory', costs:'#panel-costs', ai:'#panel-ai', settings:'#panel-settings'
     };
     var renderMap = {
       overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, soil: renderSoilPanel, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
-      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, costs: renderCostsSection, settings: function(){ lazyAdminSubs(); renderSettingsPanels(); }
+      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, costs: renderCostsSection, ai: function(){ safe(renderAiPanel); }, settings: function(){ lazyAdminSubs(); renderSettingsPanels(); }
     };
     $all('.tab-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -17041,6 +17390,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     if(c==='auth/weak-password') return 'كلمة المرور ضعيفة (6 حروف على الأقل)';
     if(c==='auth/email-already-in-use') return 'البريد الإلكتروني ده مسجّل قبل كده';
     if(c==='permission-denied'||c==='auth/operation-not-allowed') return 'مفيش صلاحية للعملية دي';
+    if(c==='auth/local-reset') return 'كلّم المدير عشان يعملك كلمة سر جديدة';
     return 'حصل خطأ: '+(e && (e.code||e.message) || '');
   }
   function enterApp(fbUser){
@@ -17553,7 +17903,7 @@ var I18N_DICT = {}; var I18N_VER = "a0f5a2a66c3c";
     });
     db.doc('userData/'+myMail()).onSnapshot(function(snap){
       var ud = snap.exists ? snap.data() : {};
-      if(ud.lang !== uiLang) i18nSaveUserLang();
+      i18nSyncUserLang(ud);
       dashMine = Array.isArray(ud.pages) ? ud.pages : [];
       if(ud.palette==='vivid' || ud.palette==='calm' || ud.palette==='cmyk') setPalette(ud.palette==='vivid' ? 'vivid' : 'calm', false);
       ownCharts = Array.isArray(ud.charts) ? ud.charts : null; ownOv = (ud.ov && typeof ud.ov === 'object') ? ud.ov : null; ioMergeCharts();

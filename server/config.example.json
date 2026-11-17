@@ -1,0 +1,11 @@
+{
+  "port": 8080,
+  "host": "127.0.0.1",
+  "adminEmail": "you@example.com",
+  "appUrl": "https://oroots.tail1234.ts.net",
+  "backupDir": "C:/Users/YourName/OneDrive/oroots-backups",
+  "backupHour": 2,
+  "keepBackups": 30,
+  "minFreeMB": 2048,
+  "backupPassphrase": "write-a-long-secret-sentence-here"
+}

@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function mail() { return request.auth.token.email.lower(); }
+    function roleDoc() { return get(/databases/$(database)/documents/roles/$(mail())); }
+    // لازم يكون للحساب ملف في النظام (المدير بيضيفه) — مجرد تسجيل حساب مش كفاية
+    function hasProfile() {
+      return signedIn() && (
+        mail() == 'dragoncool3330@gmail.com' ||
+        exists(/databases/$(database)/documents/roles/$(mail()))
+      );
+    }
+    function isAdmin() {
+      return signedIn() && (
+        mail() == 'dragoncool3330@gmail.com' ||
+        (exists(/databases/$(database)/documents/roles/$(mail())) &&
+         get(/databases/$(database)/documents/roles/$(mail())).data.role == 'admin')
+      );
+    }
+
+    // صلاحية تعديل تاب: المدير، أو الموظف اللي صلاحيته "edit" على التاب في مستند roles.
+    // الحسابات القديمة اللي مستندها من غير perms بتتعامل كمسموح لحد ما المدير يفتح التطبيق (بيتزامن تلقائي).
+    function legacyRole() { return !('perms' in roleDoc().data); }
+    function canEditTab(tab) {
+      return isAdmin() || (hasProfile() && (legacyRole() || roleDoc().data.perms.get(tab, 'none') == 'edit'));
+    }
+    function canEditSoil() {
+      return isAdmin() || (hasProfile() && (legacyRole() ||
+        roleDoc().data.perms.get('soil', roleDoc().data.perms.get('water', 'none')) == 'edit'));
+    }
+
+    // كل كولكشن مزرعة مربوط بتاب صلاحياته (readings بتتعامل لوحدها تحت حسب المصدر)
+    function farmColls() {
+      return [
+        'sops','fertilizers','targetProfiles','nutrientRecipes','pestlog',
+        'bioReleases','stickyTraps','pheromoneTraps','nursery','irrigCalib','inventory','harvest','instrumentCalibrations','nurseryPlanLog','sprayPlan','qualityOrders','qualitySorting','qualityComplaints','qualityPhotos','plantGrowth','irrigSchedules','costs','tankLog'
+      ];
+    }
+    function collTab(coll) {
+      return {
+        'sops':'tasks', 'fertilizers':'nutrients', 'targetProfiles':'nutrients', 'nutrientRecipes':'nutrients',
+        'pestlog':'pests', 'bioReleases':'pests', 'stickyTraps':'pests', 'pheromoneTraps':'pests',
+        'nursery':'nursery', 'nurseryPlanLog':'nursery',
+        'irrigCalib':'water', 'instrumentCalibrations':'water', 'irrigSchedules':'water',
+        'inventory':'inventory', 'costs':'inventory', 'tankLog':'nutrients', 'plantGrowth':'growth',
+        'qualityOrders':'quality', 'qualitySorting':'quality', 'qualityComplaints':'quality', 'qualityPhotos':'quality'
+      }.get(coll, 'any');
+    }
+    function canWriteColl(coll) {
+      return (coll == 'harvest' && (canEditTab('harvest') || canEditTab('nursery'))) ||
+        (coll == 'qualityPhotos' && canEditTab('pests')) ||
+        (collTab(coll) != 'any' && canEditTab(collTab(coll)));
+    }
+    // خطة الرش: صاحب صلاحية الرش أو المكافحة. المكلّف يعلّم "اتنفّذ" بس.
+    function canSpray() { return canEditTab('spray') || canEditTab('pests'); }
+    // المهام: صاحب صلاحية المهام يعدّل كل حاجة. غيره مايغيّرش غير قايمة المهام، ومايقللهاش
+    // (إلا صاحب الرش لأنه بيشيل مهمة الرش لما يلغي رشة). التحقق مهمة مهمة بيعمله السيرفر المحلي.
+    function canWriteTasksDoc() {
+      return canEditTab('tasks') || (
+        request.resource.data.entries is list && request.resource.data.entries.size() <= 2000 &&
+        (resource == null || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['entries']) &&
+          (request.resource.data.entries.size() >= resource.data.entries.size() || canSpray()))));
+    }
+    function canWriteReading(src) {
+      return src == 'tasks' ||
+        (src in ['irrigation', 'drainage', 'tank'] && canEditTab('water')) ||
+        (src == 'soil' && canEditSoil()) ||
+        (src == 'climate' && canEditTab('climate'));
+    }
+
+    // صلاحيات المدير: الموظف يقرا مستنده هو بس، والمدير يقرا ويكتب الكل
+    match /roles/{email} {
+      allow read: if isAdmin() || (signedIn() && mail() == email);
+      allow write: if isAdmin();
+    }
+    match /settings/users {
+      allow read: if hasProfile();
+      allow write: if isAdmin();
+    }
+
+    // بيانات كل مستخدم الخاصة (ترتيب التابات + التابات والمخططات الخاصة + المظهر): صاحبها بس يقرا ويكتب
+    match /userData/{email} {
+      allow read, write: if hasProfile() && mail() == email;
+    }
+
+    // سجل المراجعة: أي مستخدم يكتب باسمه هو بس (وحجم محدود)، المدير بس يقرأ، ومفيش تعديل أو حذف
+    match /auditLog/{id} {
+      allow create: if hasProfile() && request.resource.data.user == mail() &&
+        (!('details' in request.resource.data) || request.resource.data.details.size() <= 1500);
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // الإشعارات: أي موظف يبعت لموظف موجود في النظام (بحجم محدود)، والمستلم بس هو اللي يقرأ ويعلّم مقروء ويحذف (والمدير يقرأ ويحذف)
+    match /notifications/{id} {
+      allow create: if hasProfile() && request.resource.data.from == mail() &&
+        request.resource.data.to is string &&
+        exists(/databases/$(database)/documents/roles/$(request.resource.data.to.lower())) &&
+        (!('title' in request.resource.data) || request.resource.data.title.size() <= 300) &&
+        (!('body' in request.resource.data) || request.resource.data.body.size() <= 2000);
+      allow read: if hasProfile() && (resource.data.to == mail() || isAdmin());
+      allow update: if hasProfile() && resource.data.to == mail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']);
+      allow delete: if hasProfile() && (resource.data.to == mail() || isAdmin());
+    }
+
+    // أجهزة تنبيه الموبايل: كل موظف يسجّل/يحذف جهازه هو بس (السيرفر بيقرأها بصلاحيات الأدمن)، ومحدش يقرأها من التطبيق
+    match /pushTokens/{token} {
+      allow read: if false;
+      allow create: if hasProfile() && request.resource.data.email == mail();
+      allow update: if hasProfile() && resource.data.email == mail() && request.resource.data.email == mail();
+      allow delete: if hasProfile() && resource.data.email == mail();
+    }
+
+    // عدّاد استهلاك الفريق: كل جهاز يكتب مستنده هو بس (أرقام بس)، والمدير بس يقرأ ويحذف
+    match /usageStats/{id} {
+      allow read: if isAdmin();
+      allow create, update: if hasProfile() && request.resource.data.user == mail() &&
+        request.resource.data.keys().hasOnly(['day', 'user', 'device', 'r', 'w', 'updatedAt']) &&
+        request.resource.data.r is number && request.resource.data.w is number &&
+        (request.method == 'create' || resource.data.user == mail());
+      allow delete: if isAdmin();
+    }
+
+    // سلة المحذوفات: المدير بس
+    match /trash/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // قايمة الأصناف + أسماء المكسات: الكل يقرأ، والمدير بس يعدّل
+    match /settings/cropNames {
+      allow read: if hasProfile();
+      allow write: if isAdmin();
+    }
+
+    // إعدادات: الكل يقرأ، والكتابة للمدير، إلا المواسير وخطة المشتل (الموظف اللي صلاحيته تعديل على الحصاد/المشتل)
+    match /settings/{doc} {
+      allow read: if hasProfile() && doc != 'users' && doc != 'cropNames';
+      allow write: if hasProfile() && doc != 'users' && doc != 'cropNames' && (
+        isAdmin() ||
+        (doc == 'pipeMaps' && (canEditTab('harvest') || canEditTab('nursery'))) ||
+        (doc in ['nurseryPlans', 'nurseryTiles'] && canEditTab('nursery'))
+      );
+    }
+
+    // القراءات (مياه / مناخ / تربة / مهام): الكتابة حسب المصدر وصلاحية التاب. المهام: الموظف بيعلّم "تم" على مهمته (شوف canWriteTasksDoc). الحذف للمدير.
+    match /readings/{id} {
+      allow read: if hasProfile();
+      allow create: if hasProfile() && canWriteReading(request.resource.data.source) &&
+        (request.resource.data.source != 'tasks' || canWriteTasksDoc());
+      allow update: if hasProfile() && canWriteReading(request.resource.data.source) &&
+        resource.data.source == request.resource.data.source &&
+        (request.resource.data.source != 'tasks' || canWriteTasksDoc());
+      allow delete: if isAdmin();
+    }
+
+    // ملاحظات تسليم الوردية: أي موظف يكتب باسمه (بحجم محدود) ويعلّم "استلمت" (ackBy بس)، والمدير يحذف
+    match /handover/{id} {
+      allow read: if hasProfile();
+      allow create: if hasProfile() && request.resource.data.by == mail() &&
+        request.resource.data.text is string && request.resource.data.text.size() <= 1000;
+      // "استلمت": الموظف يضيف اسمه هو بس في ackBy (مايمسحش ولا يضيف باسم غيره)
+      allow update: if hasProfile() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ackBy']) &&
+        request.resource.data.ackBy is list &&
+        request.resource.data.ackBy.toSet().difference(resource.data.ackBy.toSet()).hasOnly([mail()]) &&
+        resource.data.ackBy.toSet().difference(request.resource.data.ackBy.toSet()).size() == 0;
+      allow delete: if isAdmin();
+    }
+
+    // خطة الرش: الإضافة والتعديل والمسح لصاحب صلاحية الرش أو المكافحة، والمكلّف يعلّم "اتنفّذ" بس (done / doneAt / doneBy)
+    match /sprayPlan/{id} {
+      allow read: if hasProfile();
+      allow create, delete: if hasProfile() && canSpray();
+      allow update: if hasProfile() && (canSpray() || (
+        resource.data.get('assignedEmail', '').lower() == mail() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['done', 'doneAt', 'doneBy'])));
+    }
+
+    // بيانات المزرعة: القراءة لأي موظف له ملف، والكتابة حسب صلاحية التاب، والحذف للمدير بس
+    // (الاستثناء: الصور — صاحب صلاحية الجودة أو المكافحة بيمسح منها أثناء التعديل العادي)
+    match /{coll}/{id} {
+      allow read: if hasProfile() && coll in farmColls();
+      allow create, update: if hasProfile() && coll in farmColls() && coll != 'sprayPlan' && canWriteColl(coll);
+      allow delete: if hasProfile() && coll in farmColls() && (isAdmin() || (coll == 'qualityPhotos' && canWriteColl(coll)));
+    }
+  }
+}
