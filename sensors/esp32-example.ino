@@ -6,9 +6,9 @@
 
 const char* WIFI_SSID = "اسم-الواي-فاي";
 const char* WIFI_PASS = "كلمة-السر";
-const char* GATEWAY   = "http://192.168.1.50:8787/ingest";   // عنوان جهاز البوابة داخل الشبكة
-const char* API_KEY   = "نفس-SENSOR_API_KEY";
-const char* DEVICE    = "lg1-climate";                       // لازم يكون موجود في sensors.config.json
+const char* GATEWAY   = "http://192.168.1.50:8787/ingest";   // عنوان كمبيوتر المزرعة (التطبيق: الإعدادات ← الحساسات)
+const char* API_KEY   = "نفس-apiKey-اللي-في-config.json";
+const char* DEVICE    = "lg1-climate";                       // لازم يكون موجود في devices في قسم sensors في config.json
 DHT dht(4, DHT22);                                           // DHT22 على دبوس 4
 
 float readLux(){ return analogRead(34) * 0.9; }              // استبدلها بقراءة BH1750 مثلًا (بوحدة لوكس)

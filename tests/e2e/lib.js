@@ -40,8 +40,11 @@ async function startServer(seed, extraCfg){
       throw new Error('login failed for ' + email);
     },
     async api(email, url, body){
-      const r = await fetch(base + url, {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + await S.token(email)}, body: JSON.stringify(body || {})});
-      return {status: r.status, j: await r.json().catch(() => ({}))};
+      for(let i = 0; i < 2; i++){
+        const r = await fetch(base + url, {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + await S.token(email)}, body: JSON.stringify(body || {})});
+        if(r.status === 401 && i === 0){ delete toks[email]; continue; }   // الجلسة خرجت (الموظف غيّر كلمة السر من المتصفح) ← ندخل تاني
+        return {status: r.status, j: await r.json().catch(() => ({}))};
+      }
     },
     async doc(p){ return ((await S.api('boss@farm.com', '/api/db/get', {path: p})).j || {}).data || null; },
     stop(){ try{ proc.kill(); }catch(e){} try{ fs.rmSync(T, {recursive: true, force: true}); }catch(e){} }
@@ -52,11 +55,12 @@ async function startServer(seed, extraCfg){
 /* متصفح + صفحة. lang: 'ar' | 'en' (اختيار اللغة قبل الدخول) */
 async function openPage(browser, S, opts){
   opts = opts || {};
-  const c = await browser.newContext({viewport: opts.viewport || {width: 430, height: 900}});
+  const c = await browser.newContext(Object.assign({viewport: opts.viewport || {width: 430, height: 900}}, opts.tz ? {timezoneId: opts.tz} : {}));
   const p = await c.newPage(), errs = [];
   p.on('dialog', d => d.accept().catch(() => {}));
   p.on('pageerror', e => errs.push(e.message));
   if(opts.lang) await p.addInitScript(l => { try{ if(!localStorage.getItem('oroots_lang_ts')){ localStorage.setItem('oroots_lang', l); localStorage.setItem('oroots_lang_ts', String(Date.now())); } }catch(e){} }, opts.lang);
+  if(opts.setup) await opts.setup(p, c);   // مثلًا نوقّف طلبات الطقس برّه أو نردّ عليها ببيانات ثابتة
   await p.goto(S.base + '/'); await p.waitForSelector('#login-name', {state: 'visible', timeout: 20000}).catch(() => {});
   return {c, p, errs};
 }
@@ -116,4 +120,4 @@ function baseSeed(more){
   return seed;
 }
 
-module.exports = {run, baseSeed, dd, sleep, ROOT, NEW_PW};
+module.exports = {run, baseSeed, dd, sleep, freePort, ROOT, NEW_PW};

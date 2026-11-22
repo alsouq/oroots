@@ -11,7 +11,7 @@ const cfg = {port: 0, host: '127.0.0.1', dataDir: path.join(tmp, 'data'), public
 fs.mkdirSync(cfg.publicDir, {recursive: true}); fs.writeFileSync(path.join(cfg.publicDir, 'index.html'), '<h1>ok</h1>');
 
 (async () => {
-  const app = createServer(cfg); jobs.start(app);
+  const app = createServer(cfg); jobs.start(app); require('../server/pipes.js').start(app);
   await new Promise(r => app.server.listen(0, '127.0.0.1', r));
   const base = 'http://127.0.0.1:' + app.server.address().port;
   const call = async (method, url, body, tok) => {
@@ -48,7 +48,7 @@ fs.mkdirSync(cfg.publicDir, {recursive: true}); fs.writeFileSync(path.join(cfg.p
 
   // الصلاحيات (نفس firestore.rules)
   const w = (tok, writes) => call('POST', '/api/db/commit', {writes}, tok);
-  assert.strictEqual((await w(E, [{op: 'set', path: 'readings/irrigation_S1_2026-11-17', data: {source: 'irrigation', systemId: 'S1', date: '2026-11-17', entries: [{ts: '2026-11-17T09:00', ph: 6}]}}])).status, 200, 'موظف المياه يسجّل قراءة ري');
+  assert.strictEqual((await w(E, [{op: 'set', path: 'readings/irrigation_S1_2026-11-17', data: {source: 'irrigation', systemId: 'S1', date: '2026-11-17', entries: [{id: 'e1', by: 'ali@farm.com', ts: '2026-11-17T09:00', ph: 6}]}}])).status, 200, 'موظف المياه يسجّل قراءة ري');
   assert.strictEqual((await w(E, [{op: 'set', path: 'readings/climate_LG1_2026-11-17', data: {source: 'climate', systemId: 'LG1', date: '2026-11-17', entries: []}}])).status, 403, 'ملوش صلاحية مناخ');
   assert.strictEqual((await w(E, [{op: 'set', path: 'pestlog/p1', data: {x: 1}}])).status, 403, 'المكافحة عرض بس');
   assert.strictEqual((await w(E, [{op: 'set', path: 'settings/config', data: {ph: [5, 6]}}])).status, 403, 'الإعدادات للمدير');
@@ -102,6 +102,57 @@ fs.mkdirSync(cfg.publicDir, {recursive: true}); fs.writeFileSync(path.join(cfg.p
   assert.strictEqual((await call('POST', '/api/db/query', {coll: 'notifications'}, E)).j.docs.length, 0, 'ما يشوفش إشعارات غيره');
   assert.strictEqual((await w(A, [{op: 'update', path: 'notifications/n1', data: {read: true, readAt: 1}}])).status, 200);
   assert.strictEqual((await w(A, [{op: 'update', path: 'notifications/n1', data: {title: 'تلاعب'}}])).status, 403, 'المستلم يعلّم مقروء بس');
+
+  // المستويات: مشغّل / مستخدم / مشرف / مدير عام
+  const mk = async (em, level, perms) => { await call('POST', '/api/auth/create', {email: em, password: 'secret1'}, A); await w(A, [{op: 'set', path: 'roles/' + em, data: {role: 'employee', level, perms}}]); return (await call('POST', '/api/auth/login', {email: em, password: 'secret1'})).j.token; };
+  const U = await mk('usr@farm.com', 'user', {harvest: 'edit', quality: 'edit', inventory: 'view', water: 'edit'});
+  const SU = await mk('sup@farm.com', 'supervisor', {harvest: 'edit', quality: 'edit', inventory: 'edit', water: 'edit'});
+  const OP = await mk('op@farm.com', 'operator', {harvest: 'edit', water: 'edit'});
+  const hv = (id, by, extra) => ({op: 'set', path: 'harvest/' + id, data: Object.assign({id, by, cropName: 'خس', quantity: 5, unit: 'kg', ts: '2026-11-17T09:00', createdAt: Date.now()}, extra || {})});
+  assert.strictEqual((await w(U, [hv('lv1', 'usr@farm.com')])).status, 200, 'المستخدم يسجّل حصاد');
+  assert.strictEqual((await w(U, [{op: 'update', path: 'harvest/lv1', data: {quantity: 6}}])).status, 200, 'ويعدّل سجله');
+  await w(A, [hv('lv2', ADMIN)]);
+  assert.strictEqual((await w(U, [{op: 'update', path: 'harvest/lv2', data: {quantity: 1}}])).status, 403, 'مايعدّلش سجل غيره');
+  assert.strictEqual((await w(SU, [{op: 'update', path: 'harvest/lv2', data: {quantity: 7}}])).status, 200, 'المشرف يعدّل أي سجل');
+  assert.strictEqual((await w(U, [{op: 'delete', path: 'harvest/lv1'}])).status, 403, 'المستخدم مايمسحش حتى سجله');
+  assert.strictEqual((await w(SU, [{op: 'delete', path: 'harvest/lv1'}])).status, 200, 'المشرف يمسح');
+  assert.strictEqual((await w(OP, [hv('lv3', 'op@farm.com')])).status, 200, 'المشغّل يسجّل');
+  assert.strictEqual((await w(OP, [{op: 'update', path: 'harvest/lv3', data: {quantity: 9}}])).status, 200, 'ويعدّل سجله خلال 24 ساعة');
+  await w(A, [hv('lv4', 'op@farm.com', {createdAt: Date.now() - 2 * 86400000})]);
+  assert.strictEqual((await w(OP, [{op: 'update', path: 'harvest/lv4', data: {quantity: 9}}])).status, 403, 'مش بعد 24 ساعة');
+  assert.strictEqual((await w(U, [{op: 'set', path: 'costs/c1', data: {id: 'c1', amount: 5, category: 'عمالة', date: '2026-11-17'}}])).status, 403, 'التكاليف للمشرف');
+  assert.strictEqual((await w(SU, [{op: 'set', path: 'costs/c1', data: {id: 'c1', amount: 5, category: 'عمالة', date: '2026-11-17'}}])).status, 200);
+  assert.strictEqual((await w(U, [{op: 'set', path: 'qualityOrders/o1', data: {id: 'o1', date: '2026-11-17', items: []}}])).status, 403, 'فتح أوردر للمشرف');
+  assert.strictEqual((await w(SU, [{op: 'set', path: 'qualityOrders/o1', data: {id: 'o1', date: '2026-11-17', items: []}}])).status, 200);
+  assert.strictEqual((await w(U, [{op: 'set', path: 'qualitySorting/s9', data: {id: 's9', date: '2026-11-17', createdBy: 'usr@farm.com', items: []}}])).status, 200, 'المستخدم يسجّل فرز');
+  // قراءات: المستخدم يضيف قراءته ويعدّلها، ما يمسحش ولا يلمس قراءة غيره
+  const rd = (entries) => [{op: 'set', path: 'readings/tank_S1_2026-11-18', data: {source: 'tank', systemId: 'S1', date: '2026-11-18', entries}}];
+  const e1 = {id: 'r1', ts: '2026-11-18T08:00', ph: 6, by: ADMIN, createdAt: Date.now()}, e2 = {id: 'r2', ts: '2026-11-18T09:00', ph: 6.2, by: 'usr@farm.com', createdAt: Date.now()};
+  await w(A, rd([e1]));
+  assert.strictEqual((await w(U, rd([e1, e2]))).status, 200, 'المستخدم يضيف قراءته');
+  assert.strictEqual((await w(U, rd([e1, Object.assign({}, e2, {ph: 6.5})]))).status, 200, 'ويعدّلها');
+  assert.strictEqual((await w(U, rd([Object.assign({}, e1, {ph: 9}), e2]))).status, 403, 'مايعدّلش قراءة غيره');
+  assert.strictEqual((await w(U, rd([e1]))).status, 403, 'ومايمسحش قراءة');
+  assert.strictEqual((await w(U, rd([e1, e2, {id: 'r3', ts: '2026-11-18T10:00', ph: 6, by: ADMIN}]))).status, 403, 'ومايسجّلش باسم غيره');
+  assert.strictEqual((await w(SU, rd([Object.assign({}, e1, {ph: 6.1}), e2]))).status, 200, 'المشرف يعدّل');
+  assert.strictEqual((await w(U, [{op: 'delete', path: 'readings/tank_S1_2026-11-18'}])).status, 403);
+  assert.strictEqual((await w(SU, [{op: 'delete', path: 'readings/tank_S1_2026-11-18'}])).status, 200, 'المشرف يمسح قراءات');
+  // ملاحظات على السجلات
+  const note = (by, coll, tid, text) => [{op: 'set', path: 'recordNotes/n' + Math.random().toString(36).slice(2, 8), data: {id: 'x', coll, targetId: tid, text, by, createdAt: Date.now()}}];
+  assert.strictEqual((await w(U, note('usr@farm.com', 'harvest', 'lv2', 'الجودة تمام'))).status, 200, 'اللي عنده عرض يكتب ملاحظة');
+  assert.strictEqual((await w(E, note('ali@farm.com', 'harvest', 'lv2', 'x'))).status, 403, 'من غير صلاحية التاب لأ');
+  assert.strictEqual((await w(U, note('boss@farm.com', 'harvest', 'lv2', 'x'))).status, 403, 'باسم غيره لأ');
+  assert.strictEqual((await w(U, note('usr@farm.com', 'harvest', 'lv2', '   '))).status, 403, 'فاضية لأ');
+  assert.strictEqual((await w(U, note('usr@farm.com', 'settings', 'users', 'x'))).status, 403, 'على حاجة مش سجل لأ');
+  const nq = async tok => ((await call('POST', '/api/db/query', {coll: 'recordNotes'}, tok)).j.docs || []).length;
+  assert.strictEqual(await nq(U), 1, 'اللي عنده عرض يشوفها'); assert.strictEqual(await nq(E), 0, 'واللي ملوش لأ');
+  const nid = ((await call('POST', '/api/db/query', {coll: 'recordNotes'}, U)).j.docs || [])[0].id;
+  assert.strictEqual((await w(U, [{op: 'update', path: 'recordNotes/' + nid, data: {text: 'تعديل'}}])).status, 403, 'مفيش تعديل');
+  assert.strictEqual((await w(U, [{op: 'delete', path: 'recordNotes/' + nid}])).status, 403);
+  assert.strictEqual((await w(SU, [{op: 'delete', path: 'recordNotes/' + nid}])).status, 200, 'المشرف يمسح');
+  assert.strictEqual((await call('POST', '/api/db/get', {path: 'roles/sup@farm.com'}, SU)).status, 200, 'المشرف يشوف الصلاحيات'); assert.strictEqual((await call('POST', '/api/db/get', {path: 'roles/boss@farm.com'}, U)).status, 403);
+
+  await w(A, ['lv2', 'lv3', 'lv4'].map(id => ({op: 'delete', path: 'harvest/' + id})));   // نضّف عشان الاختبارات اللي بعده
 
   // الاستعلامات + القيم الخاصة (increment / merge / update بنقط)
   await w(A, [{op: 'set', path: 'harvest/h1', data: {ts: '2026-11-10T10:00', q: 5, meta: {a: 1, b: 2}}}, {op: 'set', path: 'harvest/h2', data: {ts: '2026-11-12T10:00', q: 7}}, {op: 'set', path: 'harvest/h3', data: {ts: '2026-10-01T10:00', q: 1}}]);
@@ -158,6 +209,31 @@ fs.mkdirSync(cfg.publicDir, {recursive: true}); fs.writeFileSync(path.join(cfg.p
   const file = jobs.backupNow(app);
   const bk = JSON.parse(zlib.gunzipSync(fs.readFileSync(file)).toString('utf8'));
   assert.deepStrictEqual(bk.collections.harvest.h1.q, 8);
+
+  // سجل المواسير: كل تعديل على المخطط بيحدّث لقطة النهارده، ومحدش من التطبيق يكتب فيها
+  const pipes = require('../server/pipes.js'), day0 = pipes.dayOf(new Date());
+  const mapOf = list => [{op: 'set', path: 'settings/pipeMaps', data: {list}}];
+  await w(A, mapOf([{systemId: 'S1', totalPipes: 300, plantsPerPipe: 30, groups: [{id: 'a', crop: 'خس', pipes: 100}, {id: 'b', crop: 'ريحان', pipes: 50}]}]));
+  const snapOf = (sys, d) => (app.store.get('pipeSnaps/' + sys + '_' + d) || {}).data;
+  assert.deepStrictEqual([snapOf('S1', day0).total, snapOf('S1', day0).planted, snapOf('S1', day0).empty, snapOf('S1', day0).byCrop], [300, 150, 150, {'خس': 100, 'ريحان': 50}], 'اللقطة اتسجّلت على طول');
+  await w(A, mapOf([{systemId: 'S1', totalPipes: 300, plantsPerPipe: 30, groups: [{id: 'a', crop: 'خس', pipes: 100}]}, {systemId: 'S2', totalPipes: 0, rows: [{crop: 'طماطم', plants: 40}]}]));
+  assert.strictEqual(snapOf('S1', day0).planted, 100, 'تعديل تاني في نفس اليوم بيستبدل لقطة اليوم');
+  assert.deepStrictEqual([snapOf('S2', day0).rows, snapOf('S2', day0).plants], [1, 40], 'نظام الثمريات');
+  assert.strictEqual(pipes.snapshotNow(app), 0, 'من غير تغيير مفيش كتابة جديدة');
+  assert.strictEqual(pipes.snapshotNow(app, Date.now() + 86400000), 2, 'يوم جديد من غير تعديل بياخد لقطة بنفس الوضع');
+  assert.strictEqual((await w(A, [{op: 'set', path: 'pipeSnaps/x', data: {a: 1}}])).status, 403, 'حتى المدير ما يكتبش اللقطات من التطبيق');
+  assert.strictEqual((await call('POST', '/api/db/get', {path: 'pipeSnaps/S1_' + day0}, E)).status, 200, 'الموظف يقرا');
+
+  // تعبئة الخزانات: صلاحية المياه
+  const dimDoc = [{op: 'set', path: 'settings/tankDims', data: {list: [{systemId: 'S1', lengthCm: 200, widthCm: 150}], price: 8}}];
+  assert.strictEqual((await w(E, dimDoc)).status, 200, 'موظف المياه يحدد أبعاد الخزان');
+  assert.strictEqual((await w(E, [{op: 'set', path: 'waterFills/f1', data: {id: 'f1', systemId: 'S1', liters: 450}}])).status, 200);
+  assert.strictEqual((await w(E, [{op: 'delete', path: 'waterFills/f1'}])).status, 403, 'الحذف للمدير');
+  await call('POST', '/api/auth/create', {email: 'noW@farm.com', password: 'secret1'}, A);
+  await w(A, [{op: 'set', path: 'roles/now@farm.com', data: {role: 'employee', perms: {pests: 'edit'}}}]);
+  const NW = (await call('POST', '/api/auth/login', {email: 'now@farm.com', password: 'secret1'})).j.token;
+  assert.strictEqual((await w(NW, dimDoc)).status, 403, 'من غير صلاحية مياه لأ');
+  assert.strictEqual((await w(NW, [{op: 'set', path: 'waterFills/f2', data: {id: 'f2'}}])).status, 403);
 
   // المراقبة: /api/health بيقول لو فيه مشكلة، والمدير بيوصله إشعار مرة واحدة في اليوم
   let hl = await fetch(base + '/api/health'); assert.strictEqual(hl.status, 200); assert.deepStrictEqual((await hl.json()).issues, []);

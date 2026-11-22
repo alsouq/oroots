@@ -24,8 +24,8 @@ for(const [k, o] of map){
   if(r == null || (AR.test(r) && !AR.test(D[k]))){ broken.push(k + '  →  ' + r); continue; }   // ترجمة فيها عربي عن قصد (زي «مثال: Cairo أو القاهرة») مسموحة
   for(let i = 0; i < n; i++) if(r.indexOf('Q' + i + 'Z') < 0){ broken.push(k + '  →  ' + r + '   (قيمة رقم ' + (i + 1) + ' ضاعت)'); break; }
 }
-if(missing.length) console.log('نصوص من غير ترجمة (' + missing.length + '):\n  ' + missing.slice(0, 40).join('\n  '));
-if(broken.length) console.log('قوالب ترجمتها مش سليمة (' + broken.length + '):\n  ' + broken.slice(0, 40).join('\n  '));
+if(missing.length) console.log('نصوص من غير ترجمة (' + missing.length + '):\n  ' + missing.slice(0, 300).join('\n  '));
+if(broken.length) console.log('قوالب ترجمتها مش سليمة (' + broken.length + '):\n  ' + broken.slice(0, 300).join('\n  '));
 assert.strictEqual(missing.length, 0, 'فيه نصوص من غير ترجمة');
 assert.strictEqual(broken.length, 0, 'فيه قوالب ترجمتها مش سليمة');
 

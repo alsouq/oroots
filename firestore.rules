@@ -26,6 +26,22 @@ service cloud.firestore {
     function canEditTab(tab) {
       return isAdmin() || (hasProfile() && (legacyRole() || roleDoc().data.perms.get(tab, 'none') == 'edit'));
     }
+    // المستويات: operator (مشغّل) < user (مستخدم) < supervisor (مشرف) < admin (مدير عام). المستوى بيتخزّن في roles/<email>.level (غيابه = مستخدم)
+    function isSup() { return isAdmin() || (hasProfile() && roleDoc().data.get('level', 'user') == 'supervisor'); }
+    function canViewTab(tab) {
+      return isAdmin() || (hasProfile() && (legacyRole() || roleDoc().data.perms.get(tab, 'none') in ['view', 'edit']));
+    }
+    // سجل بيتعدّل من صاحبه بس (والمشغّل خلال 24 ساعة)، والمشرف يعدّل كله
+    function ownEditOk(r) {
+      return isSup() || (r.get('by', r.get('createdBy', '')).lower() == mail() &&
+        (roleDoc().data.get('level', 'user') != 'operator' || request.time.toMillis() - r.get('createdAt', 0) < 86400000));
+    }
+    function noteTab(coll) {
+      return {
+        'harvest':'harvest', 'nursery':'nursery', 'nurseryHandovers':'nursery', 'qualityOrders':'quality', 'qualitySorting':'quality', 'qualityComplaints':'quality',
+        'pestlog':'pests', 'sprayPlan':'spray', 'waterFills':'water', 'tankLog':'nutrients', 'sops':'tasks', 'bioReleases':'pests', 'plantGrowth':'growth', 'inventory':'inventory', 'irrigCalib':'water'
+      }.get(coll, 'none');
+    }
     function canEditSoil() {
       return isAdmin() || (hasProfile() && (legacyRole() ||
         roleDoc().data.perms.get('soil', roleDoc().data.perms.get('water', 'none')) == 'edit'));
@@ -35,7 +51,7 @@ service cloud.firestore {
     function farmColls() {
       return [
         'sops','fertilizers','targetProfiles','nutrientRecipes','pestlog',
-        'bioReleases','stickyTraps','pheromoneTraps','nursery','irrigCalib','inventory','harvest','instrumentCalibrations','nurseryPlanLog','sprayPlan','qualityOrders','qualitySorting','qualityComplaints','qualityPhotos','plantGrowth','irrigSchedules','costs','tankLog'
+        'bioReleases','stickyTraps','pheromoneTraps','nursery','irrigCalib','inventory','harvest','instrumentCalibrations','nurseryPlanLog','sprayPlan','qualityOrders','qualitySorting','qualityComplaints','qualityPhotos','plantGrowth','irrigSchedules','costs','tankLog','waterFills','pipeSnaps'
       ];
     }
     function collTab(coll) {
@@ -45,7 +61,7 @@ service cloud.firestore {
         'nursery':'nursery', 'nurseryPlanLog':'nursery',
         'irrigCalib':'water', 'instrumentCalibrations':'water', 'irrigSchedules':'water',
         'inventory':'inventory', 'costs':'inventory', 'tankLog':'nutrients', 'plantGrowth':'growth',
-        'qualityOrders':'quality', 'qualitySorting':'quality', 'qualityComplaints':'quality', 'qualityPhotos':'quality'
+        'qualityOrders':'quality', 'qualitySorting':'quality', 'qualityComplaints':'quality', 'qualityPhotos':'quality', 'waterFills':'water'
       }.get(coll, 'any');
     }
     function canWriteColl(coll) {
@@ -73,7 +89,7 @@ service cloud.firestore {
 
     // صلاحيات المدير: الموظف يقرا مستنده هو بس، والمدير يقرا ويكتب الكل
     match /roles/{email} {
-      allow read: if isAdmin() || (signedIn() && mail() == email);
+      allow read: if isAdmin() || isSup() || (signedIn() && mail() == email);
       allow write: if isAdmin();
     }
     match /settings/users {
@@ -142,7 +158,8 @@ service cloud.firestore {
       allow write: if hasProfile() && doc != 'users' && doc != 'cropNames' && (
         isAdmin() ||
         (doc == 'pipeMaps' && (canEditTab('harvest') || canEditTab('nursery'))) ||
-        (doc in ['nurseryPlans', 'nurseryTiles'] && canEditTab('nursery'))
+        (doc in ['nurseryPlans', 'nurseryTiles'] && canEditTab('nursery')) ||
+        (doc == 'tankDims' && canEditTab('water'))
       );
     }
 
@@ -154,7 +171,7 @@ service cloud.firestore {
       allow update: if hasProfile() && canWriteReading(request.resource.data.source) &&
         resource.data.source == request.resource.data.source &&
         (request.resource.data.source != 'tasks' || canWriteTasksDoc());
-      allow delete: if isAdmin();
+      allow delete: if hasProfile() && (isAdmin() || (isSup() && canWriteReading(resource.data.source)));
     }
 
     // ملاحظات تسليم الوردية: أي موظف يكتب باسمه (بحجم محدود) ويعلّم "استلمت" (ackBy بس)، والمدير يحذف
@@ -167,7 +184,7 @@ service cloud.firestore {
         request.resource.data.ackBy is list &&
         request.resource.data.ackBy.toSet().difference(resource.data.ackBy.toSet()).hasOnly([mail()]) &&
         resource.data.ackBy.toSet().difference(request.resource.data.ackBy.toSet()).size() == 0;
-      allow delete: if isAdmin();
+      allow delete: if isSup();
     }
 
     // خطة الرش: الإضافة والتعديل والمسح لصاحب صلاحية الرش أو المكافحة، والمكلّف يعلّم "اتنفّذ" بس (done / doneAt / doneBy)
@@ -179,12 +196,38 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['done', 'doneAt', 'doneBy'])));
     }
 
+    // جرد المشتل وتسليم/تسلم: بيتكتب مرة (صاحب صلاحية المشتل، باسمه)، والمستلم بس يعتمد أو يعترض (الحالة + وقت الاعتماد + السبب)، ومفيش تعديل بعد كده. الحذف للمدير.
+    match /nurseryHandovers/{id} {
+      allow read: if hasProfile();
+      allow create: if hasProfile() && canEditTab('nursery') && request.resource.data.by.lower() == mail() &&
+        !('toApprovedAt' in request.resource.data) && !('toApprovedBy' in request.resource.data) &&
+        (!('status' in request.resource.data) || (request.resource.data.status == 'pending' && 'toEmail' in request.resource.data));
+      allow update: if hasProfile() && resource.data.get('status', '') == 'pending' &&
+        resource.data.get('toEmail', '').lower() == mail() &&
+        request.resource.data.status in ['accepted', 'disputed'] && request.resource.data.toApprovedBy.lower() == mail() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'toApprovedAt', 'toApprovedBy', 'toNote']);
+      allow delete: if isAdmin();
+    }
+
+    // ملاحظات على السجلات: اللي له صلاحية «عرض» على تاب السجل يكتب ملاحظة (باسمه، مرة، من غير تعديل السجل). المشرف أو المدير بس يمسح.
+    match /recordNotes/{id} {
+      allow read: if hasProfile() && noteTab(resource.data.coll) != 'none' && canViewTab(noteTab(resource.data.coll));
+      allow create: if hasProfile() && request.resource.data.by.lower() == mail() &&
+        noteTab(request.resource.data.coll) != 'none' && canViewTab(noteTab(request.resource.data.coll)) &&
+        request.resource.data.targetId is string && request.resource.data.targetId.size() > 0 && request.resource.data.targetId.size() <= 200 &&
+        request.resource.data.text is string && request.resource.data.text.trim().size() > 0 && request.resource.data.text.size() <= 500;
+      allow update: if false;
+      allow delete: if isSup();
+    }
+
     // بيانات المزرعة: القراءة لأي موظف له ملف، والكتابة حسب صلاحية التاب، والحذف للمدير بس
-    // (الاستثناء: الصور — صاحب صلاحية الجودة أو المكافحة بيمسح منها أثناء التعديل العادي)
+    // (الاستثناء: الصور — صاحب صلاحية الجودة أو المكافحة بيمسح منها أثناء التعديل العادي). الحذف للمشرف والمدير، والتكاليف والأوردرات للمشرف، وسجل الحصاد/تعبئة الخزان/الفرز بيتعدّل من صاحبه.
     match /{coll}/{id} {
       allow read: if hasProfile() && coll in farmColls();
-      allow create, update: if hasProfile() && coll in farmColls() && coll != 'sprayPlan' && canWriteColl(coll);
-      allow delete: if hasProfile() && coll in farmColls() && (isAdmin() || (coll == 'qualityPhotos' && canWriteColl(coll)));
+      allow create, update: if hasProfile() && coll in farmColls() && coll != 'sprayPlan' && canWriteColl(coll) &&
+        (!(coll in ['costs', 'qualityOrders']) || isSup()) &&
+        (request.method == 'create' || !(coll in ['harvest', 'waterFills', 'tankLog', 'qualityComplaints', 'qualitySorting']) || ownEditOk(resource.data));
+      allow delete: if hasProfile() && coll in farmColls() && ((isSup() && canWriteColl(coll)) || (coll == 'qualityPhotos' && canWriteColl(coll)));
     }
   }
 }

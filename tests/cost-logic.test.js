@@ -70,4 +70,59 @@ assert(m.used.b1 && m.used.b2 && !m.used.b3, 'الدفعة اللي ما اتح�
 const w = L.clWasteByProduct([{date:'2026-11-05', items:[{product:'خس', received:100, sorted:90}, {product:'خس بلدي', received:100, sorted:70}]}, {date:'2026-10-01', items:[{product:'خس', received:100, sorted:0}]}],
   (p) => /خس/.test(p) ? 'Lettuce' : 'x', '2026-11-01');
 near(w.Lettuce, 0.2, 'نسبة الفاقد');
+
+// خزانات الري: الحجم من قياسين بالسنتيمتر
+let tkA = L.clTankAdded({lengthCm:200, widthCm:150, mode:'height'}, 30, 45);
+assert.deepStrictEqual(tkA, {cm:15, liters:450});                       // 15 سم × 200 × 150 = 450 لتر
+tkA = L.clTankAdded({lengthCm:200, widthCm:150, mode:'gap'}, 40, 25);   // المسافة من الحرف قلّت 15 سم = المياه زادت 15 سم
+assert.deepStrictEqual(tkA, {cm:15, liters:450});
+assert.strictEqual(L.clTankAdded({lengthCm:200, widthCm:150, mode:'gap', count:2}, 40, 25).liters, 900);   // خزانين متساويين متوصلين
+assert(L.clTankAdded({lengthCm:200, widthCm:150}, 45, 30).liters < 0, 'قياس بعد أقل من قبل = سالب (القياس غلط)');
+assert.strictEqual(L.clTankAdded({lengthCm:0, widthCm:150}, 30, 45), null);
+assert.strictEqual(L.clTankAdded({lengthCm:200, widthCm:150}, '', 45), null);
+assert.strictEqual(L.clTankAdded({lengthCm:123.4, widthCm:77.7}, 10.5, 22.25).liters, 112.7);   // التقريب لأقرب 0.1 لتر
+near(L.clWaterCost(4500, 8), 36, 'تكلفة 4.5 متر مكعب بسعر 8');
+assert.strictEqual(L.clWaterCost(450, 0), 0); assert.strictEqual(L.clWaterCost(-5, 8), 0);
+
+// لقطة المواسير
+const snA = L.clPipeSnap({totalPipes:300, groups:[{crop:'خس', pipes:80}, {crop:'خس', pipes:20}, {crop:'ريحان', pipes:100}, {crop:'x', pipes:0}]});
+assert.deepStrictEqual(snA, {total:300, planted:200, empty:100, byCrop:{'خس':100, 'ريحان':100}});
+assert.strictEqual(L.clPipeSnap({totalPipes:50, groups:[{crop:'a', pipes:80}]}).empty, 0, 'المنزرع أكتر من الإجمالي ⇒ الفاضي صفر مش سالب');
+const frA = L.clPipeSnap({totalPipes:0, rows:[{crop:'طماطم شيري', plants:40}, {crop:'طماطم شيري', plants:38}, {crop:'بيف', plants:30}]});
+assert.deepStrictEqual([frA.rows, frA.plants, frA.rowsByCrop['طماطم شيري']], [3, 108, 78]);
+const snapsA = [{date:'2026-11-01', planted:10}, {date:'2026-11-05', planted:20}, {date:'2026-11-09', planted:5}];
+assert.strictEqual(L.clSnapOn(snapsA, '2026-10-30'), null);
+assert.strictEqual(L.clSnapOn(snapsA, '2026-11-01').planted, 10);
+assert.strictEqual(L.clSnapOn(snapsA, '2026-11-07').planted, 20, 'يوم من غير لقطة = آخر لقطة قبله');
+assert.strictEqual(L.clSnapOn(snapsA, '2026-12-01').planted, 5);
+
+// DLI: اكتمال القراءات
+const HR = 3600000, rise = Date.parse('2026-11-10T06:00:00Z'), set = Date.parse('2026-11-10T17:00:00Z'), at = h => rise + h*HR;
+assert.strictEqual(L.clDayComplete([0.5, 3, 6, 9, 10.5].map(at), rise, set), true);
+assert.strictEqual(L.clDayComplete([0.5, 3, 9, 10.5].map(at), rise, set), false, 'فجوة 6 ساعات');
+assert.strictEqual(L.clDayComplete([4, 6, 8, 10.5].map(at), rise, set), false, 'أول قراءة بعد الشروق بـ 4 ساعات');
+assert.strictEqual(L.clDayComplete([0.5, 3, 6].map(at), rise, set), false, 'أقل من 4 قراءات');
+assert.strictEqual(L.clDayComplete([-2, 0.5, 3, 6, 9, 10.5, 13].map(at), rise, set), true, 'القراءات اللي برّه النهار بتتتجاهل');
+
+// DLI: النسبة والتقدير
+const D = (date, dli, complete, out) => ({date, dli, complete, out});
+let daysA = [D('2026-11-01', 10, true, 20), D('2026-11-02', 9, true, 18), D('2026-11-03', 12, true, 24), D('2026-11-04', 4, false, 20), D('2026-11-05', null, false, 16)];
+let serA = L.clDliSeries(daysA);
+assert.deepStrictEqual(serA.map(x => x.kind), ['measured', 'measured', 'measured', 'est', 'est']);
+near(serA[3].dli, 10, 'النسبة ثابتة 0.5 ⇒ التقدير 0.5 × 20');   // اليوم الناقص (قراءاته 4 بس) بيتقدّر مش بياخد المقاس
+near(serA[4].dli, 8, 'يوم من غير قراءات خالص');
+// النسبة بتتغيّر: إمبارح وزنه أكبر من اللي قبله
+daysA = [D('2026-11-01', 10, true, 20), D('2026-11-02', 6, true, 20), D('2026-11-03', null, false, 20)];     // 0.5 ثم 0.3
+let kA = L.clDliK(daysA, '2026-11-03'); near(kA.k, (0.3 + 0.5*Math.pow(0.5, 0.5))/(1 + Math.pow(0.5, 0.5)), 'متوسط مرجّح'); assert(kA.k < 0.4 && kA.k > 0.3);
+assert.strictEqual(kA.n, 2);
+// قراءة كاملة جديدة بتغيّر التقدير بتاع اليوم اللي بعده
+let kB = L.clDliK(daysA.concat([D('2026-11-03', 14, true, 20), D('2026-11-04', null, false, 20)]), '2026-11-04'); assert(kB.k > kA.k, 'يوم 3 كان 0.7 فرفع النسبة');
+// مفيش طقس ولا أيام مكتملة ⇒ بنرجع القراءات الناقصة زي ما هي
+serA = L.clDliSeries([D('2026-11-01', 3, false, null), D('2026-11-02', null, false, 15)]);
+assert.deepStrictEqual(serA.map(x => [x.date, x.kind]), [['2026-11-01', 'partial']], 'يوم 2 مفيهوش حاجة نبني عليها');
+// أول يوم من غير تاريخ قبله: بياخد النسبة من الأيام اللي بعده
+serA = L.clDliSeries([D('2026-11-01', null, false, 20), D('2026-11-02', 10, true, 20)]);
+near(serA[0].dli, 10, 'نسبة من اليوم اللي بعده'); assert.strictEqual(serA[0].kind, 'est');
+// يوم كامل ما بيتبدلش بتقدير
+serA = L.clDliSeries([D('2026-11-01', 10, true, 20), D('2026-11-02', 7, true, 20)]); assert.deepStrictEqual(serA.map(x => x.dli), [10, 7]);
 console.log('cost-logic OK');

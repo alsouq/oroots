@@ -132,6 +132,8 @@ function createServer(cfg){
   };
   // المحلّل الذكي (server/ai)
   Object.assign(api, require('./ai').routes({store, rules, send, need}));
+  // الحساسات (server/sensors.js): حالة كل حساس لكارت الإعدادات
+  Object.assign(api, require('./sensors').routes({hooks, rules, send, need}));
 
   /* الملفات: ETag (لو الملف ما اتغيّرش الموبايل ما بينزّلوش تاني) + ضغط br/gzip (الصفحة 1.5 ميجا بتبقى حوالي ربعها) */
   const packed = new Map();   // file → {tag, gz, br}
@@ -181,6 +183,8 @@ if(require.main === module){
   try{ require('./build').build(cfg.publicDir); }catch(e){ console.error('تجهيز نسخة التطبيق فشل (هيشتغل بالنسخة القديمة لو موجودة):', e.message); }
   const app = createServer(cfg);
   try{ require('./jobs').start(app); }catch(e){ console.error('المهام المجدولة (إشعارات/نسخ احتياطي) ما اشتغلتش:', e.message); }
+  try{ require('./sensors').start(app); }catch(e){ console.error('استقبال الحساسات ما اشتغلش:', e.message); }
+  try{ require('./pipes').start(app); }catch(e){ console.error('سجل المواسير ما اشتغلش:', e.message); }
   app.server.on('error', e => {
     if(e.code === 'EADDRINUSE') console.error('البورت ' + cfg.port + ' مستخدم: السيرفر شغّال بالفعل (أو برنامج تاني على نفس البورت). اقفل النسخة التانية أو غيّر port في config.json');
     else console.error(e);

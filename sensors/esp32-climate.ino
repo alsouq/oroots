@@ -1,5 +1,6 @@
 /* O'Roots — حساس مناخ الصوبة: ESP32 + SHT31 (حرارة ورطوبة) + VEML7700 (إضاءة).
-   بيقرا كل دقيقة، وبيبعت المتوسط لبوابة الحساسات (sensor-gateway.js) كل 10 دقايق.
+   بيقرا كل دقيقة، وبيبعت المتوسط لكمبيوتر المزرعة (السيرفر المحلي) على الواي فاي كل 10 دقايق.
+   الخطوات كاملة في server/README-AR.md (قسم الحساسات).
 
    التوصيل (الحساسين على نفس سلكين الـ I2C):
      ESP32 3V3  → VIN  في الحساسين      (أحمر)
@@ -20,11 +21,11 @@
 #include "Adafruit_VEML7700.h"
 
 /* ====== غيّر دول بس ====== */
-const char* WIFI_SSID = "اسم-الواي-فاي";
+const char* WIFI_SSID = "اسم-الواي-فاي";                     // شبكة 2.4 جيجا (الـ ESP32 ما بيشوفش 5G)
 const char* WIFI_PASS = "كلمة-سر-الواي-فاي";
-const char* GATEWAY   = "http://192.168.1.50:8787/ingest";   // عنوان الـ Raspberry Pi في شبكة المزرعة + :8787/ingest
-const char* API_KEY   = "نفس-SENSOR_API_KEY-اللي-على-البوابة";
-const char* DEVICE    = "lg1-climate";                       // لازم يكون مكتوب في sensors.config.json على البوابة
+const char* GATEWAY   = "http://192.168.1.50:8787/ingest";   // انسخه من التطبيق: الإعدادات ← الحساسات (عنوان كمبيوتر المزرعة)
+const char* API_KEY   = "نفس-apiKey-اللي-في-config.json";     // قسم sensors في server\config.json
+const char* DEVICE    = "lg1-climate";                       // لازم يكون مكتوب في devices في نفس القسم
 /* ========================= */
 
 const unsigned long SAMPLE_MS = 60UL * 1000UL;        // قراءة كل دقيقة

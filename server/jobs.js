@@ -2,7 +2,7 @@
    - إشعارات الموبايل: أول ما يتعمل إشعار جديد (ومراجعة كل 5 دقايق)
    - التذكيرات وملخص الصبح والقراءات الناقصة: كل ساعة (نفس سكربت GitHub Actions)
    - نسخة احتياطية يومية من الداتا كلها في فولدر backups (ولو فيه backupPassphrase بتتشفّر)
-   - المراقبة: كل ساعة بيشوف المساحة الفاضية وآخر نسخة احتياطية، ولو فيه مشكلة بيبعت إشعار للمدير (مرة في اليوم لكل مشكلة) */
+   - المراقبة: كل ساعة بيشوف المساحة الفاضية وآخر نسخة احتياطية والحساسات، ولو فيه مشكلة بيبعت إشعار للمدير (مرة في اليوم لكل مشكلة) */
 'use strict';
 const fs = require('fs'), path = require('path'), zlib = require('zlib');
 const W = require('./webpush');
@@ -52,6 +52,12 @@ function healthIssues(app, now){
     else if(ageH >= 36) out.push({code: 'backup-old', title: '⚠️ مفيش نسخة احتياطية جديدة',
       body: 'آخر نسخة احتياطية من ' + ageH + ' ساعة. اتأكد إن السيرفر شغال وإن فولدر النسخ موجود.'});
   }
+  const sil = require('./sensors').silent(app, now);
+  if(sil.length){
+    const S = app.hooks.sensors;
+    out.push({code: 'sensor-silent', key: 'sensor-silent-' + sil.slice().sort().join('-'), title: '📡 حساس واقف',
+      body: 'الحساسات دي ما بعتتش قراءات من أكتر من ' + S.cfg.silentMin + ' دقيقة: ' + sil.join(' ، ') + ' — اتأكد إنها شغّالة وإن الواي فاي واصل.'});
+  }
   return out;
 }
 function healthSummary(app, now){
@@ -63,15 +69,16 @@ function healthSummary(app, now){
 /* إشعار لكل المديرين (مرة في اليوم لكل نوع مشكلة) */
 function alertAdmins(app, issues, now){
   const {store, cfg} = app; now = now || Date.now();
-  const day = todayLocal(new Date(now)), sent = store.kvGet('alertsSent') || {}, fresh = issues.filter(i => sent[i.code] !== day);
+  const day = todayLocal(new Date(now)), sent = store.kvGet('alertsSent') || {}, K = i => i.key || i.code, fresh = issues.filter(i => sent[K(i)] !== day);
   if(!fresh.length) return 0;
   const admins = new Set(store.query('roles', [], [], 0).filter(d => d.data && d.data.role === 'admin').map(d => String(d.id).toLowerCase()));
   if(cfg.adminEmail) admins.add(String(cfg.adminEmail).toLowerCase());
   const writes = [];
-  fresh.forEach(i => { sent[i.code] = day; admins.forEach(to => {
-    const id = 'sys-' + i.code + '-' + day + '-' + to.replace(/[^a-z0-9]/g, '');
+  fresh.forEach(i => { sent[K(i)] = day; admins.forEach(to => {
+    const id = ('sys-' + K(i)).replace(/[^A-Za-z0-9-]/g, '').slice(0, 80) + '-' + day + '-' + to.replace(/[^a-z0-9]/g, '');
     writes.push({op: 'set', path: 'notifications/' + id, data: {id, to, kind: 'msg', title: i.title, body: i.body, from: 'system', fromName: "O'Roots", createdAt: now, read: false}});
   }); });
+  Object.keys(sent).forEach(k => { if(sent[k] !== day) delete sent[k]; });   // اللي فات من أيام قبل كده مالوش لازمة
   store.kvSet('alertsSent', sent);
   if(writes.length) store.commit(writes);
   return writes.length;

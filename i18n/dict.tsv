@@ -5255,3 +5255,208 @@ pH: محتاج {} بمقدار {} — احفظ معايرة ال{} فوق عشا
 فيه # حاجة اتسجّلت من غير نت وما اتحفظتش على السيرفر لأن مفيش صلاحية — راجعها وسجّلها تاني	# item(s) recorded offline were not saved on the server because you don't have permission — review and record them again	# item(s) recorded offline were not saved on the server because you don't have permission — review and record them again
 فيه # حاجة اتسجّلت من غير نت وما اتحفظتش على السيرفر لأنها اتمسحت من جهاز تاني — راجعها وسجّلها تاني	# item(s) recorded offline were not saved on the server because they were deleted from another device — review and record them again	# item(s) recorded offline were not saved on the server because they were deleted from another device — review and record them again
 (مفيش صلاحية)	(no permission)	(keine Berechtigung)
+الحساسات	Sensors	Sensors
+حساسات المناخ والمياه (ESP#) اللي بتبعت قراءاتها لكمبيوتر المزرعة على الواي فاي. هنا بتشوف كل حساس آخر مرة بعت إمتى وآخر قيمه، ولو حساس سكت بيوصلك إشعار. الإعداد في ملف config.json على كمبيوتر المزرعة، والخطوات بالتفصيل في الدليل.	Climate and water sensors (ESP#) that send their readings to the farm PC over Wi-Fi. Here you can see when each sensor last reported and its latest values; if a sensor goes silent you get a notification. Setup is in the config.json file on the farm PC, with detailed steps in the guide.	Climate and water sensors (ESP#) that send their readings to the farm PC over Wi-Fi. Here you can see when each sensor last reported and its latest values; if a sensor goes silent you get a notification. Setup is in the config.json file on the farm PC, with detailed steps in the guide.
+لسه ما بعتش	Not reported yet	Not reported yet
+دلوقتي	Just now	Just now
+من {} دقيقة	{} minutes ago	{} minutes ago
+من {} ساعة	{} hours ago	{} hours ago
+من {} يوم	{} days ago	{} days ago
+الحساسات مش شغّالة: اكتب apiKey في قسم sensors في config.json (# حرف على الأقل) وأعد تشغيل السيرفر.	Sensors are off: set apiKey in the sensors section of config.json (at least # characters) and restart the server.	Sensors are off: set apiKey in the sensors section of config.json (at least # characters) and restart the server.
+ما قدرتش أجيب حالة الحساسات من السيرفر.	Couldn't load the sensor status from the server.	Couldn't load the sensor status from the server.
+قسم sensors في config.json فيه غلطة: {}	The sensors section in config.json has an error: {}	The sensors section in config.json has an error: {}
+مفيش حساسات متسجّلة لسه. ضيف قسم sensors في config.json على كمبيوتر المزرعة وأعد تشغيل السيرفر.	No sensors registered yet. Add a sensors section to config.json on the farm PC and restart the server.	No sensors registered yet. Add a sensors section to config.json on the farm PC and restart the server.
+خزان	Tank	Tank
+مناخ — {}	Climate — {}	Climate — {}
+العنوان اللي يتكتب في كود الحساس (GATEWAY):	Address to put in the sensor code (GATEWAY):	Address to put in the sensor code (GATEWAY):
+ما لقيتش عنوان للكمبيوتر على شبكة المزرعة — اتأكد إنه متوصّل بالراوتر (واي فاي أو كابل).	Couldn't find the PC's address on the farm network — make sure it is connected to the router (Wi-Fi or cable).	Couldn't find the PC's address on the farm network — make sure it is connected to the router (Wi-Fi or cable).
+بورت الحساسات مستخدم من برنامج تاني — غيّر sensors.port في config.json وأعد تشغيل السيرفر.	The sensor port is used by another program — change sensors.port in config.json and restart the server.	The sensor port is used by another program — change sensors.port in config.json and restart the server.
+الحساس	Sensor	Sensor
+بيقيس	Measures	Measures
+القيم	Values	Values
+واقف	Offline	Offline
+آخر قراءة اترفضت: {}	Last reading was rejected: {}	Last reading was rejected: {}
+فيه جهاز بيبعت باسم مش متسجّل في config.json:	A device is sending with a name that isn't registered in config.json:	A device is sending with a name that isn't registered in config.json:
+— صحّح DEVICE في كود الحساس أو ضيف الاسم في devices.	— fix DEVICE in the sensor code or add the name under devices.	— fix DEVICE in the sensor code or add the name under devices.
+فيه جهاز بيبعت بكلمة سر غلط — اتأكد إن API_KEY في كود الحساس هو نفس apiKey في config.json.	A device is sending with a wrong key — make sure API_KEY in the sensor code matches apiKey in config.json.	A device is sending with a wrong key — make sure API_KEY in the sensor code matches apiKey in config.json.
+بيتسجّل من كل حساس قراءة كل {} دقايق، ولو حساس سكت أكتر من {} دقيقة بيوصلك إشعار.	One reading per sensor is saved every {} minutes; if a sensor is silent for more than {} minutes you get a notification.	One reading per sensor is saved every {} minutes; if a sensor is silent for more than {} minutes you get a notification.
+تحديث	Refresh	Refresh
+حساس واقف	Sensor offline	Sensor offline
+الحساسات دي ما بعتتش قراءات من أكتر من # دقيقة: {} — اتأكد إنها شغّالة وإن الواي فاي واصل.	These sensors haven't sent readings for more than # minutes: {} — check that they are powered and the Wi-Fi reaches them.	These sensors haven't sent readings for more than # minutes: {} — check that they are powered and the Wi-Fi reaches them.
+{} خارج المدى المنطقي	{} is outside the sensible range	{} is outside the sensible range
+القيمة {} ناقصة أو مش رقم	Value {} is missing or not a number	Value {} is missing or not a number
+حساس	Sensor	Sensor
+بيبعت عادي	Online	Online
+تعبئة خزان {} لتر	Tank fill {} litres	Tank fill {} litres
+بتتحسب لوحدها من تعبئة الخزان — احذفها من هناك	Calculated automatically from the tank fill — delete it there	Calculated automatically from the tank fill — delete it there
+DLI الطقس:	Weather DLI:	Weather DLI:
+منزرع	Planted	Planted
+فاضي	Empty	Empty
+متوسط الفاضي	Average empty	Average empty
+أكبر عدد فاضي	Most empty	Most empty
+أقل عدد فاضي	Fewest empty	Fewest empty
+متوسط المنزرع	Average planted	Average planted
+% منزرع	% planted	% planted
+مفيش بيانات (قبل بداية السجل)	No data (before the log began)	No data (before the log began)
+حالة المواسير في كل يوم: كام ماسورة فاضية وكام منزرعة وكام لكل صنف. اللقطات بتتسجّل أوتوماتيك كل ما مخطط المواسير يتعدّل (والأيام اللي مفيهاش تعديل علامتها ≈ يعني نفس آخر وضع).{}	Pipe status on each day: how many pipes are empty, how many are planted, and how many per variety. Snapshots are saved automatically whenever the pipe layout changes (days with no change are marked ≈, meaning the same as the last recorded state).{}	Pipe status on each day: how many pipes are empty, how many are planted, and how many per variety. Snapshots are saved automatically whenever the pipe layout changes (days with no change are marked ≈, meaning the same as the last recorded state).{}
+اعرض	Show	Show
+السجل بدأ من {} — الأيام اللي قبله مفيهاش بيانات.	The log starts on {} — there is no data for earlier days.	The log starts on {} — there is no data for earlier days.
+مفيش بيانات في الفترة دي.	No data in this period.	No data in this period.
+لسه مفيش سجل: بيبدأ يتسجّل على السيرفر المحلي أول ما المخطط يتعدّل أو بعد نص ساعة من تشغيل التحديث.	No log yet: it starts being recorded on the local server as soon as the layout changes, or half an hour after the update starts.	No log yet: it starts being recorded on the local server as soon as the layout changes, or half an hour after the update starts.
+سجل المواسير — {}	Pipe log — {}	Pipe log — {}
+تعبئة الخزان	Tank fill	Tank fill
+سجل المواسير	Pipe log	Pipe log
+المسافة من حرف الخزان لسطح المياه (سم)	Distance from the tank rim to the water surface (cm)	Distance from the tank rim to the water surface (cm)
+ارتفاع المياه من قاع الخزان (سم)	Water height from the tank bottom (cm)	Water height from the tank bottom (cm)
+سجّل ارتفاع المياه في الخزان قبل التعبئة وبعد ما تخلص (بالسنتيمتر)، والتطبيق يحسب كام لتر اتضاف ويحسب تكلفتها ويحطها في «التكاليف» لنفس النظام.	Record the water level in the tank before filling and after it finishes (in centimetres), and the app works out how many litres were added, calculates their cost and puts it under "Costs" for the same system.	Record the water level in the tank before filling and after it finishes (in centimetres), and the app works out how many litres were added, calculates their cost and puts it under "Costs" for the same system.
+أبعاد الخزان وسعر المياه{}	Tank dimensions and water price{}	Tank dimensions and water price{}
+— لازم تتحدد الأول	— must be set first	— must be set first
+طول الخزان (سم)	Tank length (cm)	Tank length (cm)
+عرض الخزان (سم)	Tank width (cm)	Tank width (cm)
+عدد الخزانات المتساوية المتوصلة	Number of equal connected tanks	Number of equal connected tanks
+إزاي بتقيس؟	How do you measure?	How do you measure?
+ارتفاع المياه من القاع	Water height from the bottom	Water height from the bottom
+المسافة من حرف الخزان للمياه	Distance from the tank rim to the water	Distance from the tank rim to the water
+سعر المتر المكعب من المياه (ج.م) — لكل المزرعة	Price per cubic metre of water (EGP) — for the whole farm	Price per cubic metre of water (EGP) — for the whole farm
+الطول × العرض بتاع المساحة اللي المياه واقفة عليها (من جوه الخزان). لو سعر المياه # بيتسجّل الحجم من غير تكلفة، والسعر الجديد بيتطبّق على التعبئات الجاية بس.	Length × width of the area the water stands on (inside the tank). If the water price is # the volume is saved without a cost, and a new price applies to future fills only.	Length × width of the area the water stands on (inside the tank). If the water price is # the volume is saved without a cost, and a new price applies to future fills only.
+حفظ الأبعاد والسعر	Save dimensions and price	Save dimensions and price
+تعبئة جديدة	New fill	New fill
+قبل التعبئة — {}	Before filling — {}	Before filling — {}
+بعد التعبئة — {}	After filling — {}	After filling — {}
+حفظ التعبئة	Save fill	Save fill
+قبل (سم)	Before (cm)	Before (cm)
+بعد (سم)	After (cm)	After (cm)
+المضاف	Added	Added
+لسه مفيش تعبئات متسجّلة للنظام ده.	No fills recorded for this system yet.	No fills recorded for this system yet.
+اكتب طول وعرض الخزان	Enter the tank length and width	Enter the tank length and width
+أبعاد خزان {}: {}×{} سم{} — سعر المتر المكعب {}	Tank {} dimensions: {}×{} cm{} — price per cubic metre {}	Tank {} dimensions: {}×{} cm{} — price per cubic metre {}
+اتحفظت أبعاد الخزان	Tank dimensions saved	Tank dimensions saved
+ما اتحفظش — مفيش صلاحية أو في مشكلة اتصال	Not saved — no permission or a connection problem	Not saved — no permission or a connection problem
+المسافة بعد التعبئة لازم تكون أقل من قبلها	The distance after filling must be smaller than before	The distance after filling must be smaller than before
+الارتفاع بعد التعبئة لازم يكون أكبر من قبله	The height after filling must be greater than before	The height after filling must be greater than before
+زاد في الخزان	Rise in the tank	Rise in the tank
+سم	cm	cm
+المياه المضافة	Water added	Water added
+راجع القياسين: لازم المياه تكون زادت	Check both readings: the water level must have risen	Check both readings: the water level must have risen
+الحجم {} كبير جدًا. تحفظ برضه؟	The volume {} is very large. Save anyway?	The volume {} is very large. Save anyway?
+تعبئة خزان {}: {} لتر{}	Tank fill {}: {} litres{}	Tank fill {}: {} litres{}
+— {} ج.م	— {} EGP	— {} EGP
+اتسجّلت التعبئة: {}	Fill recorded: {}	Fill recorded: {}
+التعبئة ما اتحفظتش — مفيش صلاحية أو في مشكلة اتصال	The fill was not saved — no permission or a connection problem	The fill was not saved — no permission or a connection problem
+تحذف التعبئة دي؟ (التكلفة هتتشال من التكاليف كمان)	Delete this fill? (Its cost will be removed from Costs too)	Delete this fill? (Its cost will be removed from Costs too)
+تعبئة خزان الري	Irrigation tank fill	Irrigation tank fill
+{}، فالـ DLI اتقدّر = DLI الطقس برّه × نسبة الصوبة ({}%، متوسط مرجّح لـ {} يوم قراءاته مكتملة، وإمبارح وزنه الأكبر). النسبة بتتعدّل لوحدها مع كل يوم جديد.	{}, so the DLI was estimated = outdoor weather DLI × greenhouse ratio ({}%, a weighted average of {} days with complete readings, yesterday weighted most). The ratio adjusts itself with every new day.	{}, so the DLI was estimated = outdoor weather DLI × greenhouse ratio ({}%, a weighted average of {} days with complete readings, yesterday weighted most). The ratio adjusts itself with every new day.
+DLI (تقدير)	DLI (estimate)	DLI (estimate)
+DLI الطقس برّه	Outdoor weather DLI	Outdoor weather DLI
+نسبة الصوبة	Greenhouse ratio	Greenhouse ratio
+مفيش قراءات كفاية في اليوم ده	There aren't enough readings on this day	There aren't enough readings on this day
+قراءات اليوم ده مش بتغطي النهار كله	This day's readings don't cover the whole daylight	This day's readings don't cover the whole daylight
+(وحدد موقع الطقس من الإعدادات عشان نقدّر الـ DLI من الطقس).	(and set the weather location in Settings so we can estimate DLI from the weather).	(and set the weather location in Settings so we can estimate DLI from the weather).
+مقاس	Measured	Measured
+تقدير	Estimated	Estimated
+قراءات ناقصة	Partial readings	Partial readings
+DLI: مقاس وتقدير (آخر # يوم)	DLI: measured and estimated (last # days)	DLI: measured and estimated (last # days)
+DLI الصوبة ÷ DLI برّه (من الطقس) = نسبة الصوبة، بتتحسب من الأيام اللي قراءاتها بتغطي النهار (# قراءات على الأقل وأكبر فجوة # ساعات). اليوم اللي قراءاته ناقصة أو مفيهوش قراءات بيتقدّر = النسبة × DLI برّه، وبنعتمد على إمبارح أكتر من اللي قبله.{}	Greenhouse DLI ÷ outdoor DLI (from the weather) = greenhouse ratio, calculated from days whose readings cover the daylight (at least # readings and a largest gap of # hours). A day with partial or no readings is estimated = ratio × outdoor DLI, relying on yesterday more than earlier days.{}	Greenhouse DLI ÷ outdoor DLI (from the weather) = greenhouse ratio, calculated from days whose readings cover the daylight (at least # readings and a largest gap of # hours). A day with partial or no readings is estimated = ratio × outdoor DLI, relying on yesterday more than earlier days.{}
+DLI الصوبة (مقاس)	Greenhouse DLI (measured)	Greenhouse DLI (measured)
+DLI برّه	Outdoor DLI	Outdoor DLI
+DLI المعتمد	DLI used	DLI used
+حدد موقع الطقس من الإعدادات عشان التقدير يشتغل.	Set the weather location in Settings so the estimate works.	Set the weather location in Settings so the estimate works.
+تعبئة خزان ري	Irrigation tank fill	Irrigation tank fill
+أبعاد الخزان وسعر المياه	Tank dimensions and water price	Tank dimensions and water price
+مناخ الصوبة وقت الحصاد	Greenhouse climate at harvest time	Greenhouse climate at harvest time
+مفيش قراءة مناخ قريبة من وقت الحصاد (أقل من # ساعات) للصوبة دي.	No climate reading close to the harvest time (within # hours) for this greenhouse.	No climate reading close to the harvest time (within # hours) for this greenhouse.
+الحرارة {}°C	Temperature {}°C	Temperature {}°C
+الرطوبة {}%	Humidity {}%	Humidity {}%
+الإضاءة {} lux	Light {} lux	Light {} lux
+حرارة آخر # ساعة من {} لـ {}°C	Temperature over the last # hours from {} to {}°C	Temperature over the last # hours from {} to {}°C
+متوسط الرطوبة {}%	Average humidity {}%	Average humidity {}%
+DLI اليوم {} mol/m²{}	Today's DLI {} mol/m²{}	Today's DLI {} mol/m²{}
+(تقدير)	(estimate)	(estimate)
+من قراءة {}	From the reading at {}	From the reading at {}
+(قبل/بعد الحصاد بـ {} دقيقة)	({} minutes before/after the harvest)	({} minutes before/after the harvest)
+— محسوبة دلوقتي لأن السجل ده اتسجّل قبل ما التطبيق يحفظ المناخ	— calculated now because this record was saved before the app stored climate data	— calculated now because this record was saved before the app stored climate data
+حرارة الصوبة	Greenhouse temperature	Greenhouse temperature
+DLI اليوم	Today's DLI	Today's DLI
+جرد وتسليم	Count & handover	Count & handover
+جرد	Count	Count
+اتسلّم واستلم	Handed over and received	Handed over and received
+اعتراض	Dispute	Dispute
+مستني اعتماد المستلم	Waiting for the receiver's approval	Waiting for the receiver's approval
+بالسجل	In the log	In the log
+الفعلي	Actual	Actual
+{} — إجمالي بالسجل {} صينية، الفعلي {}	{} — total in the log {} trays, actual {}	{} — total in the log {} trays, actual {}
+تسليم	Handover	Handover
+اعتمد التسليم: {} — {}	Approved the handover: {} — {}	Approved the handover: {} — {}
+اعتمد الاستلام:	Approved the receipt:	Approved the receipt:
+اعترض:	Disputed:	Disputed:
+سبب الاعتراض: {}	Reason for the dispute: {}	Reason for the dispute: {}
+({} دفعة — أقدمها {})	({} batches — oldest {})	({} batches — oldest {})
+سبب الفرق	Reason for the difference	Reason for the difference
+الجرد بيبدأ من الصواني اللي لسه في المشتل حسب السجل. اكتب العدد الفعلي اللي عدّيته، وأي فرق لازم له سبب. تقدر تحفظ الجرد بس، أو تسلّمه لموظف تاني: بتضغط «اعتمد وسلّم» (وإنت مسجّل دخول)، وهو يفتح التطبيق ويعتمد الاستلام أو يعترض.	The count starts from the trays still in the nursery according to the log. Enter the actual number you counted; any difference needs a reason. You can save the count only, or hand it over to another employee: press "Approve and hand over" (while signed in), and they open the app and approve the receipt or dispute it.	The count starts from the trays still in the nursery according to the log. Enter the actual number you counted; any difference needs a reason. You can save the count only, or hand it over to another employee: press "Approve and hand over" (while signed in), and they open the app and approve the receipt or dispute it.
+جرد جديد	New count	New count
+سجل الجرد والتسليم	Count and handover log	Count and handover log
+تسليم مستني اعتمادك	Handover waiting for your approval	Handover waiting for your approval
+اعتمد الاستلام	Approve the receipt	Approve the receipt
+بالسجل (صواني)	In the log (trays)	In the log (trays)
+تسليم إلى (اختياري)	Hand over to (optional)	Hand over to (optional)
+— جرد من غير تسليم —	— count without handover —	— count without handover —
+حفظ الجرد	Save the count	Save the count
+اعتمد وسلّم	Approve and hand over	Approve and hand over
+مفيش صواني في المشتل حسب السجل.	There are no trays in the nursery according to the log.	There are no trays in the nursery according to the log.
+لسه مفيش جرد متسجّل.	No count recorded yet.	No count recorded yet.
+اكتب العدد الفعلي لصنف «{}»	Enter the actual number for "{}"	Enter the actual number for "{}"
+اكتب سبب الفرق في «{}»	Enter the reason for the difference in "{}"	Enter the reason for the difference in "{}"
+{} — {} صينية	{} — {} trays	{} — {} trays
+تسليم مشتل لـ {}	Nursery handover to {}	Nursery handover to {}
+جرد مشتل	Nursery count	Nursery count
+تسليم مشتل ليك	Nursery handover to you	Nursery handover to you
+{} سلّمك المشتل ({} صينية) — افتح «المشتل ← جرد وتسليم» واعتمد الاستلام	{} handed the nursery over to you ({} trays) — open "Nursery ← Count & handover" and approve the receipt	{} handed the nursery over to you ({} trays) — open "Nursery ← Count & handover" and approve the receipt
+اتسجّل التسليم وبانتظار اعتماد {}	Handover recorded, waiting for {} to approve	Handover recorded, waiting for {} to approve
+اتحفظ الجرد	Count saved	Count saved
+اختار الموظف اللي هتسلّمه	Choose the employee you are handing over to	Choose the employee you are handing over to
+بتعتمد إنك سلّمت جرد المشتل ده لـ {}؟ بعد الاعتماد مبيتعدّلش.	Do you approve that you handed this nursery count over to {}? It can't be edited after approval.	Do you approve that you handed this nursery count over to {}? It can't be edited after approval.
+اعتماد استلام المشتل من	Approved receiving the nursery from	Approved receiving the nursery from
+اعتراض على تسليم المشتل من	Disputed the nursery handover from	Disputed the nursery handover from
+اتعتمد تسليم المشتل	The nursery handover was approved	The nursery handover was approved
+اعتراض على تسليم المشتل	Dispute on the nursery handover	Dispute on the nursery handover
+اعتمد استلام المشتل	approved receiving the nursery	approved receiving the nursery
+اعترض: {}	disputed: {}	disputed: {}
+اتعتمد الاستلام	Receipt approved	Receipt approved
+اتسجّل الاعتراض	Dispute recorded	Dispute recorded
+(مش مسموح)	(not allowed)	(not allowed)
+بتعتمد إنك استلمت المشتل بالأعداد دي؟	Do you approve that you received the nursery with these numbers?	Do you approve that you received the nursery with these numbers?
+اكتب سبب الاعتراض (إيه اللي مختلف؟)	Enter the reason for the dispute (what is different?)	Enter the reason for the dispute (what is different?)
+جرد المشتل والتسليم	Nursery count and handover	Nursery count and handover
+الطلب (المطلوب بيتاخد منه)	Order (the required quantity comes from it)	Order (the required quantity comes from it)
+— من غير طلب (الفرز بيتربط بطلبات نفس التاريخ) —	— no order (sorting is linked to orders with the same date) —	— no order (sorting is linked to orders with the same date) —
+حصاد من	Harvest from	Harvest from
+حصاد إلى	Harvest to	Harvest to
+املا «المطلوب» من الطلب و«جه» من الحصاد	Fill "Required" from the order and "Received" from the harvest	Fill "Required" from the order and "Received" from the harvest
+«المطلوب» بيجي من الطلب، و«جه» من حصاد نفس الصنف في الفترة اللي فوق (كجم / قطعة / كرتونة) — وبتقدر تعدّل أي رقم. الفرز بيتربط تلقائياً بالطلبات اللي ليها نفس التاريخ.	"Required" comes from the order and "Received" from the harvest of the same variety in the period above (kg / pieces / cartons) — and you can edit any number. Sorting is linked automatically to orders with the same date.	"Required" comes from the order and "Received" from the harvest of the same variety in the period above (kg / pieces / cartons) — and you can edit any number. Sorting is linked automatically to orders with the same date.
+مقارنة بالمطلوب ({}): {}	Compared with the required ({}): {}	Compared with the required ({}): {}
+زيادة	Surplus	Surplus
+حصاد «{}» من {} لـ {}:	Harvest of "{}" from {} to {}:	Harvest of "{}" from {} to {}:
+استخدمه كـ «جه»	Use it as "Received"	Use it as "Received"
+مفيش حصاد مسجّل للصنف ده في الفترة دي.	No harvest recorded for this variety in this period.	No harvest recorded for this variety in this period.
+اختار الطلب الأول	Choose the order first	Choose the order first
+الطلب ده مفيهوش أصناف	This order has no items	This order has no items
+اتملّت من الطلب والحصاد — راجع الأرقام واكتب «بعد الفرز»	Filled from the order and the harvest — review the numbers and enter "After sorting"	Filled from the order and the harvest — review the numbers and enter "After sorting"
+جرد/تسليم مشتل	Nursery count/handover	Nursery count/handover
+التكاليف للمشرف أو المدير	Costs are for the supervisor or the manager	Costs are for the supervisor or the manager
+التكاليف بيعدّلها المشرف أو المدير بس.	Only a supervisor or a manager can edit costs.	Only a supervisor or a manager can edit costs.
+مشغّل	Operator	Operator
+مستخدم	User	User
+مشرف	Supervisor	Supervisor
+مدير عام	General manager	General manager
+حذف الحسابات للمدير العام بس	Only the general manager can delete accounts	Only the general manager can delete accounts
+الحذف متاح للمشرف أو المدير بس	Deleting is available to a supervisor or manager only	Deleting is available to a supervisor or manager only
+مدير عام — كل الصلاحيات	General manager — all permissions	General manager — all permissions
+المستوى	Level	Level
+مشغّل: يسجّل في تاباته ويعدّل سجله هو خلال # ساعة. مستخدم: يسجّل ويعدّل سجله هو. مشرف: يعدّل ويمسح السجلات ويدير التكاليف والأوردرات. مدير عام: كل حاجة + الإعدادات والموظفين. اختيار المستوى بيملا صلاحيات التابات تحت، وتقدر تعدّل أي تاب.	Operator: records in their tabs and edits their own record within # hours. User: records and edits their own records. Supervisor: edits and deletes records and manages costs and orders. General manager: everything plus Settings and employees. Choosing a level fills the tab permissions below, and you can adjust any tab.	Operator: records in their tabs and edits their own record within # hours. User: records and edits their own records. Supervisor: edits and deletes records and manages costs and orders. General manager: everything plus Settings and employees. Choosing a level fills the tab permissions below, and you can adjust any tab.
+مفيش ملاحظات لسه.	No notes yet.	No notes yet.
+اكتب ملاحظتك (بتتسجّل باسمك ومبتتعدّلش)	Write your note (it is saved under your name and can't be edited)	Write your note (it is saved under your name and can't be edited)
+إضافة ملاحظة	Add note	Add note
+تمسح الملاحظة دي؟	Delete this note?	Delete this note?
+الملاحظة ما اتسجّلتش{}	The note was not saved{}	The note was not saved{}
+(مفيش صلاحية على التاب ده)	(no permission on this tab)	(no permission on this tab)
+فتح الأوردرات وتعديلها للمشرف أو المدير — تقدر تشوفها وتسجّل الفرز بتاعها	Opening and editing orders is for a supervisor or manager — you can view them and record their sorting	Opening and editing orders is for a supervisor or manager — you can view them and record their sorting

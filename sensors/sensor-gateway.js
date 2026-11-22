@@ -1,5 +1,6 @@
 /* O'Roots — بوابة الحساسات (ESP32 وغيره) ← Firestore
-   بتشتغل على أي جهاز في شبكة المزرعة (Raspberry Pi / PC / سيرفر) وبتستقبل قراءات من الحساسات على HTTP،
+   على السيرفر المحلي مش محتاج تشغّلها لوحدها: السيرفر بيستقبل الحساسات بنفسه (server/sensors.js — شوف server/README-AR.md).
+   الملف ده للنسخة القديمة (Firebase): بتشتغل على أي جهاز في شبكة المزرعة وبتستقبل قراءات من الحساسات على HTTP،
    وبتسجّلها في نفس شكل القراءات اليدوية اللي التطبيق بيقراه (readings/<مصدر>_<نظام>_<تاريخ>)، فبتظهر في المخططات والتقارير.
 
    التشغيل:
@@ -72,19 +73,29 @@ async function ingest({db, cfg, state, body, now = Date.now()}){
   state.last[body.device] = now; state.writes++;
   return {saved: true, id: d.id, ts: entry.ts};
 }
-function createServer({db, cfg, apiKey}){
-  const state = {last: {}, day: '', writes: 0};
+/* onEvent (اختياري): بيتنده بعد كل طلب — {device, ok, result, body} أو {device, error, status} — عشان حالة كل حساس */
+function createServer({db, cfg, apiKey, onEvent}){
+  const state = {last: {}, day: '', writes: 0}, bad = new Map();   // عنوان الجهاز ← محاولات بكلمة سر غلط
+  const ev = x => { if(onEvent){ try{ onEvent(x); }catch(e){ console.error(e); } } };
   return http.createServer((req, res) => {
     const send = (code, obj) => { res.writeHead(code, {'Content-Type': 'application/json; charset=utf-8'}); res.end(JSON.stringify(obj)); };
     if(req.method === 'GET' && req.url === '/health') return send(200, {ok: true});
     if(req.method !== 'POST' || req.url !== '/ingest') return send(404, {error: 'not found'});
-    if(!apiKey || !keyOk(req.headers['x-api-key'], apiKey)) return send(401, {error: 'unauthorized'});
+    // 10 محاولات بكلمة سر غلط من نفس الجهاز ⇒ يتقفل 10 دقايق
+    const ip = String(req.socket.remoteAddress || ''), now = Date.now(), b = bad.get(ip);
+    if(b && b.n >= 10 && now - b.t < 600000) return send(429, {error: 'too many attempts'});
+    if(!apiKey || !keyOk(req.headers['x-api-key'], apiKey)){
+      const x = b && now - b.t < 600000 ? b : {n: 0, t: now}; x.n++; x.t = now; bad.set(ip, x);
+      ev({device: null, ip, error: 'unauthorized', status: 401});
+      return send(401, {error: 'unauthorized'});
+    }
+    bad.delete(ip);
     let raw = '';
     req.on('data', c => { raw += c; if(raw.length > 4096){ send(413, {error: 'too large'}); req.destroy(); } });
     req.on('end', async () => {
       let body; try{ body = JSON.parse(raw); }catch(e){ return send(400, {error: 'JSON غلط'}); }
-      try{ send(200, await ingest({db, cfg, state, body})); }
-      catch(e){ if(e && e.status) send(e.status, {error: e.message}); else { console.error(e); send(500, {error: 'server error'}); } }
+      try{ const r = await ingest({db, cfg, state, body}); ev({device: body && body.device, ok: true, result: r, body}); send(200, r); }
+      catch(e){ if(e && e.status){ ev({device: body && body.device, error: e.message, status: e.status}); send(e.status, {error: e.message}); } else { console.error(e); send(500, {error: 'server error'}); } }
     });
   });
 }

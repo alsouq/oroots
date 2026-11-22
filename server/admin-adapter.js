@@ -30,6 +30,21 @@ function adminDb(store){
   return {
     collection: c => query(c), doc: p => docRef(p),
     getAll: async (...refs) => Promise.all(refs.map(r => r.get())),
+    /* معاملة: لو مستند اتقرا واتغيّر قبل الحفظ (كتابة من التطبيق في نفس اللحظة) بتتعاد (لحد 5 مرات) */
+    async runTransaction(fn){
+      for(let i = 0; i < 5; i++){
+        const reads = [], writes = [];
+        const tx = {
+          get: async ref => { const d = store.get(ref.path); reads.push({path: ref.path, ver: d ? d.ver : 0}); return snapOf(d, ref); },
+          set(ref, data, o){ writes.push({op: 'set', path: ref.path, data, merge: !!(o && o.merge)}); return tx; },
+          update(ref, data){ writes.push({op: 'update', path: ref.path, data}); return tx; },
+          delete(ref){ writes.push({op: 'delete', path: ref.path}); return tx; }
+        };
+        const r = await fn(tx);
+        try{ if(writes.length) store.commit(writes, reads); return r; }catch(e){ if(e.code !== 'aborted') throw e; }
+      }
+      throw Object.assign(new Error('transaction failed after retries'), {code: 'aborted'});
+    },
     batch(){ const w = []; return {set(r, d, o){ w.push({op: 'set', path: r.path, data: d, merge: !!(o && o.merge)}); return this; }, update(r, d){ w.push({op: 'update', path: r.path, data: d}); return this; }, delete(r){ w.push({op: 'delete', path: r.path}); return this; }, commit: async () => { if(w.length) store.commit(w); }}; }
   };
 }
