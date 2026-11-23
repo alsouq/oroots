@@ -57,6 +57,8 @@ const del = p => ({delete: name(p)});
   ok(await commit(ALI, [del('waterFills/f1')]), 403, 'fills deleted by admin only');
   ok(await commit(ALI, [set('settings/tankDims', {list: [], price: 8})]), 200, 'water editor sets tank dimensions');
   ok(await commit(SAM, [set('settings/tankDims', {list: [], price: 1})]), 403, 'non-water user can not set dimensions');
+  ok(await commit(ADMIN, [set('settings/cooling', {list: []})]), 200, 'admin sets the cooling simulator config');
+  ok(await commit(ALI, [set('settings/cooling', {list: []})]), 403, 'non-admin can not set the cooling simulator config');
   ok(await commit(ADMIN, [set('pipeSnaps/S1_2026-11-20', {systemId: 'S1'})]), 403, 'pipe snapshots are written by the server only');
   // جرد المشتل وتسليم/تسلم
   const NUR = 'nur@farm.com';

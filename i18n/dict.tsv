@@ -5460,3 +5460,104 @@ DLI اليوم	Today's DLI	Today's DLI
 الملاحظة ما اتسجّلتش{}	The note was not saved{}	The note was not saved{}
 (مفيش صلاحية على التاب ده)	(no permission on this tab)	(no permission on this tab)
 فتح الأوردرات وتعديلها للمشرف أو المدير — تقدر تشوفها وتسجّل الفرز بتاعها	Opening and editing orders is for a supervisor or manager — you can view them and record their sorting	Opening and editing orders is for a supervisor or manager — you can view them and record their sorting
+محاكي التبريد	Cooling simulator	Cooling simulator
+محاكي تبريد الصوبة	Greenhouse cooling simulator	Greenhouse cooling simulator
+مجسم ثلاثي الأبعاد لتوزيع المراوح وخلايا التبريد في صوبتك، مع محاكاة يوم كامل: الحرارة جوه وبرّه وتشغيل وفصل المراحل. التصميم والأبعاد وحرارات التشغيل بيظبطها المدير العام من الإعدادات. ده تقدير للتخطيط ومش بيتحكم في أي مروحة فعلًا.	A 3D model of the fan and cooling-pad layout in your greenhouse, with a full-day simulation: inside and outside temperature and stage on/off switching. The general manager sets the design, dimensions and switching temperatures in Settings. This is a planning estimate and does not control any fan.	A 3D model of the fan and cooling-pad layout in your greenhouse, with a full-day simulation: inside and outside temperature and stage on/off switching. The general manager sets the design, dimensions and switching temperatures in Settings. This is a planning estimate and does not control any fan.
+للمدير العام بس. اختار الصوبة وظبط لها تصميم التبريد (مراوح وخلايا تبريد) والأبعاد وعدد الأسبان والمراوح وحرارات التشغيل والفصل. الباقيين بيشوفوا المحاكي في تاب «محاكي التبريد» من غير ما يقدروا يغيّروا حاجة.	General manager only. Pick the greenhouse and set its cooling design (fans and pads), dimensions, number of spans and fans, and switch-on/off temperatures. Everyone else sees the simulator in the “Cooling simulator” tab and cannot change anything.	General manager only. Pick the greenhouse and set its cooling design (fans and pads), dimensions, number of spans and fans, and switch-on/off temperatures. Everyone else sees the simulator in the “Cooling simulator” tab and cannot change anything.
+تهوية نفقية	Tunnel ventilation	Tunnel ventilation
+كروت في وش الصوبة ومراوح في ضهرها. الأبسط والأرخص في الصيانة.	Pads on the front wall and fans at the back. The simplest and cheapest to maintain.	Pads on the front wall and fans at the back. The simplest and cheapest to maintain.
+تهوية عرضية	Cross ventilation	Cross ventilation
+كروت على حيطة طويلة ومراوح على الحيطة اللي قدامها.	Pads on one long wall and fans on the opposite wall.	Pads on one long wall and fans on the opposite wall.
+كروت على الجنبين ومراوح في الطرف	Pads on both sides and fans at the end	Pads on both sides and fans at the end
+الهواء بيدخل من الحيطتين وبيتشفط من الطرف، ومساحة كروت أكبر.	Air enters through both walls and is pulled out at the end, with a larger pad area.	Air enters through both walls and is pulled out at the end, with a larger pad area.
+نفقية + مراوح تقليب (HAF)	Tunnel + circulation fans (HAF)	Tunnel + circulation fans (HAF)
+نفس النفقية ومعاها مراوح صغيرة تحت القمة بتقلل فرق الحرارة على الطول.	Same tunnel plus small fans under the ridge that reduce the temperature difference along the length.	Same tunnel plus small fans under the ridge that reduce the temperature difference along the length.
+نفقية على # مراحل	Tunnel with # stages	Tunnel with # stages
+المراوح بتشتغل على # مراحل، فبتوفّر كهربا في الجو المعتدل.	Fans run in # stages, saving electricity in mild weather.	Fans run in # stages, saving electricity in mild weather.
+سقف مفتوح + كروت + مراوح	Open roof + pads + fans	Open roof + pads + fans
+تهوية طبيعية من السقف الأول، ولما تسخن بتشتغل الكروت والمراوح.	Natural ventilation through the roof first; when it gets hot the pads and fans start.	Natural ventilation through the roof first; when it gets hot the pads and fans start.
+جنب بعض	Side by side	Side by side
+# تحت و# فوق	# below and # above	# below and # above
+ضيف صوبة الأول (من الأنظمة)، وبعدين ظبط لها المحاكي هنا.	Add a greenhouse first (from Systems), then set up its simulator here.	Add a greenhouse first (from Systems), then set up its simulator here.
+تصميم التبريد	Cooling design	Cooling design
+ترتيب المراوح في السبان	Fan arrangement in each span	Fan arrangement in each span
+المرحلة بتشتغل لما حرارة جوه الصوبة توصل لرقم «تشغيل»، وبتفصل لما تنزل لرقم «فصل». الفرق بينهم بيمنع التشغيل والفصل المتكرر.	A stage turns on when the greenhouse inside temperature reaches the “on” value and turns off when it drops to the “off” value. The gap between them prevents rapid on/off cycling.	A stage turns on when the greenhouse inside temperature reaches the “on” value and turns off when it drops to the “off” value. The gap between them prevents rapid on/off cycling.
+الصوبة دي لسه ما اتظبطش لها محاكي. املا البيانات واحفظ.	This greenhouse has no simulator set up yet. Fill in the data and save.	This greenhouse has no simulator set up yet. Fill in the data and save.
+طول الصوبة (م)	Greenhouse length (m)	Greenhouse length (m)
+عرض السبان الواحد (م)	Width of one span (m)	Width of one span (m)
+عدد الأسبان	Number of spans	Number of spans
+ارتفاع الحيطة (م)	Wall height (m)	Wall height (m)
+ارتفاع القمة (م)	Ridge height (m)	Ridge height (m)
+مراوح في السبان الواحد	Fans per span	Fans per span
+قدرة المروحة الواحدة (م³/ساعة)	Capacity of one fan (m³/hour)	Capacity of one fan (m³/hour)
+مرحلة {}: تشغيل عند (°C)	Stage {}: switch on at (°C)	Stage {}: switch on at (°C)
+مرحلة {}: فصل عند (°C)	Stage {}: switch off at (°C)	Stage {}: switch off at (°C)
+مسح إعداد الصوبة دي	Delete this greenhouse's setup	Delete this greenhouse's setup
+راجع القيمة: {}	Check the value: {}	Check the value: {}
+ارتفاع القمة لازم يكون أكبر من ارتفاع الحيطة	Ridge height must be greater than wall height	Ridge height must be greater than wall height
+اكتب حرارات التشغيل والفصل	Enter the on and off temperatures	Enter the on and off temperatures
+مرحلة {}: حرارة الفصل لازم تكون أقل من التشغيل	Stage {}: the off temperature must be lower than the on temperature	Stage {}: the off temperature must be lower than the on temperature
+حرارة تشغيل كل مرحلة لازم تكون أعلى من اللي قبلها	Each stage must switch on at a higher temperature than the one before	Each stage must switch on at a higher temperature than the one before
+اتحفظت إعدادات المحاكي	Simulator settings saved	Simulator settings saved
+محاكي التبريد: {}	Cooling simulator: {}	Cooling simulator: {}
+تمسح إعداد المحاكي للصوبة دي؟	Delete the simulator setup for this greenhouse?	Delete the simulator setup for this greenhouse?
+المدير العام لسه ما ظبطش المحاكي للصوبة دي.	The general manager has not set up the simulator for this greenhouse yet.	The general manager has not set up the simulator for this greenhouse yet.
+مفيش صوب متسجّلة لسه.	No greenhouses registered yet.	No greenhouses registered yet.
+ظبّطه من الإعدادات	Set it up in Settings	Set it up in Settings
+بيحمّل المحاكي…	Loading the simulator…	Loading the simulator…
+آخر قراءة مناخ فعلية في الصوبة:	Latest actual climate reading in the greenhouse:	Latest actual climate reading in the greenhouse:
+(من {} دقيقة)	({} minutes ago)	({} minutes ago)
+رجّع للوضع العادي	Back to normal mode	Back to normal mode
+ابدأ المحاكاة من الحرارة دي	Start the simulation from this temperature	Start the simulation from this temperature
+المتصفح ده مش بيعرض الرسم ثلاثي الأبعاد (WebGL).	This browser cannot show 3D graphics (WebGL).	This browser cannot show 3D graphics (WebGL).
+المحاكي بيشتغل على نسخة السيرفر المحلي (كمبيوتر المزرعة) بس.	The simulator only works on the local server version (the farm computer).	The simulator only works on the local server version (the farm computer).
+مجسم	3D view	3D view
+من فوق	Top view	Top view
+من الجنب	Side view	Side view
+من جوه	Inside view	Inside view
+قرّب المراوح	Zoom to fans	Zoom to fans
+قرّب الكروت	Zoom to pads	Zoom to pads
+هواء	Air	Air
+خريطة حرارة	Heat map	Heat map
+دوران	Rotate	Rotate
+يوم كامل: الحرارة وتشغيل المراحل	Full day: temperature and stage switching	Full day: temperature and stage switching
+أبرد	Cooler	Cooler
+أسخن (خريطة حرارة أرضية الصوبة)	Hotter (heat map of the greenhouse floor)	Hotter (heat map of the greenhouse floor)
+الوقت والجو برّه	Time and outdoor weather	Time and outdoor weather
+⏸ إيقاف	⏸ Pause	⏸ Pause
+▶ تشغيل	▶ Play	▶ Play
+بطيء	Slow	Slow
+عادي	Normal	Normal
+سريع	Fast	Fast
+أقصى حرارة برّه	Max outdoor temperature	Max outdoor temperature
+أقل حرارة برّه	Min outdoor temperature	Min outdoor temperature
+رطوبة النهار	Daytime humidity	Daytime humidity
+التشغيل	Operation	Operation
+شغّل المراوح والكروت	Run fans and pads	Run fans and pads
+فصل الكل	Switch all off	Switch all off
+الأرقام دلوقتي	Numbers now	Numbers now
+محاكاة تقريبية للمقارنة والتخطيط، مش قياس حقيقي ومش بتتحكم في أي مروحة فعلًا.	An approximate simulation for comparison and planning; not a real measurement and it does not control any fan.	An approximate simulation for comparison and planning; not a real measurement and it does not control any fan.
+مرحلة #: تشغيل عند #° وفصل عند #°	Stage #: on at #° and off at #°	Stage #: on at #° and off at #°
+# م × # أسبان × # م · مراوح #/سبان	# m × # spans × # m · # fans per span	# m × # spans × # m · # fans per span
+برّه	outside	outside
+جوه	inside	inside
+كروت شغّالة	pads running	pads running
+كروت مفصولة	pads off	pads off
+حرارة جوه	Inside temperature	Inside temperature
+حرارة برّه	Outside temperature	Outside temperature
+بعد الكروت	After the pads	After the pads
+المراوح الشغّالة	Running fans	Running fans
+الهواء	Airflow	Airflow
+فرق الحرارة على الطول	Temperature rise along the length	Temperature rise along the length
+استهلاك دلوقتي	Power now	Power now
+كهربا اليوم	Electricity today	Electricity today
+مياه الكروت اليوم	Pad water today	Pad water today
+ألف م³/س	thousand m³/h	thousand m³/h
+ك.و	kW	kW
+المراوح (#) كفاية: المطلوب # بالقدرة دي	The fans (#) are enough: # needed at this capacity	The fans (#) are enough: # needed at this capacity
+تنبيه: المراوح (#) أقل من المطلوب (#) بالقدرة دي	Warning: the fans (#) are fewer than the # needed at this capacity	Warning: the fans (#) are fewer than the # needed at this capacity
+مراوح الشفط	Exhaust fans	Exhaust fans
+كروت	Pads	Pads
+مراوح تقليب	Circulation fans	Circulation fans
+فتحات السقف	Roof vents	Roof vents
+رسم حرارة اليوم ومراحل التشغيل	Chart of the day's temperature and stages	Chart of the day's temperature and stages

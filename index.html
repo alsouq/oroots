@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Mnou54IOgwuq/bwLFAgXsYG/G4wbDJRW/wnzu99zy9Y=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-atC/3iamzzG4wDN8v9p7LP1oqXMdNuMTey+Y4owhU6o=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -1034,6 +1034,38 @@
   :root[data-palette="vivid"] .stat-card,:root[data-palette="vivid"] .chart-card,:root[data-palette="vivid"] .settings-card{border-color:color-mix(in srgb,var(--brand) 22%,var(--border));}
   :root[data-palette="vivid"] .range-pill.active,:root[data-palette="vivid"] .system-pill.active{box-shadow:0 6px 16px -8px var(--brand);}
 
+
+  /* ---------- محاكي تبريد الصوبة (تاب لوحده) ---------- */
+  .cs-root{--cool:var(--water);--heat:var(--alert);--stage:#7B6BDA;--scene:var(--surface-2);--frame:var(--muted);--line:var(--border);--mono:var(--font-mono);display:flex;flex-direction:column;gap:12px;}
+  .cs-root .num{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;}
+  .cs-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:end;}
+  .cs-lname{font-size:1.02rem;} .cs-ldesc,.cs-note{color:var(--muted);font-size:.8rem;margin:0;}
+  .cs-main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:14px;align-items:start;}
+  @media(max-width:900px){.cs-main{grid-template-columns:minmax(0,1fr);}}
+  .cs-col{display:flex;flex-direction:column;gap:12px;min-width:0;}
+  .cs-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;}
+  .cs-panel h3{margin:0 0 8px;font-size:.92rem;}
+  .cs-stage{position:relative;background:var(--scene);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;aspect-ratio:16/10;min-height:280px;touch-action:none;cursor:grab;}
+  .cs-stage canvas{width:100%;height:100%;display:block;}
+  .cs-hud{position:absolute;inset:8px 8px auto 8px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;flex-wrap:wrap;}
+  .cs-chip{background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid var(--border);border-radius:8px;padding:2px 10px;font-size:.78rem;}
+  .cs-cams{position:absolute;inset:auto 8px 8px 8px;display:flex;gap:6px;flex-wrap:wrap;}
+  .cs-cams button,.cs-t{font:inherit;font-size:.76rem;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--border);border-radius:8px;padding:2px 10px;color:var(--ink);cursor:pointer;}
+  .cs-cams button:hover,.cs-t:hover{border-color:var(--water);} .cs-cams button[aria-pressed="true"],.cs-t[aria-pressed="true"]{border-color:var(--water);color:var(--water);}
+  .cs-lbl{position:absolute;transform:translate(-50%,-50%);font-size:.72rem;background:color-mix(in srgb,var(--surface) 88%,transparent);border:1px solid var(--border);border-radius:6px;padding:0 7px;pointer-events:none;white-space:nowrap;}
+  .cs-lbl.c{color:var(--water);border-color:var(--water);} .cs-lbl.h{color:var(--alert);border-color:var(--alert);}
+  .cs-row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;margin-bottom:6px;}
+  .cs-row label{font-size:.82rem;} .cs-row output{font-family:var(--font-mono);font-size:.82rem;direction:ltr;color:var(--water);}
+  .cs-row input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--water);}
+  .cs-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+  .cs-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .cs-kpi{border:1px solid var(--border);border-radius:9px;padding:5px 8px;min-width:0;}
+  .cs-kpi span{display:block;font-size:.7rem;color:var(--muted);} .cs-kpi b{font-family:var(--font-mono);font-size:.95rem;font-weight:600;direction:ltr;unicode-bidi:isolate;display:block;}
+  .cs-kpi.hot b{color:var(--alert);} .cs-kpi.cold b{color:var(--water);}
+  .cs-chart{width:100%;height:150px;display:block;}
+  .cs-legend{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);} .cs-legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#2F9E9E,#E7E1C8,#E8803A,#C23B2B);}
+  .cs-th{font-size:.82rem;margin:2px 0;}
+  #cooling-live{margin:0 0 10px;}
 </style>
 </head>
 <body>
@@ -1097,6 +1129,7 @@
     <button class="tab-btn" data-tab="inventory" style="--tab-color:var(--water)">📦 المخازن</button>
     <button class="tab-btn" data-tab="costs" style="--tab-color:var(--tank)">💰 التكاليف</button>
     <button class="tab-btn" data-tab="ai" style="--tab-color:var(--water)">✨ المحلّل الذكي</button>
+    <button class="tab-btn" data-tab="cooling" style="--tab-color:var(--water)">❄️ محاكي التبريد</button>
     <button class="tab-btn" data-tab="settings">⚙ الإعدادات</button>
   </nav>
   <div id="notif-bar" class="notif-bar hidden"></div>
@@ -1247,6 +1280,13 @@
       <div id="growth-body"></div>
     </section>
 
+    <section class="panel" id="panel-cooling">
+      <h1 class="page-title">محاكي تبريد الصوبة</h1>
+      <p class="hint help-note">مجسم ثلاثي الأبعاد لتوزيع المراوح وخلايا التبريد في صوبتك، مع محاكاة يوم كامل: الحرارة جوه وبرّه وتشغيل وفصل المراحل. التصميم والأبعاد وحرارات التشغيل بيظبطها المدير العام من الإعدادات. ده تقدير للتخطيط ومش بيتحكم في أي مروحة فعلًا.</p>
+      <div id="cooling-picker" class="system-picker"></div>
+      <div id="cooling-body"></div>
+    </section>
+
     <section class="panel" id="panel-settings">
       <h1 class="page-title">الإعدادات</h1>
 
@@ -1310,6 +1350,12 @@
         <h3>✨ المحلّل الذكي (الذكاء الاصطناعي)</h3>
         <p class="hint help-note">الافتراضي نموذج محلي على كمبيوتر المزرعة (البيانات ما بتخرجش)، وتقدر تحوّل لـ Claude أو ChatGPT أو أي مزوّد تاني من زرار في تاب المحلّل. التاب للمدير بس، وتقدر تفتحه لموظف معيّن من «حسابات الموظفين» (صلاحية «المحلّل الذكي»).</p>
         <div id="ai-set"></div>
+      </div>
+
+      <div class="settings-card" id="cooling-card" style="display:none;">
+        <h3>❄️ محاكي التبريد</h3>
+        <p class="hint help-note">للمدير العام بس. اختار الصوبة وظبط لها تصميم التبريد (مراوح وخلايا تبريد) والأبعاد وعدد الأسبان والمراوح وحرارات التشغيل والفصل. الباقيين بيشوفوا المحاكي في تاب «محاكي التبريد» من غير ما يقدروا يغيّروا حاجة.</p>
+        <div id="cooling-set"></div>
       </div>
 
       <div class="settings-card" id="sensors-card" style="display:none;">
@@ -2250,7 +2296,7 @@ function i18nLookupCore(dict, core, depth){
 }
 /*I18N-END*/
   /*I18N-DATA-BEGIN*/
-var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
+var I18N_DICT = {}; var I18N_VER = "7e647d7bc4cf";
 /*I18N-DATA-END*/
   /* ---- ترجمة الواجهة: ربط القاموس بالصفحة (الـDOM) ---- */
   var uiLang = (function(){ try{ var v = localStorage.getItem('oroots_lang'); return I18N_LANGS[v] ? v : 'ar'; }catch(e){ return 'ar'; } })();
@@ -2513,8 +2559,8 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
   var currentUser = null;
   var currentUserRole = null;
   var currentUserPermissions = {};
-  var TAB_KEYS = ['water','soil','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory','ai'];
-  var TAB_LABELS = {ai:'المحلّل الذكي', water:'بيانات المياه', soil:'بيانات التربة', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
+  var TAB_KEYS = ['water','soil','climate','tasks','spray','nutrients','pests','nursery','harvest','growth','quality','inventory','ai','cooling'];
+  var TAB_LABELS = {cooling:'محاكي التبريد', ai:'المحلّل الذكي', water:'بيانات المياه', soil:'بيانات التربة', climate:'بيانات المناخ', tasks:'المهام والإجراءات', spray:'الرش والتسميد', quality:'الجودة', nutrients:'المعادلات السمادية', pests:'المكافحة', nursery:'المشتل', harvest:'الحصاد', growth:'نمو النبات', inventory:'المخازن'};
   var appUsers = [];
   var sourceVisibility = {irrigation:true, drainage:false, tank:false};
   var climateVisibility = {ah:true, hd:false};
@@ -4053,14 +4099,14 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
   var LEVELS = [['operator', 'مشغّل'], ['user', 'مستخدم'], ['supervisor', 'مشرف'], ['admin', 'مدير عام']];
   var LEVEL_PRESETS = {
     operator: {water:'edit', soil:'edit', climate:'edit', harvest:'edit', nursery:'edit', tasks:'view'},
-    user: {water:'edit', soil:'edit', climate:'edit', tasks:'view', spray:'edit', pests:'edit', nursery:'edit', harvest:'edit', growth:'edit', quality:'edit', nutrients:'view', inventory:'view'}
+    user: {water:'edit', soil:'edit', climate:'edit', tasks:'view', spray:'edit', pests:'edit', nursery:'edit', harvest:'edit', growth:'edit', quality:'edit', nutrients:'view', inventory:'view', cooling:'view'}
   };
   var currentUserLevel = 'user';
   function levelOfUser(u){ return !u ? 'user' : (u.role==='admin' ? 'admin' : (u.level || 'user')); }
   function levelLabel(l){ var x = LEVELS.filter(function(v){ return v[0]===l; })[0]; return x ? x[1] : 'مستخدم'; }
   function presetPerms(level){
     var p = emptyPermissions(); if(level==='admin') return p;
-    TAB_KEYS.forEach(function(k){ p[k] = level==='supervisor' ? (k==='ai' ? 'view' : 'edit') : ((LEVEL_PRESETS[level] || {})[k] || 'none'); });
+    TAB_KEYS.forEach(function(k){ p[k] = level==='supervisor' ? ((k==='ai' || k==='cooling') ? 'view' : 'edit') : ((LEVEL_PRESETS[level] || {})[k] || 'none'); });
     return p;
   }
   function isSupervisor(){ return currentUserRole==='admin' || currentUserLevel==='supervisor'; }
@@ -14894,7 +14940,7 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
       db.collection('trash').doc(id).delete().then(function(){ toast('اتمسح'); }).catch(function(){ toast('تعذر المسح'); });
     }); });
   }
-  function renderSettingsPanels(){ safe(renderReadStats); safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderElecSettings); safe(renderNurseryCostSettings); safe(renderUserDictSettings); safe(renderAiSettings); safe(renderSensorsSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
+  function renderSettingsPanels(){ safe(renderCoolingSettings); safe(renderReadStats); safe(renderUsersSettings); safe(renderLeavesSettings); safe(renderCropNamesSettings); safe(renderOrderProductsSettings); safe(renderCustomersSettings); safe(renderElecSettings); safe(renderNurseryCostSettings); safe(renderUserDictSettings); safe(renderAiSettings); safe(renderSensorsSettings); safe(renderTrashPanel); safe(renderAuditPanel); }
   function renderWaterTab(){ safe(renderWaterPanel); safe(renderInstrumentCalibSection); }
   /* بيرسم التبويب المفتوح بس — باقي التبويبات بتترسم أول ما تفتحها (setupTabs) */
   /* ====================== المخططات بتصميم IIVO: خطوط بمفاتيح + جدول + محورين + مخططات مخصصة ====================== */
@@ -15625,7 +15671,7 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
   var tabDefault = (function(){ var n = document.getElementById('tabs'); return n ? Array.prototype.map.call(n.querySelectorAll('.tab-btn'), function(b){ return b.getAttribute('data-tab'); }) : []; })();
   var tabNames = (function(){ try{ var o = JSON.parse(localStorage.getItem('oroots_tabnames') || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }catch(e){ return {}; } })();
   var TAB_DEFS = {overview:['🏠','نظرة عامة'], charts:['📈','المخططات'], water:['💧','بيانات المياه'], soil:['🟫','بيانات التربة'], climate:['🌡','بيانات المناخ'], tasks:['📋','المهام والإجراءات'], spray:['🧴','الرش والتسميد'],
-    nutrients:['🧪','المعادلات السمادية'], pests:['🐛','المكافحة'], nursery:['🪴','المشتل'], harvest:['🧺','الحصاد'], growth:['🌱','نمو النبات'], quality:['✅','الجودة'], inventory:['📦','المخازن'], settings:['⚙','الإعدادات']};
+    nutrients:['🧪','المعادلات السمادية'], cooling:['❄️','محاكي التبريد'], pests:['🐛','المكافحة'], nursery:['🪴','المشتل'], harvest:['🧺','الحصاد'], growth:['🌱','نمو النبات'], quality:['✅','الجودة'], inventory:['📦','المخازن'], settings:['⚙','الإعدادات']};
   function tabDefaultName(k){ if(TAB_DEFS[k]) return TAB_DEFS[k][1]; var m = /^page:(.+)$/.exec(k || ''), pg = m ? dashPage(m[1]) : null; return pg ? pg.title : ''; }
   /* الأسماء المخصصة بتغيّر اللي بيظهر في شريط التبويبات عندك إنت بس (عنوان الصفحة نفسها بيفضل زي ما هو) */
   function tabApplyNames(){
@@ -16972,6 +17018,123 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
     });
   }
 
+  /* ---------- محاكي التبريد: الإعدادات (المدير العام بس) + التاب ---------- */
+  var coolingCfg = {list:[]};
+  var COOLING_LAYOUTS = [
+    ['tunnel', 'تهوية نفقية', 'كروت في وش الصوبة ومراوح في ضهرها. الأبسط والأرخص في الصيانة.', 1],
+    ['cross', 'تهوية عرضية', 'كروت على حيطة طويلة ومراوح على الحيطة اللي قدامها.', 2],
+    ['both', 'كروت على الجنبين ومراوح في الطرف', 'الهواء بيدخل من الحيطتين وبيتشفط من الطرف، ومساحة كروت أكبر.', 2],
+    ['haf', 'نفقية + مراوح تقليب (HAF)', 'نفس النفقية ومعاها مراوح صغيرة تحت القمة بتقلل فرق الحرارة على الطول.', 2],
+    ['staged', 'نفقية على 3 مراحل', 'المراوح بتشتغل على 3 مراحل، فبتوفّر كهربا في الجو المعتدل.', 3],
+    ['hybrid', 'سقف مفتوح + كروت + مراوح', 'تهوية طبيعية من السقف الأول، ولما تسخن بتشتغل الكروت والمراوح.', 2]];
+  var COOLING_ARR = [['row', 'جنب بعض'], ['tri', '2 تحت و1 فوق'], ['inv', '1 تحت و2 فوق']];
+  var COOLING_DEF = {layout:'tunnel', L:40, W:9.6, spans:3, he:3.2, hr:5.2, fpp:3, arr:'row', cap:40000, th:[{on:28, off:26}, {on:31, off:29}, {on:34, off:32}]};
+  var cooSetGh = null, cooGh = null, cooMounted = null, cooLive = false, cooTok = 0;
+  function coolingOf(gh){ return (coolingCfg.list || []).filter(function(x){ return x.greenhouse === gh; })[0] || null; }
+  function coolingGhNames(){ return greenhouseGroups().map(function(g){ return g.name; }).filter(function(n){ return n !== 'بدون صوبة'; }); }
+  function coolingSave(list){
+    coolingCfg = {list:list};
+    if(db) return db.doc('settings/cooling').set({list:list});
+    renderAll(); return Promise.resolve();
+  }
+  function renderCoolingSettings(force){
+    var card = $('#cooling-card'), box = $('#cooling-set'); if(!card || !box) return;
+    var on = currentUserRole === 'admin'; card.style.display = on ? '' : 'none'; if(!on) return;
+    var ghs = coolingGhNames();
+    if(!ghs.length){ box.innerHTML = '<p class="hint">ضيف صوبة الأول (من الأنظمة)، وبعدين ظبط لها المحاكي هنا.</p>'; return; }
+    if(!cooSetGh || ghs.indexOf(cooSetGh) < 0) cooSetGh = ghs[0];
+    if(force !== true && box.contains(document.activeElement) && box.getAttribute('data-gh') === cooSetGh && /^(INPUT|SELECT)$/.test(document.activeElement.tagName)) return;   // مش هنقاطعك وإنت بتكتب
+    var cur = coolingOf(cooSetGh), c = Object.assign({}, COOLING_DEF, cur || {}); if(!Array.isArray(c.th) || c.th.length < 3) c.th = COOLING_DEF.th;
+    var f = function(id, lbl, v, min, max, step){ return '<div class="field-sm"><label>'+lbl+'</label><input type="number" class="ltr" id="coo-'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+escH(v)+'"></div>'; };
+    var lay = COOLING_LAYOUTS.filter(function(x){ return x[0] === c.layout; })[0] || COOLING_LAYOUTS[0];
+    box.setAttribute('data-gh', cooSetGh);
+    box.innerHTML =
+      '<div class="system-picker" style="margin-bottom:10px;">'+ghs.map(function(g){ return '<button type="button" class="system-pill'+(g === cooSetGh ? ' active' : '')+'" data-gh="'+escH(g)+'">'+escH(g)+(coolingOf(g) ? ' ✓' : '')+'</button>'; }).join('')+'</div>'+
+      (cur ? '' : '<p class="hint">الصوبة دي لسه ما اتظبطش لها محاكي. املا البيانات واحفظ.</p>')+
+      '<div class="form-grid">'+
+        '<div class="field-sm full"><label>تصميم التبريد</label><select id="coo-layout">'+COOLING_LAYOUTS.map(function(x){ return '<option value="'+x[0]+'"'+(x[0] === c.layout ? ' selected' : '')+'>'+escH(x[1])+'</option>'; }).join('')+'</select><p class="hint" id="coo-ldesc" style="margin:4px 0 0;">'+escH(lay[2])+'</p></div>'+
+        f('L', 'طول الصوبة (م)', c.L, 10, 150, 1)+f('W', 'عرض السبان الواحد (م)', c.W, 4, 18, 0.1)+f('spans', 'عدد الأسبان', c.spans, 1, 8, 1)+
+        f('he', 'ارتفاع الحيطة (م)', c.he, 2.2, 5, 0.1)+f('hr', 'ارتفاع القمة (م)', c.hr, 3, 8, 0.1)+
+        f('fpp', 'مراوح في السبان الواحد', c.fpp, 1, 6, 1)+
+        '<div class="field-sm"><label>ترتيب المراوح في السبان</label><select id="coo-arr">'+COOLING_ARR.map(function(x){ return '<option value="'+x[0]+'"'+(x[0] === c.arr ? ' selected' : '')+'>'+x[1]+'</option>'; }).join('')+'</select></div>'+
+        f('cap', 'قدرة المروحة الواحدة (م³/ساعة)', c.cap, 10000, 100000, 500)+
+      '</div>'+
+      '<div id="coo-ths">'+[0, 1, 2].map(function(i){ return '<div class="form-grid coo-th" data-i="'+i+'" style="'+(i < lay[3] ? '' : 'display:none;')+'">'+f('on'+i, 'مرحلة '+(i + 1)+': تشغيل عند (°C)', c.th[i].on, 18, 45, 0.5)+f('off'+i, 'مرحلة '+(i + 1)+': فصل عند (°C)', c.th[i].off, 15, 44, 0.5)+'</div>'; }).join('')+'</div>'+
+      '<p class="hint">المرحلة بتشتغل لما حرارة جوه الصوبة توصل لرقم «تشغيل»، وبتفصل لما تنزل لرقم «فصل». الفرق بينهم بيمنع التشغيل والفصل المتكرر.</p>'+
+      '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="coo-save">💾 حفظ</button>'+(cur ? ' <button type="button" class="btn btn-ghost btn-sm" id="coo-del">🗑️ مسح إعداد الصوبة دي</button>' : '')+'</div>';
+    $all('#cooling-set [data-gh]').forEach(function(b){ if(b.tagName === 'BUTTON') b.addEventListener('click', function(){ cooSetGh = b.getAttribute('data-gh'); renderCoolingSettings(true); }); });
+    $('#coo-layout').addEventListener('change', function(){
+      var l = COOLING_LAYOUTS.filter(function(x){ return x[0] === $('#coo-layout').value; })[0];
+      $('#coo-ldesc').textContent = l[2];
+      $all('#coo-ths .coo-th').forEach(function(r){ r.style.display = Number(r.getAttribute('data-i')) < l[3] ? '' : 'none'; });
+    });
+    $('#coo-save').addEventListener('click', function(){
+      var g = function(id){ var v = parseFloat($('#coo-'+id).value); return isFinite(v) ? v : null; }, o = {greenhouse:cooSetGh, layout:$('#coo-layout').value, arr:$('#coo-arr').value};
+      var lim = {L:[10, 150], W:[4, 18], spans:[1, 8], he:[2.2, 5], hr:[3, 8], fpp:[1, 6], cap:[10000, 100000]}, bad = null;
+      Object.keys(lim).forEach(function(k){ var v = g(k); if(v === null || v < lim[k][0] || v > lim[k][1]) bad = bad || k; o[k] = v; });
+      if(bad){ toast('راجع القيمة: '+$('#coo-'+bad).parentNode.querySelector('label').textContent); return; }
+      if(o.hr <= o.he + 0.4){ toast('ارتفاع القمة لازم يكون أكبر من ارتفاع الحيطة'); return; }
+      o.spans = Math.round(o.spans); o.fpp = Math.round(o.fpp);
+      var ns = COOLING_LAYOUTS.filter(function(x){ return x[0] === o.layout; })[0][3], th = [], prevOn = -1;
+      for(var i = 0; i < 3; i++){
+        var on = g('on'+i), off = g('off'+i);
+        if(on === null || off === null){ toast('اكتب حرارات التشغيل والفصل'); return; }
+        if(i < ns){ if(off >= on){ toast('مرحلة '+(i + 1)+': حرارة الفصل لازم تكون أقل من التشغيل'); return; } if(on <= prevOn){ toast('حرارة تشغيل كل مرحلة لازم تكون أعلى من اللي قبلها'); return; } prevOn = on; }
+        th.push({on:on, off:off});
+      }
+      o.th = th;
+      var list = (coolingCfg.list || []).filter(function(x){ return x.greenhouse !== cooSetGh; }).concat([o]);
+      coolingSave(list).then(function(){ toast('اتحفظت إعدادات المحاكي'); logAudit(cur ? 'edit' : 'add', 'admin', 'محاكي التبريد: '+cooSetGh); renderCoolingSettings(true); });
+    });
+    var del = $('#coo-del');
+    if(del) del.addEventListener('click', function(){
+      if(!confirm('تمسح إعداد المحاكي للصوبة دي؟')) return;
+      coolingSave((coolingCfg.list || []).filter(function(x){ return x.greenhouse !== cooSetGh; })).then(function(){ toast('اتمسح'); logAudit('delete', 'admin', 'محاكي التبريد: '+cooSetGh); renderCoolingSettings(true); });
+    });
+  }
+  function coolingStop(){ cooTok++; if(cooMounted){ try{ if(window.OrootsCooling) window.OrootsCooling.unmount(); }catch(e){} cooMounted = null; } }
+  function coolingLoadLib(){
+    return new Promise(function(res, rej){
+      var go = function(){ window.OrootsCooling.load().then(res, rej); };
+      if(window.OrootsCooling) return go();
+      var s = document.createElement('script'); s.src = 'cooling-sim.js'; s.onload = go; s.onerror = function(){ rej(new Error('lib')); }; document.head.appendChild(s);
+    });
+  }
+  function coolingLive(gh){
+    var ents = flattenEntries('climate', gh), last = ents.length ? ents[ents.length - 1] : null; if(!last) return null;
+    var t = parseFloat(last.temp), age = Date.now() - new Date(last.ts).getTime(); if(!isFinite(t) || !isFinite(age) || age > 12*3600000) return null;
+    return {ti:t, rh:parseFloat(last.rh), ageMin:Math.max(0, Math.round(age/60000))};
+  }
+  function renderCoolingPanel(){
+    var pick = $('#cooling-picker'), body = $('#cooling-body'); if(!pick || !body) return;
+    var ghs = coolingGhNames();
+    if(!cooGh || ghs.indexOf(cooGh) < 0) cooGh = (ghs.filter(function(g){ return coolingOf(g); })[0]) || ghs[0] || null;
+    pick.innerHTML = ghs.length > 1 ? ghs.map(function(g){ return '<button type="button" class="system-pill'+(g === cooGh ? ' active' : '')+'" data-gh="'+escH(g)+'">'+escH(g)+'</button>'; }).join('') : '';
+    $all('#cooling-picker [data-gh]').forEach(function(b){ b.addEventListener('click', function(){ cooGh = b.getAttribute('data-gh'); cooLive = false; renderCoolingPanel(); }); });
+    var c = cooGh ? coolingOf(cooGh) : null;
+    if(!c){
+      coolingStop();
+      body.innerHTML = '<p class="empty-note">'+(cooGh ? 'المدير العام لسه ما ظبطش المحاكي للصوبة دي.' : 'مفيش صوب متسجّلة لسه.')+'</p>'+(currentUserRole === 'admin' && cooGh ? '<div class="form-actions"><button type="button" class="btn btn-primary btn-sm" id="coo-goset">⚙ ظبّطه من الإعدادات</button></div>' : '');
+      var gb = $('#coo-goset'); if(gb) gb.addEventListener('click', function(){ cooSetGh = cooGh; var t = document.querySelector('.tab-btn[data-tab="settings"]'); if(t) t.click(); setTimeout(function(){ var cc = $('#cooling-card'); if(cc) cc.scrollIntoView({block:'start'}); }, 250); });
+      return;
+    }
+    var live = coolingLive(cooGh), key = JSON.stringify(c)+'|'+(cooLive && live ? 1 : 0);
+    if(cooMounted && cooMounted.key === key && cooMounted.host && cooMounted.host.isConnected) return;
+    coolingStop();
+    body.innerHTML = '<div id="cooling-live"></div><div id="cooling-host"><p class="hint">⏳ بيحمّل المحاكي…</p></div>';
+    var lv = $('#cooling-live');
+    if(live){
+      lv.innerHTML = '<div class="view-only-banner" style="background:var(--water-soft);color:var(--water);">🌡 آخر قراءة مناخ فعلية في الصوبة: <span class="ltr">'+escH(live.ti)+'°C'+(isFinite(live.rh) ? ' · RH '+escH(live.rh)+'%' : '')+'</span> (من '+escH(live.ageMin)+' دقيقة) <button type="button" class="btn btn-ghost btn-sm" id="coo-live">'+(cooLive ? 'رجّع للوضع العادي' : 'ابدأ المحاكاة من الحرارة دي')+'</button></div>';
+      $('#coo-live').addEventListener('click', function(){ cooLive = !cooLive; renderCoolingPanel(); });
+    }
+    var host = $('#cooling-host'), tok = ++cooTok;
+    coolingLoadLib().then(function(){
+      if(tok !== cooTok || !host.isConnected) return;
+      try{ window.OrootsCooling.mount(host, c, {live: cooLive ? live : null}); cooMounted = {key:key, host:host}; }
+      catch(e){ console.error(e); host.innerHTML = '<p class="hint">المتصفح ده مش بيعرض الرسم ثلاثي الأبعاد (WebGL).</p>'; }
+    }, function(){ if(tok === cooTok) host.innerHTML = '<p class="hint">المحاكي بيشتغل على نسخة السيرفر المحلي (كمبيوتر المزرعة) بس.</p>'; });
+  }
+
   /* ---------- الإعدادات (المدير بس) ---------- */
   /* ---------- الحساسات (السيرفر المحلي بس): حالة كل حساس — للمدير ---------- */
   var sensSt = null, sensAt = 0, sensBusy = false;
@@ -17099,6 +17262,7 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
     if(panelOn('panel-inventory')) safe(renderInventoryPanel);
     if(panelOn('panel-costs')) safe(renderCostsSection);
     if(panelOn('panel-ai')) safe(renderAiPanel);
+    if(panelOn('panel-cooling')) safe(renderCoolingPanel);
     if(!panelOn('panel-overview')) safe(ovDecorate);   // زرار ⋮ / تكبير على مخططات التبويبات كمان
     safe(renderNotifBar);
     safe(updateSyncBadge);
@@ -17726,12 +17890,12 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
   function setupTabs(){
     var panelMap = {
       overview:'#panel-overview', charts:'#panel-charts', water:'#panel-water', soil:'#panel-soil', climate:'#panel-climate',
-      tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', growth:'#panel-growth', inventory:'#panel-inventory', costs:'#panel-costs', ai:'#panel-ai', settings:'#panel-settings'
+      tasks:'#panel-tasks', spray:'#panel-spray', quality:'#panel-quality', nutrients:'#panel-nutrients', pests:'#panel-pests', nursery:'#panel-nursery', harvest:'#panel-harvest', growth:'#panel-growth', inventory:'#panel-inventory', costs:'#panel-costs', cooling:'#panel-cooling', ai:'#panel-ai', settings:'#panel-settings'
     };
     var renderMap = {
       overview: function(){ renderSystemsOverview(); safe(renderOvCustom); }, charts: renderChartsPanel, water: renderWaterTab, soil: renderSoilPanel, climate: renderClimatePanel,
       tasks: renderTasksPanel, spray: renderSprayPanel, quality: renderQualityPanel, nutrients: renderNutrientsPanel, pests: renderPestsPanel, nursery: renderNurseryPanel,
-      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, costs: renderCostsSection, ai: function(){ safe(renderAiPanel); }, settings: function(){ lazyAdminSubs(); renderSettingsPanels(); }
+      harvest: renderHarvestPanel, growth: renderGrowthPanel, inventory: renderInventoryPanel, costs: renderCostsSection, cooling: function(){ safe(renderCoolingPanel); }, ai: function(){ safe(renderAiPanel); }, settings: function(){ lazyAdminSubs(); renderSettingsPanels(); }
     };
     $all('.tab-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -17740,6 +17904,7 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
         $all('.panel').forEach(function(p){ p.classList.remove('active'); });
         var panel = $(panelMap[tab] || '#panel-water');
         if(panel) panel.classList.add('active');
+        if(tab !== 'cooling') safe(coolingStop);
         if(renderMap[tab]) renderMap[tab]();
       });
     });
@@ -18631,6 +18796,7 @@ var I18N_DICT = {}; var I18N_VER = "b52e08b4f503";
       pipeSnaps = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });
       noteReads('pipeSnaps', snap); if(panelOn('panel-harvest')) safe(renderHarvestPanel);
     }, function(err){ console.error('pipeSnaps snapshot error', err); });
+    db.doc('settings/cooling').onSnapshot(function(snap){ coolingCfg = snap.exists && Array.isArray(snap.data().list) ? {list:snap.data().list} : {list:[]}; noteReads('settings/cooling', snap); if(panelOn('panel-settings')) safe(renderCoolingSettings); if(panelOn('panel-cooling')) safe(renderCoolingPanel); }, function(err){ console.error('cooling snapshot error', err); });
     db.doc('settings/tankDims').onSnapshot(function(snap){ tankDims = snap.exists ? Object.assign({list:[], price:0}, snap.data()) : {list:[], price:0}; noteReads('settings/tankDims', snap); safe(renderCostsSection); if(panelOn('panel-water')) renderWaterTab(); }, function(err){ console.error('tankDims snapshot error', err); });
     histQ('waterFills','date').limit(2000).onSnapshot(function(snap){
       waterFills = snap.docs.filter(function(d){ return d.exists; }).map(function(d){ return d.data(); });

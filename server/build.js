@@ -23,7 +23,7 @@ function transformSw(js){
   // مكتبة السيرفر المحلي لازم تتخزّن من أول مرة: من غيرها التطبيق ما يفتحش من غير نت
   const b = "var PRECACHE = ['index.html', ";
   if(js.indexOf(b) < 0) throw new Error('مش لاقي PRECACHE في sw.js');
-  return js.replace(b, b + "'local-firebase.js', ");
+  return js.replace(b, b + "'local-firebase.js', 'cooling-sim.js', 'vendor/three.min.js', ");
 }
 function build(out){
   const OUT = out || DEF_OUT;
@@ -33,6 +33,10 @@ function build(out){
   fs.writeFileSync(path.join(OUT, 'sw.js'), transformSw(fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8')));
   const copy = ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon.ico', 'favicon.png'];
   copy.forEach(f => { const p = path.join(ROOT, f); if(fs.existsSync(p)) fs.copyFileSync(p, path.join(OUT, f)); });
+  // محاكي التبريد (بيتحمّل لما حد يفتح التاب): الكود + مكتبة three.js
+  fs.copyFileSync(path.join(ROOT, 'cooling-sim.js'), path.join(OUT, 'cooling-sim.js'));
+  fs.mkdirSync(path.join(OUT, 'vendor'), {recursive: true});
+  fs.copyFileSync(path.join(ROOT, 'vendor', 'three.min.js'), path.join(OUT, 'vendor', 'three.min.js'));
   fs.mkdirSync(path.join(OUT, 'i18n'), {recursive: true});
   fs.readdirSync(path.join(ROOT, 'i18n')).filter(f => /\.json$/.test(f)).forEach(f => fs.copyFileSync(path.join(ROOT, 'i18n', f), path.join(OUT, 'i18n', f)));
   return OUT;
