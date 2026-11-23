@@ -7,5 +7,12 @@
   "backupHour": 2,
   "keepBackups": 30,
   "minFreeMB": 2048,
-  "backupPassphrase": "write-a-long-secret-sentence-here"
+  "backupPassphrase": "write-a-long-secret-sentence-here",
+  "mail": {
+    "host": "smtp.gmail.com",
+    "port": 465,
+    "user": "your-farm-account@gmail.com",
+    "pass": "xxxx xxxx xxxx xxxx",
+    "from": "O'Roots <your-farm-account@gmail.com>"
+  }
 }

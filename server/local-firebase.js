@@ -53,6 +53,43 @@
       call('POST', '/auth/password', {newPassword: a}).then(function(j){ setToken(j.token); box.remove(); rt.stop(); rt.start(); }, function(){ e.textContent = 'ما اتحفظتش — جرّب تاني'; });
     });
   }
+  /* الرابط اللي وصل على الإيميل (…/#reset=توكن): نافذة بكلمة سر جديدة */
+  function askResetLink(rt0){
+    if(document.getElementById('lf-rs')) return;
+    var box = document.createElement('div'); box.id = 'lf-rs';
+    box.setAttribute('style', 'position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px;');
+    box.innerHTML = '<form data-noconfirm="1" style="background:#fff;color:#1d2a22;border-radius:16px;padding:20px;max-width:360px;width:100%;font-family:inherit;box-shadow:0 10px 40px rgba(0,0,0,.3);">' +
+      '<h3 style="margin:0 0 8px;">🔑 كلمة سر جديدة</h3><p style="margin:0 0 12px;font-size:.9rem;color:#5b6b60;">اختار كلمة السر الجديدة لحسابك (6 حروف على الأقل).</p>' +
+      '<input type="password" id="lf-rs1" autocomplete="new-password" placeholder="كلمة السر الجديدة" style="width:100%;box-sizing:border-box;padding:10px;margin:0 0 8px;border:1px solid #ccd5cf;border-radius:10px;font-size:1rem;">' +
+      '<input type="password" id="lf-rs2" autocomplete="new-password" placeholder="أكّد كلمة السر" style="width:100%;box-sizing:border-box;padding:10px;margin:0 0 8px;border:1px solid #ccd5cf;border-radius:10px;font-size:1rem;">' +
+      '<p id="lf-rse" style="color:#c0392b;min-height:1.2em;margin:0 0 8px;font-size:.85rem;"></p>' +
+      '<button type="submit" style="width:100%;padding:11px;border:0;border-radius:10px;background:#1f8a5b;color:#fff;font-weight:700;font-size:1rem;">حفظ</button></form>';
+    document.body.appendChild(box);
+    var form = box.querySelector('form'), e = box.querySelector('#lf-rse');
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var a = box.querySelector('#lf-rs1').value, b = box.querySelector('#lf-rs2').value;
+      if(a.length < 6){ e.textContent = 'كلمة السر لازم 6 حروف على الأقل'; return; }
+      if(a !== b){ e.textContent = 'كلمتين السر مش زي بعض'; return; }
+      e.textContent = '';
+      call('POST', '/auth/reset-token', {token: rt0, password: a}).then(function(){
+        try{ history.replaceState(null, '', location.pathname + location.search); }catch(x){}
+        form.innerHTML = '<h3 style="margin:0 0 8px;">✅ اتغيّرت كلمة السر</h3><p style="margin:0 0 12px;font-size:.95rem;">ادخل دلوقتي بكلمة السر الجديدة.</p>' +
+          '<button type="button" id="lf-rsok" style="width:100%;padding:11px;border:0;border-radius:10px;background:#1f8a5b;color:#fff;font-weight:700;font-size:1rem;">تمام</button>';
+        form.querySelector('#lf-rsok').addEventListener('click', function(){ setToken(''); location.reload(); });
+      }, function(x){
+        e.textContent = x && x.code === 'auth/invalid-reset' ? 'الرابط انتهى أو اتستخدم قبل كده. اطلب رابط جديد من «نسيت كلمة المرور».' : (x && x.code === 'auth/weak-password' ? 'كلمة السر ضعيفة (6 حروف على الأقل)' : 'ما اتحفظتش. جرّب تاني.');
+      });
+    });
+  }
+  (function(){
+    var check = function(){
+      var m = /^#reset=([A-Za-z0-9_-]{20,100})$/.exec(location.hash || ''); if(!m) return;
+      var go = function(){ askResetLink(m[1]); };
+      if(document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+    };
+    check(); window.addEventListener('hashchange', check);
+  })();
   function bootAuth(){
     if(!token()){ setTimeout(function(){ setUser(null); }, 0); return; }
     call('GET', '/auth/me').then(function(j){ setUser(j.email); if(j.mustChange) askNewPassword(); }, function(e){
@@ -81,8 +118,9 @@
         if(n && !window.confirm('فيه ' + n + ' حاجة اتسجّلت من غير نت ولسه ما اتبعتتش للسيرفر. لو خرجت دلوقتي هتضيع. تخرج برضه؟')) return Promise.reject(err('cancelled', 'cancelled'));
         var p = call('POST', '/auth/logout').catch(function(){}); OFF.clearUser(); setToken(''); setUser(null); return p;
       },
-      /* مفيش إيميل على السيرفر المحلي: المدير بياخد كلمة سر مؤقتة يديها للموظف */
+      /* من شاشة الدخول (من غير تسجيل): السيرفر بيبعت رابط على الإيميل. المدير وهو داخل (من بيانات موظف): بياخد كلمة سر مؤقتة يديها للموظف */
       sendPasswordResetEmail: function(email){
+        if(!token()) return call('POST', '/auth/forgot', {email: email});
         return call('POST', '/auth/reset', {email: email}).then(function(j){
           window.alert('كلمة السر المؤقتة الجديدة:\n' + email + '\n\n' + j.tempPassword + '\n\nابعتها للموظف — أول ما يدخل بيها هيختار كلمة سر خاصة بيه.');
         });

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-atC/3iamzzG4wDN8v9p7LP1oqXMdNuMTey+Y4owhU6o=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-P7NwGm6C6y0/eHwzBhDo5BJlKyxKcTmz3DErWOaBGxs=' https://www.gstatic.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://*.web.app; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#F2F5EC">
@@ -2296,7 +2296,7 @@ function i18nLookupCore(dict, core, depth){
 }
 /*I18N-END*/
   /*I18N-DATA-BEGIN*/
-var I18N_DICT = {}; var I18N_VER = "7e647d7bc4cf";
+var I18N_DICT = {}; var I18N_VER = "5e48b6d997ba";
 /*I18N-DATA-END*/
   /* ---- ترجمة الواجهة: ربط القاموس بالصفحة (الـDOM) ---- */
   var uiLang = (function(){ try{ var v = localStorage.getItem('oroots_lang'); return I18N_LANGS[v] ? v : 'ar'; }catch(e){ return 'ar'; } })();
@@ -18152,6 +18152,7 @@ var I18N_DICT = {}; var I18N_VER = "7e647d7bc4cf";
     if(c==='auth/email-already-in-use') return 'البريد الإلكتروني ده مسجّل قبل كده';
     if(c==='permission-denied'||c==='auth/operation-not-allowed') return 'مفيش صلاحية للعملية دي';
     if(c==='auth/local-reset') return 'كلّم المدير عشان يعملك كلمة سر جديدة';
+    if(c==='auth/mail-not-configured') return 'خدمة الإيميل مش متظبطة على السيرفر، كلّم المدير عشان يعملك كلمة سر جديدة';
     return 'حصل خطأ: '+(e && (e.code||e.message) || '');
   }
   function enterApp(fbUser){

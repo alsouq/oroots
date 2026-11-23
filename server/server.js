@@ -7,6 +7,7 @@ process.removeAllListeners('warning');   // تحذير "SQLite experimental" ب�
 const {Store} = require('./store');
 const {Auth, randomPw} = require('./auth');
 const {makeRules} = require('./rules');
+const mail = require('./mail');
 
 const ROOT = __dirname;
 function loadConfig(){
@@ -89,6 +90,24 @@ function createServer(cfg){
       // مفيش إيميل على السيرفر المحلي: المدير بس بيعمل كلمة سر مؤقتة ويديها للموظف
       if(!u || !rules.isAdmin(u)) throw Object.assign(new Error('auth/local-reset'), {status: 403, code: 'auth/local-reset'});
       const pw = randomPw(); auth.setPassword(b.email, pw, true); send(res, 200, {tempPassword: pw});
+    },
+    /* «نسيت كلمة المرور»: رابط بيتبعت على الإيميل (جيميل). الرد واحد سواء الإيميل مسجّل أو لأ (عشان محدش يعرف مين عندنا حساب) */
+    'POST /api/auth/forgot': async (req, res, b) => {
+      if(!mail.configured(cfg.mail) || !/^https?:\/\//.test(String(cfg.appUrl || ''))) throw Object.assign(new Error('auth/mail-not-configured'), {status: 503, code: 'auth/mail-not-configured'});
+      const email = auth.norm(b.email);
+      if(!/^[^@\s]+@[^@\s]+$/.test(email)) throw Object.assign(new Error('auth/invalid-email'), {status: 400, code: 'auth/invalid-email'});
+      if(!auth.askLimit('e|' + email, 3) || !auth.askLimit('i|' + clientIp(req), 10)) throw Object.assign(new Error('auth/too-many-requests'), {status: 429, code: 'auth/too-many-requests'});
+      if(auth.exists(email)){
+        const link = String(cfg.appUrl).replace(/\/+$/, '') + '/#reset=' + auth.createReset(email);
+        mail.send(cfg.mail, {to: email, subject: "إعادة تعيين كلمة المرور — O'Roots", text:
+          "أهلاً،\n\nوصلنا طلب لتغيير كلمة المرور لحسابك في O'Roots.\nاضغط على الرابط ده واختار كلمة مرور جديدة (الرابط صالح لمدة ساعة ولمرة واحدة):\n\n" + link +
+          "\n\nلو إنت ما طلبتش ده، تجاهل الرسالة وكلمة المرور الحالية هتفضل زي ما هي.\n"}).catch(e => console.error('إيميل «نسيت كلمة المرور» ما اتبعتش:', e.message));
+      }
+      send(res, 200, {ok: true});
+    },
+    'POST /api/auth/reset-token': async (req, res, b) => {
+      if(!auth.askLimit('r|' + clientIp(req), 20)) throw Object.assign(new Error('auth/too-many-requests'), {status: 429, code: 'auth/too-many-requests'});
+      auth.useReset(b.token, b.password); send(res, 200, {ok: true});
     },
     'POST /api/auth/password': async (req, res, b, u) => {
       need(u);
