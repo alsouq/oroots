@@ -197,7 +197,12 @@ function createServer(cfg){
 }
 
 if(require.main === module){
-  const cfg = loadConfig();
+  /* قبل أي حاجة: لو فيه ملفات ناقصة (تحديث اتنسخ ناقص) أو config.json فيه غلطة، نقول السبب بوضوح بدل رسالة Node المبهمة */
+  try{
+    const miss = require('./doctor').missingFiles();
+    if(miss.length){ console.error('ملفات ناقصة (' + miss.length + '): ' + miss.join(' ، ') + '\nMISSING FILES - unzip the full update package over the oroots folder, or run server\\update.bat. Then run diagnose.bat.'); process.exit(3); }
+  }catch(e){ if(e && e.code === 'MODULE_NOT_FOUND'){ console.error('ملفات ناقصة: ' + e.message.split('\n')[0] + '\nMISSING FILES - unzip the full update package over the oroots folder, or run server\\update.bat.'); process.exit(3); } throw e; }
+  let cfg; try{ cfg = loadConfig(); }catch(e){ console.error(e.message + '\nCONFIG ERROR - fix server\\config.json (run diagnose.bat to see the exact line).'); process.exit(4); }
   // بيجهّز نسخة التطبيق (server/public) من index.html كل ما يبدأ — فبعد أي تحديث كفاية تعمل restart
   try{ require('./build').build(cfg.publicDir); }catch(e){ console.error('تجهيز نسخة التطبيق فشل (هيشتغل بالنسخة القديمة لو موجودة):', e.message); }
   const app = createServer(cfg);
